@@ -1,15 +1,16 @@
 import {Reducer} from "redux";
-import {CHANGE_ACTIVE_VIEW, IConfigState} from "./models";
+import {TOGGLE_SLAVE_MODE} from "./constants";
+import {IConfigState} from "./models";
 import {ConfigActions} from "./types";
 
 export const initialState: IConfigState = {
-  activeView: "Event Manager"
+  slaveModeEnabled: false
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {
   switch ((action as ConfigActions).type) {
-    case CHANGE_ACTIVE_VIEW:
-      return {...state, activeView: action.payload.activeView};
+    case TOGGLE_SLAVE_MODE:
+      return {...state, slaveModeEnabled: action.payload.slaveModeEnabled};
     default:
       return state;
   }

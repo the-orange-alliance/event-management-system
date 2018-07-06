@@ -4,15 +4,15 @@ import {ToastContainer} from "react-toastify";
 import {Dispatch} from "redux";
 import {Container, Divider, Header, Menu, MenuItemProps} from "semantic-ui-react";
 import {IApplicationState} from "../stores";
-import {updateActiveView} from "../stores/config/actions";
-import {ConfigActions, IUpdateActiveViewAction} from "../stores/config/types";
+import {changeActiveView} from "../stores/internal/actions";
+import {IChangeActiveView, InternalActions} from "../stores/internal/types";
 
 interface IProps {
-  limitedMode: boolean,
-  slaveMode: boolean,
-  navigationDisabled: boolean,
+  limitedMode?: boolean,
+  slaveMode?: boolean,
+  navigationDisabled?: boolean,
   activeItem?: string,
-  changeActiveView?: (view: string) => IUpdateActiveViewAction
+  changeActiveView?: (view: string) => IChangeActiveView
 }
 
 class AppContainer extends React.Component<IProps> {
@@ -51,15 +51,15 @@ class AppContainer extends React.Component<IProps> {
   };
 }
 
-export function mapStateToProps( {configState}: IApplicationState ) {
+export function mapStateToProps({internalState}: IApplicationState) {
   return {
-    activeItem: configState.activeView
+    activeItem: internalState.activeView
   };
 }
 
-export function mapDispatchToProps(dispatch: Dispatch<ConfigActions>) {
+export function mapDispatchToProps(dispatch: Dispatch<InternalActions>) {
   return {
-    changeActiveView: (view: string) => dispatch(updateActiveView(view))
+    changeActiveView: (view: string) => dispatch(changeActiveView(view))
   };
 }
 

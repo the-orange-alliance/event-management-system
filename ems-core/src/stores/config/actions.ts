@@ -1,10 +1,10 @@
 import {ActionCreator} from "redux";
-import {CHANGE_ACTIVE_VIEW} from "./models";
-import {IUpdateActiveViewAction} from "./types";
+import {TOGGLE_SLAVE_MODE} from "./constants";
+import {IToggleSlaveMode} from "./types";
 
-export const updateActiveView: ActionCreator<IUpdateActiveViewAction> = (activeView: string) => ({
-  type: CHANGE_ACTIVE_VIEW,
+export const enableSlaveMode: ActionCreator<IToggleSlaveMode> = (slaveModeEnabled: boolean) => ({
+  type: TOGGLE_SLAVE_MODE,
   payload: {
-    activeView: activeView
+    slaveModeEnabled: slaveModeEnabled
   }
 });

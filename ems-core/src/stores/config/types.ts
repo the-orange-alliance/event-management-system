@@ -1,11 +1,11 @@
 import {Action} from "redux";
-import {CHANGE_ACTIVE_VIEW} from "./models";
+import {TOGGLE_SLAVE_MODE} from "./constants";
 
-export interface IUpdateActiveViewAction extends Action {
-  type: CHANGE_ACTIVE_VIEW,
+export interface IToggleSlaveMode extends Action {
+  type: TOGGLE_SLAVE_MODE,
   payload: {
-    activeView: string
+    slaveModeEnabled: boolean
   }
 }
 
-export type ConfigActions = IUpdateActiveViewAction;
+export type ConfigActions = IToggleSlaveMode;

@@ -1,0 +1,2 @@
+export const TOGGLE_SLAVE_MODE = "TOGGLE_SLAVE_MODE";
+export type TOGGLE_SLAVE_MODE = typeof TOGGLE_SLAVE_MODE;

@@ -3,3 +3,64 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.ui.container {
+  height: calc(100vh - 54px) !important;
+  overflow: hidden;
+}
+
+.ui.section.divider {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* The following media queries are essentially for HD monitors. */
+@media only screen and (min-width: 1600px) {
+  .ui.container {
+    width: 85%;
+  }
+  .ui.tiny.modal {
+    top: 25% !important;
+  }
+  .ui.small.modal {
+    top: 20% !important;
+  }
+}
+
+/* The following media queries are essentially for large monitors. */
+@media only screen and (min-width: 1200px) {
+  .ui.container {
+    width: 90%;
+  }
+  .ui.tiny.modal {
+    top: 22.5% !important;
+  }
+  .ui.small.modal {
+    top: 18.5% !important;
+  }
+}
+
+/* The following media queries are essentially for medium monitors. */
+@media only screen and (min-width: 992px) {
+  .ui.container {
+    width: 90%;
+  }
+  .ui.tiny.modal {
+    top: 15% !important;
+  }
+  .ui.small.modal {
+    top: 12.5% !important;
+  }
+}
+
+@media only screen and (max-width: 991px) and (min-width: 768px) {
+  .ui.container {
+    width: 95%;
+  }
+  .ui.tiny.modal {
+    top: 10% !important;
+  }
+  .ui.small.modal {
+    top: 7.5% !important;
+  }
+}

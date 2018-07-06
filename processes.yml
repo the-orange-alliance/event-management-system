@@ -1,0 +1,13 @@
+apps:
+  - script   : ems-core/bin/www
+    name     : 'WebServer'
+  - script   : ems-socket/bin/www
+    name     : 'SocketIO'
+#    instances: 4
+#    exec_mode: cluster
+#  - script : worker.js
+#    watch  : true
+#    env    :
+#      NODE_ENV: development
+#    env_production:
+#      NODE_ENV: production

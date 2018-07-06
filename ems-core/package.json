@@ -1,0 +1,33 @@
+{
+  "name": "ems-core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-scripts-ts": "2.16.0"
+  },
+  "scripts": {
+    "start": "concurrently --kill-others \"npm run desktop\" \"npm run react\"",
+    "desktop": "electron .",
+    "react": "react-scripts-ts start",
+    "build-electron": "tsc",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  },
+  "devDependencies": {
+    "electron": "^2.0.4",
+    "electron-debug": "^2.0.0",
+    "concurrently": "^3.5.1",
+    "@types/jest": "^23.1.4",
+    "@types/node": "^10.5.1",
+    "@types/react": "^16.4.6",
+    "@types/react-dom": "^16.0.6",
+    "typescript": "^2.9.2"
+  },
+  "proxy": "http://localhost:4200",
+  "homepage": "./"
+}

@@ -1,0 +1,48 @@
+{
+  "name": "ems",
+  "description": "Hub for all programs in the FTC EMS suite.",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "audience": "cd audience-display/ && npm start",
+    "socket": "cd ems-socket/ && node bin/www",
+    "ref": "cd ref-tablet/ && npm start",
+    "webserv": "cd ems-web/ && npm start",
+    "api": "cd ems-api/ && npm start",
+    "pit": "cd pit-display/ && npm start",
+    "ems": "concurrently --kill-others \"cd ems-core/ && npm run desktop\" \"cd ems-core/ && npm start\"",
+    "build-audience": "cd audience-display/ && npm run build && cd ../",
+    "build-ref": "cd ref-tablet/ && npm run build && cd ../",
+    "build-pit": "cd pit-display/ && npm run build && cd ../",
+    "build-core": "cd ems-core/ && npm run build && cd ../",
+    "prebuild": "gulp prebuild:prod",
+    "build": "npm run build-all",
+    "postbuild": "gulp postbuild",
+    "build-all": "npm run build-audience && npm run build-ref && npm run build-core",
+    "dist": "build"
+  },
+  "dependencies": {
+    "concurrently": "^3.6.0",
+    "npm": "^6.1.0",
+    "pm2": "^3.0.0"
+  },
+  "devDependencies": {
+    "del": "^3.0.0",
+    "electron-builder": "^20.19.2",
+    "gulp": "^3.9.1",
+    "gulp-replace": "^1.0.0",
+    "gulp-util": "^3.0.8"
+  },
+  "build": {
+    "appId": "org.theorangealliance.ems",
+    "productName": "FTC Event Management System",
+    "directories": {
+      "output": "build/dist",
+      "app": "build/ems"
+    },
+    "win": {
+      "target": "NSIS"
+    },
+    "asar": false
+  }
+}

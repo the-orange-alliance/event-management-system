@@ -12,7 +12,7 @@
     "react-toastify": "^4.1.0",
     "redux": "^4.0.0",
     "semantic-ui-offline": "^2.3.2",
-    "semantic-ui-react": "^0.81.3"
+    "semantic-ui-react": "^0.82.0"
   },
   "scripts": {
     "start": "concurrently --kill-others \"npm run desktop\" \"npm run react\"",
@@ -25,12 +25,12 @@
   },
   "devDependencies": {
     "@types/jest": "^23.1.4",
-    "@types/node": "^10.5.1",
+    "@types/node": "^10.5.2",
     "@types/react": "^16.4.6",
     "@types/react-dom": "^16.0.6",
     "@types/react-redux": "^6.0.3",
     "@types/react-toastify": "^4.0.0",
-    "concurrently": "^3.5.1",
+    "concurrently": "^3.6.0",
     "electron": "^2.0.4",
     "electron-debug": "^2.0.0",
     "typescript": "^2.9.2"

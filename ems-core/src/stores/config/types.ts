@@ -1,5 +1,6 @@
 import {Action} from "redux";
-import {TOGGLE_SLAVE_MODE} from "./constants";
+import {PostQualConfig} from "../../shared/AppTypes";
+import {SET_POST_QUAL_CONFIG, TOGGLE_SLAVE_MODE} from "./constants";
 
 export interface IToggleSlaveMode extends Action {
   type: TOGGLE_SLAVE_MODE,
@@ -8,4 +9,11 @@ export interface IToggleSlaveMode extends Action {
   }
 }
 
-export type ConfigActions = IToggleSlaveMode;
+export interface ISetPostQualConfig extends Action {
+  type: SET_POST_QUAL_CONFIG,
+  payload: {
+    postQualConfig: PostQualConfig
+  }
+}
+
+export type ConfigActions = IToggleSlaveMode | ISetPostQualConfig;

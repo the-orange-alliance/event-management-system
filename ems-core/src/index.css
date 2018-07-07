@@ -4,6 +4,18 @@ body {
   font-family: sans-serif;
 }
 
+.view {
+  height: calc(100vh - 50px - 30px);
+  width: 100%;
+}
+
+.step-view {
+  width: 100%;
+  height: calc(100% - 150px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .ui.container {
   height: calc(100vh - 54px) !important;
   overflow: hidden;
@@ -13,6 +25,7 @@ body {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+
 
 /* The following media queries are essentially for HD monitors. */
 @media only screen and (min-width: 1600px) {

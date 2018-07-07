@@ -1,3 +1,6 @@
+import {PostQualConfig} from "../../shared/AppTypes";
+
 export interface IConfigState {
-  slaveModeEnabled: boolean
+  slaveModeEnabled: boolean,
+  postQualConfig: PostQualConfig
 }

@@ -1,8 +1,10 @@
 import {combineReducers, createStore, Reducer} from "redux";
 import {IConfigState} from "./config/models";
 import configReducer from "./config/reducer";
+import {ConfigActions} from "./config/types";
 import {IInternalState} from "./internal/models";
 import internalReducer from "./internal/reducer";
+import {InternalActions} from "./internal/types";
 
 export interface IApplicationState {
   internalState: IInternalState,
@@ -13,5 +15,7 @@ export const reducers: Reducer<IApplicationState> = combineReducers<IApplication
   internalState: internalReducer,
   configState: configReducer
 });
+
+export type ApplicationActions = ConfigActions | InternalActions;
 
 export const applicationStore = createStore(reducers);

@@ -1,39 +1,48 @@
 import * as React from "react";
 import {connect} from "react-redux";
 import {ToastContainer} from "react-toastify";
-import {Dispatch} from "redux";
 import {Container, Divider, Header, Menu, MenuItemProps} from "semantic-ui-react";
+import {getTheme} from "../shared/AppTheme";
 import {IApplicationState} from "../stores";
-import {changeActiveView} from "../stores/internal/actions";
-import {IChangeActiveView, InternalActions} from "../stores/internal/types";
+import {IChangeActiveView} from "../stores/internal/types";
+import EventManagerView from "../views/event-manager/EventManagerView";
 
 interface IProps {
   limitedMode?: boolean,
   slaveMode?: boolean,
   navigationDisabled?: boolean,
-  activeItem?: string,
   changeActiveView?: (view: string) => IChangeActiveView
 }
 
-class AppContainer extends React.Component<IProps> {
+interface IState {
+  activeItem?: string
+}
+
+class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    this.state = {
+      activeItem: "Event Manager"
+    };
   }
 
   public render() {
+    const {activeItem} = this.state;
+
     return (
       <div>
-        <Menu inverted={true} widths={6}>
-          <Menu.Item name={"Event Manager"} active={this.props.activeItem === "Event Manager"} disabled={this.props.slaveMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
-          <Menu.Item name={"Match Play"} active={this.props.activeItem === "Match Play"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
-          <Menu.Item name={"Match Test"} active={this.props.activeItem === "Match Test"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
-          <Menu.Item name={"Match Review"} active={this.props.activeItem === "Match Review"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
-          <Menu.Item name={"Reports"} active={this.props.activeItem === "Reports"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
-          <Menu.Item name={"Settings"} active={this.props.activeItem === "Settings"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
+        <Menu inverted={true} widths={6} color={getTheme().primary}>
+          <Menu.Item name={"Event Manager"} active={activeItem === "Event Manager"} disabled={this.props.slaveMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
+          <Menu.Item name={"Match Play"} active={activeItem === "Match Play"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
+          <Menu.Item name={"Match Test"} active={activeItem === "Match Test"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
+          <Menu.Item name={"Match Review"} active={activeItem === "Match Review"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
+          <Menu.Item name={"Reports"} active={activeItem === "Reports"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
+          <Menu.Item name={"Settings"} active={activeItem === "Settings"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
         </Menu>
         <Container className="view-container">
-          <Header as='h1'>Active Item</Header>
+          <Header as='h1'>{activeItem}</Header>
           <Divider section={true}/>
+          {this.getViewFromActiveItem(activeItem)}
           <ToastContainer
             position="bottom-right"
             pauseOnHover={true}
@@ -46,21 +55,30 @@ class AppContainer extends React.Component<IProps> {
     );
   }
 
+  private getViewFromActiveItem(activeItem: string) {
+    switch (activeItem) {
+      case "Event Manager":
+        return <EventManagerView/>;
+      default:
+        return <span>View Not Found.</span>;
+    }
+  }
+
   private changeActiveView = (event: React.SyntheticEvent, data: MenuItemProps) => {
-    this.props.changeActiveView(data.name);
+    this.setState({activeItem: data.name});
   };
 }
 
 export function mapStateToProps({internalState}: IApplicationState) {
   return {
-    activeItem: internalState.activeView
+    navigationDisabled: internalState.navigationDisabled
   };
 }
 
-export function mapDispatchToProps(dispatch: Dispatch<InternalActions>) {
-  return {
-    changeActiveView: (view: string) => dispatch(changeActiveView(view))
-  };
-}
+// export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+//   return {
+//     changeActiveView: (view: string) => dispatch(changeActiveView(view))
+//   };
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);
+export default connect(mapStateToProps)(AppContainer);

@@ -19,10 +19,9 @@ class AppTheme {
   }
 
 }
-
 export const FTC_THEME = new AppTheme("orange", "orange");
 export const FGC_THEME = new AppTheme("green", "blue");
 
 export function getTheme(): AppTheme {
-  return FTC_THEME;
+  return FGC_THEME;
 }

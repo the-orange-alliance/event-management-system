@@ -27,9 +27,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 
     return (
       <div className="view">
-        <div className="step-view">
-          {this.getViewFromActiveStep(activeStep)}
-        </div>
+        {this.getViewFromActiveStep(activeStep)}
         <Step.Group ordered={true} size="tiny" unstackable={true} fluid={true} widths={this.getStepLength()}>
           <Step completed={this.isCompleted(1)} disabled={this.isDisabled(1)} active={this.isActiveStep(1)} onClick={this.setActiveStep.bind(this, 1)}>
             <Step.Content>
@@ -117,7 +115,7 @@ class EventManagerView extends React.Component<IProps, IState> {
       case 1:
         return <EventSelection/>;
       default:
-        return <span>View not found.</span>
+        return <span>View not found.</span>;
     }
   }
 

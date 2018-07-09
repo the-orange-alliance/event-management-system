@@ -1,13 +1,13 @@
 import * as React from "react";
 import {connect} from "react-redux";
 import {Step} from "semantic-ui-react";
-import {PostQualConfig} from "../../shared/AppTypes";
 import {IApplicationState} from "../../stores";
 import EventSelection from "./containers/EventSelection";
+import EventConfiguration from "../../shared/models/EventConfiguration";
 
 interface IProps {
   completedStep?: number,
-  postQualConfig?: PostQualConfig
+  eventConfig?: EventConfiguration
 }
 
 interface IState {
@@ -54,7 +54,7 @@ class EventManagerView extends React.Component<IProps, IState> {
           </Step>
 
           {
-            this.props.postQualConfig === "elims" &&
+            this.props.eventConfig.postQualConfig === "elims" &&
             <Step completed={this.isCompleted(5)} disabled={this.isDisabled(5)} active={this.isActiveStep(5)} onClick={this.setActiveStep.bind(this, 5)}>
               <Step.Content>
                 <Step.Description>Alliance Selections</Step.Description>
@@ -64,7 +64,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 
           <Step completed={this.isCompleted(6)} disabled={this.isDisabled(6)} active={this.isActiveStep(6)} onClick={this.setActiveStep.bind(this, 6)}>
             <Step.Content>
-              <Step.Description>{this.props.postQualConfig === "elims" ? "Eliminations" : "Finals"} Setup</Step.Description>
+              <Step.Description>{this.props.eventConfig.postQualConfig === "elims" ? "Eliminations" : "Finals"} Setup</Step.Description>
             </Step.Content>
           </Step>
 
@@ -107,7 +107,7 @@ class EventManagerView extends React.Component<IProps, IState> {
   }
 
   private getStepLength(): 7 | 8 {
-    return this.props.postQualConfig === "elims" ? 8 : 7;
+    return this.props.eventConfig.postQualConfig === "elims" ? 8 : 7;
   }
 
   private getViewFromActiveStep(activeStep: number): JSX.Element {
@@ -124,7 +124,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
     completedStep: internalState.completedStep,
-    postQualConfig: configState.postQualConfig
+    eventConfig: configState.eventConfiguration
   };
 }
 

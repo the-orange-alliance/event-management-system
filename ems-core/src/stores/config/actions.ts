@@ -1,7 +1,8 @@
 import {ActionCreator} from "redux";
-import {PostQualConfig} from "../../shared/AppTypes";
-import {SET_POST_QUAL_CONFIG, TOGGLE_SLAVE_MODE} from "./constants";
-import {ISetPostQualConfig, IToggleSlaveMode} from "./types";
+import {SET_EVENT, SET_EVENT_CONFIG, TOGGLE_SLAVE_MODE} from "./constants";
+import {ISetEvent, ISetEventConfiguration, IToggleSlaveMode} from "./types";
+import EventConfiguration from "../../shared/models/EventConfiguration";
+import Event from "../../shared/models/Event";
 
 export const enableSlaveMode: ActionCreator<IToggleSlaveMode> = (slaveModeEnabled: boolean) => ({
   type: TOGGLE_SLAVE_MODE,
@@ -10,9 +11,16 @@ export const enableSlaveMode: ActionCreator<IToggleSlaveMode> = (slaveModeEnable
   }
 });
 
-export const setPostQualConfig: ActionCreator<ISetPostQualConfig> = (postQualConfig: PostQualConfig) => ({
-  type: SET_POST_QUAL_CONFIG,
+export const setEventConfiguration: ActionCreator<ISetEventConfiguration> = (eventConfiguration: EventConfiguration) => ({
+  type: SET_EVENT_CONFIG,
   payload: {
-    postQualConfig: postQualConfig
+    eventConfiguration: eventConfiguration
+  }
+});
+
+export const setEvent: ActionCreator<ISetEvent> = (event: Event) => ({
+  type: SET_EVENT,
+  payload: {
+    event: event
   }
 });

@@ -4,7 +4,8 @@ import {Card, Popup, SemanticCOLORS} from "semantic-ui-react";
 interface IProps {
   title: string,
   color: SemanticCOLORS,
-  imgUrl: string
+  imgUrl: string,
+  onClick?: () => void
 }
 
 class EventConfigurationCard extends React.Component<IProps> {
@@ -14,7 +15,7 @@ class EventConfigurationCard extends React.Component<IProps> {
 
   public render() {
     return (
-      <Card className="square-card" fluid={true} color={this.props.color}>
+      <Card className="square-card" fluid={true} color={this.props.color} onClick={this.props.onClick}>
           <Popup trigger={
             <Card.Content className="square-card-content">
               <img className="config-card-image" src={this.props.imgUrl} />

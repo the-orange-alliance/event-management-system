@@ -1,6 +1,8 @@
-import {PostQualConfig} from "../../shared/AppTypes";
+import EventConfiguration from "../../shared/models/EventConfiguration";
+import Event from "../../shared/models/Event";
 
 export interface IConfigState {
   slaveModeEnabled: boolean,
-  postQualConfig: PostQualConfig
+  eventConfiguration: EventConfiguration,
+  event: Event
 }

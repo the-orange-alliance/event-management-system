@@ -1,4 +1,5 @@
 import Region from "../models/Region";
+import {DropdownItemProps} from "semantic-ui-react";
 
 const regionsList = [
   {
@@ -332,3 +333,13 @@ const regionsList = [
 ];
 
 export const Regions: Region[] = regionsList.map(region => new Region(region.region_key, region.description));
+export const RegionItems: DropdownItemProps[] = Regions.map(region => ({text: region.regionDesc, value: region.regionKey}));
+
+export function getFromRegionKey(regionKey: string): Region {
+  for (const region of Regions) {
+    if (region.regionKey === regionKey) {
+      return region;
+    }
+  }
+  return null;
+}

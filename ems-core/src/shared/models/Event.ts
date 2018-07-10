@@ -11,9 +11,9 @@ export default class Event {
   private _city: string;
   private _stateProv: string;
   private _country: string;
-  private _website: string;
   private _fieldCount: number;
-  private _divisionName: string;
+  private _website?: string;
+  private _divisionName?: string;
 
   get season(): Season {
     return this._season;
@@ -36,7 +36,17 @@ export default class Event {
   }
 
   set eventCode(value: string) {
-    this._eventCode = value;
+    if (value.length < 5) { // TODO - Magic number!
+      this._eventCode = value;
+    }
+  }
+
+  get eventKey(): string {
+    if (typeof this.season === "undefined" || typeof this.region === "undefined") {
+      return "";
+    } else {
+      return this.season.seasonKey + "-" + this.region.regionKey + "-" + (this.eventCode || "");
+    }
   }
 
   get eventName(): string {

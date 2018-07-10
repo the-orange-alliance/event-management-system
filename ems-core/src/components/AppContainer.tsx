@@ -31,13 +31,14 @@ class AppContainer extends React.Component<IProps, IState> {
 
     return (
       <div>
-        <Menu inverted={true} widths={6} color={getTheme().primary}>
+        <Menu inverted={true} widths={7} color={getTheme().primary}>
           <Menu.Item name={"Event Manager"} active={activeItem === "Event Manager"} disabled={this.props.slaveMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
           <Menu.Item name={"Match Play"} active={activeItem === "Match Play"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
           <Menu.Item name={"Match Test"} active={activeItem === "Match Test"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
           <Menu.Item name={"Match Review"} active={activeItem === "Match Review"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
           <Menu.Item name={"Reports"} active={activeItem === "Reports"} disabled={this.props.limitedMode || this.props.navigationDisabled} onClick={this.changeActiveView}/>
           <Menu.Item name={"Settings"} active={activeItem === "Settings"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
+          <Menu.Item name={"About"} active={activeItem === "About"} disabled={this.props.navigationDisabled} onClick={this.changeActiveView}/>
         </Menu>
         <Container className="view-container">
           <Header as='h1'>{activeItem}</Header>

@@ -3,11 +3,21 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from "react-redux";
 import App from './App';
 import './index.css';
-import {applicationStore} from "./stores";
+import {reducers} from "./stores";
+import {createStore} from "redux";
 
-ReactDOM.render(
-  <Provider store={applicationStore}>
-    <App />
-  </Provider>,
-  document.getElementById('root') as HTMLElement
-);
+const {ipcRenderer} = (window as any).require("electron");
+
+console.log("Preloading application state...");
+
+ipcRenderer.on("preload-finished", () => {
+  const applicationStore = createStore(reducers);
+  console.log("Preloaded application state.");
+  ReactDOM.render(
+    <Provider store={applicationStore}>
+      <App />
+    </Provider>,
+    document.getElementById('root') as HTMLElement
+  );
+});
+ipcRenderer.send("preload");

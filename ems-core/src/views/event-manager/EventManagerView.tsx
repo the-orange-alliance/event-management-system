@@ -76,7 +76,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 
           <Step completed={this.isCompleted(8)} disabled={this.isDisabled(8)} active={this.isActiveStep(8)} onClick={this.setActiveStep.bind(this, 8)}>
             <Step.Content>
-              <Step.Description>Upload and Archive</Step.Description>
+              <Step.Description>Data Upload</Step.Description>
             </Step.Content>
           </Step>
         </Step.Group>

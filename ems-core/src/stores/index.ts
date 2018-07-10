@@ -1,4 +1,4 @@
-import {combineReducers, createStore, Reducer} from "redux";
+import {combineReducers, Reducer} from "redux";
 import {IConfigState} from "./config/models";
 import configReducer from "./config/reducer";
 import {ConfigActions} from "./config/types";
@@ -17,5 +17,3 @@ export const reducers: Reducer<IApplicationState> = combineReducers<IApplication
 });
 
 export type ApplicationActions = ConfigActions | InternalActions;
-
-export const applicationStore = createStore(reducers);

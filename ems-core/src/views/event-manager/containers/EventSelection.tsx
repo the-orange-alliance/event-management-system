@@ -53,6 +53,7 @@ class EventSelection extends React.Component<IProps, IState> {
     this.setEventStateProv = this.setEventStateProv.bind(this);
     this.setEventCountry = this.setEventCountry.bind(this);
     this.setEventFields = this.setEventFields.bind(this);
+    this.createEvent = this.createEvent.bind(this);
 
     this.state = {
       eventValidator: new EventCreationValidator(this.props.eventConfig, this.props.event)
@@ -215,6 +216,10 @@ class EventSelection extends React.Component<IProps, IState> {
     return this.state.eventValidator.isValid;
   }
 
+  private createEvent(): void {
+    console.log("HOLY SHIT YOU MADE IT THIS FAR");
+  }
+
   private renderConfigCards(): JSX.Element {
     return (
       <Grid columns={16}>
@@ -282,7 +287,7 @@ class EventSelection extends React.Component<IProps, IState> {
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={RegionItems} value={selectedRegion} onChange={this.setEventRegion} error={typeof event.region === "undefined"} label="Region"/></Grid.Column>
             {
               this.props.eventConfig.requiresTOA &&
-               <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} error={!eventValidator.isValidEventKey()} label="Event"/></Grid.Column> // TODO - Implement automatic event importing
+               <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={[]} error={!eventValidator.isValidEventKey()} label="Event"/></Grid.Column> // TODO - Implement automatic event importing
             }
             {
               !this.props.eventConfig.requiresTOA &&
@@ -318,13 +323,13 @@ class EventSelection extends React.Component<IProps, IState> {
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={PostQualItems} value={this.props.eventConfig.postQualConfig} onChange={this.setPostQualConfig} label="Post-Qualification Type"/></Grid.Column>
             {
               this.props.eventConfig.postQualConfig === "elims" &&
-              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={AllianceCaptainItems} value={this.props.eventConfig.allianceCaptains} onChange={this.setAllianceCaptainConfig} label="Alliance Captains"/></Grid.Column>
+              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={AllianceCaptainItems} value={this.props.eventConfig.allianceCaptains} onChange={this.setAllianceCaptainConfig} error={!eventValidator.isValidAllianceCaptains()} label="Alliance Captains"/></Grid.Column>
             }
             {
               this.props.eventConfig.postQualConfig === "finals" &&
               <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.rankingCutoff} onChange={this.setRankingCutoff} label={<ExplanationIcon title={"Ranking Cutoff"} content={"This configuration may be changed after the event is created in the 'Settings' tab."}/>}/></Grid.Column>
             }
-            <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.postQualTeamsPerAlliance} onChange={this.setPostQualTeamsPerAlliance}  error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>
+            <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.postQualTeamsPerAlliance} onChange={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>
           </Grid.Row>
         </Grid>
       </Form>
@@ -335,7 +340,7 @@ class EventSelection extends React.Component<IProps, IState> {
     return (
       <Grid>
         <Grid.Row columns={16}>
-          <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={!this.canCreateEvent()}>Create Event</Button></Grid.Column>
+          <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={!this.canCreateEvent()} onClick={this.createEvent}>Create Event</Button></Grid.Column>
         </Grid.Row>
       </Grid>
     );

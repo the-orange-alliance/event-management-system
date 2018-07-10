@@ -3,6 +3,10 @@ const url = require("url");
 const path = require("path");
 // const logger = require("./process/process-logger");
 
+window.eval = global.eval = function () {
+    throw new Error("This app does not support window.eval().")
+};
+
 require("dotenv").config({path: path.join(__dirname, ".env")});
 
 const prod = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging";
@@ -33,7 +37,7 @@ function createWindow () {
             }
             win.maximize();
             win.show();
-        }, 2000);
+        }, 200);
     });
 
     // Create the browser window.

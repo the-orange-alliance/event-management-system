@@ -72,10 +72,18 @@ class EventCreationValidator {
     return typeof tpa === "number" && this.isSafe(tpa.toString()) && tpa > 1 && tpa < 5;
   }
 
+  public isValidAllianceCaptains(): boolean {
+    const captains = this._eventConfig.allianceCaptains;
+    if (this._eventConfig.postQualConfig === "finals") {
+      return true;
+    }
+    return typeof captains === "number" && this.isSafe(captains.toString());
+  }
+
   private checkIfValid() {
     this._isValid = this.isValidEventKey() && this.isValidEventName() && this.isValidEventVenue() && this.isValidCity()
       && this.isValidStateProv() && this.isValidCountry() && this.isValidWebsite() && this.isValidFieldCount()
-      && this.isValidTPA() && this.isValidPostQualTPA();
+      && this.isValidTPA() && this.isValidPostQualTPA() && this.isValidAllianceCaptains();
   }
 
   private isSafe(str: string): boolean {

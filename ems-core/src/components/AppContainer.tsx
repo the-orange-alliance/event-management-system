@@ -6,6 +6,7 @@ import {getTheme} from "../shared/AppTheme";
 import {IApplicationState} from "../stores";
 import {IChangeActiveView} from "../stores/internal/types";
 import EventManagerView from "../views/event-manager/EventManagerView";
+import SettingsView from "../views/settings/SettingsView";
 
 interface IProps {
   limitedMode?: boolean,
@@ -22,7 +23,7 @@ class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeItem: "Event Manager"
+      activeItem: "Settings"
     };
   }
 
@@ -60,6 +61,8 @@ class AppContainer extends React.Component<IProps, IState> {
     switch (activeItem) {
       case "Event Manager":
         return <EventManagerView/>;
+      case "Settings":
+        return <SettingsView/>;
       default:
         return <span>View Not Found.</span>;
     }

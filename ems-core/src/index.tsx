@@ -8,6 +8,10 @@ import {createStore} from "redux";
 
 const {ipcRenderer} = (window as any).require("electron");
 
+(window as any).eval = global.eval = () => {
+  throw new Error("This app does not support window.eval().")
+};
+
 console.log("Preloading application state...");
 
 ipcRenderer.on("preload-finished", () => {

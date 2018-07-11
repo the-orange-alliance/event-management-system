@@ -1,0 +1,26 @@
+{
+  "name": "ems-web",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -- --watch",
+    "start": "node build/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.4",
+    "@types/express": "^4.16.0",
+    "@types/node": "^10.5.2",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "@types/cookie-parser": "^1.4.1",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3"
+  }
+}

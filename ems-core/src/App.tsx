@@ -1,11 +1,12 @@
 import * as React from 'react';
-import {connect} from "react-redux";
-import {Dispatch} from "redux";
 import './App.css';
 import AppContainer from "./components/AppContainer";
 import {ApplicationActions, IApplicationState} from "./stores";
-import * as Actions from "./stores/internal/actions";
 import {IDisableNavigation} from "./stores/internal/types";
+import {Dispatch} from "redux";
+import {connect} from "react-redux";
+import ProcessManager from "./shared/managers/ProcessManager";
+import Process from "./shared/models/Process";
 
 interface IProps {
   toggleNavigation?: (navigationDisabled: boolean) => IDisableNavigation
@@ -17,9 +18,9 @@ class App extends React.Component<IProps> {
   }
 
   public componentDidMount() {
-    setTimeout(() => {
-      this.props.toggleNavigation(false);
-    },1000);
+    ProcessManager.startEcosystem().then((procList: Process[]) => {
+      console.log("Here!");
+    });
   }
 
   public render() {
@@ -35,8 +36,7 @@ export function mapStateToProps(state: IApplicationState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    toggleNavigation: (disable: boolean) => dispatch(Actions.disableNavigation(disable))
-  }
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

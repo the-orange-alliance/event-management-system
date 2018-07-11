@@ -1,7 +1,7 @@
 const {app, ipcMain, BrowserWindow} = require("electron");
 const url = require("url");
 const path = require("path");
-// const logger = require("./process/process-logger");
+const logger = require("./main/logger");
 
 require("dotenv").config({path: path.join(__dirname, ".env")});
 
@@ -33,14 +33,14 @@ function createWindow () {
             }
             win.maximize();
             win.show();
-        }, 3000);
+        }, 500);
     });
 
     // Create the browser window.
     win = new BrowserWindow({width: 1280, height: 720, minHeight: 600, minWidth: 900, show: false});
     if (prod) {
-        // logger.transports[0].level = "debug";
-        // logger.info("------------STARTING EMS IN PRODUCTION MODE------------");
+        logger.transports[0].level = "debug";
+        logger.info("------------STARTING EMS IN PRODUCTION MODE------------");
         win.loadURL(url.format({
             pathname: path.join(__dirname, "./build/index.html"),
             protocol: "file:",
@@ -48,14 +48,14 @@ function createWindow () {
             slashes: true
         }));
     } else {
-        // logger.transports[0].level = "debug";
-        // logger.info("------------STARTING EMS IN DEVELOPMENT MODE------------");
+        logger.transports[0].level = "debug";
+        logger.info("------------STARTING EMS IN DEVELOPMENT MODE------------");
         win.loadURL("http://localhost:3000/");
     }
 
     win.setMenu(null);
 
-    // require("./process/communication-process");
+    require("./main/process-communication");
     // require("./process/request-dialogs");
     // require("./process/match-maker-process");
 

@@ -13,13 +13,13 @@
     "react-toastify": "^4.1.0",
     "redux": "^4.0.0",
     "semantic-ui-offline": "^2.3.2",
-    "semantic-ui-react": "^0.82.0"
+    "semantic-ui-react": "^0.82.0",
+    "winston": "^3.0.0"
   },
   "scripts": {
     "start": "concurrently --kill-others \"npm run desktop\" \"npm run react\"",
     "desktop": "electron .",
     "react": "react-scripts-ts start",
-    "build-electron": "tsc",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

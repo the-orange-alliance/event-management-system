@@ -1,10 +1,11 @@
 import {Action} from "redux";
-import {CHANGE_ACTIVE_VIEW, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP} from "./constants";
+import {UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP} from "./constants";
+import Process from "../../shared/models/Process";
 
-export interface IChangeActiveView extends Action {
-  type: CHANGE_ACTIVE_VIEW,
+export interface IUpdateProcessList extends Action {
+  type: UPDATE_PROCESS_LIST,
   payload: {
-    activeView: string
+    processList: Process[]
   }
 }
 
@@ -22,4 +23,4 @@ export interface IIncrementCompletedStep extends Action {
   }
 }
 
-export type InternalActions = IChangeActiveView | IDisableNavigation | IIncrementCompletedStep;
+export type InternalActions = IUpdateProcessList | IDisableNavigation | IIncrementCompletedStep;

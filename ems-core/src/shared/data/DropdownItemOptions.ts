@@ -19,3 +19,18 @@ export const AllianceCaptainItems = [
     value: 8
   }
 ];
+
+export const TeamIdentifierItems = [
+  {
+    text: "Team Number",
+    value: "team_key"
+  },
+  {
+    text: "Team Name",
+    value: "team_name_short"
+  },
+  {
+    text: "Team Country (3 Letter Code)",
+    value: "country"
+  }
+];

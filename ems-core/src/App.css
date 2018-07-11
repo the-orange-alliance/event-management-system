@@ -24,6 +24,42 @@
   align-items: center !important;
 }
 
+.center-left-items {
+  display: flex !important;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.align-center {
+  display: flex !important;
+  align-items: center;
+}
+
+.align-bottom {
+  display: flex !important;
+  align-items: flex-end !important;
+}
+
+.align-bottom > .field {
+  width: 100%;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.success-text {
+  color: #1aa62a;
+}
+
+.warn-text {
+  color: #ffe623;
+}
+
+.error-text {
+  color: #ff2733;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

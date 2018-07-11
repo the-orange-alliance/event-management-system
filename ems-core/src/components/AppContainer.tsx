@@ -4,7 +4,6 @@ import {ToastContainer} from "react-toastify";
 import {Container, Divider, Header, Menu, MenuItemProps} from "semantic-ui-react";
 import {getTheme} from "../shared/AppTheme";
 import {IApplicationState} from "../stores";
-import {IChangeActiveView} from "../stores/internal/types";
 import EventManagerView from "../views/event-manager/EventManagerView";
 import SettingsView from "../views/settings/SettingsView";
 
@@ -12,7 +11,6 @@ interface IProps {
   limitedMode?: boolean,
   slaveMode?: boolean,
   navigationDisabled?: boolean,
-  changeActiveView?: (view: string) => IChangeActiveView
 }
 
 interface IState {

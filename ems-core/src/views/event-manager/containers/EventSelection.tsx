@@ -22,7 +22,7 @@ import ExplanationIcon from "../../../components/ExplanationIcon";
 import {getFromEMSEventType, getFromSeasonKey, SeasonItems} from "../../../shared/data/Seasons";
 import {getFromRegionKey, RegionItems} from "../../../shared/data/Regions";
 import {SyntheticEvent} from "react";
-import {AllianceCaptainItems, PostQualItems} from "../../../shared/data/PostQualification";
+import {AllianceCaptainItems, PostQualItems} from "../../../shared/data/DropdownItemOptions";
 import {PostQualConfig} from "../../../shared/AppTypes";
 import EventCreationValidator from "../controllers/EventCreationValidator";
 
@@ -112,8 +112,8 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private setRankingCutoff(event: SyntheticEvent, props: InputProps) {
-    if (typeof props.value === "number") {
-      this.props.eventConfig.rankingCutoff = props.value;
+    if (!isNaN(parseInt(props.value, 10))) {
+      this.props.eventConfig.rankingCutoff = parseInt(props.value, 10);
       this.props.selectConfigPreset(this.props.eventConfig);
       this.state.eventValidator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();

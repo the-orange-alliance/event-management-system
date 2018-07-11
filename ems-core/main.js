@@ -33,7 +33,7 @@ function createWindow () {
             }
             win.maximize();
             win.show();
-        }, 200);
+        }, 1000);
     });
 
     // Create the browser window.

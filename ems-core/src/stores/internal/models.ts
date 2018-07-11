@@ -1,5 +1,7 @@
+import Process from "../../shared/models/Process";
+
 export interface IInternalState {
-  activeView: string
+  processList: Process[]
   navigationDisabled: boolean,
   completedStep: number
 }

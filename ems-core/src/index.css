@@ -18,6 +18,16 @@ body {
   padding: 2px;
 }
 
+.tab-subview {
+  width: 100%;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.card-header {
+  max-height: 50px;
+}
+
 .ui.container {
   height: calc(100vh - 54px) !important;
   overflow: hidden;
@@ -28,30 +38,18 @@ body {
   margin-bottom: 1rem;
 }
 
-
-/* The following media queries are essentially for HD monitors. */
-@media only screen and (min-width: 1600px) {
+@media only screen and (max-width: 991px) and (min-width: 768px) {
   .ui.container {
-    width: 85%;
+    width: 95%;
   }
   .ui.tiny.modal {
-    top: 25% !important;
+    top: 10% !important;
   }
   .ui.small.modal {
-    top: 20% !important;
+    top: 7.5% !important;
   }
-}
-
-/* The following media queries are essentially for large monitors. */
-@media only screen and (min-width: 1200px) {
-  .ui.container {
-    width: 90%;
-  }
-  .ui.tiny.modal {
-    top: 22.5% !important;
-  }
-  .ui.small.modal {
-    top: 18.5% !important;
+  .tab-subview {
+    max-height: 66vh;
   }
 }
 
@@ -66,16 +64,39 @@ body {
   .ui.small.modal {
     top: 12.5% !important;
   }
+  .tab-subview {
+    max-height: 70vh;
+  }
 }
 
-@media only screen and (max-width: 991px) and (min-width: 768px) {
+/* The following media queries are essentially for large monitors. */
+@media only screen and (min-width: 1200px) {
   .ui.container {
-    width: 95%;
+    width: 90%;
   }
   .ui.tiny.modal {
-    top: 10% !important;
+    top: 22.5% !important;
   }
   .ui.small.modal {
-    top: 7.5% !important;
+    top: 18.5% !important;
+  }
+  .tab-subview {
+    max-height: 75vh !important;
+  }
+}
+
+/* The following media queries are essentially for HD monitors. */
+@media only screen and (min-width: 1600px) {
+  .ui.container {
+    width: 85%;
+  }
+  .ui.tiny.modal {
+    top: 25% !important;
+  }
+  .ui.small.modal {
+    top: 20% !important;
+  }
+  .tab-subview {
+    max-height: 80vh !important;
   }
 }

@@ -12,6 +12,9 @@ export default class EventConfiguration {
   private _allianceCaptains: number;
   private _rankingCutoff: number;
 
+  // Variables that aren't necessary in standard mode
+  private _fieldsControlled: number[];
+
   get eventType(): EMSEventTypes {
     return this._eventType;
   }
@@ -74,6 +77,14 @@ export default class EventConfiguration {
 
   set rankingCutoff(value: number) {
     this._rankingCutoff = value;
+  }
+
+  get fieldsControlled(): number[] {
+    return this._fieldsControlled;
+  }
+
+  set fieldsControlled(value: number[]) {
+    this._fieldsControlled = value;
   }
 }
 

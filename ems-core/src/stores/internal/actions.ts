@@ -1,11 +1,12 @@
 import {ActionCreator} from "redux";
-import {CHANGE_ACTIVE_VIEW, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP} from "./constants";
-import {IChangeActiveView, IDisableNavigation, IIncrementCompletedStep} from "./types";
+import {UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP} from "./constants";
+import {IUpdateProcessList, IDisableNavigation, IIncrementCompletedStep} from "./types";
+import Process from "../../shared/models/Process";
 
-export const changeActiveView: ActionCreator<IChangeActiveView> = (activeView: string) => ({
-  type: CHANGE_ACTIVE_VIEW,
+export const updateProcessList: ActionCreator<IUpdateProcessList> = (processList: Process[]) => ({
+  type: UPDATE_PROCESS_LIST,
   payload: {
-    activeView: activeView
+    processList: processList
   }
 });
 

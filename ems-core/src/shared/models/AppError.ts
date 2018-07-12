@@ -9,7 +9,7 @@ export default class AppError {
     this._message = message;
   }
 
-  toString() {
+  public toString() {
     return `Error ${this.httpCode}: ${this.errorStr}. ${this.message}`;
   }
 

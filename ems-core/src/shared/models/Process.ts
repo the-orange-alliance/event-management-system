@@ -7,6 +7,15 @@ export default class Process {
   private _mem: number;
   private _address: string;
 
+  public static fromPM2(pm2Proc: any, host?: string): Process {
+    const newProcess = new Process();
+    newProcess.name = pm2Proc.name;
+    newProcess.id = pm2Proc.pm_id;
+    newProcess.status = pm2Proc.status.toString().toUpperCase();
+    newProcess.address = host;
+    return newProcess;
+  }
+
   get name(): string {
     return this._name;
   }

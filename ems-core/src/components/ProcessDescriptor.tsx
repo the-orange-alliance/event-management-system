@@ -19,8 +19,8 @@ class ProcessDescriptor extends React.Component<IProps> {
         <Grid.Column>{process.address || ""}</Grid.Column>
         <Grid.Column className={this.getStatusStyle()}>{process.status || ""}</Grid.Column>
         <Grid.Column>{process.pid || ""}</Grid.Column>
-        <Grid.Column>{process.cpu || ""}</Grid.Column>
-        <Grid.Column>{process.mem || ""}</Grid.Column>
+        <Grid.Column>{Process.toMegaBytes(process.cpu).toFixed(2) + " MB" || ""}</Grid.Column>
+        <Grid.Column>{Process.toMegaBytes(process.mem).toFixed(2) + " MB" || ""}</Grid.Column>
       </Grid.Row>
     )
   }
@@ -31,6 +31,8 @@ class ProcessDescriptor extends React.Component<IProps> {
         return "bold success-text";
       case "WAITING...":
         return "bold warn-text";
+      case "RESTARTING...":
+        return "bold error-text";
       case "OFFLINE":
         return "bold error-text";
       case "STOPPED":

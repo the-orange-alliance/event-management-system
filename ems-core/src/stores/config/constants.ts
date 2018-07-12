@@ -6,3 +6,6 @@ export type SET_EVENT_CONFIG = typeof SET_EVENT_CONFIG;
 
 export const SET_EVENT = "SET_EVENT";
 export type SET_EVENT = typeof SET_EVENT;
+
+export const SET_NETWORK_HOST = "SET_NETWORK_HOST";
+export type SET_NETWORK_HOST = typeof SET_NETWORK_HOST;

@@ -4,5 +4,6 @@ import Event from "../../shared/models/Event";
 export interface IConfigState {
   slaveModeEnabled: boolean,
   eventConfiguration: EventConfiguration,
-  event: Event
+  event: Event,
+  networkHost: string
 }

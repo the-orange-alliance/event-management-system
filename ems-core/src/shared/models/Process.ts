@@ -5,15 +5,28 @@ export default class Process {
   private _status: string;
   private _cpu: number;
   private _mem: number;
+  private _envMode: string;
   private _address: string;
 
   public static fromPM2(pm2Proc: any, host?: string): Process {
     const newProcess = new Process();
-    newProcess.name = pm2Proc.name;
-    newProcess.id = pm2Proc.pm_id;
-    newProcess.status = pm2Proc.status.toString().toUpperCase();
-    newProcess.address = host;
+    newProcess.name = pm2Proc.name || pm2Proc.pm2_env.name;
+    newProcess.id = pm2Proc.pm_id || pm2Proc.pm2_env.pm_id;
+    newProcess.status = pm2Proc.status || pm2Proc.pm2_env.status.toString().toUpperCase();
+    newProcess.pid = pm2Proc.pid;
+    newProcess.address = host || pm2Proc.pm2_env.args[0];
+    if (pm2Proc.monit) {
+      newProcess.cpu = pm2Proc.monit.cpu;
+      newProcess.mem = pm2Proc.monit.memory;
+    }
     return newProcess;
+  }
+
+  public static toMegaBytes(bytes: number): number {
+    if (typeof bytes === "undefined") {
+      return 0.0;
+    }
+    return bytes / 1048576.0;
   }
 
   get name(): string {
@@ -45,7 +58,7 @@ export default class Process {
   }
 
   set status(value: string) {
-    this._status = value;
+    this._status = value.toUpperCase();
   }
 
   get cpu(): number {
@@ -71,4 +84,13 @@ export default class Process {
   set address(value: string) {
     this._address = value;
   }
+
+  set envMode(value: string) {
+    this._envMode = value;
+  }
+
+  get envMode(): string {
+    return this._envMode
+  }
+
 }

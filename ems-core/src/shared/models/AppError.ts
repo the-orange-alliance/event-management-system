@@ -1,27 +1,35 @@
 export default class AppError {
-  private _httpCode: number;
-  private _errorStr: string;
-  private _message: string;
+  private _errorCode: number;
+  private _errorMessage: string;
+  private _stacktrace: any;
 
-  constructor(httpCode: number, errorStr: string, message: string) {
-    this._httpCode = httpCode;
-    this._errorStr = errorStr;
-    this._message = message;
+  constructor(errorCode: number, errorMessage: string, stacktrace: any) {
+    this._errorCode = errorCode;
+    this._errorMessage = errorMessage;
+    this._stacktrace = stacktrace.toString();
   }
 
-  public toString() {
-    return `Error ${this.httpCode}: ${this.errorStr}. ${this.message}`;
+  get errorCode(): number {
+    return this._errorCode;
   }
 
-  get httpCode(): number {
-    return this._httpCode;
+  set errorCode(value: number) {
+    this._errorCode = value;
   }
 
-  get errorStr(): string {
-    return this._errorStr;
+  get errorMessage(): string {
+    return this._errorMessage;
   }
 
-  get message(): string {
-    return this._message;
+  set errorMessage(value: string) {
+    this._errorMessage = value;
+  }
+
+  get stacktrace(): any {
+    return this._stacktrace;
+  }
+
+  set stacktrace(value: any) {
+    this._stacktrace = value.toString();
   }
 }

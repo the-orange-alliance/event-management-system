@@ -14,7 +14,7 @@ ipcMain.on("list-ecosystem", (event) => {
         } else {
             pm2.list((errList, procDescList) => {
                 pm2.disconnect();
-                logger.debug("Process description list results were sent back to the renderer process.");
+                logger.info("Process description list results were sent back to the renderer process.");
                 if (errList) {
                     event.sender.send("list-ecosystem-error", errList);
                 } else {
@@ -49,15 +49,77 @@ ipcMain.on("start-ecosystem", (event, host) => {
                 const sckProc = startProcess(base + "ems-socket/build/server.js", "ems-sck", host);
                 Promise.all([apiProc, webProc, sckProc]).then((values) => {
                     pm2.disconnect();
-                    logger.debug(`Successfully started application ecosystem on ${host}`);
+                    logger.info(`Successfully started application ecosystem on ${host}`);
                     event.sender.send("start-ecosystem-success", values, host);
                 }).catch((reason) => {
                     pm2.disconnect();
-                    logger.error("Error while starting application ecosystem. Results were sent to renderer process.");
+                    logger.info("Error while starting application ecosystem. Results were sent to renderer process.");
                     event.sender.send("start-ecosystem-error", reason);
                 });
             }
         });
+    });
+});
+
+ipcMain.on("start-process", (event, procName, host) => {
+    localIPv4().then((localHost) => {
+        if (typeof host === "undefined" || host === null) {
+            host = localHost;
+            logger.info(`Starting services with a default ${host} address.`);
+        } else if (host.match(ipRegex) === null) {
+            host = "127.0.0.1";
+            logger.info(`Starting services with a default ${host} address.`);
+        } else {
+            logger.info(`Starting services with a ${host} address.`);
+        }
+        logger.info("Attempting to start " + procName + " service...");
+        pm2.connect((err) => {
+            if (err) {
+                event.sender.send("start-process-error", err);
+            } else {
+                startProcess(procName, host).then((process) => {
+                    logger.info(`Successfully started application ${procName}`);
+                    event.sender.send("start-process-success", process);
+                }).catch((reason) => {
+                    logger.info(`Error while starting application ${procName}. Results were sent back to the renderer process.`);
+                    event.sender.send("start-process-error", reason);
+                });
+            }
+        });
+    });
+});
+
+ipcMain.on("stop-process", (event, procName) => {
+    logger.info("Attempting to stop " + procName + " service...");
+    pm2.connect((err) => {
+        if (err) {
+            event.sender.send("stop-process-error", err);
+        } else {
+            stopProcess(procName).then((process) => {
+                logger.info(`Successfully stopped application ${procName}`);
+                event.sender.send("stop-process-success", process);
+            }).catch((reason) => {
+                logger.info(`Error while stopping application ${procName}. Results were sent back to the renderer process.`);
+                event.sender.send("stop-process-error", reason);
+            });
+        }
+    });
+});
+
+ipcMain.on("restart-process", (event, procName) => {
+    logger.info("Attempting to restart " + procName + " service...");
+    pm2.connect((err) => {
+        if (err) {
+            event.sender.send("restart-process-error", err);
+        } else {
+            restartProcess(procName).then((process) => {
+                logger.info(`Successfully restarted application ${procName}`);
+                event.sender.send("restart-process-success", process);
+            }).catch((reason) => {
+                logger.info(`Error while restarting application ${procName}. Results were sent back to the renderer process.`);
+                event.sender.send("restart-process-error", reason);
+            });
+        }
     });
 });
 
@@ -75,5 +137,29 @@ function startProcess(scriptLoc, procName, args) {
                 resolve(apps);
             }
         });
+    });
+}
+
+function stopProcess(procName) {
+    return new Promise((resolve, reject) => {
+        pm2.stop(procName, (err, process) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(process);
+            }
+        });
+    });
+}
+
+function restartProcess(procName) {
+    return new Promise((resolve, reject) => {
+       pm2.restart(procName, (err, process) => {
+           if (err) {
+               reject(err);
+           } else {
+               resolve(process);
+           }
+       });
     });
 }

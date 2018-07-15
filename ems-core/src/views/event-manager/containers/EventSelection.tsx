@@ -25,6 +25,9 @@ import {SyntheticEvent} from "react";
 import {AllianceCaptainItems, PostQualItems} from "../../../shared/data/DropdownItemOptions";
 import {PostQualConfig} from "../../../shared/AppTypes";
 import EventCreationValidator from "../controllers/EventCreationValidator";
+import EMSProvider from "../../../shared/providers/EMSProvider";
+import {AxiosResponse} from "axios";
+import HttpError from "../../../shared/models/HttpError";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -78,7 +81,7 @@ class EventSelection extends React.Component<IProps, IState> {
 
   /* Event Configuration Methods */
   private setConfigurationPreset(preset: EventConfiguration) {
-    const seasonKey = getFromEMSEventType(this.props.eventConfig.eventType).value;
+    const seasonKey = getFromEMSEventType(preset.eventType).value;
     this.props.selectConfigPreset(preset);
     this.props.event.season = getFromSeasonKey(seasonKey);
     this.state.eventValidator.update(this.props.eventConfig, this.props.event);
@@ -217,7 +220,11 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private createEvent(): void {
-    console.log("HOLY SHIT YOU MADE IT THIS FAR");
+    EMSProvider.postEvent(this.props.eventConfig.eventType, this.props.event).then((response: AxiosResponse) => {
+      console.log(response);
+    }).catch((error: HttpError) => {
+      console.log(error); // TODO - Error dialog.
+    });
   }
 
   private renderConfigCards(): JSX.Element {

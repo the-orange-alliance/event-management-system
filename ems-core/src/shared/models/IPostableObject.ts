@@ -1,0 +1,3 @@
+interface IPostableObject {
+  toJSON(): object
+}

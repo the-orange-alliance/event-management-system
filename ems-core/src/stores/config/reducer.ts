@@ -21,7 +21,7 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
     case SET_EVENT:
       return {...state, event: action.payload.event};
     case SET_NETWORK_HOST:
-      return {...state, event: action.payload.networkHost};
+      return {...state, networkHost: action.payload.networkHost};
     default:
       return state;
   }

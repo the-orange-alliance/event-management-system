@@ -9,7 +9,7 @@ class ProcessManager {
   private constructor() {}
 
   public static getInstance() {
-    if (!ProcessManager._instance) {
+    if (typeof ProcessManager._instance === "undefined") {
       ProcessManager._instance = new ProcessManager();
     }
     return ProcessManager._instance;

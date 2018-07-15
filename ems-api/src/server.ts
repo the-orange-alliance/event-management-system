@@ -1,6 +1,9 @@
 import express from "express";
 import http from "http";
+import parser from "body-parser";
 import cors from "cors";
+import helmet from "helmet";
+import * as Errors from "./errors";
 import logger from './logger';
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
@@ -15,6 +18,21 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 }
 
 app.use(cors());
+app.use(helmet());
+
+app.use(parser.json({limit: "5mb"}));
+app.use(parser.urlencoded({ limit: "5mb", extended: false }));
+
+/* This API will only be sending out json data, so if the request takes something else, it's not safe. */
+app.use((req, res, next) => {
+  if (req.get("Content-Type") !== "application/json") {
+    next(Errors.UNACCEPTABLE_CONTENT_TYPE);
+  } else if (!req.accepts("application/json")) {
+    next(Errors.UNACCEPTABLE_CONTENT_TYPE);
+  } else {
+    next();
+  }
+});
 
 app.use("/", (req: express.Request, res: express.Response) => {
   res.send("Hello World!");

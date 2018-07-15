@@ -15,6 +15,7 @@ import {SyntheticEvent} from "react";
 import {ISetNetworkHost} from "../../../stores/config/types";
 import {setNetworkHost} from "../../../stores/config/actions";
 import AppError from "../../../shared/models/AppError";
+import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
 
 interface IProps {
   processingAction?: boolean,
@@ -27,7 +28,8 @@ interface IProps {
 
 interface IState {
   updateIP: string,
-  updateIPValid: boolean
+  updateIPValid: boolean,
+  modalOpen: boolean
 }
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
@@ -37,11 +39,14 @@ class NetworkConfig extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       updateIP: "",
-      updateIPValid: true
+      updateIPValid: false,
+      modalOpen: false
     };
 
     this.setUpdateIP = this.setUpdateIP.bind(this);
     this.updateNetworkHost = this.updateNetworkHost.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   public componentWillMount() {
@@ -51,7 +56,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {updateIP, updateIPValid} = this.state;
+    const {updateIP, updateIPValid, modalOpen} = this.state;
     const processes = this.props.processList.map(process => {
       return <ProcessDescriptor key={process.id} process={process}/>;
     });
@@ -60,6 +65,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
     });
     return (
       <Tab.Pane className="tab-subview">
+        <RestrictedAccessModal open={modalOpen} onClose={this.closeModal} onSuccess={this.updateNetworkHost}/>
         <h3>Network Config</h3>
         <Divider />
         <Card fluid={true} color={getTheme().secondary}>
@@ -89,7 +95,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
                 <Grid columns={16}>
                   <Grid.Row>
                     <Grid.Column width={10}><Form.Input fluid={true} error={!updateIPValid} value={updateIP} onChange={this.setUpdateIP} placeholder="IPv4 Address (xxx.xxx.xxx.xxx)" label={<ExplanationIcon title={"New Host Address"} content={"If EMS incorrectly detects your IPv4 address, set it here then click 'Update Network'."}/>}/></Grid.Column>
-                    <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} disabled={!updateIPValid} color="orange" onClick={this.updateNetworkHost}>Update Network Address</Form.Button></Grid.Column>
+                    <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} disabled={!updateIPValid} color="orange" onClick={this.openModal}>Update Network Address</Form.Button></Grid.Column>
                   </Grid.Row>
                   <Grid.Row>
                     <Grid.Column width={6} floated="right"><Button fluid={true} color="red">Reset Network Addresses</Button></Grid.Column>
@@ -147,6 +153,14 @@ class NetworkConfig extends React.Component<IProps, IState> {
       this.props.setProcessActionsDisabled(false);
       console.log(error);
     });
+  }
+
+  private openModal() {
+    this.setState({modalOpen: true});
+  }
+
+  private closeModal() {
+    this.setState({modalOpen: false});
   }
 }
 

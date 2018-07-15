@@ -42,7 +42,6 @@ class SettingsView extends React.Component<IProps, IState> {
 
   private onTabChange(event: SyntheticEvent, props: TabProps) {
     if (!this.props.navigationDisabled) {
-      console.log("here!");
       this.setState({activeIndex: parseInt(props.activeIndex as string, 10)});
     }
   }

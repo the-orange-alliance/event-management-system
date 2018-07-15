@@ -1,7 +1,7 @@
 import Region from "./Region";
 import Season from "./Season";
 
-export default class Event {
+export default class Event implements IPostableObject {
 
   private _season: Season;
   private _region: Region;
@@ -14,6 +14,21 @@ export default class Event {
   private _fieldCount: number;
   private _website?: string;
   private _divisionName?: string;
+
+  public toJSON(): object {
+    return {
+      season_key: this.season.seasonKey,
+      region_key: this.region.regionKey,
+      event_key: this.eventKey,
+      venue: this.venue,
+      city: this.city,
+      state_prov: this.stateProv,
+      country: this.country,
+      field_count: this.fieldCount,
+      website: this.website,
+      division_name: this.divisionName
+    };
+  }
 
   get season(): Season {
     return this._season;

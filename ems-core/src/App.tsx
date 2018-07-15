@@ -10,6 +10,7 @@ import Process from "./shared/models/Process";
 import {updateProcessList} from "./stores/internal/actions";
 import {ISetNetworkHost} from "./stores/config/types";
 import {setNetworkHost} from "./stores/config/actions";
+import EMSProvider from "./shared/providers/EMSProvider";
 
 interface IProps {
   setProcessList?: (procList: Process[]) => IUpdateProcessList,
@@ -26,6 +27,8 @@ class App extends React.Component<IProps> {
       const networkHost = procList[0].address;
       this.props.setNetworkHost(networkHost);
       this.props.setProcessList(procList);
+
+      EMSProvider.initialize(networkHost);
     });
   }
 

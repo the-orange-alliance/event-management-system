@@ -20,6 +20,7 @@ export default class Event implements IPostableObject {
       season_key: this.season.seasonKey,
       region_key: this.region.regionKey,
       event_key: this.eventKey,
+      event_name: this.eventName,
       venue: this.venue,
       city: this.city,
       state_prov: this.stateProv,

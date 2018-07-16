@@ -5,6 +5,10 @@ import cors from "cors";
 import helmet from "helmet";
 import * as Errors from "./errors";
 import logger from './logger';
+import * as ErrorHandler from "./error-handler";
+import * as Validator from "./validator";
+
+import {EventController} from "./controllers/Event";
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 
@@ -34,9 +38,23 @@ app.use((req, res, next) => {
   }
 });
 
-app.use("/", (req: express.Request, res: express.Response) => {
-  res.send("Hello World!");
+app.use(Validator.validate);
+
+app.use("/api/event", EventController);
+
+/* Defining a simple test route. */
+app.use("/ping", (req, res) => {
+  res.set("Content-Type", "application/json");
+  res.send({res: "pong!"});
 });
+
+/* If the user is trying to get to a route not previously handled, it wasn't found. */
+app.all("*", (req, res, next) => {
+  next(Errors.CONTENT_NOT_FOUND);
+});
+
+app.use(ErrorHandler.logErrors);
+app.use(ErrorHandler.handleClient);
 
 http.createServer(app).listen({
   port: port,

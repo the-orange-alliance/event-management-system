@@ -66,10 +66,10 @@ class EMSProvider {
       } else {
         records.push(body.toJSON());
       }
-      console.log({records: records});
       this._axios.post(url, {records: records}).then((response: AxiosResponse) => {
         resolve(response);
       }).catch((error) => {
+        console.log(error);
         if (error.response) {
           reject(new HttpError(error.response.data.message, error.response.data.code, this._host + url));
         } else if (error.request) {
@@ -86,7 +86,7 @@ class EMSProvider {
   }
 
   public postEvent(eventType: EMSEventTypes, event: Event): Promise<AxiosResponse> {
-    return this.post("api/event/" + eventType, event);
+    return this.post("api/event?type=" + eventType, event);
   }
 
 }

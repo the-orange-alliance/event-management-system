@@ -1,3 +1,4 @@
 interface IPostableObject {
-  toJSON(): object
+  toJSON(): object,
+  fromJSON(json: any): IPostableObject
 }

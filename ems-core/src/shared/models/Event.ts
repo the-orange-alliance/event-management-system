@@ -1,5 +1,7 @@
 import Region from "./Region";
 import Season from "./Season";
+import * as Regions from "../data/Regions";
+import * as Seasons from "../data/Seasons";
 
 export default class Event implements IPostableObject {
 
@@ -29,6 +31,22 @@ export default class Event implements IPostableObject {
       website: this.website,
       division_name: this.divisionName
     };
+  }
+
+  public fromJSON(json: any): Event {
+    const e: Event = new Event();
+    e.season = Seasons.getFromSeasonKey(json.season_key);
+    e.region = Regions.getFromRegionKey(json.region_key);
+    e.eventCode = json.event_key.split("-")[2];
+    e.eventName = json.event_name;
+    e.venue = json.venue;
+    e.city = json.city;
+    e.stateProv = json.state_prov;
+    e.country = json.country;
+    e.fieldCount = json.field_count;
+    e.website = json.website;
+    e.divisionName = json.division_name;
+    return e;
   }
 
   get season(): Season {

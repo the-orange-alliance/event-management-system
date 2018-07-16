@@ -44,7 +44,7 @@ class ProcessManager {
         }
         resolve(processes);
       });
-      ipcRenderer.once("list-ecosystem-error", (error: any) => {
+      ipcRenderer.once("list-ecosystem-error", (event: any, error: any) => {
         reject(new AppError(1013, "PM2_LIST", error));
       });
       ipcRenderer.send("list-ecosystem");
@@ -60,7 +60,7 @@ class ProcessManager {
         const processes: Process[] = [proc1, proc2, proc3];
         resolve(processes);
       });
-      ipcRenderer.once("start-ecosystem-error", (error: any) => {
+      ipcRenderer.once("start-ecosystem-error", (event: any, error: any) => {
         reject(new AppError(1010, "PM2_START", error));
       });
       ipcRenderer.send("start-ecosystem", newHost);
@@ -77,7 +77,7 @@ class ProcessManager {
         }
         resolve(process);
       });
-      ipcRenderer.once("start-process-error", (error: any) => {
+      ipcRenderer.once("start-process-error", (event: any, error: any) => {
         reject(new AppError(1000, "PM2_START", error));
       });
       ipcRenderer.send("start-process", process.name, host);
@@ -94,7 +94,7 @@ class ProcessManager {
         }
         resolve(process);
       });
-      ipcRenderer.once("stop-process-error", (error: any) => {
+      ipcRenderer.once("stop-process-error", (event: any, error: any) => {
         reject(new AppError(1001, "PM2_STOP", error));
       });
       ipcRenderer.send("stop-process", process.name);
@@ -111,7 +111,7 @@ class ProcessManager {
         }
         resolve(process);
       });
-      ipcRenderer.once("restart-process-error", (error: any) => {
+      ipcRenderer.once("restart-process-error", (event: any, error: any) => {
         reject(new AppError(1002, "PM2_RESTART", error));
       });
       ipcRenderer.send("restart-process", process.name);

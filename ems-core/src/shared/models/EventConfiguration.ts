@@ -1,6 +1,6 @@
 import {EMSEventTypes, PostQualConfig, TeamIdentifier} from "../AppTypes";
 
-export default class EventConfiguration {
+export default class EventConfiguration implements IPostableObject {
   private _eventType: EMSEventTypes;
   private _postQualConfig: PostQualConfig;
   private _teamIdentifier: TeamIdentifier;
@@ -14,6 +14,34 @@ export default class EventConfiguration {
 
   // Variables that aren't necessary in standard mode
   private _fieldsControlled: number[];
+
+  public toJSON(): object {
+    return {
+      event_type: this.eventType,
+      post_qual_config: this.postQualConfig,
+      team_identifier: this.teamIdentifier,
+      requires_toa: this.requiresTOA,
+      teams_per_alliance: this.teamsPerAlliance,
+      post_qual_teams_per_alliance: this.postQualTeamsPerAlliance,
+      alliance_captains: this.allianceCaptains,
+      ranking_cutoff: this.rankingCutoff,
+      fields_controlled: this.fieldsControlled
+    };
+  }
+
+  public fromJSON(json: any): EventConfiguration {
+    const config: EventConfiguration = new EventConfiguration();
+    config.eventType = json.event_type;
+    config.postQualConfig = json.post_qual_config;
+    config.teamIdentifier = json.team_identifier;
+    config.requiresTOA = json.requires_toa;
+    config.teamsPerAlliance = json.teams_per_alliance;
+    config.postQualTeamsPerAlliance = json.post_qual_teams_per_alliance;
+    config.allianceCaptains = json.alliance_captains;
+    config.rankingCutoff = json.ranking_cutoff;
+    config.fieldsControlled = json.fields_controlled;
+    return config;
+  }
 
   get eventType(): EMSEventTypes {
     return this._eventType;

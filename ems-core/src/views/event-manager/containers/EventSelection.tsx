@@ -28,6 +28,7 @@ import EventCreationValidator from "../controllers/EventCreationValidator";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
 import HttpError from "../../../shared/models/HttpError";
+import {CONFIG_STORE} from "../../../shared/AppStore";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -220,6 +221,11 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private createEvent(): void {
+    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).then((storeState: object) => {
+      console.log(storeState);
+    }).catch((err) => {
+      console.log(err);
+    });
     EMSProvider.postEvent(this.props.eventConfig.eventType, this.props.event).then((response: AxiosResponse) => {
       console.log(response);
     }).catch((error: HttpError) => {

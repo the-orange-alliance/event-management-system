@@ -24,16 +24,13 @@ function createWindow () {
     }));
     splashWin.setMenu(null);
 
-    ipcMain.on("preload", (event) => { // TODO - Actually load application state.
-        setTimeout(() => {
-            event.sender.send("preload-finished");
-            if (splashWin !== null) {
-                splashWin.destroy();
-                splashWin = null;
-            }
-            win.maximize();
-            win.show();
-        }, 500);
+    ipcMain.on("preload-finish", () => {
+        if (splashWin !== null) {
+            splashWin.destroy();
+            splashWin = null;
+        }
+        win.maximize();
+        win.show();
     });
 
     // Create the browser window.
@@ -56,8 +53,7 @@ function createWindow () {
     win.setMenu(null);
 
     require("./main/process-communication");
-    // require("./process/request-dialogs");
-    // require("./process/match-maker-process");
+    require("./main/store-communication");
 
     // Emitted when the window is closed.
     win.on("closed", () => {

@@ -31,6 +31,7 @@ import HttpError from "../../../shared/models/HttpError";
 import {CONFIG_STORE} from "../../../shared/AppStore";
 
 interface IProps {
+  onComplete: () => void,
   eventConfig?: EventConfiguration,
   event?: Event,
   selectConfigPreset?: (preset: EventConfiguration) => ISetEventConfiguration
@@ -223,6 +224,7 @@ class EventSelection extends React.Component<IProps, IState> {
   private createEvent(): void {
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).then((storeState: object) => {
       console.log(storeState);
+      this.props.onComplete();
     }).catch((err) => {
       console.log(err);
     });
@@ -354,6 +356,9 @@ class EventSelection extends React.Component<IProps, IState> {
       <Grid>
         <Grid.Row columns={16}>
           <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={!this.canCreateEvent()} onClick={this.createEvent}>Create Event</Button></Grid.Column>
+        </Grid.Row>
+        <Grid.Row columns={16}>
+          <Grid.Column width={8}><i>NOTE: Everything in the Event Manager can only be completed once! Make sure all of your information is correct.</i></Grid.Column>
         </Grid.Row>
       </Grid>
     );

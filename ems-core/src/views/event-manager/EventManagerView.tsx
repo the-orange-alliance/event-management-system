@@ -1,13 +1,18 @@
 import * as React from "react";
 import {connect} from "react-redux";
 import {Step} from "semantic-ui-react";
-import {IApplicationState} from "../../stores";
+import {ApplicationActions, IApplicationState} from "../../stores";
 import EventSelection from "./containers/EventSelection";
 import EventConfiguration from "../../shared/models/EventConfiguration";
+import EventParticipantSelection from "./containers/EventParticipantSelection";
+import {Dispatch} from "redux";
+import {incrementCompletedStep} from "../../stores/internal/actions";
+import {IIncrementCompletedStep} from "../../stores/internal/types";
 
 interface IProps {
   completedStep?: number,
-  eventConfig?: EventConfiguration
+  eventConfig?: EventConfiguration,
+  setCompletedStep?: (step: number) => IIncrementCompletedStep
 }
 
 interface IState {
@@ -102,8 +107,7 @@ class EventManagerView extends React.Component<IProps, IState> {
   }
 
   private isDisabled(step: number): boolean {
-    // return this.props.completedStep > (step + 1);
-    return false;
+    return this.props.completedStep < (step - 1);
   }
 
   private getStepLength(): 7 | 8 {
@@ -113,10 +117,17 @@ class EventManagerView extends React.Component<IProps, IState> {
   private getViewFromActiveStep(activeStep: number): JSX.Element {
     switch (activeStep) {
       case 1:
-        return <EventSelection/>;
+        return <EventSelection onComplete={this.completeStep.bind(this, 1)} />;
+      case 2:
+        return <EventParticipantSelection/>;
       default:
         return <span>View not found.</span>;
     }
+  }
+
+  private completeStep(step: number): void {
+    this.props.setCompletedStep(step);
+    this.setActiveStep(step + 1);
   }
 
 }
@@ -128,10 +139,10 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
   };
 }
 
-// export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
-//   return {
-//     setActiveStep: (step: number) => dispatch(incrementCompletedStep(step))
-//   };
-// }
+export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+  return {
+    setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step))
+  };
+}
 
-export default connect(mapStateToProps)(EventManagerView);
+export default connect(mapStateToProps, mapDispatchToProps)(EventManagerView);

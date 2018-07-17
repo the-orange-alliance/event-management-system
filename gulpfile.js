@@ -1,34 +1,37 @@
 const gulp = require("gulp");
-// const util = require("gulp-util");
-// const replace = require("gulp-replace");
+const rename = require("gulp-rename");
 const fs = require("fs");
 const del = require("del");
 const ecosystemConfig = require("./ecosystem.config");
 
 gulp.task("generate-env:prod", () => {
-	let contents = "NODE_ENV=production\n";
+	let reactAppContents = "NODE_ENV=production\n";
 	for (let app of ecosystemConfig.apps) {
+        let contents = "NODE_ENV=production\n";
 		for (let key in app.env_production) {
 			if (app.env_production.hasOwnProperty(key) && key !== "NODE_ENV") {
 				contents += key + "=" + app.env_production[key] + "\n";
-				contents += "REACT_APP_" + key + "=" + app.env_production[key] + "\n";
+				reactAppContents += "REACT_APP_" + app.name.toString().toUpperCase().replace("-", "_") + "_" + key + "=" + app.env_production[key] + "\n";
 			}
 		}
+        fs.writeFileSync(app.name + ".env", contents);
 	}
-	fs.writeFileSync(".env", contents);
+    fs.writeFileSync("ems-core.env", reactAppContents);
 });
 
 gulp.task("generate-env", () => {
-	let contents = "NODE_ENV=development\n";
-	for (let app of ecosystemConfig.apps) {
-		for (let key in app.env) {
-			if (app.env.hasOwnProperty(key) && key !== "NODE_ENV") {
-				contents += key + "=" + app.env[key] + "\n";
-				contents += "REACT_APP_" + key + "=" + app.env[key] + "\n";
-			}
-		}
-	}
-	fs.writeFileSync(".env", contents);
+    let reactAppContents = "NODE_ENV=development\n";
+    for (let app of ecosystemConfig.apps) {
+        let contents = "NODE_ENV=development\n";
+        for (let key in app.env) {
+            if (app.env.hasOwnProperty(key) && key !== "NODE_ENV") {
+                contents += key + "=" + app.env[key] + "\n";
+                reactAppContents += "REACT_APP_" + app.name.toString().toUpperCase().replace("-", "_") + "_" + key + "=" + app.env[key] + "\n";
+            }
+        }
+        fs.writeFileSync(app.name + ".env", contents);
+    }
+    fs.writeFileSync("ems-core.env", reactAppContents);
 });
 
 gulp.task("clean-build", () => {
@@ -37,13 +40,13 @@ gulp.task("clean-build", () => {
 });
 
 gulp.task("deploy-env", () => {
-	gulp.src([".env"]).pipe(gulp.dest("audience-display"));
-	gulp.src([".env"]).pipe(gulp.dest("ref-tablet"));
-	gulp.src([".env"]).pipe(gulp.dest("pit-display"));
-	gulp.src([".env"]).pipe(gulp.dest("ems-core"));
-	gulp.src([".env"]).pipe(gulp.dest("ems-api"));
-	gulp.src([".env"]).pipe(gulp.dest("ems-web"));
-	gulp.src([".env"]).pipe(gulp.dest("ems-socket"));
+	// gulp.src([".env"]).pipe(gulp.dest("audience-display"));
+	// gulp.src([".env"]).pipe(gulp.dest("ref-tablet"));
+	// gulp.src([".env"]).pipe(gulp.dest("pit-display"));
+	gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-core"));
+	gulp.src(["ems-api.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-api"));
+	gulp.src(["ems-web.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-web"));
+	gulp.src(["ems-sck.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-socket"));
 });
 
 gulp.task("post-build", () => {

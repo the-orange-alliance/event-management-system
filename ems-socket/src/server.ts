@@ -3,6 +3,14 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import logger from "./logger";
+import * as path from "path";
+import * as dotenv from "dotenv";
+
+/* Load our environment variables. The .env file is not included in the repository.
+ * Only TOA staff/collaborators will have access to their own, specialized version of
+ * the .env file.
+ */
+dotenv.config({path: path.join(__dirname, "../.env")});
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 

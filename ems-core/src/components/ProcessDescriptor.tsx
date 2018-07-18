@@ -16,7 +16,7 @@ class ProcessDescriptor extends React.Component<IProps> {
     return (
       <Grid.Row columns="equal" textAlign="center">
         <Grid.Column>{process.name || ""}</Grid.Column>
-        <Grid.Column>{process.address || ""}</Grid.Column>
+        <Grid.Column>http://{process.address || ""}:{process.port}/</Grid.Column>
         <Grid.Column className={this.getStatusStyle()}>{process.status || ""}</Grid.Column>
         <Grid.Column>{process.pid || ""}</Grid.Column>
         <Grid.Column>{Process.toMegaBytes(process.cpu).toFixed(2) + " MB" || ""}</Grid.Column>

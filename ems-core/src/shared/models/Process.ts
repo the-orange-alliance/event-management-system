@@ -7,6 +7,7 @@ export default class Process {
   private _mem: number;
   private _envMode: string;
   private _address: string;
+  private _port: number;
 
   public static fromPM2(pm2Proc: any, host?: string): Process {
     const newProcess = new Process();
@@ -15,6 +16,9 @@ export default class Process {
     newProcess.status = pm2Proc.status || pm2Proc.pm2_env.status.toString().toUpperCase();
     newProcess.pid = pm2Proc.pid;
     newProcess.address = host || pm2Proc.pm2_env.args[0];
+    if (pm2Proc.pm2_env) {
+      newProcess.port = pm2Proc.pm2_env["REACT_APP_" + newProcess.name.toUpperCase().replace("-", "_") + "_PORT"];
+    }
     if (pm2Proc.monit) {
       newProcess.cpu = pm2Proc.monit.cpu;
       newProcess.mem = pm2Proc.monit.memory;
@@ -93,4 +97,11 @@ export default class Process {
     return this._envMode
   }
 
+  get port(): number {
+    return this._port;
+  }
+
+  set port(value: number) {
+    this._port = value;
+  }
 }

@@ -3,12 +3,19 @@ import http from "http";
 import parser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
+import * as path from "path";
 import * as Errors from "./errors";
 import logger from './logger';
 import * as ErrorHandler from "./error-handler";
 import * as Validator from "./validator";
-
+import * as dotenv from "dotenv";
 import {EventController} from "./controllers/Event";
+
+/* Load our environment variables. The .env file is not included in the repository.
+ * Only TOA staff/collaborators will have access to their own, specialized version of
+ * the .env file.
+ */
+dotenv.config({path: path.join(__dirname, "../.env")});
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 

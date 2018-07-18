@@ -1,0 +1,9 @@
+{
+  "name": "ems-core",
+  "author": "The Orange Alliance",
+  "description": "An improved event experience.",
+  "version": "0.1.0",
+  "private": true,
+  "main": "public/desktop/electron.js",
+  "homepage": "./public/desktop/"
+}

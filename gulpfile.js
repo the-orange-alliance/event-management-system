@@ -1,7 +1,9 @@
 const gulp = require("gulp");
 const rename = require("gulp-rename");
 const fs = require("fs");
+const install = require("gulp-install");
 const del = require("del");
+
 const ecosystemConfig = require("./ecosystem.config");
 
 gulp.task("generate-env:prod", () => {
@@ -50,18 +52,65 @@ gulp.task("deploy-env", () => {
 });
 
 gulp.task("post-build", () => {
-	gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
-	gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
-	gulp.src(["pit-display/build/**/*"]).pipe(gulp.dest("build/ems/public/pit-display"));
-	gulp.src(["ems-api/**/*"]).pipe(gulp.dest("build/ems/server/ems-api"));
-	gulp.src(["ems-web/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
-	gulp.src(["ems-socket/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));
-	gulp.src(["ems-core/**/*", "!ems-core/src/**/*"]).pipe(gulp.dest("build/ems/"));
+	// gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
+	// gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
+	// gulp.src(["pit-display/build/**/*"]).pipe(gulp.dest("build/ems/public/pit-display"));
+	gulp.src(["ems-api/**/*", "!ems-api/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-api"));
+	gulp.src(["ems-web/**/*", "!ems-web/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
+	gulp.src(["ems-socket/**/*", "!ems-socket/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));
+	gulp.src(["ems-core/build/**/*"]).pipe(gulp.dest("build/ems/public/desktop"));
+  gulp.src(["ems-core/main/**/*"]).pipe(gulp.dest("build/ems/public/desktop/main"));
 	gulp.src(["ecosystem.config.js"]).pipe(gulp.dest("build/ems/server/"));
-	gulp.src([".env"]).pipe(gulp.dest("build/ems/"));
+
+	gulp.src(["ems-core/.env"]).pipe(gulp.dest("build/ems/public/desktop"));
+  gulp.src(["ems-api/.env"]).pipe(gulp.dest("build/ems/server/ems-api"));
+  gulp.src(["ems-web/.env"]).pipe(gulp.dest("build/ems/server/ems-web"));
+  gulp.src(["ems-sck/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
 	// del.sync(["build/ems/node_modules/**", "build/ems/src/**"]);
 });
 
+gulp.task("update-pkg", () => {
+  let mainContents = JSON.parse(fs.readFileSync("ems-core/package.electron.json"));
+  let newDeps = {};
+  let coreDeps = JSON.parse(fs.readFileSync("ems-core/package.json")).dependencies;
+  let apiDeps = JSON.parse(fs.readFileSync("ems-api/package.json")).dependencies;
+  let webDeps = JSON.parse(fs.readFileSync("ems-web/package.json")).dependencies;
+  let sckDeps = JSON.parse(fs.readFileSync("ems-socket/package.json")).dependencies;
+  for (let dep in coreDeps) {
+    if (coreDeps.hasOwnProperty(dep)) {
+      if (typeof newDeps[dep] === "undefined") {
+        newDeps[dep] = {};
+      }
+      newDeps[dep] = coreDeps[dep];
+    }
+  }
+  for (let dep in apiDeps) {
+    if (apiDeps.hasOwnProperty(dep)) {
+      if (typeof newDeps[dep] === "undefined") {
+        newDeps[dep] = {};
+      }
+      newDeps[dep] = apiDeps[dep];
+    }
+  }
+  for (let dep in webDeps) {
+    if (webDeps.hasOwnProperty(dep)) {
+      if (typeof newDeps[dep] === "undefined") {
+        newDeps[dep] = {};
+      }
+      newDeps[dep] = webDeps[dep];
+    }
+  }
+  for (let dep in sckDeps) {
+    if (sckDeps.hasOwnProperty(dep)) {
+      if (typeof newDeps[dep] === "undefined") {
+        newDeps[dep] = {};
+      }
+      newDeps[dep] = sckDeps[dep];
+    }
+  }
+  mainContents.dependencies = newDeps;
+  fs.writeFileSync("build/ems/package.json", JSON.stringify(mainContents));
+});
 
 /* .env tasks */
 gulp.task("update-env:prod", ["generate-env:prod", "deploy-env"]);
@@ -73,4 +122,4 @@ gulp.task("prebuild", ["generate-env", "deploy-env"]);
 /* Inbetween these tasks, run `npm run build` */
 
 /* Postbuild tasks */
-gulp.task("postbuild", ["clean-build", "post-build"]);
+gulp.task("postbuild", ["clean-build", "post-build", "update-pkg"]);

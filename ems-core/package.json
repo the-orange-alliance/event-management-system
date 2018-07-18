@@ -2,7 +2,7 @@
   "name": "ems-core",
   "version": "0.1.0",
   "private": true,
-  "main": "main.js",
+  "main": "public/electron.js",
   "dependencies": {
     "axios": "^0.18.0",
     "dotenv": "^6.0.0",
@@ -24,7 +24,8 @@
     "react": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "postinstall": "electron-rebuild"
   },
   "devDependencies": {
     "@types/jest": "^23.1.5",
@@ -36,6 +37,7 @@
     "concurrently": "^3.6.0",
     "electron": "^2.0.4",
     "electron-debug": "^2.0.0",
+    "electron-rebuild": "^1.8.1",
     "typescript": "^2.9.2"
   },
   "proxy": "http://localhost:4200",

@@ -37,15 +37,28 @@ class DatabaseManager {
         });
     }
 
+    public selectAll(table: string): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
+            const query: string = "SELECT * FROM \"" + table + "\";";
+            this._db.all(query, (error: any, rows: any[]) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
+
     public createEventDatabase(eventType: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             if (!fs.existsSync(path.join(__dirname, "../sql/" + eventType + ".sql"))) {
                 reject("There does not exist an SQL file for the given event type.");
             }
             this.createBase().then(() => {
-               this.alterFromEventType(eventType).then(() => {
-                   resolve();
-               }).catch((error) => reject(error));
+                this.alterFromEventType(eventType).then(() => {
+                    resolve();
+                }).catch((error) => reject(error));
             }).catch((error) => reject(error));
         });
     }

@@ -2,11 +2,40 @@ import * as React from "react";
 import {Button, Card, Divider, Form, Grid, Tab} from "semantic-ui-react";
 import {getTheme} from "../../../shared/AppTheme";
 import ExplanationIcon from "../../../components/ExplanationIcon";
+import {IDisableNavigation, IIncrementCompletedStep} from "../../../stores/internal/types";
+import {Dispatch} from "redux";
+import {ApplicationActions} from "../../../stores";
+import {disableNavigation, incrementCompletedStep} from "../../../stores/internal/actions";
+import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
+import EMSProvider from "../../../shared/providers/EMSProvider";
+import HttpError from "../../../shared/models/HttpError";
+import {connect} from "react-redux";
 
-class DataSyncConfig extends React.Component {
+interface IProps {
+    setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+    setCompletedStep?: (step: number) => IIncrementCompletedStep
+}
+
+interface IState {
+    modalOpen: boolean
+}
+
+class DataSyncConfig extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      modalOpen: false
+    };
+    this.purgeLocal = this.purgeLocal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.openModal = this.openModal.bind(this);
+  }
+
   public render() {
+    const {modalOpen} = this.state;
     return (
       <Tab.Pane className="tab-subview">
+        <RestrictedAccessModal open={modalOpen} onClose={this.closeModal} onSuccess={this.purgeLocal}/>
         <h3>Data Sync</h3>
         <Divider />
         <Card.Group itemsPerRow={3}>
@@ -20,7 +49,7 @@ class DataSyncConfig extends React.Component {
                      <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} color={getTheme().primary}>Choose Directory</Form.Button></Grid.Column>
                    </Grid.Row>
                   <Grid.Row columns={16}>
-                    <Grid.Column width={10}><Form.Button fluid={true} color="red">Purge Local</Form.Button></Grid.Column>
+                    <Grid.Column width={10}><Form.Button fluid={true} color="red" onClick={this.openModal}>Purge Local</Form.Button></Grid.Column>
                     <Grid.Column width={6}><Form.Button fluid={true} color="orange">Force Backup</Form.Button></Grid.Column>
                   </Grid.Row>
                 </Grid>
@@ -50,6 +79,32 @@ class DataSyncConfig extends React.Component {
       </Tab.Pane>
     )
   }
+
+  private purgeLocal() {
+      this.props.setNavigationDisabled(true);
+    EMSProvider.deleteEvent().then(() => {
+        this.props.setNavigationDisabled(false);
+       this.props.setCompletedStep(0);
+    }).catch((error: HttpError) => {
+        this.props.setNavigationDisabled(false);
+        console.error(error);
+    });
+  }
+
+  public openModal() {
+    this.setState({modalOpen: true});
+  }
+
+  public closeModal() {
+   this.setState({modalOpen: false});
+  }
 }
 
-export default DataSyncConfig;
+export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+  return {
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
+    setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step))
+  };
+}
+
+export default connect(null, mapDispatchToProps)(DataSyncConfig);

@@ -19,7 +19,7 @@ postRoutes.set("event", postEvent);
 export function validate(req: Request, res: Response, next: NextFunction)  {
   const method = req.method.toString().toUpperCase();
   let routeMap: Map<string, string[]> = new Map<string, string[]>();
-  let routeURL = req.path.replace("/api/", "");
+  let routeURL = req.baseUrl.replace("/api/", "");
   if (method === "GET" || method === "DELETE") {
       next();
       return;
@@ -29,8 +29,6 @@ export function validate(req: Request, res: Response, next: NextFunction)  {
       next(Errors.METHOD_NOT_FOUND);
       return;
   }
-
-  console.log(method, routeURL);
 
   if (!routeMap.has(routeURL)) {
     next(Errors.ROUTE_NOT_DEFINED);

@@ -37,3 +37,7 @@ export function ERROR_WHILE_CREATING_DB(reason: string) {
 export function ERROR_WHILE_DELETING_DB(reason: string) {
     return new Error(400, "Error while deleting event database." + reason);
 }
+
+export function ERROR_WHILE_EXECUTING_QUERY(reason: string) {
+    return new Error(500, "Error while executing query. " + reason);
+}

@@ -1,8 +1,8 @@
 import Event from "../../../shared/models/Event";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import HttpError from "../../../shared/models/HttpError";
 import {EMSEventTypes} from "../../../shared/AppTypes";
+import HttpError from "../../../shared/models/HttpError";
 
 class EventPostingController {
     private static _instance: EventPostingController;
@@ -16,23 +16,42 @@ class EventPostingController {
 
     private constructor() {}
 
-    public postEventCreation(eventType: EMSEventTypes, event: Event): Promise<any> {
+    public createEventDatabase(eventType: EMSEventTypes, event: Event): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             try {
-                EMSProvider.createEvent(eventType).then(() => {
-                    EMSProvider.postEvent(eventType, event).then((response: AxiosResponse) => {
-                        resolve(response.data);
+                EMSProvider.getEvent().then((response: AxiosResponse) => {
+                    if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
+                        /* Resolve. The event database was originally created, and nothing needs to be done. This is
+                           completely safe.*/
+                        resolve(response.data.payload[0]);
+                    } else {
+                        EMSProvider.postEvent(event).then((eventResponse: AxiosResponse) => {
+                            resolve(eventResponse.data.payload[0]);
+                        }).catch((error: HttpError) => {
+                            // If we can't post the event, then something is wrong.
+                            reject(error);
+                        });
+                    }
+                }).catch(() => {
+                    // If this errors out, then the database has not been created.
+                    EMSProvider.createEvent(eventType).then(() => {
+                        EMSProvider.postEvent(event).then((response: AxiosResponse) => {
+                            resolve(response.data.payload[0]);
+                        }).catch((error: HttpError) => {
+                            // If we can't post the event, then something is wrong.
+                            reject(error);
+                        });
                     }).catch((error: HttpError) => {
+                        // If this errors out... Something is wrong.
                         reject(error);
                     });
-                }).catch((error) => {
-                    reject(error); // TODO - What to do here? Try and post event data?
                 });
             } catch (e) {
                 reject(e);
             }
         });
     }
+
 }
 
 export default EventPostingController.getInstance();

@@ -56,6 +56,25 @@ class EMSProvider {
     });
   }
 
+    private delete(url: string): Promise<AxiosResponse> {
+        return new Promise((resolve, reject) => {
+            if (typeof this._axios === "undefined" || typeof this._host === "undefined") {
+                reject(new HttpError(500, "ERR_PROVIDER_UNDEFINED", "The provider's host address has not been initialized."));
+            }
+            this._axios.delete(url, {data: {}}).then((response: AxiosResponse) => {
+                resolve(response);
+            }).catch((error: AxiosError) => {
+                if (error.response) {
+                    reject(new HttpError(error.response.data.message, error.response.data.code, this._host + url));
+                } else if (error.request) {
+                    reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
+                } else {
+                    reject(new HttpError(404, error.message, this._host + url));
+                }
+            });
+        });
+    }
+
   public post(url: string, body: IPostableObject | IPostableObject[]): Promise<AxiosResponse> {
     return new Promise((resolve, reject) => {
       const records: object[] = [];
@@ -85,12 +104,16 @@ class EMSProvider {
     return this.get("api/event/create?type=" + eventType);
   }
 
+  public deleteEvent(): Promise<AxiosResponse> {
+    return this.delete("api/event/delete");
+  }
+
   public getEvent(): Promise<AxiosResponse> {
     return this.get("api/event");
   }
 
-  public postEvent(eventType: EMSEventTypes, event: Event): Promise<AxiosResponse> {
-    return this.post("api/event" + eventType, event);
+  public postEvent(event: Event): Promise<AxiosResponse> {
+    return this.post("api/event", event);
   }
 
 }

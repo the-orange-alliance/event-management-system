@@ -28,17 +28,21 @@ import EventCreationValidator from "../controllers/EventCreationValidator";
 import HttpError from "../../../shared/models/HttpError";
 import {CONFIG_STORE} from "../../../shared/AppStore";
 import EventPostingController from "../controllers/EventPostingController";
+import {IDisableNavigation} from "../../../stores/internal/types";
+import {disableNavigation} from "../../../stores/internal/actions";
 
 interface IProps {
   onComplete: () => void,
   eventConfig?: EventConfiguration,
   event?: Event,
   selectConfigPreset?: (preset: EventConfiguration) => ISetEventConfiguration
-  setEvent?: (event: Event) => ISetEvent
+  setEvent?: (event: Event) => ISetEvent,
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
 }
 
 interface IState {
-  eventValidator: EventCreationValidator
+  eventValidator: EventCreationValidator,
+  creatingEvent: boolean
 }
 
 class EventSelection extends React.Component<IProps, IState> {
@@ -60,7 +64,8 @@ class EventSelection extends React.Component<IProps, IState> {
     this.createEvent = this.createEvent.bind(this);
 
     this.state = {
-      eventValidator: new EventCreationValidator(this.props.eventConfig, this.props.event)
+      eventValidator: new EventCreationValidator(this.props.eventConfig, this.props.event),
+      creatingEvent: false
     };
   }
 
@@ -221,15 +226,20 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private createEvent(): void {
+    this.setState({creatingEvent: true});
+    this.props.setNavigationDisabled(true);
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).then((storeState: object) => {
       console.log(storeState);
     }).catch((err) => {
       console.log(err);
     });
-    EventPostingController.postEventCreation(this.props.eventConfig.eventType, this.props.event).then(() => {
-        this.props.onComplete();
-        // TODO - Think. If you create another event should it completely overwrite all of your data?
+    EventPostingController.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
+      this.setState({creatingEvent: false});
+      this.props.setNavigationDisabled(false);
+      this.props.onComplete();
     }).catch((error: HttpError) => {
+      this.setState({creatingEvent: true});
+      this.props.setNavigationDisabled(false);
       console.log(error);
     });
   }
@@ -351,10 +361,11 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private renderEventCreation(): JSX.Element {
+    const {creatingEvent} = this.state;
     return (
       <Grid>
         <Grid.Row columns={16}>
-          <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={!this.canCreateEvent()} onClick={this.createEvent}>Create Event</Button></Grid.Column>
+          <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={!this.canCreateEvent() || creatingEvent} loading={creatingEvent} onClick={this.createEvent}>Create Event</Button></Grid.Column>
         </Grid.Row>
         <Grid.Row columns={16}>
           <Grid.Column width={8}><i>NOTE: Everything in the Event Manager can only be completed once! Make sure all of your information is correct.</i></Grid.Column>
@@ -375,7 +386,8 @@ export function mapStateToProps({configState}: IApplicationState) {
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     selectConfigPreset: (preset: EventConfiguration) => dispatch(setEventConfiguration(preset)),
-    setEvent: (event: Event) => dispatch(setEvent(event))
+    setEvent: (event: Event) => dispatch(setEvent(event)),
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
   };
 }
 

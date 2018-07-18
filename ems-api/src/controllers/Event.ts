@@ -5,6 +5,14 @@ import logger from "../logger";
 
 const router: Router = Router();
 
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
+    DatabaseManager.selectAll("event").then((rows: any[]) => {
+        res.send({payload: rows});
+    }).catch((error) => {
+        next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+    });
+});
+
 router.get("/create", (req: Request, res: Response, next: NextFunction) => {
   if (!req.query.type) {
       next(Errors.MISSING_QUERY("type"));

@@ -45,15 +45,14 @@ app.use((req, res, next) => {
   }
 });
 
-app.use(Validator.validate);
-
-app.use("/api/event", EventController);
-
 /* Defining a simple test route. */
 app.use("/ping", (req, res) => {
-  res.set("Content-Type", "application/json");
-  res.send({res: "pong!"});
+    res.send({res: "pong!"});
 });
+
+app.use("/api/*", Validator.validate);
+
+app.use("/api/event", EventController);
 
 /* If the user is trying to get to a route not previously handled, it wasn't found. */
 app.all("*", (req, res, next) => {

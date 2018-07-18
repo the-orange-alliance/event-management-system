@@ -81,12 +81,16 @@ class EMSProvider {
     });
   }
 
-  public testConnection(): Promise<AxiosResponse> {
-    return this.get("");
+  public createEvent(eventType: EMSEventTypes): Promise<AxiosResponse> {
+    return this.get("api/event/create?type=" + eventType);
+  }
+
+  public getEvent(): Promise<AxiosResponse> {
+    return this.get("api/event");
   }
 
   public postEvent(eventType: EMSEventTypes, event: Event): Promise<AxiosResponse> {
-    return this.post("api/event?type=" + eventType, event);
+    return this.post("api/event" + eventType, event);
   }
 
 }

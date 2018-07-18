@@ -25,10 +25,9 @@ import {SyntheticEvent} from "react";
 import {AllianceCaptainItems, PostQualItems} from "../../../shared/data/DropdownItemOptions";
 import {PostQualConfig} from "../../../shared/AppTypes";
 import EventCreationValidator from "../controllers/EventCreationValidator";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import {AxiosResponse} from "axios";
 import HttpError from "../../../shared/models/HttpError";
 import {CONFIG_STORE} from "../../../shared/AppStore";
+import EventPostingController from "../controllers/EventPostingController";
 
 interface IProps {
   onComplete: () => void,
@@ -224,14 +223,14 @@ class EventSelection extends React.Component<IProps, IState> {
   private createEvent(): void {
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).then((storeState: object) => {
       console.log(storeState);
-      this.props.onComplete();
     }).catch((err) => {
       console.log(err);
     });
-    EMSProvider.postEvent(this.props.eventConfig.eventType, this.props.event).then((response: AxiosResponse) => {
-      console.log(response);
+    EventPostingController.postEventCreation(this.props.eventConfig.eventType, this.props.event).then(() => {
+        this.props.onComplete();
+        // TODO - Think. If you create another event should it completely overwrite all of your data?
     }).catch((error: HttpError) => {
-      console.log(error); // TODO - Error dialog.
+      console.log(error);
     });
   }
 

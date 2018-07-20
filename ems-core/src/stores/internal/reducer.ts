@@ -10,7 +10,7 @@ export const initialState: IInternalState = {
   processingActionsDisabled: false,
   processList: [],
   navigationDisabled: false,
-  completedStep: 1,
+  completedStep: 0,
   teamList: []
 };
 

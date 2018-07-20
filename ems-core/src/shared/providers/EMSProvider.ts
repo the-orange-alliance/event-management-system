@@ -3,7 +3,7 @@ import HttpError from "../models/HttpError";
 import Event from "../models/Event";
 import {EMSEventTypes} from "../AppTypes";
 
-const PORT = 8008;
+const PORT = process.env.REACT_APP_EMS_API_PORT;
 
 class EMSProvider {
   private static _instance: EMSProvider;

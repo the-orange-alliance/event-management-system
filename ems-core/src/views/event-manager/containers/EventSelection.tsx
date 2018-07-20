@@ -228,17 +228,13 @@ class EventSelection extends React.Component<IProps, IState> {
   private createEvent(): void {
     this.setState({creatingEvent: true});
     this.props.setNavigationDisabled(true);
-    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).then((storeState: object) => {
-      console.log(storeState);
-    }).catch((err) => {
-      console.log(err);
-    });
+    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).catch((err) => console.log(err));
     EventPostingController.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
       this.setState({creatingEvent: false});
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {
-      this.setState({creatingEvent: true});
+      this.setState({creatingEvent: false});
       this.props.setNavigationDisabled(false);
       console.log(error);
     });

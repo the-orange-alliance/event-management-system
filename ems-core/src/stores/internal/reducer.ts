@@ -10,7 +10,7 @@ export const initialState: IInternalState = {
   processingActionsDisabled: false,
   processList: [],
   navigationDisabled: false,
-  completedStep: 0
+  completedStep: 1
 };
 
 const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, action) => {

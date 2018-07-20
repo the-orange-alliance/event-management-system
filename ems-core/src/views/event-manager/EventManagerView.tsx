@@ -23,7 +23,7 @@ class EventManagerView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeStep: 1
+      activeStep: 2
     }
   }
 

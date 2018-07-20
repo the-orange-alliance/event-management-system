@@ -1,9 +1,10 @@
 import {Action} from "redux";
 import {
   UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP,
-  SET_PROCESS_ACTIONS_DISABLED
+  SET_PROCESS_ACTIONS_DISABLED, UPDATE_TEAM_LIST, ADD_TEAM, ALTER_TEAM, REMOVE_TEAM
 } from "./constants";
 import Process from "../../shared/models/Process";
+import Team from "../../shared/models/Team";
 
 export interface IUpdateProcessList extends Action {
   type: UPDATE_PROCESS_LIST,
@@ -33,4 +34,33 @@ export interface IIncrementCompletedStep extends Action {
   }
 }
 
-export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation | IIncrementCompletedStep;
+export interface IUpdateTeamList extends Action {
+  type: UPDATE_TEAM_LIST,
+  payload: {
+    teamList: Team[]
+  }
+}
+
+export interface IAddTeam extends Action {
+  type: ADD_TEAM,
+  payload: {
+    team: Team
+  }
+}
+
+export interface IAlterTeam extends Action {
+  type: ALTER_TEAM,
+  payload: {
+    index: number,
+    team: Team
+  }
+}
+
+export interface IRemoveTeam extends Action {
+  type: REMOVE_TEAM,
+  payload: {
+    index: number
+  }
+}
+
+export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation | IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam;

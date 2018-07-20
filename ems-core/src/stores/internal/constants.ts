@@ -9,3 +9,15 @@ export type DISABLE_NAVIGATION = typeof DISABLE_NAVIGATION;
 
 export const INCREMENT_COMPLETED_STEP = "INCREMENT_COMPLETED_STEP";
 export type INCREMENT_COMPLETED_STEP = typeof INCREMENT_COMPLETED_STEP;
+
+export const UPDATE_TEAM_LIST = "UPDATE_TEAM_LIST";
+export type UPDATE_TEAM_LIST = typeof UPDATE_TEAM_LIST;
+
+export const ADD_TEAM = "ADD_TEAM";
+export type ADD_TEAM = typeof ADD_TEAM;
+
+export const ALTER_TEAM = "ALTER_TEAM";
+export type ALTER_TEAM = typeof ALTER_TEAM;
+
+export const REMOVE_TEAM = "REMOVE_TEAM";
+export type REMOVE_TEAM = typeof REMOVE_TEAM;

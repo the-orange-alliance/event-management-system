@@ -10,6 +10,17 @@ export default class Team implements IPostableObject {
   private _country: string;
   private _countryCode: string;
 
+  constructor() {
+    this.teamKey = 0;
+    this.teamNameShort = "";
+    this.teamNameLong = "";
+    this.robotName = "";
+    this.city = "";
+    this.stateProv = "";
+    this.country = "";
+    this.countryCode = "";
+  }
+
   public toJSON(): object {
     return {
       team_key: this.teamKey,

@@ -43,6 +43,7 @@ function createWindow () {
     const logger = require("./main/logger");
     require("./main/process-communication");
     require("./main/store-communication");
+    require("./main/dialog-communication");
 
     logger.transports[0].level = "debug";
     logger.info("------------STARTING EMS IN PRODUCTION MODE------------");
@@ -56,6 +57,8 @@ function createWindow () {
     const logger = require("../main/logger");
     require("../main/process-communication");
     require("../main/store-communication");
+    require("../main/dialog-communication");
+
     logger.transports[0].level = "debug";
     logger.info("------------STARTING EMS IN DEVELOPMENT MODE------------");
     win.loadURL("http://localhost:3000/");

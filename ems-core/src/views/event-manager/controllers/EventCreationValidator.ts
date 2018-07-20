@@ -80,7 +80,7 @@ class EventCreationValidator {
     return typeof captains === "number" && this.isSafe(captains.toString());
   }
 
-  private checkIfValid() {
+  private checkIfValid(): void {
     this._isValid = this.isValidEventKey() && this.isValidEventName() && this.isValidEventVenue() && this.isValidCity()
       && this.isValidStateProv() && this.isValidCountry() && this.isValidWebsite() && this.isValidFieldCount()
       && this.isValidTPA() && this.isValidPostQualTPA() && this.isValidAllianceCaptains();

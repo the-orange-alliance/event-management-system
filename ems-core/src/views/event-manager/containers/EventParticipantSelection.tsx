@@ -1,27 +1,31 @@
 import * as React from "react";
-import {Button, Dimmer, Loader, Table} from "semantic-ui-react";
+import {Button, Table} from "semantic-ui-react";
 import {getTheme} from "../../../shared/AppTheme";
 import Team from "../../../shared/models/Team";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
 import TeamEditModal from "../../../components/TeamEditModal";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {Dispatch} from "redux";
-import {IAddTeam, IAlterTeam, IRemoveTeam, IUpdateTeamList} from "../../../stores/internal/types";
-import {addTeam, alterTeam, removeTeam, updateTeamList} from "../../../stores/internal/actions";
+import {IAddTeam, IAlterTeam, IDisableNavigation, IRemoveTeam, IUpdateTeamList} from "../../../stores/internal/types";
+import {addTeam, alterTeam, disableNavigation, removeTeam, updateTeamList} from "../../../stores/internal/actions";
 import {connect} from "react-redux";
 import DialogManager from "../../../shared/managers/DialogManager";
 import TeamValidator from "../controllers/TeamValidator";
 import EventConfiguration from "../../../shared/models/EventConfiguration";
 import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
+import Event from "../../../shared/models/Event";
 
 interface IProps {
+  onComplete: () => void,
   teams?: Team[],
-  eventConfig?: EventConfiguration
+  eventConfig?: EventConfiguration,
+  event: Event,
   addTeam?: (team: Team) => IAddTeam,
   alterTeam?: (index: number, team: Team) => IAlterTeam,
   removeTeam?: (index: number) => IRemoveTeam
-  setTeamList?: (teams: Team[]) => IUpdateTeamList
+  setTeamList?: (teams: Team[]) => IUpdateTeamList,
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
 }
 
 interface IState {
@@ -77,9 +81,6 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
         <div className="step-table-subview">
           <ConfirmActionModal open={confirmModalOpen} onClose={this.closeConfirmModal} onConfirm={this.removeTeam} innerText={"Are you sure you want to remove this team from the event?"}/>
           <TeamEditModal open={teamModalOpen} onClose={this.closeTeamModal} onUpdate={this.updateModifiedTeam} team={activeTeam}/>
-          <Dimmer active={loadingTeams}>
-            <Loader />
-          </Dimmer>
           <Table color={getTheme().secondary} attached={true} celled={true} selectable={true} textAlign="center" columns={16}>
             <Table.Header>
               <Table.Row>
@@ -98,12 +99,12 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
         </div>
         <div className="step-table-buttons">
           <div>
-            <Button color={getTheme().primary} disabled={loadingTeams || !this.canCreateTeamList()} onClick={this.createTeamList}>Save &amp; Publish</Button>
-            <Button color={getTheme().primary} disabled={loadingTeams} onClick={this.importTeamsByCSV}>Import By CSV</Button>
+            <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams || !this.canCreateTeamList()} onClick={this.createTeamList}>Save &amp; Publish</Button>
+            <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importTeamsByCSV}>Import By CSV</Button>
           </div>
           <div>
-            <Button color={getTheme().secondary} disabled={loadingTeams} onClick={this.createNewTeam}>Add Team</Button>
-            <Button color={removeMode ? "red" : getTheme().secondary} disabled={loadingTeams} onClick={this.toggleRemoveMode}>Remove Team</Button>
+            <Button color={getTheme().secondary} loading={loadingTeams} disabled={loadingTeams} onClick={this.createNewTeam}>Add Team</Button>
+            <Button color={removeMode ? "red" : getTheme().secondary} loading={loadingTeams} disabled={loadingTeams} onClick={this.toggleRemoveMode}>Remove Team</Button>
           </div>
         </div>
       </div>
@@ -111,7 +112,19 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   }
 
   private createTeamList() {
-    EventPostingController.createTeamList(this.props.teams).catch((error: HttpError) => {
+    this.setState({loadingTeams: true});
+    this.props.setNavigationDisabled(true);
+    const updatedTeams: Team[] = this.props.teams;
+    for (let i = 0; i < this.props.teams.length; i++) {
+      updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + (i + 1);
+    }
+    EventPostingController.createTeamList(updatedTeams).then(() => {
+      setTimeout(() => {
+        this.setState({loadingTeams: false});
+        this.props.setNavigationDisabled(false);
+        this.props.onComplete();
+      }, 500);
+    }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
     });
   }
@@ -119,6 +132,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   private importTeamsByCSV() {
     DialogManager.showOpenDialog({title: "Team CSV Import", files: true, filters: [{name: "CSV Files", extensions: ["csv"]}]}).then((paths: string[]) => {
       this.setState({loadingTeams: true});
+      this.props.setNavigationDisabled(true);
       DialogManager.parseCSV(paths[0]).then((lines: string[]) => {
         const teams: Team[] = [];
         const failedImports: string[] = [];
@@ -147,6 +161,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
           }
         }
         this.setState({loadingTeams: false});
+        this.props.setNavigationDisabled(false);
         this.props.setTeamList(teams);
         setTimeout(() => {
           DialogManager.showInfoBox("Team Import Result", "Imported " + teams.length + " of original " + lines.length + ". The following teams were not imported due to parsing errors: " + failedImports.toString());
@@ -209,7 +224,8 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
 export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
     teams: internalState.teamList,
-    eventConfig: configState.eventConfiguration
+    eventConfig: configState.eventConfiguration,
+    event: configState.event
   };
 }
 
@@ -218,7 +234,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     addTeam: (team: Team) => dispatch(addTeam(team)),
     alterTeam: (index: number, team: Team) => dispatch(alterTeam(index, team)),
     removeTeam: (index: number) => dispatch(removeTeam(index)),
-    setTeamList: (teams: Team[]) => dispatch(updateTeamList(teams))
+    setTeamList: (teams: Team[]) => dispatch(updateTeamList(teams)),
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
   };
 }
 

@@ -12,9 +12,19 @@ const postEvent = [
   "field_count"
 ];
 
+const postTeam = [
+  "team_key",
+  "event_participant_key",
+  "team_name_short",
+  "city",
+  "country",
+  "country_code"
+];
+
 const postRoutes = new Map<string, string[]>();
 
 postRoutes.set("event", postEvent);
+postRoutes.set("team", postTeam);
 
 export function validate(req: Request, res: Response, next: NextFunction)  {
   const method = req.method.toString().toUpperCase();

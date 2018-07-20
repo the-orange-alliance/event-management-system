@@ -103,7 +103,7 @@ class EventManagerView extends React.Component<IProps, IState> {
   }
 
   private isCompleted(step: number): boolean {
-    return this.props.completedStep > step;
+    return this.props.completedStep >= step;
   }
 
   private isDisabled(step: number): boolean {
@@ -117,9 +117,9 @@ class EventManagerView extends React.Component<IProps, IState> {
   private getViewFromActiveStep(activeStep: number): JSX.Element {
     switch (activeStep) {
       case 1:
-        return <EventSelection onComplete={this.completeStep.bind(this, 1)} />;
+        return <EventSelection onComplete={this.completeStep.bind(this, 1)}/>;
       case 2:
-        return <EventParticipantSelection/>;
+        return <EventParticipantSelection onComplete={this.completeStep.bind(this, 2)}/>;
       default:
         return <span>View not found.</span>;
     }

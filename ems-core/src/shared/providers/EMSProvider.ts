@@ -47,7 +47,7 @@ class EMSProvider {
         resolve(response);
       }).catch((error: AxiosError) => {
         if (error.response) {
-          reject(new HttpError(error.response.data.message, error.response.data.code, this._host + url));
+          reject(new HttpError(error.response.data._code, error.response.data._message, this._host + url));
         } else if (error.request) {
           reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
         } else {
@@ -57,24 +57,24 @@ class EMSProvider {
     });
   }
 
-    private delete(url: string): Promise<AxiosResponse> {
-        return new Promise((resolve, reject) => {
-            if (typeof this._axios === "undefined" || typeof this._host === "undefined") {
-                reject(new HttpError(500, "ERR_PROVIDER_UNDEFINED", "The provider's host address has not been initialized."));
-            }
-            this._axios.delete(url, {data: {}}).then((response: AxiosResponse) => {
-                resolve(response);
-            }).catch((error: AxiosError) => {
-                if (error.response) {
-                    reject(new HttpError(error.response.data.message, error.response.data.code, this._host + url));
-                } else if (error.request) {
-                    reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
-                } else {
-                    reject(new HttpError(404, error.message, this._host + url));
-                }
-            });
-        });
-    }
+  private delete(url: string): Promise<AxiosResponse> {
+    return new Promise((resolve, reject) => {
+      if (typeof this._axios === "undefined" || typeof this._host === "undefined") {
+        reject(new HttpError(500, "ERR_PROVIDER_UNDEFINED", "The provider's host address has not been initialized."));
+      }
+      this._axios.delete(url, {data: {}}).then((response: AxiosResponse) => {
+        resolve(response);
+      }).catch((error: AxiosError) => {
+        if (error.response) {
+          reject(new HttpError(error.response.data._code, error.response.data._message, this._host + url));
+        } else if (error.request) {
+          reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
+        } else {
+          reject(new HttpError(404, error.message, this._host + url));
+        }
+      });
+    });
+  }
 
   public post(url: string, body: IPostableObject | IPostableObject[]): Promise<AxiosResponse> {
     return new Promise((resolve, reject) => {
@@ -89,9 +89,8 @@ class EMSProvider {
       this._axios.post(url, {records: records}).then((response: AxiosResponse) => {
         resolve(response);
       }).catch((error) => {
-        console.log(error);
         if (error.response) {
-          reject(new HttpError(error.response.data.message, error.response.data.code, this._host + url));
+          reject(new HttpError(error.response.data._code, error.response.data._message, this._host + url));
         } else if (error.request) {
           reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
         } else {

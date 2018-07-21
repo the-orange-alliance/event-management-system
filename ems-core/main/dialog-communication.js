@@ -23,7 +23,7 @@ ipcMain.on("open-dialog", (event, openProperties) => {
     if (paths && paths[0]) {
       event.sender.send("open-dialog-success", paths);
     } else {
-      event.sender.send("open-dialog-error");
+      event.sender.send("open-dialog-error", "No file was selected.");
     }
   });
 });
@@ -34,4 +34,22 @@ ipcMain.on("show-info", (event, title, message) => {
     title: title,
     type: "info",
   });
+});
+
+ipcMain.on("show-error", (event, error) => {
+  if (error._stacktrace) {
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+      message: "There was an error while trying to complete a vital operation. Error code " + error._errorCode + " (" + error._errorMessage + "). Stacktrace: " + error._stacktrace +
+      ". If you don't understand how to fix this error, contact the application staff for support.",
+      title: "System Application Error " + error._errorCode,
+      type: "error"
+    });
+  } else {
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+      message: "There was an error while trying to complete a vital operation. Error code " + error._httpCode + ": " + error._errorStr + " accessing " + error._message +
+      ". If you don't understand how to fix this error, contact the application staff for support.",
+      title: "System HTTP Error " + error._httpCode,
+      type: "error"
+    });
+  }
 });

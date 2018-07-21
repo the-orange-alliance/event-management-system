@@ -34,6 +34,18 @@ body {
     height: 50px;
 }
 
+.step-view-tab {
+    width: 100%;
+    max-height: calc(100% - 50px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2px;
+}
+
+.step-view-tab-table {
+
+}
+
 .tab-subview {
   width: 100%;
   max-height: 70vh;

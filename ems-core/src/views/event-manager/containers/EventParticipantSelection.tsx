@@ -125,6 +125,8 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
         this.props.onComplete();
       }, 500);
     }).catch((error: HttpError) => {
+      this.setState({loadingTeams: false});
+      this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);
     });
   }

@@ -23,7 +23,11 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
     case DISABLE_NAVIGATION:
       return {...state, navigationDisabled: action.payload.navigationDisabled};
     case INCREMENT_COMPLETED_STEP:
-      return {...state, completedStep: action.payload.completedStep};
+      if (action.payload.completedStep > state.completedStep) {
+        return {...state, completedStep: action.payload.completedStep};
+      } else {
+        return state;
+      }
     case UPDATE_TEAM_LIST:
       return {...state, teamList: action.payload.teamList};
     case ADD_TEAM:
@@ -40,10 +44,9 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
         })
       };
     case REMOVE_TEAM:
-      const newArray = state.teamList.slice();
       return {
         ...state,
-        teamList: newArray.splice(action.payload.index, 1) // TODO - Make this and change element constant functions inside of this reducer
+        teamList: [...state.teamList.slice(0, action.payload.index), ...state.teamList.slice(1 + action.payload.index)] // TODO - Make this and change element constant functions inside of this reducer
       };
     default:
       return state;

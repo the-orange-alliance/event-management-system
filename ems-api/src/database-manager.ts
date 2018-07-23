@@ -63,6 +63,19 @@ class DatabaseManager {
     });
   }
 
+  public selectAllWhere(table: string, whereClause: string): Promise<any[]> {
+    return new Promise<any[]>((resolve, reject) => {
+      const query: string = "SELECT * FROM \"" + table + "\" WHERE " + whereClause + ";";
+      this._db.all(query, (error: any, rows: any[]) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
+
   public insertValues(table: string, values: object[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       let columns = "";

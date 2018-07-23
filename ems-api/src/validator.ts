@@ -21,10 +21,39 @@ const postTeam = [
   "country_code"
 ];
 
+const postSchedule = [
+  "schedule_item_key",
+  "schedule_item_type",
+  "schedule_Item_name",
+  "schedule_day",
+  "start_time",
+  "duration",
+  "is_match"
+];
+
+const postMatch = [
+  "match_key",
+  "match_detail_key",
+  "match_name",
+  "tournament_level",
+  "scheduled_time",
+  "field_number"
+];
+
+const postMatchParticipants = [
+  "match_participant_key",
+  "match_key",
+  "team_key",
+  "station"
+];
+
 const postRoutes = new Map<string, string[]>();
 
 postRoutes.set("event", postEvent);
 postRoutes.set("team", postTeam);
+postRoutes.set("schedule", postSchedule);
+postRoutes.set("match", postMatch);
+postRoutes.set("match/participants", postMatchParticipants);
 
 export function validate(req: Request, res: Response, next: NextFunction)  {
   const method = req.method.toString().toUpperCase();

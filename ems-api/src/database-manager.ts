@@ -50,6 +50,21 @@ class DatabaseManager {
     });
   }
 
+  public deleteAll(table: string): Promise<any[]> {
+    return new Promise<any[]>((resolve, reject) => {
+      const query: string = "DELETE FROM \"" + table + "\";";
+      this._db.all(query, (error: any, rows: any[]) => {
+        if (error) {
+          reject(error);
+        } else {
+          setTimeout(() => {
+            resolve(rows);
+          }, 250); // Give the DB time to process all the actions.
+        }
+      });
+    });
+  }
+
   public selectAll(table: string): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
       const query: string = "SELECT * FROM \"" + table + "\";";
@@ -71,6 +86,21 @@ class DatabaseManager {
           reject(error);
         } else {
           resolve(rows);
+        }
+      });
+    });
+  }
+
+  public deleteAllWhere(table: string, whereClause: string): Promise<any[]> {
+    return new Promise<any[]>((resolve, reject) => {
+      const query: string = "DELETE FROM \"" + table + "\" WHERE " + whereClause + ";";
+      this._db.all(query, (error: any, rows: any[]) => {
+        if (error) {
+          reject(error);
+        } else {
+          setTimeout(() => {
+            resolve(rows);
+          }, 250); // Give the DB time to process all the actions.
         }
       });
     });
@@ -102,7 +132,9 @@ class DatabaseManager {
         if (error) {
           reject(error);
         } else {
-          resolve(rows);
+          setTimeout(() => {
+            resolve(rows);
+          }, 250); // Give the DB time to process all the actions.
         }
       });
     });

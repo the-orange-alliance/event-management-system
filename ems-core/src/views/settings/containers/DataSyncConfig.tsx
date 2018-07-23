@@ -10,14 +10,15 @@ import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import HttpError from "../../../shared/models/HttpError";
 import {connect} from "react-redux";
+import DialogManager from "../../../shared/managers/DialogManager";
 
 interface IProps {
-    setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
-    setCompletedStep?: (step: number) => IIncrementCompletedStep
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  setCompletedStep?: (step: number) => IIncrementCompletedStep
 }
 
 interface IState {
-    modalOpen: boolean
+  modalOpen: boolean
 }
 
 class DataSyncConfig extends React.Component<IProps, IState> {
@@ -44,10 +45,10 @@ class DataSyncConfig extends React.Component<IProps, IState> {
             <Card.Content>
               <Form>
                 <Grid>
-                   <Grid.Row columns={16}>
-                     <Grid.Column width={10}><Form.Input fluid={true} label={<ExplanationIcon title={"Local Data Backup Path"} content={"EMS will periodically backup configuration and database files to this path."}/>}/></Grid.Column>
-                     <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} color={getTheme().primary}>Choose Directory</Form.Button></Grid.Column>
-                   </Grid.Row>
+                  <Grid.Row columns={16}>
+                    <Grid.Column width={10}><Form.Input fluid={true} label={<ExplanationIcon title={"Local Data Backup Path"} content={"EMS will periodically backup configuration and database files to this path."}/>}/></Grid.Column>
+                    <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} color={getTheme().primary}>Choose Directory</Form.Button></Grid.Column>
+                  </Grid.Row>
                   <Grid.Row columns={16}>
                     <Grid.Column width={10}><Form.Button fluid={true} color="red" onClick={this.openModal}>Purge Local</Form.Button></Grid.Column>
                     <Grid.Column width={6}><Form.Button fluid={true} color="orange">Force Backup</Form.Button></Grid.Column>
@@ -81,13 +82,13 @@ class DataSyncConfig extends React.Component<IProps, IState> {
   }
 
   private purgeLocal() {
-      this.props.setNavigationDisabled(true);
+    this.props.setNavigationDisabled(true);
     EMSProvider.deleteEvent().then(() => {
-        this.props.setNavigationDisabled(false);
-       this.props.setCompletedStep(0);
+      this.props.setNavigationDisabled(false);
+      this.props.setCompletedStep(0);
     }).catch((error: HttpError) => {
-        this.props.setNavigationDisabled(false);
-        console.error(error);
+      this.props.setNavigationDisabled(false);
+      DialogManager.showErrorBox(error);
     });
   }
 
@@ -96,7 +97,7 @@ class DataSyncConfig extends React.Component<IProps, IState> {
   }
 
   public closeModal() {
-   this.setState({modalOpen: false});
+    this.setState({modalOpen: false});
   }
 }
 

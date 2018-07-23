@@ -8,8 +8,8 @@ import {reducers} from "./stores";
 import {createStore} from "redux";
 import {CONFIG_STORE} from "./shared/AppStore";
 import AppError from "./shared/models/AppError";
-import Event from "./shared/models/Event";
-import EventConfiguration from "./shared/models/EventConfiguration";
+import {IConfigState} from "./stores/config/models";
+import * as Config from "./stores/config/reducer";
 
 const {ipcRenderer} = (window as any).require("electron");
 
@@ -21,23 +21,22 @@ console.log("Preloading application state...");
 
 CONFIG_STORE.getAll().then((configStore: any) => {
 
-  let applicationStore;
+  const configState: IConfigState = Config.initialState;
 
-  if (typeof configStore.event === "undefined" || typeof configStore.eventConfig === "undefined") {
-    applicationStore = createStore(reducers);
-  } else {
-    let event: Event = new Event();
-    let config: EventConfiguration = new EventConfiguration();
-    event = event.fromJSON(configStore.event);
-    config = config.fromJSON(configStore.eventConfig);
-
-    applicationStore = createStore(reducers, {
-      configState: {
-        event: event,
-        eventConfiguration: config
-      }
-    });
+  if (typeof configStore.event !== "undefined" || typeof configStore.eventConfig !== "undefined") {
+    configState.event = configState.event.fromJSON(configStore.event);
+    configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);
   }
+
+  if (typeof configStore.schedule !== "undefined") {
+    if (typeof configStore.schedule.Practice !== "undefined") {
+      configState.practiceSchedule = configState.practiceSchedule.fromJSON(configStore.schedule.Practice);
+    }
+  }
+
+  const applicationStore = createStore(reducers, {
+    configState: configState
+  });
 
   console.log("Preloaded application state.");
   ipcRenderer.send("preload-finish");

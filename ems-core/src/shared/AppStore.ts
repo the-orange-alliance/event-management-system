@@ -12,7 +12,7 @@ const ipcRenderer = (window as any).require("electron").ipcRenderer;
  * newest redux state.
  */
 class AppStore {
-  private _name: string;
+  private readonly _name: string;
 
   constructor(name: string) {
     this._name = name;

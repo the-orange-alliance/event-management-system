@@ -7,8 +7,17 @@ const router: Router = Router();
 
 router.get("/:schedule_type", (req: Request, res: Response, next: NextFunction) => {
   const scheduleType = req.params.schedule_type;
-  DatabaseManager.selectAllWhere("schedule", "schedule_type=" + scheduleType).then((rows: any[]) => {
+  DatabaseManager.selectAllWhere("schedule", "schedule_item_type=\"" + scheduleType + "\"").then((rows: any[]) => {
     res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.delete("/:schedule_type", (req: Request, res: Response, next: NextFunction) => {
+  const scheduleType = req.params.schedule_type;
+  DatabaseManager.deleteAllWhere("schedule", "schedule_item_type=\"" + scheduleType + "\"").then(() => {
+    res.send({payload: "Successfully delete all schedule rows with schedule type " + scheduleType});
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
   });

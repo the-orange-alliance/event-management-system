@@ -27,3 +27,27 @@ ipcMain.on("store-get-all", (event, file) => {
     }
   });
 });
+
+ipcMain.on("store-set", (event, options) => {
+  const filePath = path.join(appDataPath, options.file);
+  fs.readFile(filePath, (readErr, data) => {
+    if (readErr) {
+      logger.error(readErr);
+      event.sender.send("store-set-error", readErr);
+    } else {
+      const storeJSON = JSON.parse(data.toString());
+      if (typeof storeJSON[options.key] === "undefined") {
+        storeJSON[options.key] = {};
+      }
+      storeJSON[options.key] = options.data;
+      fs.writeFile(filePath, JSON.stringify(storeJSON), (writeErr) => {
+        if (writeErr) {
+          logger.error(writeErr);
+          event.sender.send("store-set-error", writeErr);
+        } else {
+          event.sender.send("store-set-success", storeJSON);
+        }
+      });
+    }
+  });
+});

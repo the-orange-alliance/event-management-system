@@ -1,6 +1,6 @@
 import * as moment from "moment";
 
-export default class DayBreak {
+export default class DayBreak implements IPostableObject {
   private _id: number;
   private _name: string;
   private _startTime: moment.Moment;
@@ -12,6 +12,26 @@ export default class DayBreak {
     this._name = "Break";
     this._duration = 30;
     this._match = 0;
+  }
+
+  public toJSON(): object {
+    return {
+      id: this.id,
+      name: this.name,
+      startTime: this.formattedStartTime,
+      duration: this.duration,
+      match: this.match
+    };
+  }
+
+  public fromJSON(json: any): DayBreak {
+    const dayBreak: DayBreak = new DayBreak();
+    dayBreak.id = json.id;
+    dayBreak.name = json.name;
+    dayBreak.startTime = moment(json.startTime, "dddd, MMMM Do YYYY, h:mm a");
+    dayBreak.duration = json.duration;
+    dayBreak.match = json.match;
+    return dayBreak;
   }
 
   public isValid(): boolean {

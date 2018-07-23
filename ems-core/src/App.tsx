@@ -40,7 +40,6 @@ class App extends React.Component<IProps> {
         if (eventResponse.data.payload && eventResponse.data.payload[0] && eventResponse.data.payload[0].event_key) {
           // this.props.setCompletedStep(1);
         }
-
         EMSProvider.getTeams().then((teamResponse: AxiosResponse) => {
           if (teamResponse.data && teamResponse.data.payload && teamResponse.data.payload.length > 0) {
             const teams: Team[] = [];

@@ -1,8 +1,9 @@
 import {ActionCreator} from "redux";
-import {SET_EVENT, SET_EVENT_CONFIG, SET_NETWORK_HOST, TOGGLE_SLAVE_MODE} from "./constants";
-import {ISetEvent, ISetEventConfiguration, ISetNetworkHost, IToggleSlaveMode} from "./types";
+import {SET_EVENT, SET_EVENT_CONFIG, SET_NETWORK_HOST, SET_PRACTICE_SCHEDULE, TOGGLE_SLAVE_MODE} from "./constants";
+import {ISetEvent, ISetEventConfiguration, ISetNetworkHost, ISetPracticeSchedule, IToggleSlaveMode} from "./types";
 import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
+import Schedule from "../../shared/models/Schedule";
 
 export const enableSlaveMode: ActionCreator<IToggleSlaveMode> = (slaveModeEnabled: boolean) => ({
   type: TOGGLE_SLAVE_MODE,
@@ -29,5 +30,12 @@ export const setNetworkHost: ActionCreator<ISetNetworkHost> = (networkHost: stri
   type: SET_NETWORK_HOST,
   payload: {
     networkHost: networkHost
+  }
+});
+
+export const setPracticeSchedule: ActionCreator<ISetPracticeSchedule> = (schedule: Schedule) => ({
+  type: SET_PRACTICE_SCHEDULE,
+  payload: {
+    schedule: schedule
   }
 });

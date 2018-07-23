@@ -24,7 +24,7 @@ const postTeam = [
 const postSchedule = [
   "schedule_item_key",
   "schedule_item_type",
-  "schedule_Item_name",
+  "schedule_item_name",
   "schedule_day",
   "start_time",
   "duration",

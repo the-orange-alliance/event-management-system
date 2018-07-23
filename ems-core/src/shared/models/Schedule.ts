@@ -1,10 +1,12 @@
 import Day from "./Day";
 import {TournamentLevels} from "../AppTypes";
 import * as moment from "moment";
+import ScheduleItem from "./ScheduleItem";
+import Event from "./Event";
 
-export default class Schedule {
+export default class Schedule implements IPostableObject {
+  private readonly _type: TournamentLevels;
   private _days: Day[];
-  private _type: TournamentLevels;
   private _matchConcurrency: number;
   private _teamsParticipating: number;
   private _teamsPerAlliance: number;
@@ -22,8 +24,70 @@ export default class Schedule {
     this._teamsParticipating = 0;
     this._teamsPerAlliance = 3;
     this._matchesPerTeam = 5;
+    this._totalMatches = this.maxTotalMatches;
     this._cycleTime = 7;
     this.addDay();
+  }
+
+  public toJSON(): object {
+    return {
+      type: this.type,
+      matchConcurrency: this.matchConcurrency,
+      teamsParticipating: this.teamsParticipating,
+      matchesPerTeam: this.matchesPerTeam,
+      totalMatches: this.totalMatches,
+      cycleTime: this.cycleTime,
+      days: this.days.map(day => day.toJSON())
+    };
+  }
+
+  public fromJSON(json: any): Schedule {
+    const schedule: Schedule = new Schedule(json.type);
+    schedule.matchConcurrency = json.matchConcurrency;
+    schedule.teamsParticipating = json.teamsParticipating;
+    schedule.matchesPerTeam = json.matchesPerTeam;
+    schedule.totalMatches = json.totalMatches;
+    schedule.cycleTime = json.cycleTime;
+    schedule.days = json.days.map((day: any) => new Day().fromJSON(day));
+    return schedule;
+  }
+
+  public generateSchedule(event: Event): ScheduleItem[] {
+    const scheduleItems: ScheduleItem[] = [];
+    let totalMatches: number = 0;
+    for (const day of this.days) {
+      const matchBreaks: number[] = day.breaks.map(dayBreak => dayBreak.match);
+      let breakPadding: number = 0;
+      let dayMatches: number = 0;
+      for (let i = 0; i < day.matchesScheduled; i++) {
+        const item: ScheduleItem = new ScheduleItem(this.type);
+        const breakIndex = matchBreaks.indexOf(dayMatches + 1);
+
+        item.key = event.eventKey + "-" + this.type.substring(0, 1) + ((scheduleItems.length + 1));
+        item.day = day.id;
+        item.duration = this.cycleTime;
+        item.name = this.type + " Match " + (totalMatches + 1);
+        item.startTime = moment(day.startTime).add((Math.ceil((scheduleItems.length - 1) / this.matchConcurrency) * this.cycleTime) + breakPadding, "minutes");
+        item.isMatch = true;
+        scheduleItems.push(item);
+        dayMatches++;
+        totalMatches++;
+
+        if (breakIndex !== -1) {
+          const breakItem: ScheduleItem = new ScheduleItem(this.type);
+          breakItem.key = event.eventKey + "-" + this.type.substring(0, 1) + (scheduleItems.length + 1);
+          breakItem.day = day.id;
+          breakItem.duration = day.breaks[breakIndex].duration;
+          breakItem.name = day.breaks[breakIndex].name;
+          breakItem.startTime = day.breaks[breakIndex].startTime;
+          breakItem.isMatch = false;
+          scheduleItems.push(breakItem);
+          breakPadding += day.breaks[breakIndex].duration;
+        }
+      }
+
+    }
+    return scheduleItems;
   }
 
   public containsWarnings(): boolean {

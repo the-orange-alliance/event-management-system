@@ -1,8 +1,9 @@
 import {default as Axios, AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse} from "axios";
 import HttpError from "../models/HttpError";
 import Event from "../models/Event";
-import {EMSEventTypes} from "../AppTypes";
+import {EMSEventTypes, TournamentLevels} from "../AppTypes";
 import Team from "../models/Team";
+import ScheduleItem from "../models/ScheduleItem";
 
 const PORT = process.env.REACT_APP_EMS_API_PORT;
 
@@ -116,12 +117,24 @@ class EMSProvider {
     return this.get("api/team");
   }
 
+  public getScheduleItems(type: TournamentLevels): Promise<AxiosResponse> {
+    return this.get("api/schedule/" + type);
+  }
+
+  public deleteScheduleItems(type: TournamentLevels): Promise<AxiosResponse> {
+    return this.delete("api/schedule/" + type);
+  }
+
   public postEvent(event: Event): Promise<AxiosResponse> {
     return this.post("api/event", event);
   }
 
   public postTeams(teams: Team[]): Promise<AxiosResponse> {
     return this.post("api/team", teams);
+  }
+
+  public postScheduleItems(scheduleItems: ScheduleItem[]): Promise<AxiosResponse> {
+    return this.post("api/schedule", scheduleItems);
   }
 
 }

@@ -4,7 +4,6 @@
   "private": true,
   "main": "public/electron.js",
   "dependencies": {
-    "@types/react-datepicker": "^1.1.5",
     "axios": "^0.18.0",
     "dotenv": "^6.0.0",
     "local-ipv4-address": "0.0.2",
@@ -34,6 +33,7 @@
     "@types/jest": "^23.1.5",
     "@types/node": "^10.5.2",
     "@types/react": "^16.4.6",
+    "@types/react-datepicker": "^1.1.5",
     "@types/react-dom": "^16.0.6",
     "@types/react-redux": "^6.0.4",
     "@types/react-toastify": "^4.0.0",

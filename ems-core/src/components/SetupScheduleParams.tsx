@@ -1,28 +1,57 @@
 import * as React from "react";
-import {Button, Card, Divider, Form, Grid, Input, InputProps, Tab} from "semantic-ui-react";
+import {Button, Card, Dimmer, Divider, Form, Grid, Loader, Input, InputProps, Tab} from "semantic-ui-react";
 import {getTheme} from "../shared/AppTheme";
 import ExplanationIcon from "./ExplanationIcon";
 import Schedule from "../shared/models/Schedule";
 import {SyntheticEvent} from "react";
 import DatePicker from "react-datepicker";
 import {Moment} from "moment";
+import {IApplicationState} from "../stores";
+import {connect} from "react-redux";
+import {CONFIG_STORE} from "../shared/AppStore";
+import DialogManager from "../shared/managers/DialogManager";
+import ConfirmActionModal from "./ConfirmActionModal";
+import Event from "../shared/models/Event";
+import ScheduleItem from "../shared/models/ScheduleItem";
+import Team from "../shared/models/Team";
 
 interface IProps {
-  schedule: Schedule
+  onComplete: (scheduleItems: ScheduleItem[]) => void
+  schedule: Schedule,
+  event?: Event,
+  teamList: Team[],
+  navigationDisabled?: boolean
 }
 
-class SetupScheduleParams extends React.Component<IProps> {
+interface IState {
+  warningModalOpen: boolean
+}
+
+class SetupScheduleParams extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    this.state = {
+      warningModalOpen: false
+    };
+    this.openWarningModal = this.openWarningModal.bind(this);
+    this.closeWarningModal = this.closeWarningModal.bind(this);
     this.updateMatchesPerTeam = this.updateMatchesPerTeam.bind(this);
     this.updateCycleTime = this.updateCycleTime.bind(this);
     this.updateMatchConcurrency = this.updateMatchConcurrency.bind(this);
     this.addDay = this.addDay.bind(this);
     this.removeDay = this.removeDay.bind(this);
+    this.generateSchedule = this.generateSchedule.bind(this);
+  }
+
+  public componentDidUpdate(prevProps: IProps) {
+    if (prevProps.teamList.length !== this.props.teamList.length) {
+      this.props.schedule.teamsParticipating = this.props.teamList.length;
+      this.forceUpdate();
+    }
   }
 
   public render() {
-
+    const {warningModalOpen} = this.state;
     const days = this.props.schedule.days.map(day => {
       const dayBreaks = this.props.schedule.days[day.id].breaks.map(dayBreak => {
         return (
@@ -58,8 +87,8 @@ class SetupScheduleParams extends React.Component<IProps> {
           </Grid.Row>
           {dayBreaks}
           <Grid.Row>
-            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.addBreak.bind(this, day.id)} fluid={true}>Add Break</Button></Grid.Column>
-            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.removeBreak.bind(this, day.id)} fluid={true} disabled={!this.canRemoveBreak(day.id)}>Remove Break</Button></Grid.Column>
+            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.addBreak.bind(this, day.id)} fluid={true} disabled={this.props.navigationDisabled}>Add Break</Button></Grid.Column>
+            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.removeBreak.bind(this, day.id)} fluid={true} disabled={!this.canRemoveBreak(day.id) || this.props.navigationDisabled}>Remove Break</Button></Grid.Column>
           </Grid.Row>
         </Grid>
       );
@@ -67,7 +96,11 @@ class SetupScheduleParams extends React.Component<IProps> {
 
     return (
       <Tab.Pane className="step-view-tab">
+        <ConfirmActionModal open={warningModalOpen} onClose={this.closeWarningModal} onConfirm={this.generateSchedule} innerText={"You are about to generate a schedule that plans to run more than 1 match at a time. Are you sure you want to proceed?"}/>
         <Card fluid={true} color={getTheme().secondary}>
+          <Dimmer active={this.props.navigationDisabled}>
+            <Loader/>
+          </Dimmer>
           <Card.Content>
             <Card.Header>{this.props.schedule.type} Schedule Parameters</Card.Header>
           </Card.Content>
@@ -84,6 +117,9 @@ class SetupScheduleParams extends React.Component<IProps> {
           </Card.Content>
         </Card>
         <Card fluid={true} color={getTheme().secondary}>
+          <Dimmer active={this.props.navigationDisabled}>
+            <Loader/>
+          </Dimmer>
           <Card.Content>
             <Card.Header>{this.props.schedule.type} Schedule Outline</Card.Header>
           </Card.Content>
@@ -93,8 +129,8 @@ class SetupScheduleParams extends React.Component<IProps> {
               <Divider />
               <Grid columns={16}>
                 <Grid.Row>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} fluid={true}>Add Day</Button></Grid.Column>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.removeDay} disabled={!this.canRemoveDay()} fluid={true}>Remove Day</Button></Grid.Column>
+                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} disabled={this.props.navigationDisabled} fluid={true}>Add Day</Button></Grid.Column>
+                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.removeDay} disabled={!this.canRemoveDay() || this.props.navigationDisabled} fluid={true}>Remove Day</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>
@@ -107,7 +143,7 @@ class SetupScheduleParams extends React.Component<IProps> {
           <Card.Content>
             <Grid>
               <Grid.Row columns={16}>
-                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} disabled={!this.props.schedule.isValid()}>Generate Schedule</Button></Grid.Column>
+                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} loading={this.props.navigationDisabled} disabled={!this.props.schedule.isValid() || this.props.navigationDisabled} onClick={this.openWarningModal}>Generate Schedule</Button></Grid.Column>
                 <Grid.Column width={12} className="center-left-items">
                   {
                     this.props.schedule.validationMessage.length > 0 &&
@@ -122,9 +158,22 @@ class SetupScheduleParams extends React.Component<IProps> {
     );
   }
 
+  private openWarningModal() {
+    if (this.props.schedule.containsWarnings()) {
+      this.setState({warningModalOpen: true});
+    } else {
+      this.generateSchedule();
+    }
+  }
+
+  private closeWarningModal() {
+    this.setState({warningModalOpen: false});
+  }
+
   private updateMatchesPerTeam(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.matchesPerTeam = parseInt(props.value, 10);
+      this.props.schedule.totalMatches = this.props.schedule.maxTotalMatches;
       this.forceUpdate();
     }
   }
@@ -171,31 +220,31 @@ class SetupScheduleParams extends React.Component<IProps> {
     this.forceUpdate();
   }
 
-  public removeDay(event: SyntheticEvent) {
+  private removeDay(event: SyntheticEvent) {
     this.props.schedule.removeDay();
     this.props.schedule.forceUpdate();
     this.forceUpdate();
   }
 
-  public addBreak(day: number) {
+  private addBreak(day: number) {
     this.props.schedule.days[day].addBreak();
     this.props.schedule.forceUpdate();
     this.forceUpdate();
   }
 
-  public removeBreak(day: number) {
+  private removeBreak(day: number) {
     this.props.schedule.days[day].removeBreak();
     this.props.schedule.forceUpdate();
     this.forceUpdate();
   }
 
-  public updateDayStartTime(day: number, time: Moment) {
+  private updateDayStartTime(day: number, time: Moment) {
     this.props.schedule.days[day].startTime = time;
     this.props.schedule.forceUpdate();
     this.forceUpdate();
   }
 
-  public updateDayMatches(day: number, event: SyntheticEvent, props: InputProps) {
+  private updateDayMatches(day: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].matchesScheduled = parseInt(props.value, 10) || 0;
       this.props.schedule.forceUpdate();
@@ -203,12 +252,12 @@ class SetupScheduleParams extends React.Component<IProps> {
     }
   }
 
-  public updateBreakName(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+  private updateBreakName(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     this.props.schedule.days[day].breaks[dayBreak].name = props.value;
     this.forceUpdate();
   }
 
-  public updateBreakStart(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+  private updateBreakStart(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].breaks[dayBreak].match = parseInt(props.value, 10) || 0;
       this.props.schedule.forceUpdate();
@@ -216,13 +265,40 @@ class SetupScheduleParams extends React.Component<IProps> {
     }
   }
 
-  public updateBreakDuration(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+  private updateBreakDuration(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].breaks[dayBreak].duration = parseInt(props.value, 10) || 0;
       this.props.schedule.forceUpdate();
       this.forceUpdate();
     }
   }
+
+  private generateSchedule() {
+    this.closeWarningModal();
+    this.props.schedule.totalMatches = this.props.schedule.maxTotalMatches;
+    CONFIG_STORE.getAll().then((config: any) => {
+      let schedule: any = {};
+      if (typeof config.schedule !== "undefined") {
+        schedule = config.schedule;
+      }
+      schedule[this.props.schedule.type] = this.props.schedule.toJSON();
+      CONFIG_STORE.set("schedule", schedule).then(() => {
+        this.props.onComplete(this.props.schedule.generateSchedule(this.props.event));
+      }).catch((err) => {
+        DialogManager.showErrorBox(err);
+      });
+    }).catch((err) => {
+      DialogManager.showErrorBox(err);
+    });
+  }
 }
 
-export default SetupScheduleParams;
+export function mapStateToProps({configState, internalState}: IApplicationState) {
+  return {
+    event: configState.event,
+    teamList: internalState.teamList,
+    navigationDisabled: internalState.navigationDisabled
+  };
+}
+
+export default connect(mapStateToProps)(SetupScheduleParams);

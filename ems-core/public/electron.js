@@ -44,6 +44,7 @@ function createWindow () {
     require("./main/process-communication");
     require("./main/store-communication");
     require("./main/dialog-communication");
+    require("./main/matchmaker-communication");
 
     logger.transports[0].level = "debug";
     logger.info("------------STARTING EMS IN PRODUCTION MODE------------");
@@ -58,6 +59,7 @@ function createWindow () {
     require("../main/process-communication");
     require("../main/store-communication");
     require("../main/dialog-communication");
+    require("../main/matchmaker-communication");
 
     logger.transports[0].level = "debug";
     logger.info("------------STARTING EMS IN DEVELOPMENT MODE------------");

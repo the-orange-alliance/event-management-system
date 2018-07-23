@@ -1,9 +1,10 @@
 import Event from "../../../shared/models/Event";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import {EMSEventTypes} from "../../../shared/AppTypes";
+import {EMSEventTypes, TournamentLevels} from "../../../shared/AppTypes";
 import HttpError from "../../../shared/models/HttpError";
 import Team from "../../../shared/models/Team";
+import ScheduleItem from "../../../shared/models/ScheduleItem";
 
 class EventPostingController {
   private static _instance: EventPostingController;
@@ -74,6 +75,25 @@ class EventPostingController {
       });
     });
   }
+
+  public createSchedule(type: TournamentLevels, scheduleItems: ScheduleItem[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.deleteScheduleItems(type).then(() => {
+        EMSProvider.postScheduleItems(scheduleItems).then(() => {
+          resolve();
+        }).catch((error: HttpError) => {
+          reject(error);
+        })
+      }).catch(() => [
+        EMSProvider.postScheduleItems(scheduleItems).then(() => {
+          resolve();
+        }).catch((error: HttpError) => {
+          reject(error);
+        })
+      ]);
+    });
+  }
+
 }
 
 export default EventPostingController.getInstance();

@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "ranking" (
 CREATE TABLE IF NOT EXISTS "schedule" (
     schedule_item_key VARCHAR(40) PRIMARY KEY NOT NULL,
     schedule_item_type VARCHAR(15) NOT NULL,
-    schedule_Item_name VARCHAR(100) NOT NULL,
+    schedule_item_name VARCHAR(100) NOT NULL,
     schedule_day INT NOT NULL,
     start_time VARCHAR(255) NOT NULL,
     duration INT NOT NULL,

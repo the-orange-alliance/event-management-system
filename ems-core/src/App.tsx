@@ -13,6 +13,7 @@ import {setNetworkHost} from "./stores/config/actions";
 import EMSProvider from "./shared/providers/EMSProvider";
 // import {AxiosResponse} from "axios";
 import Team from "./shared/models/Team";
+import {AxiosResponse} from "axios";
 
 interface IProps {
   setCompletedStep: (step: number) => IIncrementCompletedStep,
@@ -35,24 +36,24 @@ class App extends React.Component<IProps> {
       EMSProvider.initialize(networkHost);
       this.props.setCompletedStep(2);
       // Preload app-wide variables like team list, schedule, etc.
-      // EMSProvider.getEvent().then((eventResponse: AxiosResponse) => {
-      //   if (eventResponse.data.payload && eventResponse.data.payload[0] && eventResponse.data.payload[0].event_key) {
-      //     this.props.setCompletedStep(1);
-      //   }
-      //
-      //   EMSProvider.getTeams().then((teamResponse: AxiosResponse) => {
-      //     if (teamResponse.data && teamResponse.data.payload && teamResponse.data.payload.length > 0) {
-      //       const teams: Team[] = [];
-      //       for (const teamJSON of teamResponse.data.payload) {
-      //         let team: Team = new Team();
-      //         team = team.fromJSON(teamJSON);
-      //         teams.push(team);
-      //       }
-      //       this.props.setTeamList(teams);
-      //       this.props.setCompletedStep(2);
-      //     }
-      //   });
-      // });
+      EMSProvider.getEvent().then((eventResponse: AxiosResponse) => {
+        if (eventResponse.data.payload && eventResponse.data.payload[0] && eventResponse.data.payload[0].event_key) {
+          // this.props.setCompletedStep(1);
+        }
+
+        EMSProvider.getTeams().then((teamResponse: AxiosResponse) => {
+          if (teamResponse.data && teamResponse.data.payload && teamResponse.data.payload.length > 0) {
+            const teams: Team[] = [];
+            for (const teamJSON of teamResponse.data.payload) {
+              let team: Team = new Team();
+              team = team.fromJSON(teamJSON);
+              teams.push(team);
+            }
+            this.props.setTeamList(teams);
+            // this.props.setCompletedStep(2);
+          }
+        });
+      });
     });
   }
 

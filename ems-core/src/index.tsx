@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from "react-redux";
 import App from './App';
 import './index.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import {reducers} from "./stores";
 import {createStore} from "redux";
 import {CONFIG_STORE} from "./shared/AppStore";

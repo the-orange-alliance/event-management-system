@@ -1,73 +1,227 @@
 import * as React from "react";
-import {Button, Card, Divider, Form, Grid, Tab} from "semantic-ui-react";
+import {Button, Card, Divider, Form, Grid, Input, InputProps, Tab} from "semantic-ui-react";
 import {getTheme} from "../shared/AppTheme";
-import {TournamentLevels} from "../shared/AppTypes";
 import ExplanationIcon from "./ExplanationIcon";
+import Schedule from "../shared/models/Schedule";
+import {SyntheticEvent} from "react";
+import DatePicker from "react-datepicker";
+import {Moment} from "moment";
 
 interface IProps {
-  type: TournamentLevels
+  schedule: Schedule
 }
 
 class SetupScheduleParams extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
+    this.updateMatchesPerTeam = this.updateMatchesPerTeam.bind(this);
+    this.updateCycleTime = this.updateCycleTime.bind(this);
+    this.updateMatchConcurrency = this.updateMatchConcurrency.bind(this);
+    this.addDay = this.addDay.bind(this);
+    this.removeDay = this.removeDay.bind(this);
   }
 
   public render() {
+
+    const days = this.props.schedule.days.map(day => {
+      const dayBreaks = this.props.schedule.days[day.id].breaks.map(dayBreak => {
+        return (
+          <Grid.Row key={"day-" + day.id + "-break-" + dayBreak.id}>
+            <Grid.Column width={2} className="center-items"><span>{dayBreak.name}</span></Grid.Column>
+            <Grid.Column width={2}><Form.Input fluid={true} value={dayBreak.name} onChange={this.updateBreakName.bind(this, day.id, dayBreak.id)} label="Break Name"/></Grid.Column>
+            <Grid.Column width={2}><Form.Input fluid={true} value={dayBreak.match} error={!dayBreak.isValidMatch()} onChange={this.updateBreakStart.bind(this, day.id, dayBreak.id)} label={<ExplanationIcon title={"Start"} content={"Designate after what match the break should begin. This number is relative to the day, not the overall schedule."}/>}/></Grid.Column>
+            <Grid.Column width={2}><Form.Input fluid={true} value={dayBreak.duration} error={!dayBreak.isValidDuration()} onChange={this.updateBreakDuration.bind(this, day.id, dayBreak.id)} label="Duration"/></Grid.Column>
+            <Grid.Column width={4}><Form.Input fluid={true} value={dayBreak.formattedStartTime} label="Projected Break Start"/></Grid.Column>
+            <Grid.Column width={4}><Form.Input fluid={true} value={dayBreak.formattedEndTime} label="Projected Break End"/></Grid.Column>
+          </Grid.Row>
+        );
+      });
+      return (
+        <Grid key={"day-" + day.id} columns={16}>
+          <Grid.Row>
+            <Grid.Column width={2} className="center-items"><span>Day {day.id + 1}:</span></Grid.Column>
+            <Grid.Column width={4}>
+              <Form.Field>
+                <label>Day Start Time</label>
+                <DatePicker
+                  customInput={<Input fluid={true}/>}
+                  showTimeSelect={true}
+                  timeIntervals={15}
+                  dateFormat="dddd, MMMM Do YYYY, h:mm a"
+                  onChange={this.updateDayStartTime.bind(this, day.id)}
+                  selected={day.startTime}
+                />
+              </Form.Field>
+            </Grid.Column>
+            <Grid.Column width={2}><Form.Input fluid={true} value={day.matchesScheduled} error={!day.isValid()} onChange={this.updateDayMatches.bind(this, day.id)} label="Matches"/></Grid.Column>
+            <Grid.Column width={4}><Form.Input fluid={true} value={day.formattedEndTime} label="Projected Day End"/></Grid.Column>
+          </Grid.Row>
+          {dayBreaks}
+          <Grid.Row>
+            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.addBreak.bind(this, day.id)} fluid={true}>Add Break</Button></Grid.Column>
+            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.removeBreak.bind(this, day.id)} fluid={true} disabled={!this.canRemoveBreak(day.id)}>Remove Break</Button></Grid.Column>
+          </Grid.Row>
+        </Grid>
+      );
+    });
+
     return (
       <Tab.Pane className="step-view-tab">
         <Card fluid={true} color={getTheme().secondary}>
           <Card.Content>
-            <Card.Header>{this.props.type} Schedule Parameters</Card.Header>
+            <Card.Header>{this.props.schedule.type} Schedule Parameters</Card.Header>
           </Card.Content>
           <Card.Content>
             <Form widths="equal">
               <Form.Group>
-                <Form.Input label="Number Of Teams"/>
-                <Form.Input label="Matches Per Team"/>
-                <Form.Input label="Cycle Time"/>
-                <Form.Input label={<ExplanationIcon title={"Match Concurrency"} content={"Sets the number of matches that will be run at any given time. Leave this at 1 unless you have special clearence for your event."}/>}/>
-                <Form.Input label="Total Matches"/>
+                <Form.Input label="Number Of Teams" value={this.props.schedule.teamsParticipating}/>
+                <Form.Input label="Matches Per Team" value={this.props.schedule.matchesPerTeam} error={!this.isValidMatchesPerTeam()} onChange={this.updateMatchesPerTeam}/>
+                <Form.Input label="Cycle Time" value={this.props.schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
+                <Form.Input value={this.props.schedule.matchConcurrency} error={!this.isValidMatchConcurrency()} onChange={this.updateMatchConcurrency} label={<ExplanationIcon title={"Match Concurrency"} content={"Sets the number of matches that will be run at any given time. Leave this at 1 unless you have special clearence for your event."}/>}/>
+                <Form.Input value={this.props.schedule.maxTotalMatches} label="Total Matches"/>
               </Form.Group>
             </Form>
           </Card.Content>
         </Card>
         <Card fluid={true} color={getTheme().secondary}>
           <Card.Content>
-            <Card.Header>{this.props.type} Schedule Outline</Card.Header>
+            <Card.Header>{this.props.schedule.type} Schedule Outline</Card.Header>
           </Card.Content>
           <Card.Content>
             <Form>
+              {days}
+              <Divider />
               <Grid columns={16}>
                 <Grid.Row>
-                  <Grid.Column width={2} className="center-items"><span>Day 1:</span></Grid.Column>
-                  <Grid.Column width={4}><Form.Input fluid={true} label="Day Start Time"/></Grid.Column>
-                  <Grid.Column width={2}><Form.Input fluid={true} label="Matches"/></Grid.Column>
-                  <Grid.Column width={4}><Form.Input fluid={true} label="Projected Day End"/></Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column width={2} className="center-items"><span>Break #1</span></Grid.Column>
-                  <Grid.Column width={4}><Form.Input fluid={true} label="Break Name"/></Grid.Column>
-                  <Grid.Column width={4}><Form.Input fluid={true} label="Start (After Match #)"/></Grid.Column>
-                  <Grid.Column width={2}><Form.Input fluid={true} label="Duration"/></Grid.Column>
-                  <Grid.Column width={2}><Form.Input fluid={true} label="Projected Break Start"/></Grid.Column>
-                  <Grid.Column width={2}><Form.Input fluid={true} label="Projected Break End"/></Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} fluid={true}>Add Break</Button></Grid.Column>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} fluid={true}>Remove Break</Button></Grid.Column>
-                </Grid.Row>
-                <Divider />
-                <Grid.Row>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} fluid={true}>Add Day</Button></Grid.Column>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} fluid={true}>Remove Day</Button></Grid.Column>
+                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} fluid={true}>Add Day</Button></Grid.Column>
+                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.removeDay} disabled={!this.canRemoveDay()} fluid={true}>Remove Day</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>
           </Card.Content>
         </Card>
+        <Card fluid={true} color={getTheme().secondary}>
+          <Card.Content>
+            <Card.Header>{this.props.schedule.type} Schedule Generation</Card.Header>
+          </Card.Content>
+          <Card.Content>
+            <Grid>
+              <Grid.Row columns={16}>
+                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} disabled={!this.props.schedule.isValid()}>Generate Schedule</Button></Grid.Column>
+                <Grid.Column width={12} className="center-left-items">
+                  {
+                    this.props.schedule.validationMessage.length > 0 &&
+                    <span className="error-text">{this.props.schedule.validationMessage}</span>
+                  }
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Card.Content>
+        </Card>
       </Tab.Pane>
     );
+  }
+
+  private updateMatchesPerTeam(event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      this.props.schedule.matchesPerTeam = parseInt(props.value, 10);
+      this.forceUpdate();
+    }
+  }
+
+  private updateCycleTime(event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      this.props.schedule.cycleTime = parseInt(props.value, 10);
+      this.props.schedule.forceUpdate();
+      this.forceUpdate();
+    }
+  }
+
+  private updateMatchConcurrency(event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      this.props.schedule.matchConcurrency = parseInt(props.value, 10);
+      this.props.schedule.forceUpdate();
+      this.forceUpdate();
+    }
+  }
+
+  private isValidMatchConcurrency(): boolean {
+    return !isNaN(this.props.schedule.matchConcurrency) && this.props.schedule.matchConcurrency  > 0;
+  }
+
+  private isValidCycleTime(): boolean {
+    return !isNaN(this.props.schedule.cycleTime) && this.props.schedule.cycleTime <= 15 && this.props.schedule.cycleTime > 0;
+  }
+
+  private isValidMatchesPerTeam(): boolean {
+    return !isNaN(this.props.schedule.matchesPerTeam) && this.props.schedule.matchesPerTeam > 0;
+  }
+
+  private canRemoveDay(): boolean {
+    return this.props.schedule.days.length > 1;
+  }
+
+  private canRemoveBreak(day: number) {
+    return this.props.schedule.days[day].breaks.length > 0;
+  }
+
+  private addDay(event: SyntheticEvent) {
+    this.props.schedule.addDay();
+    this.props.schedule.forceUpdate();
+    this.forceUpdate();
+  }
+
+  public removeDay(event: SyntheticEvent) {
+    this.props.schedule.removeDay();
+    this.props.schedule.forceUpdate();
+    this.forceUpdate();
+  }
+
+  public addBreak(day: number) {
+    this.props.schedule.days[day].addBreak();
+    this.props.schedule.forceUpdate();
+    this.forceUpdate();
+  }
+
+  public removeBreak(day: number) {
+    this.props.schedule.days[day].removeBreak();
+    this.props.schedule.forceUpdate();
+    this.forceUpdate();
+  }
+
+  public updateDayStartTime(day: number, time: Moment) {
+    this.props.schedule.days[day].startTime = time;
+    this.props.schedule.forceUpdate();
+    this.forceUpdate();
+  }
+
+  public updateDayMatches(day: number, event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      this.props.schedule.days[day].matchesScheduled = parseInt(props.value, 10) || 0;
+      this.props.schedule.forceUpdate();
+      this.forceUpdate();
+    }
+  }
+
+  public updateBreakName(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+    this.props.schedule.days[day].breaks[dayBreak].name = props.value;
+    this.forceUpdate();
+  }
+
+  public updateBreakStart(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      this.props.schedule.days[day].breaks[dayBreak].match = parseInt(props.value, 10) || 0;
+      this.props.schedule.forceUpdate();
+      this.forceUpdate();
+    }
+  }
+
+  public updateBreakDuration(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      this.props.schedule.days[day].breaks[dayBreak].duration = parseInt(props.value, 10) || 0;
+      this.props.schedule.forceUpdate();
+      this.forceUpdate();
+    }
   }
 }
 

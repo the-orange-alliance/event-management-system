@@ -5,13 +5,14 @@ import {ApplicationActions, IApplicationState} from "../../stores";
 import EventSelection from "./containers/EventSelection";
 import EventConfiguration from "../../shared/models/EventConfiguration";
 import EventParticipantSelection from "./containers/EventParticipantSelection";
+import EventPracticeSetup from "./containers/EventPracticeSetup";
 import {Dispatch} from "redux";
 import {incrementCompletedStep} from "../../stores/internal/actions";
 import {IIncrementCompletedStep} from "../../stores/internal/types";
-import EventPracticeSetup from "./EventPracticeSetup";
 
 interface IProps {
   completedStep?: number,
+  navigationDisabled?: boolean,
   eventConfig?: EventConfiguration,
   setCompletedStep?: (step: number) => IIncrementCompletedStep
 }
@@ -115,7 +116,7 @@ class EventManagerView extends React.Component<IProps, IState> {
   }
 
   private isDisabled(step: number): boolean {
-    return this.props.completedStep < (step - 1);
+    return this.props.completedStep < (step - 1) || this.props.navigationDisabled;
   }
 
   private getStepLength(): 7 | 8 {
@@ -145,7 +146,8 @@ class EventManagerView extends React.Component<IProps, IState> {
 export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
     completedStep: internalState.completedStep,
-    eventConfig: configState.eventConfiguration
+    eventConfig: configState.eventConfiguration,
+    navigationDisabled: internalState.navigationDisabled
   };
 }
 

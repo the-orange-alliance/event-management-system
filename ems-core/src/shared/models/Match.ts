@@ -62,9 +62,9 @@ export default class Match implements IPostableObject {
     match.matchDetailKey = json.match_detail_key;
     match.matchName = json.match_name;
     match.tournamentLevel = json.tournament_level;
-    match.scheduledStartTime = json.scheduled_time;
-    match.startTime = json.start_time;
-    match.prestartTime = json.prestart_time;
+    match.scheduledStartTime = moment(json.scheduled_time);
+    match.startTime = moment(json.start_time);
+    match.prestartTime = moment(json.prestart_time);
     match.fieldNumber = json.field_number;
     match.cycleTime = json.cycle_time;
     match.redScore = json.red_score;

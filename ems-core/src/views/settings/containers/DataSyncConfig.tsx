@@ -11,6 +11,8 @@ import EMSProvider from "../../../shared/providers/EMSProvider";
 import HttpError from "../../../shared/models/HttpError";
 import {connect} from "react-redux";
 import DialogManager from "../../../shared/managers/DialogManager";
+import {CONFIG_STORE} from "../../../shared/AppStore";
+import AppError from "../../../shared/models/AppError";
 
 interface IProps {
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
@@ -84,8 +86,13 @@ class DataSyncConfig extends React.Component<IProps, IState> {
   private purgeLocal() {
     this.props.setNavigationDisabled(true);
     EMSProvider.deleteEvent().then(() => {
-      this.props.setNavigationDisabled(false);
       this.props.setCompletedStep(0);
+      CONFIG_STORE.setAll({}).then(() => {
+        this.props.setNavigationDisabled(false);
+      }).catch((err: AppError) => {
+        this.props.setNavigationDisabled(false);
+        DialogManager.showErrorBox(err);
+      });
     }).catch((error: HttpError) => {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);

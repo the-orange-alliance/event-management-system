@@ -1,5 +1,12 @@
 import {Reducer} from "redux";
-import {SET_EVENT, SET_EVENT_CONFIG, SET_NETWORK_HOST, SET_PRACTICE_SCHEDULE, TOGGLE_SLAVE_MODE} from "./constants";
+import {
+  SET_EVENT,
+  SET_EVENT_CONFIG,
+  SET_NETWORK_HOST,
+  SET_PRACTICE_SCHEDULE,
+  SET_QUALIFICATION_SCHEDULE,
+  TOGGLE_SLAVE_MODE
+} from "./constants";
 import {IConfigState} from "./models";
 import {ConfigActions} from "./types";
 import * as EventConfig from "../../shared/models/EventConfiguration";
@@ -11,7 +18,8 @@ export const initialState: IConfigState = {
   eventConfiguration: EventConfig.DEFAULT_RESET,
   event: new Event(),
   networkHost: undefined,
-  practiceSchedule: new Schedule("Practice")
+  practiceSchedule: new Schedule("Practice"),
+  qualificationSchedule: new Schedule("Qualification")
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {
@@ -26,6 +34,8 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, networkHost: action.payload.networkHost};
     case SET_PRACTICE_SCHEDULE:
       return {...state, practiceSchedule: action.payload.schedule};
+    case SET_QUALIFICATION_SCHEDULE:
+      return {...state, qualificationSchedule: action.payload.schedule};
     default:
       return state;
   }

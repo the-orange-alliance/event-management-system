@@ -1,5 +1,12 @@
 import {Action} from "redux";
-import {SET_EVENT, SET_EVENT_CONFIG, SET_NETWORK_HOST, SET_PRACTICE_SCHEDULE, TOGGLE_SLAVE_MODE} from "./constants";
+import {
+  SET_EVENT,
+  SET_EVENT_CONFIG,
+  SET_NETWORK_HOST,
+  SET_PRACTICE_SCHEDULE,
+  SET_QUALIFICATION_SCHEDULE,
+  TOGGLE_SLAVE_MODE
+} from "./constants";
 import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
@@ -39,4 +46,12 @@ export interface ISetPracticeSchedule extends Action {
   }
 }
 
-export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost | ISetPracticeSchedule;
+export interface ISetQualificationSchedule extends Action {
+  type: SET_QUALIFICATION_SCHEDULE,
+  payload: {
+    schedule: Schedule
+  }
+}
+
+export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
+  ISetPracticeSchedule | ISetQualificationSchedule;

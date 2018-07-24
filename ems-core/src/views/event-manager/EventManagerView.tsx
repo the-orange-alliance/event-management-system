@@ -9,6 +9,7 @@ import EventPracticeSetup from "./containers/EventPracticeSetup";
 import {Dispatch} from "redux";
 import {incrementCompletedStep} from "../../stores/internal/actions";
 import {IIncrementCompletedStep} from "../../stores/internal/types";
+import EventQualificationSetup from "./containers/EventQualificationSetup";
 
 interface IProps {
   completedStep?: number,
@@ -26,9 +27,9 @@ class EventManagerView extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       activeStep: this.props.completedStep + 1
-    }
+    };
+    console.log(this.state);
   }
-
 
   public componentDidUpdate(prevProps: IProps) {
     if (prevProps.completedStep !== this.props.completedStep) {
@@ -130,7 +131,9 @@ class EventManagerView extends React.Component<IProps, IState> {
       case 2:
         return <EventParticipantSelection onComplete={this.completeStep.bind(this, 2)}/>;
       case 3:
-        return <EventPracticeSetup/>;
+        return <EventPracticeSetup onComplete={this.completeStep.bind(this, 3)}/>;
+      case 4:
+        return <EventQualificationSetup onComplete={this.completeStep.bind(this, 4)}/>;
       default:
         return <span>View not found.</span>;
     }

@@ -11,9 +11,9 @@ import Schedule from "../../../shared/models/Schedule";
 import Team from "../../../shared/models/Team";
 import EventConfiguration from "../../../shared/models/EventConfiguration";
 import ScheduleItem from "../../../shared/models/ScheduleItem";
-import {IDisableNavigation, ISetPracticeMatches} from "../../../stores/internal/types";
+import {IDisableNavigation, ISetQualificationMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
-import {disableNavigation, setPracticeMatches} from "../../../stores/internal/actions";
+import {disableNavigation, setQualificationMatches} from "../../../stores/internal/actions";
 import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
@@ -25,16 +25,16 @@ interface IProps {
   eventConfig?: EventConfiguration,
   teamList?: Team[],
   schedule?: Schedule,
-  practiceMatches?: Match[],
+  qualificationMatches?: Match[],
   setNavigationDisabled?: (disabled?: boolean) => IDisableNavigation,
-  setPracticeMatches?: (matches: Match[]) => ISetPracticeMatches
+  setQualificationMatches?: (matches: Match[]) => ISetQualificationMatches
 }
 
 interface IState {
   activeIndex: number,
 }
 
-class EventPracticeSetup extends React.Component<IProps, IState> {
+class EventQualificationSetup extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -64,9 +64,9 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
       <div className="step-view no-overflow">
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
           { menuItem: "Schedule Parameters", render: () => <SetupScheduleParams schedule={this.props.schedule} teams={this.props.teamList} onComplete={this.onParamsComplete}/>},
-          { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Practice"}/>},
+          { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Qualification"}/>},
           { menuItem: "Match Maker Parameters", render: () => <SetupRunMatchMaker schedule={this.props.schedule} teams={this.props.teamList} onComplete={this.onMatchMakerComplete}/>},
-          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Practice" matchList={this.props.practiceMatches} onComplete={this.onPublishSchedule}/>},
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Qualification" matchList={this.props.qualificationMatches} onComplete={this.onPublishSchedule}/>},
         ]}
         />
       </div>
@@ -81,7 +81,7 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
     this.props.setNavigationDisabled(true);
-    EventPostingController.createSchedule("Practice", scheduleItems).then(() => {
+    EventPostingController.createSchedule("Qualification", scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({activeIndex: 1});
     }).catch((error: HttpError) => {
@@ -91,13 +91,13 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
   }
 
   private onMatchMakerComplete(matches: Match[]) {
-    this.props.setPracticeMatches(matches);
+    this.props.setQualificationMatches(matches);
     this.setState({activeIndex: 3});
   }
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
-    EventPostingController.createMatchSchedule(0, this.props.practiceMatches).then(() => {
+    EventPostingController.createMatchSchedule(1, this.props.qualificationMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {
@@ -113,16 +113,16 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     navigationDisabled: internalState.navigationDisabled,
     teamList: internalState.teamList,
     eventConfig: configState.eventConfiguration,
-    schedule: configState.practiceSchedule,
-    practiceMatches: internalState.practiceMatches
+    schedule: configState.qualificationSchedule,
+    qualificationMatches: internalState.qualificationMatches
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
-    setPracticeMatches: (matches: Match[]) => dispatch(setPracticeMatches(matches))
+    setQualificationMatches: (matches: Match[]) => dispatch(setQualificationMatches(matches))
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventPracticeSetup);
+export default connect(mapStateToProps, mapDispatchToProps)(EventQualificationSetup);

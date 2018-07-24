@@ -24,7 +24,7 @@ interface IProps {
   onComplete: (matches: Match[]) => void,
   event?: Event,
   navigationDisabled?: boolean,
-  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
 }
 
 interface IState {
@@ -134,7 +134,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
   };
 }
 

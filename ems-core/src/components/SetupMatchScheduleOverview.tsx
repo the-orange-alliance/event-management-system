@@ -3,15 +3,14 @@ import {Button, Card, Divider, Table} from "semantic-ui-react";
 import {getTheme} from "../shared/AppTheme";
 import {TournamentLevels} from "../shared/AppTypes";
 import EventConfiguration from "../shared/models/EventConfiguration";
-import {ApplicationActions, IApplicationState} from "../stores";
+import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import Match from "../shared/models/Match";
 import {IDisableNavigation} from "../stores/internal/types";
-import {Dispatch} from "redux";
-import {disableNavigation} from "../stores/internal/actions";
 import ConfirmActionModal from "./ConfirmActionModal";
 
 interface IProps {
+  onComplete: () => void,
   type: TournamentLevels,
   matchList: Match[],
   eventConfig?: EventConfiguration,
@@ -119,10 +118,7 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
 
   private publish() {
     this.closeConfirmModal();
-    this.props.setNavigationDisabled(true);
-    setTimeout(() => {
-      this.props.setNavigationDisabled(false);
-    }, 1000);
+    this.props.onComplete();
   }
 }
 
@@ -133,10 +129,4 @@ export function mapStateToProps({configState, internalState}: IApplicationState)
   };
 }
 
-export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
-  return {
-    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SetupMatchScheduleOverview);
+export default connect(mapStateToProps)(SetupMatchScheduleOverview);

@@ -1,7 +1,14 @@
 import {Reducer} from "redux";
 import {
-  UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP,
-  SET_PROCESS_ACTIONS_DISABLED, UPDATE_TEAM_LIST, ADD_TEAM, ALTER_TEAM, REMOVE_TEAM, SET_PRACTICE_MATCHES
+  UPDATE_PROCESS_LIST,
+  DISABLE_NAVIGATION,
+  INCREMENT_COMPLETED_STEP,
+  SET_PROCESS_ACTIONS_DISABLED,
+  UPDATE_TEAM_LIST,
+  ADD_TEAM,
+  ALTER_TEAM,
+  REMOVE_TEAM,
+  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES,
 } from "./constants";
 import {IInternalState} from "./models";
 import {InternalActions} from "./types";
@@ -12,7 +19,8 @@ export const initialState: IInternalState = {
   navigationDisabled: false,
   completedStep: 0,
   teamList: [],
-  practiceMatches: []
+  practiceMatches: [],
+  qualificationMatches: []
 };
 
 const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, action) => {
@@ -51,6 +59,8 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
       };
     case SET_PRACTICE_MATCHES:
       return {...state, practiceMatches: action.payload.matches};
+    case SET_QUALIFICATION_MATCHES:
+      return {...state, qualificationMatches: action.payload.matches};
     default:
       return state;
   }

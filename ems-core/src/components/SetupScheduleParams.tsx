@@ -273,7 +273,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
     }
   }
 
-  private generateSchedule() {
+  private generateSchedule() { // TODO - Check to see if an online schedule has already been posted.
     this.closeWarningModal();
     this.props.schedule.totalMatches = this.props.schedule.maxTotalMatches;
     CONFIG_STORE.getAll().then((config: any) => {

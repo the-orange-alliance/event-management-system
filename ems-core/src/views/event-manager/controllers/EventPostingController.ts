@@ -5,6 +5,8 @@ import {EMSEventTypes, TournamentLevels} from "../../../shared/AppTypes";
 import HttpError from "../../../shared/models/HttpError";
 import Team from "../../../shared/models/Team";
 import ScheduleItem from "../../../shared/models/ScheduleItem";
+import Match from "../../../shared/models/Match";
+import MatchParticipant from "../../../shared/models/MatchParticipant";
 
 class EventPostingController {
   private static _instance: EventPostingController;
@@ -91,6 +93,48 @@ class EventPostingController {
           reject(error);
         })
       ]);
+    });
+  }
+
+  public createMatchSchedule(tournamentLevel: number, matches: Match[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.getMatches(tournamentLevel).then((matchesResponse: AxiosResponse) => {
+        if (matchesResponse.data && matchesResponse.data.payload && matchesResponse.data.payload.length > 0) {
+          resolve();
+        } else {
+          EMSProvider.postMatchSchedule(matches).then(() => {
+            const participants: MatchParticipant[] = [];
+            for (const match of matches) {
+              for (const participant of match.participants) {
+                participants.push(participant);
+              }
+            }
+            EMSProvider.postMatchScheduleParticipants(participants).then(() => {
+              resolve();
+            }).catch((participantError: HttpError) => {
+              reject(participantError);
+            });
+          }).catch((scheduleError: HttpError) => {
+            reject(scheduleError);
+          });
+        }
+      }).catch(() => {
+        EMSProvider.postMatchSchedule(matches).then(() => {
+          const participants: MatchParticipant[] = [];
+          for (const match of matches) {
+            for (const participant of match.participants) {
+              participants.push(participant);
+            }
+          }
+          EMSProvider.postMatchScheduleParticipants(participants).then(() => {
+            resolve();
+          }).catch((participantError: HttpError) => {
+            reject(participantError);
+          });
+        }).catch((scheduleError: HttpError) => {
+          reject(scheduleError);
+        });
+      });
     });
   }
 

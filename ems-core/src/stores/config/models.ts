@@ -7,5 +7,6 @@ export interface IConfigState {
   eventConfiguration: EventConfiguration,
   event: Event,
   networkHost: string,
-  practiceSchedule: Schedule
+  practiceSchedule: Schedule,
+  qualificationSchedule: Schedule
 }

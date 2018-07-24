@@ -32,6 +32,9 @@ CONFIG_STORE.getAll().then((configStore: any) => {
     if (typeof configStore.schedule.Practice !== "undefined") {
       configState.practiceSchedule = configState.practiceSchedule.fromJSON(configStore.schedule.Practice);
     }
+    if (typeof configStore.schedule.Qualification !== "undefined") {
+      configState.qualificationSchedule = configState.qualificationSchedule.fromJSON(configStore.schedule.Qualification);
+    }
   }
 
   const applicationStore = createStore(reducers, {

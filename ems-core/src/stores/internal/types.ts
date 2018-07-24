@@ -8,7 +8,7 @@ import {
   ADD_TEAM,
   ALTER_TEAM,
   REMOVE_TEAM,
-  SET_PRACTICE_MATCHES
+  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES
 } from "./constants";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
@@ -70,6 +70,7 @@ export interface IRemoveTeam extends Action {
     index: number
   }
 }
+
 export interface ISetPracticeMatches extends Action {
   type: SET_PRACTICE_MATCHES,
   payload: {
@@ -77,5 +78,12 @@ export interface ISetPracticeMatches extends Action {
   }
 }
 
+export interface ISetQualificationMatches extends Action {
+  type: SET_QUALIFICATION_MATCHES,
+  payload: {
+    matches: Match[]
+  }
+}
+
 export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation |
-  IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetPracticeMatches;
+  IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetPracticeMatches | ISetQualificationMatches;

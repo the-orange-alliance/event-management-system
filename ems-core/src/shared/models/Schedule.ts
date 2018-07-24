@@ -67,7 +67,7 @@ export default class Schedule implements IPostableObject {
         item.day = day.id;
         item.duration = this.cycleTime;
         item.name = this.type + " Match " + (totalMatches + 1);
-        item.startTime = moment(day.startTime).add((Math.ceil((scheduleItems.length - 1) / this.matchConcurrency) * this.cycleTime) + breakPadding, "minutes");
+        item.startTime = moment(day.startTime).add((Math.ceil((dayMatches - 1) / this.matchConcurrency) * this.cycleTime) + breakPadding, "minutes");
         item.isMatch = true;
         scheduleItems.push(item);
         dayMatches++;

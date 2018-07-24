@@ -1,6 +1,20 @@
 import {ActionCreator} from "redux";
-import {SET_EVENT, SET_EVENT_CONFIG, SET_NETWORK_HOST, SET_PRACTICE_SCHEDULE, TOGGLE_SLAVE_MODE} from "./constants";
-import {ISetEvent, ISetEventConfiguration, ISetNetworkHost, ISetPracticeSchedule, IToggleSlaveMode} from "./types";
+import {
+  SET_EVENT,
+  SET_EVENT_CONFIG,
+  SET_NETWORK_HOST,
+  SET_PRACTICE_SCHEDULE,
+  SET_QUALIFICATION_SCHEDULE,
+  TOGGLE_SLAVE_MODE
+} from "./constants";
+import {
+  ISetEvent,
+  ISetEventConfiguration,
+  ISetNetworkHost,
+  ISetPracticeSchedule,
+  ISetQualificationSchedule,
+  IToggleSlaveMode
+} from "./types";
 import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
@@ -35,6 +49,13 @@ export const setNetworkHost: ActionCreator<ISetNetworkHost> = (networkHost: stri
 
 export const setPracticeSchedule: ActionCreator<ISetPracticeSchedule> = (schedule: Schedule) => ({
   type: SET_PRACTICE_SCHEDULE,
+  payload: {
+    schedule: schedule
+  }
+});
+
+export const setQualificationSchedule: ActionCreator<ISetQualificationSchedule> = (schedule: Schedule) => ({
+  type: SET_QUALIFICATION_SCHEDULE,
   payload: {
     schedule: schedule
   }

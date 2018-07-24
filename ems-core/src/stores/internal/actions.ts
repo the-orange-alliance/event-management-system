@@ -8,14 +8,14 @@ import {
   ADD_TEAM,
   ALTER_TEAM,
   REMOVE_TEAM,
-  SET_PRACTICE_MATCHES
+  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES
 } from "./constants";
 import {
   IUpdateProcessList,
   IDisableNavigation,
   IIncrementCompletedStep,
   ISetProcessActionsDisabled,
-  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam, ISetPracticeMatches
+  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam, ISetPracticeMatches, ISetQualificationMatches
 } from "./types";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
@@ -80,6 +80,13 @@ export const removeTeam: ActionCreator<IRemoveTeam> = (index: number) => ({
 
 export const setPracticeMatches: ActionCreator<ISetPracticeMatches> = (matches: Match[]) => ({
   type: SET_PRACTICE_MATCHES,
+  payload: {
+    matches: matches
+  }
+});
+
+export const setQualificationMatches: ActionCreator<ISetQualificationMatches> = (matches: Match[]) => ({
+  type: SET_QUALIFICATION_MATCHES,
   payload: {
     matches: matches
   }

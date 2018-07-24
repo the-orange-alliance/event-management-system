@@ -1,6 +1,8 @@
 import AppError from "../models/AppError";
 import Team from "../models/Team";
 import {TournamentLevels} from "../AppTypes";
+import Match from "../models/Match";
+import MatchParticipant from "../models/MatchParticipant";
 
 const ipcRenderer = (window as any).require("electron").ipcRenderer;
 
@@ -26,10 +28,20 @@ class MatchMakerManager {
 
   private constructor() {}
 
-  public execute(options: IMatchMakerOptions): Promise<any> {
+  public execute(options: IMatchMakerOptions): Promise<Match[]> {
     return new Promise<any>((resolve, reject) => {
       ipcRenderer.once("match-maker-success", (event: any, data: any) => {
-        resolve(data);
+        const matches: Match[] = [];
+        for (const matchJSON of data) {
+          const match = new Match().fromJSON(matchJSON);
+          const participants: MatchParticipant[] = [];
+          for (const participantJSON of matchJSON.participants) {
+            participants.push(new MatchParticipant().fromJSON(participantJSON));
+          }
+          match.participants = participants;
+          matches.push(match);
+        }
+        resolve(matches);
       });
       ipcRenderer.once("match-maker-error", (event: any, error: any) => {
         reject(new AppError(1500, "MATCH_MAKER_RUN", error));

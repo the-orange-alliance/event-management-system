@@ -1,10 +1,18 @@
 import {Action} from "redux";
 import {
-  UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP,
-  SET_PROCESS_ACTIONS_DISABLED, UPDATE_TEAM_LIST, ADD_TEAM, ALTER_TEAM, REMOVE_TEAM
+  UPDATE_PROCESS_LIST,
+  DISABLE_NAVIGATION,
+  INCREMENT_COMPLETED_STEP,
+  SET_PROCESS_ACTIONS_DISABLED,
+  UPDATE_TEAM_LIST,
+  ADD_TEAM,
+  ALTER_TEAM,
+  REMOVE_TEAM,
+  SET_PRACTICE_MATCHES
 } from "./constants";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
+import Match from "../../shared/models/Match";
 
 export interface IUpdateProcessList extends Action {
   type: UPDATE_PROCESS_LIST,
@@ -62,5 +70,12 @@ export interface IRemoveTeam extends Action {
     index: number
   }
 }
+export interface ISetPracticeMatches extends Action {
+  type: SET_PRACTICE_MATCHES,
+  payload: {
+    matches: Match[]
+  }
+}
 
-export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation | IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam;
+export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation |
+  IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetPracticeMatches;

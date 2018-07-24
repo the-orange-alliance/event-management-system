@@ -40,7 +40,44 @@ ipcMain.on("match-maker", (event, config) => {
       logger.error(error);
       event.sender.send("match-maker-error", error);
     } else {
-      event.sender.send("match-maker-success", stdout);
+      const result = [];
+      const lines = stdout.toString().split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].length > 2) {
+         const fields = lines[i].split(" ");
+         const matchNumber = parseInt(fields[0], 10);
+         const matchKey = config.eventKey + "-" + getMatchKeyPartialFromType(config.type) + matchNumber.toString().padStart(3, "0");
+         const participants = [];
+         for (let j = 0; j < (config.teamsPerAlliance * 2); j++) {
+           if (j < config.teamsPerAlliance) {
+             participants.push({
+               match_key: matchKey,
+               match_participant_key: matchKey + "-T" + (j + 1),
+               station: 10 + j,
+               surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
+               team_key: parseInt(fields[(j * 2) + 1], 10)
+             });
+           } else {
+             participants.push({
+               match_key: matchKey,
+               match_participant_key: matchKey + "-T" + (j + 1),
+               station: 20 + j - config.teamsPerAlliance,
+               surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
+               team_key: parseInt(fields[(j * 2) + 1], 10)
+             });
+           }
+         }
+         result.push({
+           field_number: matchNumber % config.fields === 0 ? config.fields : (matchNumber % config.fields),
+           match_detail_key: matchKey + "D",
+           match_key: matchKey,
+           match_name: config.type + " Match " + matchNumber,
+           participants: participants,
+           tournament_level: getTournamentLevelFromType(config.type)
+         });
+        }
+      }
+      event.sender.send("match-maker-success", result);
     }
   });
 });
@@ -55,5 +92,18 @@ function getTournamentLevelFromType(type) {
       return 2;
     default:
       return 0;
+  }
+}
+
+function getMatchKeyPartialFromType(type) {
+  switch (type) {
+    case "Practice":
+      return "P";
+    case "Qualification":
+      return "Q";
+    case "Finals":
+      return "E";
+    default:
+      return "P";
   }
 }

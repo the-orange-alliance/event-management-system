@@ -1,17 +1,25 @@
 import {ActionCreator} from "redux";
 import {
-  UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP,
-  SET_PROCESS_ACTIONS_DISABLED, UPDATE_TEAM_LIST, ADD_TEAM, ALTER_TEAM, REMOVE_TEAM
+  UPDATE_PROCESS_LIST,
+  DISABLE_NAVIGATION,
+  INCREMENT_COMPLETED_STEP,
+  SET_PROCESS_ACTIONS_DISABLED,
+  UPDATE_TEAM_LIST,
+  ADD_TEAM,
+  ALTER_TEAM,
+  REMOVE_TEAM,
+  SET_PRACTICE_MATCHES
 } from "./constants";
 import {
   IUpdateProcessList,
   IDisableNavigation,
   IIncrementCompletedStep,
   ISetProcessActionsDisabled,
-  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam
+  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam, ISetPracticeMatches
 } from "./types";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
+import Match from "../../shared/models/Match";
 
 export const updateProcessList: ActionCreator<IUpdateProcessList> = (processList: Process[]) => ({
   type: UPDATE_PROCESS_LIST,
@@ -67,5 +75,12 @@ export const removeTeam: ActionCreator<IRemoveTeam> = (index: number) => ({
   type: REMOVE_TEAM,
   payload: {
     index: index
+  }
+});
+
+export const setPracticeMatches: ActionCreator<ISetPracticeMatches> = (matches: Match[]) => ({
+  type: SET_PRACTICE_MATCHES,
+  payload: {
+    matches: matches
   }
 });

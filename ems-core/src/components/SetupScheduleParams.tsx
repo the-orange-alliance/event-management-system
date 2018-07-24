@@ -18,8 +18,8 @@ import Team from "../shared/models/Team";
 interface IProps {
   onComplete: (scheduleItems: ScheduleItem[]) => void
   schedule: Schedule,
+  teams: Team[],
   event?: Event,
-  teamList: Team[],
   navigationDisabled?: boolean
 }
 
@@ -44,8 +44,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   }
 
   public componentDidUpdate(prevProps: IProps) {
-    if (prevProps.teamList.length !== this.props.teamList.length) {
-      this.props.schedule.teamsParticipating = this.props.teamList.length;
+    if (prevProps.teams.length !== this.props.teams.length) {
+      this.props.schedule.teamsParticipating = this.props.teams.length;
       this.forceUpdate();
     }
   }
@@ -296,7 +296,6 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     event: configState.event,
-    teamList: internalState.teamList,
     navigationDisabled: internalState.navigationDisabled
   };
 }

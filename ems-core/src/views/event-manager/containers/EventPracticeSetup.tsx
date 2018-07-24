@@ -17,6 +17,7 @@ import {disableNavigation} from "../../../stores/internal/actions";
 import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
+import Match from "../../../shared/models/Match";
 
 interface IProps {
   navigationDisabled?: boolean,
@@ -27,7 +28,8 @@ interface IProps {
 }
 
 interface IState {
-  activeIndex: number
+  activeIndex: number,
+  matchList: Match[]
 }
 
 class EventPracticeSetup extends React.Component<IProps, IState> {
@@ -35,9 +37,11 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       activeIndex: 0,
+      matchList: []
     };
     this.onTabChange = this.onTabChange.bind(this);
     this.onParamsComplete = this.onParamsComplete.bind(this);
+    this.onMatchMakerComplete = this.onMatchMakerComplete.bind(this);
   }
 
   public componentDidMount() {
@@ -55,12 +59,12 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   public render() {
     return (
-      <div className="step-view">
+      <div className="step-view no-overflow">
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
-          { menuItem: "Schedule Parameters", render: () => <SetupScheduleParams schedule={this.props.schedule} onComplete={this.onParamsComplete}/>},
+          { menuItem: "Schedule Parameters", render: () => <SetupScheduleParams schedule={this.props.schedule} teams={this.props.teamList} onComplete={this.onParamsComplete}/>},
           { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Practice"}/>},
-          { menuItem: "Match Maker Parameters", render: () => <SetupRunMatchMaker type={"Practice"} schedule={this.props.schedule}/>},
-          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Practice"/>},
+          { menuItem: "Match Maker Parameters", render: () => <SetupRunMatchMaker schedule={this.props.schedule} teams={this.props.teamList} onComplete={this.onMatchMakerComplete}/>},
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Practice" matchList={this.state.matchList}/>},
         ]}
         />
       </div>
@@ -82,6 +86,10 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);
     });
+  }
+
+  private onMatchMakerComplete(matches: Match[]) {
+    this.setState({matchList: matches, activeIndex: 3});
   }
 
 }

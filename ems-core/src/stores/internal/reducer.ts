@@ -1,7 +1,7 @@
 import {Reducer} from "redux";
 import {
   UPDATE_PROCESS_LIST, DISABLE_NAVIGATION, INCREMENT_COMPLETED_STEP,
-  SET_PROCESS_ACTIONS_DISABLED, UPDATE_TEAM_LIST, ADD_TEAM, ALTER_TEAM, REMOVE_TEAM
+  SET_PROCESS_ACTIONS_DISABLED, UPDATE_TEAM_LIST, ADD_TEAM, ALTER_TEAM, REMOVE_TEAM, SET_PRACTICE_MATCHES
 } from "./constants";
 import {IInternalState} from "./models";
 import {InternalActions} from "./types";
@@ -11,7 +11,8 @@ export const initialState: IInternalState = {
   processList: [],
   navigationDisabled: false,
   completedStep: 0,
-  teamList: []
+  teamList: [],
+  practiceMatches: []
 };
 
 const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, action) => {
@@ -48,6 +49,8 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
         ...state,
         teamList: [...state.teamList.slice(0, action.payload.index), ...state.teamList.slice(1 + action.payload.index)] // TODO - Make this and change element constant functions inside of this reducer
       };
+    case SET_PRACTICE_MATCHES:
+      return {...state, practiceMatches: action.payload.matches};
     default:
       return state;
   }

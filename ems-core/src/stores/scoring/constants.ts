@@ -1,2 +1,5 @@
 export const SET_ACTIVE_MATCH = "SET_ACTIVE_MATCH";
 export type SET_ACTIVE_MATCH = typeof SET_ACTIVE_MATCH;
+
+export const SET_MATCH_STATE = "SET_MATCH_STATE";
+export type SET_MATCH_STATE = typeof SET_MATCH_STATE;

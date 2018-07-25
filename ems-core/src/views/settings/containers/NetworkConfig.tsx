@@ -16,6 +16,7 @@ import {ISetNetworkHost} from "../../../stores/config/types";
 import {setNetworkHost} from "../../../stores/config/actions";
 import AppError from "../../../shared/models/AppError";
 import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
+import DialogManager from "../../../shared/managers/DialogManager";
 
 interface IProps {
   processingAction?: boolean,
@@ -140,18 +141,18 @@ class NetworkConfig extends React.Component<IProps, IState> {
     ProcessManager.startEcosystem(this.state.updateIP).then(() => {
       ProcessManager.listEcosystem().then((procList: Process[]) => {
         this.props.updateProcessList(procList);
-        this.props.setNetworkHost(this.state.updateIP);
+        this.props.setNetworkHost(this.state.updateIP); // TODO - Update EMSProvider, WebProvider, SocketProvider
         this.props.setNavigationDisabled(false);
         this.props.setProcessActionsDisabled(false);
       }).catch((error: AppError) => {
         this.props.setNavigationDisabled(false);
         this.props.setProcessActionsDisabled(false);
-        console.log(error);
+        DialogManager.showErrorBox(error);
       });
     }).catch((error: AppError) => {
       this.props.setNavigationDisabled(false);
       this.props.setProcessActionsDisabled(false);
-      console.log(error);
+      DialogManager.showErrorBox(error);
     });
   }
 

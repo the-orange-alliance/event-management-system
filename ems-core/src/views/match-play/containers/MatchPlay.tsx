@@ -1,26 +1,34 @@
 import * as React from "react";
+import {SyntheticEvent} from "react";
 import {Button, Card, Divider, DropdownProps, Form, Grid, Tab} from "semantic-ui-react";
 import Match from "../../../shared/models/Match";
-import {IApplicationState} from "../../../stores";
+import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import EventConfiguration from "../../../shared/models/EventConfiguration";
 import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
-import {SyntheticEvent} from "react";
 import MatchConfiguration from "../../../shared/models/MatchConfiguration";
 import MatchPlayTimerConfiguration from "../../../components/MatchPlayTimerConfiguration";
+import {MatchState} from "../../../shared/models/MatchState";
+import {ISetMatchState} from "../../../stores/scoring/types";
+import {Dispatch} from "redux";
+import {setMatchState} from "../../../stores/scoring/actions";
+import MatchFlowController from "../controllers/MatchFlowController";
 
 interface IProps {
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
+  matchState?: MatchState,
   practiceMatches: Match[],
-  qualificationMatches: Match[]
+  qualificationMatches: Match[],
+  setMatchState?: (matchState: MatchState) => ISetMatchState
 }
 
 interface IState {
   selectedLevel: TournamentLevels,
   selectedMatch: string
   selectedField: number,
-  configModalOpen: boolean
+  configModalOpen: boolean,
+  hasPrestarted: boolean
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -30,16 +38,24 @@ class MatchPlay extends React.Component<IProps, IState> {
       selectedLevel: "Practice",
       selectedMatch: "",
       selectedField: 1,
-      configModalOpen: false
+      configModalOpen: false,
+      hasPrestarted: false,
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
     this.changeSelectedField = this.changeSelectedField.bind(this);
+
+    this.cancelPrestart = this.cancelPrestart.bind(this);
+    this.prestart = this.prestart.bind(this);
+    this.setAudienceDisplay = this.setAudienceDisplay.bind(this);
+    this.startMatch = this.startMatch.bind(this);
+    this.abortMatch = this.abortMatch.bind(this);
+    this.commitScores = this.commitScores.bind(this);
   }
 
   public render() {
-    const {selectedLevel, selectedMatch, selectedField} = this.state;
-    const {eventConfig} = this.props;
+    const {selectedLevel, selectedMatch, selectedField, hasPrestarted} = this.state;
+    const {eventConfig, matchState} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
     const availableLevels = this.getAvailableTournamentLevels(eventConfig.postQualConfig).map(tournamentLevel => {
@@ -63,11 +79,14 @@ class MatchPlay extends React.Component<IProps, IState> {
       };
     });
 
+    const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
+    const canPrestart = selectedMatch.length > 0 && selectedField > 0;
+
     return (
       <Tab.Pane className="tab-subview">
         <Grid columns="equal">
           <Grid.Row>
-            <Grid.Column textAlign="left"><b>Match Status: </b>UNDEFINED</Grid.Column>
+            <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
             <Grid.Column textAlign="center"><b>02:30 </b>(TELEOP)</Grid.Column>
             <Grid.Column textAlign="right"><b>Connection Status: </b>OKAY</Grid.Column>
           </Grid.Row>
@@ -75,11 +94,18 @@ class MatchPlay extends React.Component<IProps, IState> {
         <Divider/>
         <Grid columns={16} centered={true}>
           <Grid.Row>
-            <Grid.Column width={3}><Button fluid={true} color="orange">Prestart</Button></Grid.Column>
-            <Grid.Column width={3}><Button fluid={true} color="blue">Set Audience Display</Button></Grid.Column>
-            <Grid.Column width={3}><Button fluid={true} color="yellow">Start Match</Button></Grid.Column>
-            <Grid.Column width={3}><Button fluid={true} color="red">Abort Match</Button></Grid.Column>
-            <Grid.Column width={3}><Button fluid={true} color="green">Commit Scores</Button></Grid.Column>
+            {
+              hasPrestarted &&
+              <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[0]} color="red" onClick={this.cancelPrestart}>Cancel Prestart</Button></Grid.Column>
+            }
+            {
+              !hasPrestarted &&
+              <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[0] || !canPrestart} color="orange" onClick={this.prestart}>Prestart</Button></Grid.Column>
+            }
+            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[1]} color="blue" onClick={this.setAudienceDisplay}>Set Audience Display</Button></Grid.Column>
+            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[2]} color="yellow" onClick={this.startMatch}>Start Match</Button></Grid.Column>
+            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[3]} color="red" onClick={this.abortMatch}>Abort Match</Button></Grid.Column>
+            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4]} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
           </Grid.Row>
         </Grid>
         <Divider/>
@@ -117,11 +143,50 @@ class MatchPlay extends React.Component<IProps, IState> {
     );
   }
 
+  private cancelPrestart() {
+    this.setState({hasPrestarted: false});
+    this.props.setMatchState(MatchState.PRESTART_READY);
+  }
+
+  private prestart() {
+    this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
+    MatchFlowController.prestart().then(() => {
+      this.setState({hasPrestarted: true});
+      this.props.setMatchState(MatchState.PRESTART_COMPLETE);
+    });
+  }
+
+  private setAudienceDisplay() {
+    MatchFlowController.setAudiencedisplay().then(() => {
+      this.props.setMatchState(MatchState.AUDIENCE_DISPLAY_SET);
+    });
+  }
+
+  private startMatch() {
+    MatchFlowController.startMatch().then(() => {
+      this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);
+    });
+  }
+
+  private abortMatch() {
+    MatchFlowController.abortMatch().then(() => {
+      this.setState({hasPrestarted: false});
+      this.props.setMatchState(MatchState.MATCH_ABORTED);
+    });
+  }
+
+  private commitScores() {
+    MatchFlowController.commitScores().then(() => {
+      this.setState({hasPrestarted: false});
+      this.props.setMatchState(MatchState.PRESTART_READY);
+    });
+  }
+
   private getAvailableTournamentLevels(postQualConfig: PostQualConfig): TournamentLevels[] {
     return ["Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Finals"];
   }
 
-  private getMatchesByTournamentLevel(tournamentLevel: TournamentLevels): Match[] {
+  private getMatchesByTournamentLevel(tournamentLevel: TournamentLevels): Match[] { // TODO - Only show fields that EMS controls
     switch (tournamentLevel) {
       case "Practice":
         return this.props.practiceMatches;
@@ -168,13 +233,20 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 }
 
-export function mapStateToProps({configState, internalState}: IApplicationState) {
+export function mapStateToProps({configState, internalState, scoringState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,
+    matchState: scoringState.matchState,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches
   };
 }
 
-export default connect(mapStateToProps)(MatchPlay);
+export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+  return {
+    setMatchState: (matchState: MatchState) => dispatch(setMatchState(matchState))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MatchPlay);

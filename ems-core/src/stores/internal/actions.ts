@@ -8,14 +8,14 @@ import {
   ADD_TEAM,
   ALTER_TEAM,
   REMOVE_TEAM,
-  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES
+  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES, SET_SOCKET_CONNECTED
 } from "./constants";
 import {
   IUpdateProcessList,
   IDisableNavigation,
   IIncrementCompletedStep,
   ISetProcessActionsDisabled,
-  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam, ISetPracticeMatches, ISetQualificationMatches
+  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam, ISetPracticeMatches, ISetQualificationMatches, ISetSocketConnected
 } from "./types";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
@@ -89,5 +89,12 @@ export const setQualificationMatches: ActionCreator<ISetQualificationMatches> = 
   type: SET_QUALIFICATION_MATCHES,
   payload: {
     matches: matches
+  }
+});
+
+export const setSocketConnected: ActionCreator<ISetSocketConnected> = (connected: boolean) => ({
+  type: SET_SOCKET_CONNECTED,
+  payload: {
+    connected: connected
   }
 });

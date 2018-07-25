@@ -4,8 +4,10 @@ import "./SponsorScreen.css";
 class SponsorScreen extends React.Component {
   public render() {
     return (
-      <div className="container">
-        <span>Thank you to our wonderful sponsors...</span>
+      <div id="fgc-body">
+        <div id="fgc-sponsor-container">
+          <span>Thank you to our wonderful sponsors...</span>
+        </div>
       </div>
     );
   }

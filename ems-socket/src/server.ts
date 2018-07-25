@@ -29,6 +29,10 @@ app.use(cors());
 
 const clients: Map<string, string> = new Map<string, string>();
 
+/**
+ * Main socket connection/event logic. We're not trying to be super secure, but inside of EMS you will (eventually)
+ * be able to see all connected clients. Clients can't send/receive any events until they identify themselves.
+ */
 socket.on("connection", (client: Socket) => {
   logger.info(`Client connection (${client.id})`);
   client.on("identify", (params: string[]) => {
@@ -38,6 +42,9 @@ socket.on("connection", (client: Socket) => {
       client.join(params[i]);
       logger.info(`Client ${client.id} joined ${params[i]}.`)
     }
+  });
+  client.on("request-video", (id: number) => {
+    socket.to("scoring").emit("video-switch", id);
   });
 });
 

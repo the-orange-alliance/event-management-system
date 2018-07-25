@@ -4,7 +4,7 @@ import AppContainer from "./components/AppContainer";
 import {ApplicationActions, IApplicationState} from "./stores";
 import {
   IIncrementCompletedStep,
-  ISetPracticeMatches, ISetQualificationMatches,
+  ISetPracticeMatches, ISetQualificationMatches, ISetSocketConnected,
   IUpdateProcessList,
   IUpdateTeamList
 } from "./stores/internal/types";
@@ -15,7 +15,7 @@ import Process from "./shared/models/Process";
 import {
   incrementCompletedStep,
   setPracticeMatches,
-  setQualificationMatches,
+  setQualificationMatches, setSocketConnected,
   updateProcessList,
   updateTeamList
 } from "./stores/internal/actions";
@@ -26,14 +26,16 @@ import Team from "./shared/models/Team";
 import {AxiosResponse} from "axios";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
+import SocketProvider from "./shared/providers/SocketProvider";
 
 interface IProps {
-  setCompletedStep: (step: number) => IIncrementCompletedStep,
+  setCompletedStep?: (step: number) => IIncrementCompletedStep,
   setProcessList?: (procList: Process[]) => IUpdateProcessList,
   setNetworkHost?: (host: string) => ISetNetworkHost,
-  setTeamList: (teams: Team[]) => IUpdateTeamList,
-  setPracticeMatches: (matches: Match[]) => ISetPracticeMatches,
-  setQualificationMatches: (matches: Match[]) => ISetQualificationMatches
+  setTeamList?: (teams: Team[]) => IUpdateTeamList,
+  setPracticeMatches?: (matches: Match[]) => ISetPracticeMatches,
+  setQualificationMatches?: (matches: Match[]) => ISetQualificationMatches,
+  setSocketConnected?: (connected: boolean) => ISetSocketConnected
 }
 
 class App extends React.Component<IProps> {
@@ -46,9 +48,10 @@ class App extends React.Component<IProps> {
       const networkHost = procList[0].address;
       this.props.setNetworkHost(networkHost);
       this.props.setProcessList(procList);
+      this.initializeSocket(networkHost);
 
       EMSProvider.initialize(networkHost);
-      // this.props.setCompletedStep(2);
+
       // Preload app-wide variables like team list, schedule, etc.
       EMSProvider.getEvent().then((eventResponse: AxiosResponse) => {
         if (eventResponse.data.payload && eventResponse.data.payload[0] && eventResponse.data.payload[0].event_key) {
@@ -119,6 +122,17 @@ class App extends React.Component<IProps> {
       <AppContainer/>
     );
   }
+
+  private initializeSocket(host: string) {
+    SocketProvider.initialize(host);
+    SocketProvider.on("connect", () => {
+      SocketProvider.emit("identify", "ems-core", "scoring");
+      this.props.setSocketConnected(true);
+    });
+    SocketProvider.on("disconnect", () => {
+      this.props.setSocketConnected(false);
+    });
+  }
 }
 
 export function mapStateToProps(state: IApplicationState) {
@@ -132,7 +146,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     setNetworkHost: (host: string) => dispatch(setNetworkHost(host)),
     setTeamList: (teams: Team[]) => dispatch(updateTeamList(teams)),
     setPracticeMatches: (matches: Match[]) => dispatch(setPracticeMatches(matches)),
-    setQualificationMatches: (matches: Match[]) => dispatch(setQualificationMatches(matches))
+    setQualificationMatches: (matches: Match[]) => dispatch(setQualificationMatches(matches)),
+    setSocketConnected: (connected: boolean) => dispatch(setSocketConnected(connected))
   };
 }
 

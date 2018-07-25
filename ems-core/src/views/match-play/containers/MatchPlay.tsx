@@ -20,6 +20,7 @@ interface IProps {
   matchState?: MatchState,
   practiceMatches: Match[],
   qualificationMatches: Match[],
+  connected: boolean,
   setMatchState?: (matchState: MatchState) => ISetMatchState
 }
 
@@ -55,7 +56,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   public render() {
     const {selectedLevel, selectedMatch, selectedField, hasPrestarted} = this.state;
-    const {eventConfig, matchState} = this.props;
+    const {eventConfig, matchState, connected} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
     const availableLevels = this.getAvailableTournamentLevels(eventConfig.postQualConfig).map(tournamentLevel => {
@@ -88,7 +89,7 @@ class MatchPlay extends React.Component<IProps, IState> {
           <Grid.Row>
             <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
             <Grid.Column textAlign="center"><b>02:30 </b>(TELEOP)</Grid.Column>
-            <Grid.Column textAlign="right"><b>Connection Status: </b>OKAY</Grid.Column>
+            <Grid.Column textAlign="right"><b>Connection Status: </b>{connected ? "OKAY" : "NO CONNECTION"}</Grid.Column>
           </Grid.Row>
         </Grid>
         <Divider/>
@@ -239,7 +240,8 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     matchConfig: configState.matchConfig,
     matchState: scoringState.matchState,
     practiceMatches: internalState.practiceMatches,
-    qualificationMatches: internalState.qualificationMatches
+    qualificationMatches: internalState.qualificationMatches,
+    connected: internalState.socketConnected
   };
 }
 

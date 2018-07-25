@@ -4,6 +4,7 @@ import {SyntheticEvent} from "react";
 import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import MatchPlay from "./containers/MatchPlay";
+import VideoSwitch from "./containers/VideoSwitch";
 
 interface IProps {
   navigationDisabled?: boolean
@@ -27,7 +28,7 @@ class MatchPlayView extends React.Component<IProps, IState> {
       <div className="view">
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={ [
           { menuItem: "Match Play", render: () => <MatchPlay/>},
-          { menuItem: "Video Switch", render: () => <span>Merp</span>},
+          { menuItem: "Video Switch", render: () => <VideoSwitch/>},
         ]}/>
       </div>
     );

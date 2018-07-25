@@ -9,5 +9,6 @@ export interface IInternalState {
   completedStep: number,
   teamList: Team[],
   practiceMatches: Match[],
-  qualificationMatches: Match[]
+  qualificationMatches: Match[],
+  socketConnected: boolean
 }

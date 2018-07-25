@@ -6,6 +6,7 @@ import {getTheme} from "../shared/AppTheme";
 import {IApplicationState} from "../stores";
 import EventManagerView from "../views/event-manager/EventManagerView";
 import SettingsView from "../views/settings/SettingsView";
+import MatchPlayView from "../views/match-play/MatchPlayView";
 
 interface IProps {
   slaveMode?: boolean,
@@ -21,7 +22,7 @@ class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeItem: "Event Manager"
+      activeItem: "Match Play"
     };
   }
 
@@ -61,6 +62,8 @@ class AppContainer extends React.Component<IProps, IState> {
         return <EventManagerView/>;
       case "Settings":
         return <SettingsView/>;
+      case "Match Play":
+        return <MatchPlayView/>;
       default:
         return <span>View Not Found.</span>;
     }

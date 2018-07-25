@@ -1,10 +1,11 @@
 import * as React from "react";
-import {Button, Card, Divider, Form, Grid, Tab} from "semantic-ui-react";
+import {Button, Card, Divider, DropdownProps, Form, Grid, Tab} from "semantic-ui-react";
 import Match from "../../../shared/models/Match";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import EventConfiguration from "../../../shared/models/EventConfiguration";
 import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
+import {SyntheticEvent} from "react";
 
 interface IProps {
   eventConfig?: EventConfiguration
@@ -26,6 +27,9 @@ class MatchPlay extends React.Component<IProps, IState> {
       selectedMatch: "",
       selectedField: 1
     };
+    this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
+    this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
+    this.changeSelectedField = this.changeSelectedField.bind(this);
   }
 
   public render() {
@@ -45,19 +49,12 @@ class MatchPlay extends React.Component<IProps, IState> {
       };
     });
 
-    // const availableFields = this.props.eventConfig.fieldsControlled.map(fieldNumber => {
-    //   return {
-    //     text: "Field " + fieldNumber,
-    //     value: fieldNumber
-    //   };
-    // });
-
-    const availableFields = [
-      {text: "Field 1", value: 1},
-      {text: "Field 2", value: 2},
-      {text: "Field 3", value: 3},
-      {text: "Field 4", value: 4}
-    ];
+    const availableFields = this.props.eventConfig.fieldsControlled.map(fieldNumber => {
+      return {
+        text: "Field " + fieldNumber,
+        value: fieldNumber
+      };
+    });
 
     return (
       <Tab.Pane className="tab-subview">
@@ -80,9 +77,9 @@ class MatchPlay extends React.Component<IProps, IState> {
               <Form>
                 <Grid columns={16}>
                   <Grid.Row>
-                    <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} label="Tournament Level"/></Grid.Column>
-                    <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedMatch} options={availableMatches} label="Match"/></Grid.Column>
-                    <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} value={selectedField} options={availableFields} label="Field"/></Grid.Column>
+                    <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
+                    <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedMatch} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
+                    <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} value={selectedField} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
                   </Grid.Row>
                 </Grid>
               </Form>
@@ -118,6 +115,41 @@ class MatchPlay extends React.Component<IProps, IState> {
       default:
         return [];
     }
+  }
+
+  private changeSelectedLevel(event: SyntheticEvent, props: DropdownProps) {
+    const matches = this.getMatchesByTournamentLevel((props.value as TournamentLevels));
+    if (matches.length > 0) {
+      this.setState({
+        selectedLevel: (props.value as TournamentLevels),
+        selectedMatch: matches[0].matchKey,
+        selectedField: matches[0].fieldNumber,
+      });
+    } else {
+      this.setState({
+        selectedLevel: (props.value as TournamentLevels),
+        selectedMatch: "",
+        selectedField: -1,
+      });
+    }
+  }
+
+  private changeSelectedMatch(event: SyntheticEvent, props: DropdownProps) {
+    for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
+      if (match.matchKey === (props.value as string)) {
+        this.setState({
+          selectedMatch: match.matchKey,
+          selectedField: match.fieldNumber,
+        });
+        break;
+      }
+    }
+  }
+
+  private changeSelectedField(event: SyntheticEvent, props: DropdownProps) {
+    this.setState({
+      selectedField: (props.value as number),
+    });
   }
 }
 

@@ -28,7 +28,6 @@ class EventManagerView extends React.Component<IProps, IState> {
     this.state = {
       activeStep: this.props.completedStep + 1
     };
-    console.log(this.state);
   }
 
   public componentDidUpdate(prevProps: IProps) {

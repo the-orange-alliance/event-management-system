@@ -215,6 +215,11 @@ class EventSelection extends React.Component<IProps, IState> {
   private setEventFields(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(parseInt(props.value, 10))) {
       this.props.event.fieldCount = parseInt(props.value, 10);
+      const fieldControl: number[] = [];
+      for (let i = 0; i < this.props.event.fieldCount; i++) {
+        fieldControl.push(i + 1);
+      }
+      this.props.eventConfig.fieldsControlled = fieldControl;
       this.props.setEvent(this.props.event);
       this.state.eventValidator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();

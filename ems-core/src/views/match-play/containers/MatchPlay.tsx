@@ -34,6 +34,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   public render() {
     const {selectedLevel, selectedMatch, selectedField} = this.state;
+    const fieldControl: number[] = (typeof this.props.eventConfig.fieldsControlled === "undefined" ? [1] : this.props.eventConfig.fieldsControlled);
 
     const availableLevels = this.getAvailableTournamentLevels(this.props.eventConfig.postQualConfig).map(tournamentLevel => {
       return {
@@ -49,7 +50,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       };
     });
 
-    const availableFields = this.props.eventConfig.fieldsControlled.map(fieldNumber => {
+    const availableFields = fieldControl.map(fieldNumber => {
       return {
         text: "Field " + fieldNumber,
         value: fieldNumber
@@ -58,7 +59,13 @@ class MatchPlay extends React.Component<IProps, IState> {
 
     return (
       <Tab.Pane className="tab-subview">
-        <h3>Match Play</h3>
+        <Grid columns="equal">
+          <Grid.Row>
+            <Grid.Column textAlign="left"><b>Match Status: </b>UNDEFINED</Grid.Column>
+            <Grid.Column textAlign="center"><b>02:30 </b>(TELEOP)</Grid.Column>
+            <Grid.Column textAlign="right"><b>Connection Status: </b>OKAY</Grid.Column>
+          </Grid.Row>
+        </Grid>
         <Divider/>
         <Grid columns={16} centered={true}>
           <Grid.Row>
@@ -80,6 +87,12 @@ class MatchPlay extends React.Component<IProps, IState> {
                     <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
                     <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedMatch} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
                     <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} value={selectedField} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
+                  </Grid.Row>
+                  <Grid.Row>
+                    <Grid.Column width={4}><Form.Input label="Start Delay"/></Grid.Column>
+                    <Grid.Column width={4}><Form.Input label="Autonomous"/></Grid.Column>
+                    <Grid.Column width={4}><Form.Input label="Teleop"/></Grid.Column>
+                    <Grid.Column width={4}><Form.Input label="End Game"/></Grid.Column>
                   </Grid.Row>
                 </Grid>
               </Form>

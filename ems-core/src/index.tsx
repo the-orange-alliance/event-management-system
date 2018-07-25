@@ -23,7 +23,7 @@ CONFIG_STORE.getAll().then((configStore: any) => {
 
   const configState: IConfigState = Config.initialState;
 
-  if (typeof configStore.event !== "undefined" || typeof configStore.eventConfig !== "undefined") {
+  if (typeof configStore.event !== "undefined" && typeof configStore.eventConfig !== "undefined") {
     configState.event = configState.event.fromJSON(configStore.event);
     configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);
   }

@@ -26,13 +26,19 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 }
 
 app.use(cors());
-app.use("/", (req: express.Request, res: express.Response) => {
-  res.send("Hello World!");
-});
+
+const clients: Map<string, string> = new Map<string, string>();
 
 socket.on("connection", (client: Socket) => {
-  logger.info("Client connection.");
-  client.emit("connect");
+  logger.info(`Client connection (${client.id})`);
+  client.on("identify", (params: string[]) => {
+    logger.info(`Identified client ${client.id} as ${params[0]}.`);
+    clients.set(client.id, params[0]);
+    for (let i = 1; i < params.length; i++) {
+      client.join(params[i]);
+      logger.info(`Client ${client.id} joined ${params[i]}.`)
+    }
+  });
 });
 
 server.listen({

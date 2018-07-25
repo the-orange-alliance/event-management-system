@@ -1,0 +1,16 @@
+body {
+  background-image: url("../res/global-bg.png");
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+.container {
+  position: absolute;
+  width: 75vw;
+  height: 75vh;
+  left: 12.5vw;
+  top: 12.5vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  padding: 20px;
+}

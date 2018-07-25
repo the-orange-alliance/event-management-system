@@ -25,9 +25,25 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 app.use(cors());
 app.use(cookieParser());
 
-app.use("/", (req: express.Request, res: express.Response) => {
-  res.send("Hello World!");
+const isProd: boolean = process.env.NODE_ENV === "production";
+let staticPath: string = "../../*/build";
+if (isProd) staticPath = "../../../public/*";
+app.use(express.static(path.join(__dirname, staticPath.replace("*", "audience-display"))));
+// app.use(express.static(path.join(__dirname, staticPath.replace("*", "ref-tablet"))));
+
+app.use("/audience", (req: express.Request, res: express.Response) => {
+  res.cookie("host", host, {secure: false, httpOnly: false, maxAge: 600000});
+  res.sendFile(path.join(__dirname, staticPath.replace("*", "audience-display") + "/index.html"));
 });
+
+app.use("/ping", (req: express.Request, res: express.Response) => {
+  res.send({res: "pong!"});
+});
+
+app.get("*", (req, res) => {
+  res.status(404).send("Content not found.");
+});
+
 
 http.createServer(app).listen({
   port: port,

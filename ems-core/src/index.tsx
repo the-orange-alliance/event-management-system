@@ -37,6 +37,10 @@ CONFIG_STORE.getAll().then((configStore: any) => {
     }
   }
 
+  if (typeof configStore.matchConfig !== "undefined") {
+    configState.matchConfig = configState.matchConfig.fromJSON(configStore.matchConfig);
+  }
+
   const applicationStore = createStore(reducers, {
     configState: configState
   });

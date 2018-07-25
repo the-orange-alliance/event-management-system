@@ -32,7 +32,9 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
     case DISABLE_NAVIGATION:
       return {...state, navigationDisabled: action.payload.navigationDisabled};
     case INCREMENT_COMPLETED_STEP:
-      if (action.payload.completedStep > state.completedStep) {
+      if (action.payload.completedStep === 0) {
+        return {...state, completedStep: action.payload.completedStep};
+      } else if (action.payload.completedStep > state.completedStep) {
         return {...state, completedStep: action.payload.completedStep};
       } else {
         return state;

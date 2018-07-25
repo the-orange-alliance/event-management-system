@@ -1,7 +1,7 @@
 import {Reducer} from "redux";
 import {
   SET_EVENT,
-  SET_EVENT_CONFIG,
+  SET_EVENT_CONFIG, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE,
@@ -12,10 +12,12 @@ import {ConfigActions} from "./types";
 import * as EventConfig from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
+import MatchConfiguration from "../../shared/models/MatchConfiguration";
 
 export const initialState: IConfigState = {
   slaveModeEnabled: false,
   eventConfiguration: EventConfig.DEFAULT_RESET,
+  matchConfig: new MatchConfiguration(),
   event: new Event(),
   networkHost: undefined,
   practiceSchedule: new Schedule("Practice"),
@@ -36,6 +38,8 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, practiceSchedule: action.payload.schedule};
     case SET_QUALIFICATION_SCHEDULE:
       return {...state, qualificationSchedule: action.payload.schedule};
+    case SET_MATCH_CONFIG:
+      return {...state, matchConfig: action.payload.matchConfig};
     default:
       return state;
   }

@@ -1,7 +1,7 @@
 import {Action} from "redux";
 import {
   SET_EVENT,
-  SET_EVENT_CONFIG,
+  SET_EVENT_CONFIG, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE,
@@ -10,6 +10,7 @@ import {
 import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
+import MatchConfiguration from "../../shared/models/MatchConfiguration";
 
 export interface IToggleSlaveMode extends Action {
   type: TOGGLE_SLAVE_MODE,
@@ -53,5 +54,12 @@ export interface ISetQualificationSchedule extends Action {
   }
 }
 
+export interface ISetMatchConfig extends Action {
+  type: SET_MATCH_CONFIG,
+  payload: {
+    matchConfig: MatchConfiguration
+  }
+}
+
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
-  ISetPracticeSchedule | ISetQualificationSchedule;
+  ISetPracticeSchedule | ISetQualificationSchedule | ISetMatchConfig;

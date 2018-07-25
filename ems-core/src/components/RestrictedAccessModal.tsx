@@ -59,6 +59,7 @@ class RestrictedAccessModal extends React.Component<IProps, IState> {
 
   private validateAndAct() {
     if (this.state.pin === "FGCadmin#1") {
+      this.setState({pin: ""});
       this.props.onClose();
       this.props.onSuccess();
     } else {

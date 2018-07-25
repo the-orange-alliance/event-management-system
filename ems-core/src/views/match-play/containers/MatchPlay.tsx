@@ -6,9 +6,12 @@ import {connect} from "react-redux";
 import EventConfiguration from "../../../shared/models/EventConfiguration";
 import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
 import {SyntheticEvent} from "react";
+import MatchConfiguration from "../../../shared/models/MatchConfiguration";
+import MatchPlayTimerConfiguration from "../../../components/MatchPlayTimerConfiguration";
 
 interface IProps {
-  eventConfig?: EventConfiguration
+  eventConfig?: EventConfiguration,
+  matchConfig?: MatchConfiguration,
   practiceMatches: Match[],
   qualificationMatches: Match[]
 }
@@ -16,7 +19,8 @@ interface IProps {
 interface IState {
   selectedLevel: TournamentLevels,
   selectedMatch: string
-  selectedField: number
+  selectedField: number,
+  configModalOpen: boolean
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -25,7 +29,8 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.state = {
       selectedLevel: "Practice",
       selectedMatch: "",
-      selectedField: 1
+      selectedField: 1,
+      configModalOpen: false
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
@@ -34,9 +39,10 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   public render() {
     const {selectedLevel, selectedMatch, selectedField} = this.state;
-    const fieldControl: number[] = (typeof this.props.eventConfig.fieldsControlled === "undefined" ? [1] : this.props.eventConfig.fieldsControlled);
+    const {eventConfig} = this.props;
+    const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
-    const availableLevels = this.getAvailableTournamentLevels(this.props.eventConfig.postQualConfig).map(tournamentLevel => {
+    const availableLevels = this.getAvailableTournamentLevels(eventConfig.postQualConfig).map(tournamentLevel => {
       return {
         text: tournamentLevel,
         value: tournamentLevel
@@ -84,17 +90,13 @@ class MatchPlay extends React.Component<IProps, IState> {
               <Form>
                 <Grid columns={16}>
                   <Grid.Row>
-                    <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
-                    <Grid.Column width={6}><Form.Dropdown fluid={true} selection={true} value={selectedMatch} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
-                    <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} value={selectedField} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={selectedMatch} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={6} widescreen={4}><Form.Dropdown fluid={true} selection={true} value={selectedField} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
                   </Grid.Row>
-                  <Grid.Row>
-                    <Grid.Column width={4}><Form.Input label="Start Delay"/></Grid.Column>
-                    <Grid.Column width={4}><Form.Input label="Autonomous"/></Grid.Column>
-                    <Grid.Column width={4}><Form.Input label="Teleop"/></Grid.Column>
-                    <Grid.Column width={4}><Form.Input label="End Game"/></Grid.Column>
-                  </Grid.Row>
+                  <Divider/>
                 </Grid>
+                <MatchPlayTimerConfiguration/>
               </Form>
             </Card.Content>
           </Card>
@@ -169,6 +171,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
+    matchConfig: configState.matchConfig,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches
   };

@@ -29,7 +29,6 @@ interface IState {
   selectedMatch: string
   selectedField: number,
   configModalOpen: boolean,
-  hasPrestarted: boolean
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -40,7 +39,6 @@ class MatchPlay extends React.Component<IProps, IState> {
       selectedMatch: "",
       selectedField: 1,
       configModalOpen: false,
-      hasPrestarted: false,
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
@@ -55,7 +53,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {selectedLevel, selectedMatch, selectedField, hasPrestarted} = this.state;
+    const {selectedLevel, selectedMatch, selectedField} = this.state;
     const {eventConfig, matchState, connected} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
@@ -82,6 +80,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
     const canPrestart = selectedMatch.length > 0 && selectedField > 0;
+    const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
 
     return (
       <Tab.Pane className="tab-subview">
@@ -145,14 +144,12 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private cancelPrestart() {
-    this.setState({hasPrestarted: false});
     this.props.setMatchState(MatchState.PRESTART_READY);
   }
 
   private prestart() {
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     MatchFlowController.prestart().then(() => {
-      this.setState({hasPrestarted: true});
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
     });
   }
@@ -171,14 +168,12 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private abortMatch() {
     MatchFlowController.abortMatch().then(() => {
-      this.setState({hasPrestarted: false});
       this.props.setMatchState(MatchState.MATCH_ABORTED);
     });
   }
 
   private commitScores() {
     MatchFlowController.commitScores().then(() => {
-      this.setState({hasPrestarted: false});
       this.props.setMatchState(MatchState.PRESTART_READY);
     });
   }

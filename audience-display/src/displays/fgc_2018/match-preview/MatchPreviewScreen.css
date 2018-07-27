@@ -121,3 +121,33 @@
     display: flex;
     align-items: center;
 }
+
+@media only screen and (max-width: 1600px) {
+    #fgc-pre-header {
+        height: 25vh;
+        margin-top: 0;
+    }
+    #fgc-pre-logo {
+        margin-top: 3%;
+    }
+    #fgc-pre-match-info {
+        margin-top: 2vh;
+    }
+    #fgc-pre-match-info-left {
+        min-width: 25%;
+    }
+    #fgc-pre-match-info-right {
+        min-width: 25%;
+    }
+    .pre-match-alliance-row {
+        font-family: Roboto, sans-serif;
+        font-weight: bold;
+        font-size: 1.75rem;
+    }
+    .pre-match-alliance-left {
+        width: 13.5%;
+    }
+    .pre-match-alliance-right {
+        width: 86.5%;
+    }
+}

@@ -41,5 +41,14 @@
 .fit {
     width: 100%;
     height: 100%;
->>>>>>> 22d3369d220201e7482609665ec3ea5a7e8c3e88
+}
+
+.fit-h {
+    max-height: 100%;
+    width: auto;
+}
+
+.fit-w {
+    max-width: 100%;
+    height: auto;
 }

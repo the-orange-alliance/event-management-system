@@ -15,3 +15,11 @@
     display: flex;
     flex-direction: column;
 }
+
+.red-bg {
+    background-color: #CE2000;
+}
+
+.blue-bg {
+    background-color: #5C88FF;
+}

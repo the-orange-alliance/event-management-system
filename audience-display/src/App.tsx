@@ -31,8 +31,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.1.54"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.1.54"); // Debug/local IPv4
+      SocketProvider.initialize("10.0.100.40"); // Debug/local IPv4
+      EMSProvider.initialize("10.0.100.40"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       SocketProvider.emit("identify", "audience-display", "event", "scoring");
@@ -51,6 +51,7 @@ class App extends React.Component<IProps, IState> {
    * event.
    */
   public componentDidMount() {
+    console.log("here");
     EMSProvider.getEvent().then((response: AxiosResponse) => {
       if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
         this.setState({
@@ -73,7 +74,7 @@ class App extends React.Component<IProps, IState> {
         display = <EnergyImpact event={event} videoID={videoID}/>;
         break;
       default:
-        display = <span>REST API CONNECTION LOST</span>;
+        display = <div id="app-error">REST API CONNECTION LOST</div>;
     }
 
     if (!loading) {

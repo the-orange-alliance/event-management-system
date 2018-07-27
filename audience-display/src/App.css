@@ -1,0 +1,9 @@
+#app-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4vw;
+    width: 100vw;
+    height: 100vh;
+    color: mediumpurple;
+}

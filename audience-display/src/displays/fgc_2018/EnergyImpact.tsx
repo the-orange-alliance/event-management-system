@@ -2,6 +2,9 @@ import * as React from "react";
 import Event from "../../shared/models/Event";
 import SponsorScreen from "./sponsor/SponsorScreen";
 
+import "./EnergyImpact.css";
+import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
+
 interface IProps {
   event: Event,
   videoID: number
@@ -22,6 +25,9 @@ class EnergyImpact extends React.Component<IProps> {
         break;
       case 1:
         view = <span/>; // Blank screen
+        break;
+      case 2:
+        view = <MatchPreviewScreen/>;
         break;
       default:
         view = <SponsorScreen/>;

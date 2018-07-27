@@ -1,18 +1,18 @@
 import {ActionCreator} from "redux";
 import {
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_MATCH_CONFIG,
+  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
-  SET_QUALIFICATION_SCHEDULE,
+  SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID,
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {
   ISetEvent,
-  ISetEventConfiguration, ISetMatchConfig,
+  ISetEventConfiguration, ISetMasterHost, ISetMatchConfig,
   ISetNetworkHost,
   ISetPracticeSchedule,
-  ISetQualificationSchedule,
+  ISetQualificationSchedule, ISetSlaveID,
   IToggleSlaveMode
 } from "./types";
 import EventConfiguration from "../../shared/models/EventConfiguration";
@@ -66,5 +66,19 @@ export const setMatchConfig: ActionCreator<ISetMatchConfig> = (matchConfig: Matc
   type: SET_MATCH_CONFIG,
   payload: {
     matchConfig: matchConfig
+  }
+});
+
+export const setMasterHost: ActionCreator<ISetMasterHost> = (masterHost: string) => ({
+  type: SET_MASTER_HOST,
+  payload: {
+    masterHost: masterHost
+  }
+});
+
+export const setSlaveID: ActionCreator<ISetSlaveID> = (slaveID: number) => ({
+  type: SET_SLAVE_ID,
+  payload: {
+    slaveID: slaveID
   }
 });

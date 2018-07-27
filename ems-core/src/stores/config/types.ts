@@ -1,10 +1,10 @@
 import {Action} from "redux";
 import {
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_MATCH_CONFIG,
+  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
-  SET_QUALIFICATION_SCHEDULE,
+  SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID,
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import EventConfiguration from "../../shared/models/EventConfiguration";
@@ -61,5 +61,19 @@ export interface ISetMatchConfig extends Action {
   }
 }
 
+export interface ISetMasterHost extends Action {
+  type: SET_MASTER_HOST,
+  payload: {
+    masterHost: string
+  }
+}
+
+export interface ISetSlaveID extends Action {
+  type: SET_SLAVE_ID,
+  payload: {
+    slaveID: number
+  }
+}
+
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
-  ISetPracticeSchedule | ISetQualificationSchedule | ISetMatchConfig;
+  ISetPracticeSchedule | ISetQualificationSchedule | ISetMatchConfig | ISetMasterHost | ISetSlaveID;

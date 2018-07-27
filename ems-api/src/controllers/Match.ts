@@ -5,6 +5,22 @@ import logger from "../logger";
 
 const router: Router = Router();
 
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
+  if (!req.query.active) {
+    DatabaseManager.selectAllWhere("match", "active=\"" + req.query.active + "\"").then((rows: any[]) => {
+      res.send({payload: rows});
+    }).catch((error: any) => {
+      next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+    });
+  } else {
+    DatabaseManager.selectAllWhere("match", "active>\"0\"").then((rows: any[]) => {
+      res.send({payload: rows});
+    }).catch((error: any) => {
+      next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+    });
+  }
+});
+
 router.get("/:tournament_level", (req: Request, res: Response, next: NextFunction) => {
   const tournament_level = req.params.tournament_level;
   DatabaseManager.getMatchAndParticipants(tournament_level).then((rows: any[]) => {
@@ -38,6 +54,14 @@ router.post("/participants", (req: Request, res: Response, next: NextFunction) =
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
   })
+});
+
+router.put("/:match_key", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.updateWhere("match", req.body.records, "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
+    res.send({payload: row});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
 });
 
 export const MatchController: Router = router;

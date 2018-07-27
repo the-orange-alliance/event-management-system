@@ -25,7 +25,7 @@ class App extends React.Component<IProps, IState> {
       connected: false,
       event: new Event(),
       loading: true,
-      videoID: 3
+      videoID: 4
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));

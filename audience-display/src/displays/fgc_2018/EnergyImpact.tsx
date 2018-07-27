@@ -5,6 +5,7 @@ import SponsorScreen from "./sponsor/SponsorScreen";
 import "./EnergyImpact.css";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";
+import MatchPlayScreen from "./match-play/MatchPlayScreen";
 
 interface IProps {
   event: Event,
@@ -31,7 +32,10 @@ class EnergyImpact extends React.Component<IProps> {
         view = <MatchPreviewScreen/>;
         break;
       case 3:
-        view = <MatchResultsScreen/>
+        view = <MatchResultsScreen/>;
+        break;
+      case 4:
+        view = <MatchPlayScreen/>;
         break;
       default:
         view = <SponsorScreen/>;

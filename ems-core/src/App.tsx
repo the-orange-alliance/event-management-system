@@ -126,7 +126,7 @@ class App extends React.Component<IProps> {
   private initializeSocket(host: string) {
     SocketProvider.initialize(host);
     SocketProvider.on("connect", () => {
-      SocketProvider.emit("identify", "ems-core", "scoring");
+      SocketProvider.emit("identify", "ems-core", "scoring", "event");
       this.props.setSocketConnected(true);
     });
     SocketProvider.on("disconnect", () => {

@@ -24,3 +24,9 @@ export type SET_ELIMINATIONS_SCHEDULE = typeof SET_ELIMINATIONS_SCHEDULE;
 
 export const SET_MATCH_CONFIG = "SET_MATCH_CONFIG";
 export type SET_MATCH_CONFIG = typeof SET_MATCH_CONFIG;
+
+export const SET_MASTER_HOST = "SET_MASTER_HOST";
+export type SET_MASTER_HOST = typeof SET_MASTER_HOST;
+
+export const SET_SLAVE_ID = "SET_SLAVE_ID";
+export type SET_SLAVE_ID = typeof SET_SLAVE_ID;

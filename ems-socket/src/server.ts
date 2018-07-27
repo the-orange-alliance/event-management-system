@@ -5,6 +5,9 @@ import cors from "cors";
 import logger from "./logger";
 import * as path from "path";
 import * as dotenv from "dotenv";
+import ScoringRoom from "./rooms/Scoring";
+import EventRoom from "./rooms/Event";
+import RefereeRoom from "./rooms/Referee";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -28,6 +31,9 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 app.use(cors());
 
 const clients: Map<string, string> = new Map<string, string>();
+const scoringRoom = new ScoringRoom(socket);
+const eventRoom = new EventRoom(socket);
+const refereeRoom = new RefereeRoom(socket);
 
 /**
  * Main socket connection/event logic. We're not trying to be super secure, but inside of EMS you will (eventually)
@@ -40,11 +46,20 @@ socket.on("connection", (client: Socket) => {
     clients.set(client.id, params[0]);
     for (let i = 1; i < params.length; i++) {
       client.join(params[i]);
-      logger.info(`Client ${client.id} joined ${params[i]}.`)
+      if (params[i] === "scoring") {
+        scoringRoom.addClient(client);
+      }
+      if (params[i] === "event") {
+        eventRoom.addClient(client);
+      }
+      if (params[i] === "referee") {
+        refereeRoom.addClient(client);
+      }
     }
   });
-  client.on("request-video", (id: number) => {
-    socket.to("scoring").emit("video-switch", id);
+  client.on("disconnect", () => {
+    scoringRoom.removeClient(client);
+    eventRoom.removeClient(client);
   });
 });
 

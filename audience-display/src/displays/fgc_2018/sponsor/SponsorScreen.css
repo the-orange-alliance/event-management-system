@@ -1,12 +1,3 @@
-#fgc-body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background-image: url("../res/global-bg.png");
-  -webkit-background-size: cover;
-  background-size: cover;
-}
-
 #fgc-sponsor-container {
   position: absolute;
   width: 75vw;

@@ -13,6 +13,9 @@ import {ISetMatchState} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setMatchState} from "../../../stores/scoring/actions";
 import MatchFlowController from "../controllers/MatchFlowController";
+import * as moment from "moment";
+import HttpError from "../../../shared/models/HttpError";
+import DialogManager from "../../../shared/managers/DialogManager";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -149,8 +152,16 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private prestart() {
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
-    MatchFlowController.prestart().then(() => {
+    const match: Match = new Match().fromJSON({
+      match_key: this.state.selectedMatch,
+      prestart_time: moment(),
+      active: 1
+    });
+    MatchFlowController.prestart(match).then(() => {
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
+    }).catch((error: HttpError) => {
+      this.props.setMatchState(MatchState.PRESTART_READY);
+      DialogManager.showErrorBox(error);
     });
   }
 

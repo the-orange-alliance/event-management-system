@@ -34,6 +34,9 @@ export default class ScoringRoom implements IRoom {
     client.on("request-video", (id: number) => {
       this._server.to("scoring").emit("video-switch", id);
     });
+    client.on("prestart", (matchKey: string) => {
+      this._server.to("scoring").emit("prestart", matchKey);
+    });
   }
 
   get name(): string {

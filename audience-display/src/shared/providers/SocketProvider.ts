@@ -29,6 +29,10 @@ class SocketProvider {
     this._client.on(event, listener);
   }
 
+  public off(event: string) {
+    this._client.off(event);
+  }
+
   get client(): SocketIOClient.Socket {
     return this._client;
   }

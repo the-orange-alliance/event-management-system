@@ -56,6 +56,22 @@ class EMSProvider {
   public getEvent(): Promise<AxiosResponse> {
     return this.get("api/event");
   }
+
+  public getAllTeams(): Promise<AxiosResponse> {
+    return this.get("api/team");
+  }
+
+  public getMatch(matchKey: string): Promise<AxiosResponse> {
+    return this.get("api/match/" + matchKey);
+  }
+
+  public getMatchParticipants(matchKey: string): Promise<AxiosResponse> {
+    return this.get("api/match/" + matchKey + "/participants");
+  }
+
+  public getMatchTeams(matchKey: string): Promise<AxiosResponse> {
+    return this.get("api/match/" + matchKey + "/teams");
+  }
 }
 
 export default EMSProvider.getInstance();

@@ -6,8 +6,14 @@ import logger from "../logger";
 const router: Router = Router();
 
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  if (!req.query.active) {
+  if (req.query.active) {
     DatabaseManager.selectAllWhere("match", "active=\"" + req.query.active + "\"").then((rows: any[]) => {
+      res.send({payload: rows});
+    }).catch((error: any) => {
+      next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+    });
+  } else if (req.query.level) {
+    DatabaseManager.getMatchAndParticipants(req.query.level).then((rows: any[]) => {
       res.send({payload: rows});
     }).catch((error: any) => {
       next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
@@ -21,9 +27,32 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.get("/:tournament_level", (req: Request, res: Response, next: NextFunction) => {
-  const tournament_level = req.params.tournament_level;
-  DatabaseManager.getMatchAndParticipants(tournament_level).then((rows: any[]) => {
+router.get("/:match_key", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllWhere("match", "match_key=\"" + req.params.match_key + "\"").then((rows: any[]) => {
+    res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.get("/:match_key/details", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllWhere("match_detail", "match_key=\"" + req.params.match_key + "\"").then((rows: any[]) => {
+    res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.get("/:match_key/participants", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllWhere("match_participant", "match_key=\"" + req.params.match_key + "\"").then((rows: any[]) => {
+    res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.get("/:match_key/teams", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllFromJoinWhere("match_participant", "team", "team_key", "\"match_participant\".match_key=\"" + req.params.match_key + "\"").then((rows: any[]) => {
     res.send({payload: rows});
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
@@ -57,8 +86,14 @@ router.post("/participants", (req: Request, res: Response, next: NextFunction) =
 });
 
 router.put("/:match_key", (req: Request, res: Response, next: NextFunction) => {
-  DatabaseManager.updateWhere("match", req.body.records, "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
-    res.send({payload: row});
+  DatabaseManager.updateWhere("match", {active: 0}, "active=" + req.body.records[0].active).then(() => {
+    setTimeout(() => {
+      DatabaseManager.updateWhere("match", req.body.records[0], "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
+        res.send({payload: row});
+      }).catch((error: any) => {
+        next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+      });
+    }, 250);
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
   });

@@ -23,9 +23,36 @@ import RED_TURBINE_STARTED from "../res/Red_Wind_Core_Icon.png";
 import RED_TURBINE_COMPLETE from "../res/Red_Wind_Complete_Icon.png";
 import TeamCardStatus from "./TeamCardStatus";
 import SolarCapsule from "./ScoringCapsule";
+import Match from "../../../shared/models/Match";
+import Team from "../../../shared/models/Team";
+import MatchParticipant from "../../../shared/models/MatchParticipant";
 
-class MatchPlayScreen extends React.Component {
+interface IProps {
+  match: Match
+}
+
+interface IState {
+  match: Match,
+  teams: Team[]
+}
+
+class MatchPlayScreen extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      match: this.getUpdatedMatchInfo(),
+      teams: this.getUpdatedTeamInfo()
+    };
+  }
+
+  public componentDidUpdate(prevProps: IProps) {
+    if (prevProps.match.matchKey !== this.props.match.matchKey) {
+      this.setState({match: this.getUpdatedMatchInfo(), teams: this.getUpdatedTeamInfo()});
+    }
+  }
+
   public render() {
+    const {match, teams} = this.state;
     return (
       <div>
         <div id="play-display-base">
@@ -45,28 +72,28 @@ class MatchPlayScreen extends React.Component {
                 <div className="team">
                   <TeamCardStatus cardStatus={0}/>
                   <div className="team-name-left">
-                    <span>USA</span>
+                    <span>{teams[0].country}</span>
                   </div>
                   <div className="team-flag">
-                    f
+                    <span>{teams[0].countryCode}</span>
                   </div>
                 </div>
                 <div className="team">
-                  <TeamCardStatus cardStatus={0}/>
+                  <TeamCardStatus cardStatus={2}/>
                   <div className="team-name-left">
-                    <span>USA</span>
+                    <span>{teams[1].country}</span>
                   </div>
                   <div className="team-flag">
-                    f
+                    <span>{teams[1].countryCode}</span>
                   </div>
                 </div>
                 <div className="team">
-                  <TeamCardStatus cardStatus={0}/>
+                  <TeamCardStatus cardStatus={1}/>
                   <div className="team-name-left">
-                    <span>USA</span>
+                    <span>{teams[2].country}</span>
                   </div>
                   <div className="team-flag">
-                    f
+                    <span>{teams[2].countryCode}</span>
                   </div>
                 </div>
               </div>
@@ -95,28 +122,28 @@ class MatchPlayScreen extends React.Component {
               <div className="teams blue-bg right-score">
                 <div className="team">
                   <div className="team-flag">
-                    f
+                    <span>{teams[3].countryCode}</span>
                   </div>
                   <div className="team-name-left">
-                    <span>USA</span>
+                    <span>{teams[3].country}</span>
                   </div>
                   <TeamCardStatus cardStatus={0}/>
                 </div>
                 <div className="team">
                   <div className="team-flag">
-                    f
+                    <span>{teams[4].countryCode}</span>
                   </div>
                   <div className="team-name-left">
-                    <span>USA</span>
+                    <span>{teams[4].country}</span>
                   </div>
                   <TeamCardStatus cardStatus={0}/>
                 </div>
                 <div className="team">
                   <div className="team-flag">
-                    f
+                    <span>{teams[5].countryCode}</span>
                   </div>
                   <div className="team-name-left">
-                    <span>USA</span>
+                    <span>{teams[5].country}</span>
                   </div>
                   <TeamCardStatus cardStatus={0}/>
                 </div>
@@ -135,16 +162,55 @@ class MatchPlayScreen extends React.Component {
           </div>
           <div id="play-display-base-bottom">
             <div className="info-col">
-              <span className="info-field">MATCH: 1</span>
-              <span className="info-field">FIELD: 1</span>
+              <span className="info-field">MATCH: {match.matchName}</span>
+              <span className="info-field">FIELD: {match.fieldNumber}</span>
             </div>
             <div className="info-col">
-              <span className="info-field">SPONSORED BY: REV Robotics</span>
+              <span className="info-field">FIRST Global 2018</span>
             </div>
           </div>
         </div>
       </div>
     );
+  }
+
+  private getUpdatedMatchInfo(): Match {
+    if (this.props.match.matchKey.length === 0) {
+      const match: Match = new Match();
+      match.matchName = "A MATCH TEST";
+      match.fieldNumber = 1; // TODO - Change field number in EMS
+
+      const participants: MatchParticipant[] = [];
+      for (let i = 0; i < 6; i++) {
+        participants.push(new MatchParticipant().fromJSON({team_key: (i + 1), country_code: "us", card_status: 0}));
+      }
+
+      match.participants = participants;
+      return match;
+    } else {
+      return this.props.match;
+    }
+  }
+
+  private getUpdatedTeamInfo(): Team[] {
+    if (typeof this.props.match.participants === "undefined") {
+      const teams: Team[] = [];
+      for (let i = 0; i < 6; i++) {
+        teams.push(new Team().fromJSON({
+          team_key: i,
+          team_name_short: "TEST TEAM #" + (i + 1),
+          country: "TST",
+          country_code: "us"
+        }));
+      }
+      return teams;
+    } else {
+      const teams: Team[] = [];
+      for (const participant of this.props.match.participants) {
+        teams.push(participant.team);
+      }
+      return teams;
+    }
   }
 }
 

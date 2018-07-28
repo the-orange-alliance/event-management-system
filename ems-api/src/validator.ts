@@ -47,7 +47,10 @@ const postMatchParticipants = [
   "station"
 ];
 
+const putActiveMatch = ["match_key", "active"];
+
 const postRoutes = new Map<string, string[]>();
+const putRoutes = new Map<string, string[]>();
 
 postRoutes.set("event", postEvent);
 postRoutes.set("team", postTeam);
@@ -55,18 +58,26 @@ postRoutes.set("schedule", postSchedule);
 postRoutes.set("match", postMatch);
 postRoutes.set("match/participants", postMatchParticipants);
 
+putRoutes.set("match", putActiveMatch);
+
 export function validate(req: Request, res: Response, next: NextFunction)  {
   const method = req.method.toString().toUpperCase();
   let routeMap: Map<string, string[]> = new Map<string, string[]>();
   let routeURL = req.baseUrl.replace("/api/", "");
   if (method === "GET" || method === "DELETE") {
-      next();
-      return;
+    next();
+    return;
   } else if (method === "POST") {
-      routeMap = postRoutes;
+    routeMap = postRoutes;
+  } else if (method === "PUT") {
+    routeURL = routeURL.replace(routeURL.split("/")[1], "").replace("//", "/");
+    if (routeURL[routeURL.length - 1] === "/") {
+      routeURL = routeURL.replace("/", "");
+    }
+    routeMap = putRoutes;
   } else {
-      next(Errors.METHOD_NOT_FOUND);
-      return;
+    next(Errors.METHOD_NOT_FOUND);
+    return;
   }
 
   if (!routeMap.has(routeURL)) {
@@ -83,6 +94,8 @@ export function validate(req: Request, res: Response, next: NextFunction)  {
     next(Errors.INVALID_BODY_JSON);
     return;
   }
+
+  console.log(routeMap.get(routeURL));
 
   const requiredFields: string[] = routeMap.get(routeURL) as string[]; // Normally not safe, but we know it won't be undefined from our checks up above.
   for (const record of req.body.records) {

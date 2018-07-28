@@ -103,6 +103,30 @@ class EMSProvider {
     });
   }
 
+  public put(url: string, body: IPostableObject | IPostableObject[]): Promise<AxiosResponse> {
+    return new Promise((resolve, reject) => {
+      const records: object[] = [];
+      if (body instanceof Array) {
+        for (const record of body) {
+          records.push(record.toJSON());
+        }
+      } else {
+        records.push(body.toJSON());
+      }
+      this._axios.put(url, {records: records}).then((response: AxiosResponse) => {
+        resolve(response);
+      }).catch((error) => {
+        if (error.response) {
+          reject(new HttpError(error.response.data._code, error.response.data._message, this._host + url));
+        } else if (error.request) {
+          reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
+        } else {
+          reject(new HttpError(404, error.message, this._host + url));
+        }
+      });
+    });
+  }
+
   public createEvent(eventType: EMSEventTypes): Promise<AxiosResponse> {
     return this.get("api/event/create?type=" + eventType);
   }
@@ -124,7 +148,7 @@ class EMSProvider {
   }
 
   public getMatches(tournamentLevel: number): Promise<AxiosResponse> {
-    return this.get("api/match/" + tournamentLevel);
+    return this.get("api/match?level=" + tournamentLevel);
   }
 
   public deleteScheduleItems(type: TournamentLevels): Promise<AxiosResponse> {
@@ -151,6 +175,9 @@ class EMSProvider {
     return this.post("api/match/participants", participants);
   }
 
+  public putActiveMatch(match: Match): Promise<AxiosResponse> {
+    return this.put("api/match/" + match.matchKey, match);
+  }
 }
 
 export default EMSProvider.getInstance();

@@ -6,10 +6,14 @@ import "./EnergyImpact.css";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";
 import MatchPlayScreen from "./match-play/MatchPlayScreen";
+import Team from "../../shared/models/Team";
+import Match from "../../shared/models/Match";
 
 interface IProps {
   event: Event,
-  videoID: number
+  teams: Team[],
+  videoID: number,
+  match: Match
 }
 
 class EnergyImpact extends React.Component<IProps> {
@@ -18,7 +22,7 @@ class EnergyImpact extends React.Component<IProps> {
   }
 
   public render() {
-    const {videoID} = this.props;
+    const {videoID, match} = this.props;
 
     let view;
     switch (videoID) {
@@ -26,16 +30,16 @@ class EnergyImpact extends React.Component<IProps> {
         view = <SponsorScreen/>;
         break;
       case 1:
-        view = <span/>; // Blank screen
+        view = <MatchPreviewScreen match={match}/>;
         break;
       case 2:
-        view = <MatchPreviewScreen/>;
+        view = <MatchPlayScreen match={match}/>;
         break;
       case 3:
         view = <MatchResultsScreen/>;
         break;
       case 4:
-        view = <MatchPlayScreen/>;
+        view = <span/>; // Blank screen
         break;
       default:
         view = <SponsorScreen/>;

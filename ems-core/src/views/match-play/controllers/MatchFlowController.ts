@@ -1,4 +1,8 @@
 import {MatchState} from "../../../shared/models/MatchState";
+import Match from "../../../shared/models/Match";
+import EMSProvider from "../../../shared/providers/EMSProvider";
+import HttpError from "../../../shared/models/HttpError";
+import SocketProvider from "../../../shared/providers/SocketProvider";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -18,19 +22,25 @@ class MatchFlowController {
 
   private constructor() {}
 
-  public prestart(): Promise<any> {
+  public makeActiveMatch(match: Match): Promise<any> {
+    return EMSProvider.putActiveMatch(match);
+  }
+
+  public prestart(match: Match): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      setTimeout(() => {
+      this.makeActiveMatch(match).then(() => {
+        SocketProvider.send("prestart", match.matchKey);
         resolve();
-      }, 1000);
+      }).catch((error: HttpError) => {
+        reject(error);
+      })
     });
   }
 
   public setAudiencedisplay(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      setTimeout(() => {
-        resolve();
-      }, 250);
+      SocketProvider.send("request-video", 2);
+      resolve();
     });
   }
 

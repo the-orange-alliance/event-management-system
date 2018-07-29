@@ -39,6 +39,18 @@ class SocketProvider {
     }
   }
 
+  public once(event: string, listener: (...args: any[]) => any) {
+    if (typeof this._client !== "undefined") {
+      this._client.once(event, listener);
+    }
+  }
+
+  public off(event: string) {
+    if (typeof this._client !== "undefined") {
+      this._client.off("match-start");
+    }
+  }
+
   get client(): SocketIOClient.Socket {
     return this._client;
   }

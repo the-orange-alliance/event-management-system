@@ -16,6 +16,9 @@ import MatchFlowController from "../controllers/MatchFlowController";
 import * as moment from "moment";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
+import SocketProvider from "../../../shared/providers/SocketProvider";
+import {IDisableNavigation} from "../../../stores/internal/types";
+import {disableNavigation} from "../../../stores/internal/actions";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -24,14 +27,16 @@ interface IProps {
   practiceMatches: Match[],
   qualificationMatches: Match[],
   connected: boolean,
-  setMatchState?: (matchState: MatchState) => ISetMatchState
+  matchDuration?: moment.Duration,
+  setMatchState?: (matchState: MatchState) => ISetMatchState,
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
 }
 
 interface IState {
   selectedLevel: TournamentLevels,
   selectedMatch: string
   selectedField: number,
-  configModalOpen: boolean,
+  configModalOpen: boolean
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -57,7 +62,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   public render() {
     const {selectedLevel, selectedMatch, selectedField} = this.state;
-    const {eventConfig, matchState, connected} = this.props;
+    const {eventConfig, matchState, connected, matchDuration} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
     const availableLevels = this.getAvailableTournamentLevels(eventConfig.postQualConfig).map(tournamentLevel => {
@@ -84,13 +89,15 @@ class MatchPlay extends React.Component<IProps, IState> {
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
     const canPrestart = selectedMatch.length > 0 && selectedField > 0;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
+    const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
+    const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
 
     return (
       <Tab.Pane className="tab-subview">
         <Grid columns="equal">
           <Grid.Row>
             <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
-            <Grid.Column textAlign="center"><b>02:30 </b>(TELEOP)</Grid.Column>
+            <Grid.Column textAlign="center"><b>{disMin}:{disSec} </b>(TELEOP)</Grid.Column>
             <Grid.Column textAlign="right"><b>Connection Status: </b>{connected ? "OKAY" : "NO CONNECTION"}</Grid.Column>
           </Grid.Row>
         </Grid>
@@ -151,6 +158,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private prestart() {
+    this.props.setNavigationDisabled(true);
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     const match: Match = new Match().fromJSON({
       match_key: this.state.selectedMatch,
@@ -172,12 +180,16 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private startMatch() {
+    SocketProvider.once("match-end", () => {
+      this.props.setMatchState(MatchState.MATCH_COMPLETE);
+    });
     MatchFlowController.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);
     });
   }
 
   private abortMatch() {
+    this.props.setNavigationDisabled(false);
     MatchFlowController.abortMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_ABORTED);
     });
@@ -185,6 +197,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private commitScores() {
     MatchFlowController.commitScores().then(() => {
+      this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
     });
   }
@@ -247,13 +260,15 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     matchState: scoringState.matchState,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,
-    connected: internalState.socketConnected
+    connected: internalState.socketConnected,
+    matchDuration: scoringState.matchDuration
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    setMatchState: (matchState: MatchState) => dispatch(setMatchState(matchState))
+    setMatchState: (matchState: MatchState) => dispatch(setMatchState(matchState)),
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
   };
 }
 

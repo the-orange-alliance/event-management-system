@@ -3,3 +3,6 @@ export type SET_ACTIVE_MATCH = typeof SET_ACTIVE_MATCH;
 
 export const SET_MATCH_STATE = "SET_MATCH_STATE";
 export type SET_MATCH_STATE = typeof SET_MATCH_STATE;
+
+export const SET_MATCH_DURATION = "SET_MATCH_DURATION";
+export type SET_MATCH_DURATION = typeof SET_MATCH_DURATION;

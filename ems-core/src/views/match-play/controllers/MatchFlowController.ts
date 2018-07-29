@@ -46,21 +46,22 @@ class MatchFlowController {
 
   public startMatch(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
+      SocketProvider.emit("start");
       resolve();
     });
   }
 
   public abortMatch(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
+      SocketProvider.emit("abort");
       resolve();
     });
   }
 
   public commitScores(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      setTimeout(() => {
-        resolve();
-      }, 1250);
+      SocketProvider.emit("request-video", 3);
+      resolve();
     });
   }
 

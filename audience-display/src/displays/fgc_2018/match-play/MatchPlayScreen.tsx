@@ -1,5 +1,6 @@
 import * as React from "react";
 import ScoringComponent from "./ScoringComponent";
+import * as moment from "moment";
 
 import "./MatchPlayScreen.css";
 import FGC_LOGO from "../res/Global_Logo.png";
@@ -26,6 +27,7 @@ import SolarCapsule from "./ScoringCapsule";
 import Match from "../../../shared/models/Match";
 import Team from "../../../shared/models/Team";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
+import SocketProvider from "../../../shared/providers/SocketProvider";
 
 interface IProps {
   match: Match
@@ -33,7 +35,9 @@ interface IProps {
 
 interface IState {
   match: Match,
-  teams: Team[]
+  teams: Team[],
+  time: moment.Duration,
+  timerID: any
 }
 
 class MatchPlayScreen extends React.Component<IProps, IState> {
@@ -41,8 +45,29 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       match: this.getUpdatedMatchInfo(),
-      teams: this.getUpdatedTeamInfo()
+      teams: this.getUpdatedTeamInfo(),
+      time: moment.duration(0, "seconds"),
+      timerID: null
     };
+  }
+
+  public componentDidMount() {
+    SocketProvider.on("match-start", (matchTime: number) => {
+      this.setState({time: moment.duration(matchTime, "seconds")});
+      this.startTimer();
+    });
+    SocketProvider.on("match-abort", () => {
+      this.setState({time: moment.duration(0, "seconds")});
+      this.stopTimer();
+    });
+    SocketProvider.on("match-end", () => {
+      this.stopTimer();
+    })
+  }
+
+  public componentWillUnmount() {
+    SocketProvider.off("match-start");
+    SocketProvider.off("match-abort");
   }
 
   public componentDidUpdate(prevProps: IProps) {
@@ -52,7 +77,9 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {match, teams} = this.state;
+    const {match, teams, time} = this.state;
+    const disMin = time.minutes() < 10 ? "0" + time.minutes().toString() : time.minutes().toString();
+    const disSec = time.seconds() < 10 ? "0" + time.seconds().toString() : time.seconds().toString();
     return (
       <div>
         <div id="play-display-base">
@@ -103,7 +130,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                 <img src={FGC_LOGO} className="fit"/>
               </div>
               <div id="score-container-timer">
-                <span>2:30</span>
+                <span>{disMin}:{disSec}</span>
               </div>
               <div id="score-container-scores">
                 <div id="score-container-red">
@@ -172,6 +199,22 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         </div>
       </div>
     );
+  }
+
+  private startTimer() {
+    const timerID = global.setInterval(() => {
+      this.setState({
+        time: moment.duration(this.state.time).subtract(1, "s")
+      });
+    }, 1000);
+    this.setState({timerID: timerID});
+  }
+
+  private stopTimer() {
+    if (this.state.timerID !== null) {
+      global.clearInterval(this.state.timerID);
+      this.setState({timerID: null});
+    }
   }
 
   private getUpdatedMatchInfo(): Match {

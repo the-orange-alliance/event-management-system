@@ -48,6 +48,7 @@ class MatchPlayView extends React.Component<IProps, IState> {
     SocketProvider.off("match-start");
     SocketProvider.off("match-end");
     SocketProvider.off("match-abort");
+    this.stopTimer();
   }
 
   public render() {
@@ -74,8 +75,10 @@ class MatchPlayView extends React.Component<IProps, IState> {
   }
 
   private stopTimer() {
-    global.clearInterval(this.state.timerID);
-    this.setState({timerID: null});
+    if (this.state.timerID !== null) {
+      global.clearInterval(this.state.timerID);
+      this.setState({timerID: null});
+    }
   }
 }
 

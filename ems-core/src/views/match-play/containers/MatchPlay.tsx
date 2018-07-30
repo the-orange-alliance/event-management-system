@@ -19,6 +19,7 @@ import DialogManager from "../../../shared/managers/DialogManager";
 import SocketProvider from "../../../shared/providers/SocketProvider";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
+import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -98,7 +99,7 @@ class MatchPlay extends React.Component<IProps, IState> {
           <Grid.Row>
             <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
             <Grid.Column textAlign="center"><b>{disMin}:{disSec} </b>(TELEOP)</Grid.Column>
-            <Grid.Column textAlign="right"><b>Connection Status: </b>{connected ? "OKAY" : "NO CONNECTION"}</Grid.Column>
+            <Grid.Column textAlign="right"><b>Connection Status: </b><span className={connected ? "success-text" : "error-text"}>{connected ? "OKAY" : "NO CONNECTION"}</span></Grid.Column>
           </Grid.Row>
         </Grid>
         <Divider/>
@@ -136,24 +137,15 @@ class MatchPlay extends React.Component<IProps, IState> {
               </Form>
             </Card.Content>
           </Card>
-          <Card fluid={true}>
-            <Card.Content className="center-items card-header"><Card.Header>Red Alliance Scorecard</Card.Header></Card.Content>
-            <Card.Content>
-              Stuff
-            </Card.Content>
-          </Card>
-          <Card fluid={true}>
-            <Card.Content className="center-items card-header"><Card.Header>Blue Alliance Scorecard</Card.Header></Card.Content>
-            <Card.Content>
-              Stuff
-            </Card.Content>
-          </Card>
+          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Red"}/>
+          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Blue"}/>
         </Card.Group>
       </Tab.Pane>
     );
   }
 
   private cancelPrestart() {
+    this.props.setNavigationDisabled(false);
     this.props.setMatchState(MatchState.PRESTART_READY);
   }
 

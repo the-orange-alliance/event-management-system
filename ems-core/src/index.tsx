@@ -10,6 +10,11 @@ import {CONFIG_STORE} from "./shared/AppStore";
 import AppError from "./shared/models/AppError";
 import {IConfigState} from "./stores/config/models";
 import * as Config from "./stores/config/reducer";
+import * as Internal from "./stores/internal/reducer";
+import Process from "./shared/models/Process";
+import ProcessManager from "./shared/managers/ProcessManager";
+import {IInternalState} from "./stores/internal/models";
+import DialogManager from "./shared/managers/DialogManager";
 
 const {ipcRenderer} = (window as any).require("electron");
 
@@ -19,48 +24,62 @@ const {ipcRenderer} = (window as any).require("electron");
 
 console.log("Preloading application state...");
 
-CONFIG_STORE.getAll().then((configStore: any) => {
+ProcessManager.performStartupCheck().then((procList: Process[]) => {
+  const internalState: IInternalState = Internal.initialState;
+  internalState.processList = procList;
 
-  const configState: IConfigState = Config.initialState;
+  CONFIG_STORE.getAll().then((configStore: any) => {
 
-  if (typeof configStore.event !== "undefined" && typeof configStore.eventConfig !== "undefined") {
-    configState.event = configState.event.fromJSON(configStore.event);
-    configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);
-  }
+    const configState: IConfigState = Config.initialState;
 
-  if (typeof configStore.schedule !== "undefined") {
-    if (typeof configStore.schedule.Practice !== "undefined") {
-      configState.practiceSchedule = configState.practiceSchedule.fromJSON(configStore.schedule.Practice);
+    configState.networkHost = procList[0].address;
+
+    if (typeof configStore.event !== "undefined" && typeof configStore.eventConfig !== "undefined") {
+      configState.event = configState.event.fromJSON(configStore.event);
+      configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);
     }
-    if (typeof configStore.schedule.Qualification !== "undefined") {
-      configState.qualificationSchedule = configState.qualificationSchedule.fromJSON(configStore.schedule.Qualification);
+
+    if (typeof configStore.schedule !== "undefined") {
+      if (typeof configStore.schedule.Practice !== "undefined") {
+        configState.practiceSchedule = configState.practiceSchedule.fromJSON(configStore.schedule.Practice);
+      }
+      if (typeof configStore.schedule.Qualification !== "undefined") {
+        configState.qualificationSchedule = configState.qualificationSchedule.fromJSON(configStore.schedule.Qualification);
+      }
     }
-  }
 
-  if (typeof configStore.matchConfig !== "undefined") {
-    configState.matchConfig = configState.matchConfig.fromJSON(configStore.matchConfig);
-  }
+    if (typeof configStore.matchConfig !== "undefined") {
+      configState.matchConfig = configState.matchConfig.fromJSON(configStore.matchConfig);
+    }
 
-  const applicationStore = createStore(reducers, {
-    configState: configState
+    const applicationStore = createStore(reducers, {
+      configState: configState,
+      internalState: internalState
+    });
+
+    // The microservices aren't 100% ready when the application loads, so we give it some time here.
+    setTimeout(() => {
+      console.log("Preloaded application state.");
+      ipcRenderer.send("preload-finish");
+      ReactDOM.render(
+        <Provider store={applicationStore}>
+          <App />
+        </Provider>,
+        document.getElementById('root') as HTMLElement
+      );
+    }, 0); // For development, get rid of this, BUT production NEEDS this delay!
+  }).catch((error: AppError) => {
+    console.log(error);
+    const applicationStore = createStore(reducers);
+    ipcRenderer.send("preload-finish");
+    ReactDOM.render(
+      <Provider store={applicationStore}>
+        <App />
+      </Provider>,
+      document.getElementById('root') as HTMLElement
+    );
   });
 
-  console.log("Preloaded application state.");
-  ipcRenderer.send("preload-finish");
-  ReactDOM.render(
-    <Provider store={applicationStore}>
-      <App />
-    </Provider>,
-    document.getElementById('root') as HTMLElement
-  );
 }).catch((error: AppError) => {
-  console.log(error);
-  const applicationStore = createStore(reducers);
-  ipcRenderer.send("preload-finish");
-  ReactDOM.render(
-    <Provider store={applicationStore}>
-      <App />
-    </Provider>,
-    document.getElementById('root') as HTMLElement
-  );
+  DialogManager.showErrorBox(error);
 });

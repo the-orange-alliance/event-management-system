@@ -60,6 +60,22 @@
   color: #ff2733;
 }
 
+.red-bg {
+    background-color: #ff2733 !important;
+}
+
+.red-bg > .content > .header, .red-bg > .content {
+    color: #ffffff !important;
+}
+
+.blue-bg {
+    background-color: #0069ff !important;
+}
+
+.blue-bg > .content > .header, .blue-bg > .content {
+    color: #ffffff !important;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

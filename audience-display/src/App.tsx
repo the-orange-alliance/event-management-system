@@ -42,7 +42,11 @@ class App extends React.Component<IProps, IState> {
       EMSProvider.initialize("127.0.0.1"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
+      console.log("Connected to SocketIO.");
       SocketProvider.emit("identify", "audience-display", "event", "scoring");
+    });
+    SocketProvider.on("disconnect", () => {
+      console.log("Disconnected from SocketIO.");
     });
     SocketProvider.on("video-switch", (id: number) => {
       console.log("Switching to video ID " + id);

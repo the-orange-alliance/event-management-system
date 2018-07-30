@@ -23,7 +23,6 @@ class EnergyImpact extends React.Component<IProps> {
 
   public render() {
     const {videoID, match} = this.props;
-    console.log(videoID);
     let view;
     switch (videoID) {
       case 0:
@@ -36,7 +35,7 @@ class EnergyImpact extends React.Component<IProps> {
         view = <MatchPlayScreen match={match}/>;
         break;
       case 3:
-        view = <MatchResultsScreen/>;
+        view = <MatchResultsScreen match={match}/>;
         break;
       case 4:
         view = <span/>; // Blank screen

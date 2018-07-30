@@ -22,10 +22,6 @@ class MatchFlowController {
 
   private constructor() {}
 
-  public makeActiveMatch(match: Match): Promise<any> {
-    return EMSProvider.putActiveMatch(match);
-  }
-
   public prestart(match: Match): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.makeActiveMatch(match).then(() => {
@@ -37,7 +33,7 @@ class MatchFlowController {
     });
   }
 
-  public setAudiencedisplay(): Promise<any> {
+  public setAudienceDisplay(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       SocketProvider.send("request-video", 2);
       resolve();
@@ -58,10 +54,14 @@ class MatchFlowController {
     });
   }
 
-  public commitScores(): Promise<any> {
+  public commitScores(match: Match): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      SocketProvider.send("request-video", 3);
-      resolve();
+      this.postMatchResults(match).then(() => {
+        SocketProvider.send("commit-scores", match.matchKey);
+        resolve();
+      }).catch((error: any) => {
+        reject(error);
+      });
     });
   }
 
@@ -139,6 +139,18 @@ class MatchFlowController {
         states[COMMIT_ID] = true;
     }
     return states;
+  }
+
+  private makeActiveMatch(match: Match): Promise<any> {
+    return EMSProvider.putActiveMatch(match);
+  }
+
+  private postMatchResults(match: Match): Promise<any> {
+    const promises: Array<Promise<any>> = [];
+    promises.push(EMSProvider.putMatchResult(match));
+    promises.push(EMSProvider.putMatchDetails(match.matchDetails));
+    promises.push(EMSProvider.putMatchParticipants(match.participants));
+    return Promise.all(promises);
   }
 }
 

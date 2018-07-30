@@ -48,6 +48,9 @@ const postMatchParticipants = [
 ];
 
 const putActiveMatch = ["match_key", "active"];
+const putMatchScores = ["match_key", "red_score", "blue_score"];
+const putMatchDetails = ["match_detail_key"];
+const putMatchParticipants = ["match_participant_key", "card_status"];
 
 const postRoutes = new Map<string, string[]>();
 const putRoutes = new Map<string, string[]>();
@@ -59,6 +62,9 @@ postRoutes.set("match", postMatch);
 postRoutes.set("match/participants", postMatchParticipants);
 
 putRoutes.set("match", putActiveMatch);
+putRoutes.set("match/results", putMatchScores);
+putRoutes.set("match/details", putMatchDetails);
+putRoutes.set("match/participants", putMatchParticipants);
 
 export function validate(req: Request, res: Response, next: NextFunction)  {
   const method = req.method.toString().toUpperCase();

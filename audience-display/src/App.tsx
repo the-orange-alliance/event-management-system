@@ -9,6 +9,7 @@ import EnergyImpact from "./displays/fgc_2018/EnergyImpact";
 import Team from "./shared/models/Team";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
+import EnergyImpactMatchDetails from "./shared/models/EnergyImpactMatchDetails";
 
 interface IProps {
   cookies: Cookies
@@ -69,6 +70,21 @@ class App extends React.Component<IProps, IState> {
         }).catch((partErr) => console.error(partErr));
       }).catch((matchRes: any) => console.error(matchRes));
     });
+    SocketProvider.on("commit-scores", (matchKey: string) => {
+      EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
+        EMSProvider.getMatchDetails(matchKey).then((detailRes: AxiosResponse) => {
+          if (matchRes.data && detailRes.data) {
+            const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
+            match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
+            match.participants = this.state.activeMatch.participants;
+            this.setState({
+              activeMatch: match,
+              videoID: 3 // Universal Match Results Screen
+            });
+          }
+        }).catch((detailsRes: any) => console.error(detailsRes));
+      }).catch((matchRes: any) => console.error(matchRes));
+    });
   }
 
   /**
@@ -118,6 +134,16 @@ class App extends React.Component<IProps, IState> {
       return (display);
     } else {
       return (<span/>);
+    }
+  }
+
+  private getDetailsFromKey(matchKey: string): IMatchDetails {
+    const seasonKey = matchKey.split("-")[0];
+    switch (seasonKey) {
+      case "2018":
+        return new EnergyImpactMatchDetails();
+      default:
+        return new EnergyImpactMatchDetails();
     }
   }
 }

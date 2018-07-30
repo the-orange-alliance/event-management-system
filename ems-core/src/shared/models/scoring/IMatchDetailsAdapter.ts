@@ -1,0 +1,3 @@
+interface IMatchDetailsAdapter {
+  toMatchDetails(): IMatchDetails
+}

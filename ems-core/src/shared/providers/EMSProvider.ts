@@ -178,6 +178,18 @@ class EMSProvider {
   public putActiveMatch(match: Match): Promise<AxiosResponse> {
     return this.put("api/match/" + match.matchKey, match);
   }
+
+  public putMatchResult(match: Match): Promise<AxiosResponse> {
+    return this.put("api/match/" + match.matchKey + "/results", match);
+  }
+
+  public putMatchDetails(details: IMatchDetails): Promise<AxiosResponse> {
+    return this.put("api/match/" + details.matchKey + "/details", details);
+  }
+
+  public putMatchParticipants(participants: MatchParticipant[]): Promise<AxiosResponse> {
+    return this.put("api/match/" + participants[0].matchKey + "/participants", participants);
+  }
 }
 
 export default EMSProvider.getInstance();

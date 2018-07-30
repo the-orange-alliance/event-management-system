@@ -99,4 +99,32 @@ router.put("/:match_key", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+router.put("/:match_key/results", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.updateWhere("match", req.body.records[0], "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
+    res.send({payload: row});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.put("/:match_key/details", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.updateWhere("match_detail", req.body.records[0], "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
+    res.send({payload: row});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.put("/:match_key/participants", (req: Request, res: Response, next: NextFunction) => {
+  const promises: Promise<any>[] = [];
+  for (const record of req.body.records) {
+    promises.push(DatabaseManager.updateWhere("match_participant", record, "match_participant_key=\"" + record.match_participant_key + "\""));
+  }
+  Promise.all(promises).then((values: any[]) => {
+    res.send({payload: values});
+  }).catch((reason: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(reason));
+  });
+});
+
 export const MatchController: Router = router;

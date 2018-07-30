@@ -49,7 +49,7 @@ export default class EnergyImpactDetails implements IPostableObject {
 
   public fromJSON(json: any): EnergyImpactDetails {
     const details: EnergyImpactDetails = new EnergyImpactDetails();
-    details.windTurbinePoints = json.wind_turine_ownership;
+    details.windTurbinePoints = json.wind_turbine_ownership;
     details.solarPanelPoints = [json.solar_panel_one_ownership, json.solar_panel_two_ownership, json.solar_panel_three_ownership, json.solar_panel_four_ownership, json.solar_panel_five_ownership];
     details.nuclearReactorPoints = json.nuclear_reactor_ownership;
     details.lowCombustionPoints = json.combustion_low;

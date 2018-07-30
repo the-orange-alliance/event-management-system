@@ -39,7 +39,7 @@ class ScoringTimerContainer extends events.EventEmitter {
     this.scoringTimers[alliance_index][type].tick();
     this.scoringTimers[alliance_index][type].setTimerObj(setInterval(() => {
         this.scoringTimers[alliance_index][type].tick();
-        console.log("Alliance index: ", alliance_index, "Timer index: ", type); // TODO - Remove
+        //console.log("Alliance index: ", alliance_index, "Timer index: ", type); // TODO - Remove
         this.emit("updateMatchScoring", {alliance_index: alliance_index, scoreType: type});
       }, 1000)
     );

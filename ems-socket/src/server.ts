@@ -102,7 +102,7 @@ ScoringTimerContainer.on("updateMatchScoring", (obj) => {
         ScoreManager.getDetails(alliance_str).solarPanelPoints[4] += 1;
         break;
       case REACTOR:
-        ScoreManager.getDetails(alliance_str).solarPanelPoints[5] += 1;
+        ScoreManager.getDetails(alliance_str).nuclearReactorPoints += 1;
         break;
     }
 
@@ -114,8 +114,8 @@ ScoringTimerContainer.on("updateMatchScoring", (obj) => {
       score = ScoreCalculator.getBlueSum();
       ScoreManager.match.blueScore = score;
     }
-    console.log("Red score: ", ScoreManager.match.redScore); // TODO - Remove
-    console.log("Blue score: ", ScoreManager.match.blueScore); // TODO - Remove
+    //console.log("Red score: ", ScoreManager.match.redScore); // TODO - Remove
+    //console.log("Blue score: ", ScoreManager.match.blueScore); // TODO - Remove
     socket.to("scoring").emit("score-update", ScoreManager.match.toJSON());
   }
 });

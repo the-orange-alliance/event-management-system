@@ -1,14 +1,16 @@
 import {IScoringState} from "./models";
 import {Reducer} from "redux";
 import {ScoringActions} from "./types";
-import {SET_ACTIVE_MATCH, SET_MATCH_DURATION, SET_MATCH_STATE} from "./constants";
+import {SET_ACTIVE_MATCH, SET_MATCH_DURATION, SET_MATCH_STATE, UPDATE_SCORING_OBJECT} from "./constants";
 import {MatchState} from "../../shared/models/MatchState";
 import * as moment from "moment";
+import SocketMatch from "../../shared/models/scoring/SocketMatch";
 
 export const initialState: IScoringState = {
   activeMatch: null,
   matchState: MatchState.PRESTART_READY,
-  matchDuration: moment.duration("0", "seconds")
+  matchDuration: moment.duration("0", "seconds"),
+  scoreObj: new SocketMatch()
 };
 
 const reducer: Reducer<IScoringState> = (state: IScoringState = initialState, action) => {
@@ -19,6 +21,8 @@ const reducer: Reducer<IScoringState> = (state: IScoringState = initialState, ac
       return {...state, matchState: action.payload.matchState};
     case SET_MATCH_DURATION:
       return {...state, matchDuration: action.payload.duration};
+    case UPDATE_SCORING_OBJECT:
+      return {...state, scoreObj: action.payload.scoreObj};
     default:
       return state;
   }

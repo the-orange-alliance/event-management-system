@@ -48,6 +48,9 @@ export default class ScoringRoom implements IRoom {
       };
       this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "no"});
     });
+    client.on("commit-scores", (matchKey: string) => {
+      this._server.to("scoring").emit("commit-scores", matchKey);
+    });
     client.on("start", () => {
       if (!this._timer.inProgress()) {
         this._timer.start();

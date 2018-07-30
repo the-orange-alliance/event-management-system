@@ -40,7 +40,7 @@ interface IState {
   time: moment.Duration,
   timerID: any,
   matchData: BasicMatch,
-  panels: number[]
+  panels: any
 }
 
 class MatchPlayScreen extends React.Component<IProps, IState> {
@@ -52,7 +52,10 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       time: moment.duration(0, "seconds"),
       timerID: null,
       matchData: new BasicMatch(),
-      panels: [0, 0]
+      panels: {
+        red: 0,
+        blue: 0
+      }
     };
   }
 
@@ -71,7 +74,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     SocketProvider.on("score-update", (scoreObj: any) => {
       this.setState({matchData: new BasicMatch().fromJSON(scoreObj)});
     });
-    SocketProvider.on("onSolar", (solarObj) => {
+    SocketProvider.on("onSolar", (solarObj: any) => {
       const alliance = solarObj.alliance_index === 0 ? "red" : "blue";
       if (solarObj.value === true) {
         this.state.panels[alliance]++;
@@ -128,7 +131,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                 <ScoringComponent baseImg={TURBINE_BASE} startedImg={RED_TURBINE_STARTED} completedImg={RED_TURBINE_COMPLETE} started={redTurbineStarted} completed={redTurbineComplete}/>
               </div>
               <div className="bottom-details">
-                <SolarCapsule allianceColor="red" solarPanelCount={panels[0]}/>
+                <SolarCapsule allianceColor="red" solarPanelCount={panels.red}/>
               </div>
             </div>
             <div id="play-display-left-score">
@@ -220,7 +223,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                 <ScoringComponent baseImg={TURBINE_BASE} startedImg={BLUE_TURBINE_STARTED} completedImg={BLUE_TURBINE_COMPLETE} started={blueTurbineStarted} completed={blueTurbineComplete}/>
               </div>
               <div className="bottom-details">
-                <SolarCapsule allianceColor="blue" solarPanelCount={panels[1]}/>
+                <SolarCapsule allianceColor="blue" solarPanelCount={panels.blue}/>
               </div>
             </div>
           </div>

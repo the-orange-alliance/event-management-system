@@ -9,9 +9,9 @@ import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
 import MatchConfiguration from "../../../shared/models/MatchConfiguration";
 import MatchPlayTimerConfiguration from "../../../components/MatchPlayTimerConfiguration";
 import {MatchState} from "../../../shared/models/MatchState";
-import {ISetMatchState} from "../../../stores/scoring/types";
+import {ISetMatchState, IUpdateScoringObject} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {setMatchState} from "../../../stores/scoring/actions";
+import {setMatchState, updateScoringObject} from "../../../stores/scoring/actions";
 import MatchFlowController from "../controllers/MatchFlowController";
 import * as moment from "moment";
 import HttpError from "../../../shared/models/HttpError";
@@ -20,6 +20,9 @@ import SocketProvider from "../../../shared/providers/SocketProvider";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
+import SocketMatch from "../../../shared/models/scoring/SocketMatch";
+import EnergyImpactDetails from "../../../shared/models/scoring/EnergyImpactDetails";
+import MatchParticipant from "../../../shared/models/MatchParticipant";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -29,8 +32,10 @@ interface IProps {
   qualificationMatches: Match[],
   connected: boolean,
   matchDuration?: moment.Duration,
+  scoreObj: SocketMatch,
   setMatchState?: (matchState: MatchState) => ISetMatchState,
-  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  updateScores?: (scoreObj: SocketMatch) => IUpdateScoringObject
 }
 
 interface IState {
@@ -159,6 +164,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
     MatchFlowController.prestart(match).then(() => {
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
+      this.props.updateScores(new SocketMatch());
     }).catch((error: HttpError) => {
       this.props.setMatchState(MatchState.PRESTART_READY);
       DialogManager.showErrorBox(error);
@@ -166,7 +172,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private setAudienceDisplay() {
-    MatchFlowController.setAudiencedisplay().then(() => {
+    MatchFlowController.setAudienceDisplay().then(() => {
       this.props.setMatchState(MatchState.AUDIENCE_DISPLAY_SET);
     });
   }
@@ -174,6 +180,10 @@ class MatchPlay extends React.Component<IProps, IState> {
   private startMatch() {
     SocketProvider.once("match-end", () => {
       this.props.setMatchState(MatchState.MATCH_COMPLETE);
+      SocketProvider.off("score-update");
+    });
+    SocketProvider.on("score-update", (scoreObj: any) => {
+      this.props.updateScores(new SocketMatch().fromJSON(scoreObj, new EnergyImpactDetails()));
     });
     MatchFlowController.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);
@@ -182,15 +192,38 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private abortMatch() {
     this.props.setNavigationDisabled(false);
+    SocketProvider.off("score-update");
     MatchFlowController.abortMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_ABORTED);
     });
   }
 
   private commitScores() {
-    MatchFlowController.commitScores().then(() => {
+    const match: Match = new Match().fromJSON({
+      match_key: this.state.selectedMatch,
+      red_score: this.props.scoreObj.redScore,
+      blue_score: this.props.scoreObj.blueScore,
+      red_min_pen: this.props.scoreObj.redMinPen,
+      red_maj_pen: this.props.scoreObj.redMajPen,
+      blue_min_pen: this.props.scoreObj.blueMinPen,
+      blue_maj_pen: this.props.scoreObj.blueMajPen
+    });
+    match.matchDetails = this.props.scoreObj.toMatchDetails();
+    match.matchDetails.matchKey = this.state.selectedMatch;
+    match.matchDetails.matchDetailKey = this.state.selectedMatch + "D";
+    match.participants = this.props.scoreObj.cardStatuses.map((status, index) => {
+      return new MatchParticipant().fromJSON({
+        match_key: this.state.selectedMatch,
+        match_participant_key: this.state.selectedMatch + "-T" + (index + 1),
+        card_status: status
+      });
+    });
+    MatchFlowController.commitScores(match).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
+      this.props.updateScores(new SocketMatch());
+    }).catch((error: HttpError) => {
+      DialogManager.showErrorBox(error);
     });
   }
 
@@ -253,14 +286,16 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,
     connected: internalState.socketConnected,
-    matchDuration: scoringState.matchDuration
+    matchDuration: scoringState.matchDuration,
+    scoreObj: scoringState.scoreObj
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setMatchState: (matchState: MatchState) => dispatch(setMatchState(matchState)),
-    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
+    updateScores: (scoreObj: SocketMatch) => dispatch(updateScoringObject(scoreObj))
   };
 }
 

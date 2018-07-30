@@ -1,0 +1,68 @@
+#lv-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background-color: #000000db;
+    color: #ffffff;
+}
+
+#lv-header {
+    height: 17.5vh;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-bottom: 3px solid #ffffff23;
+    position: relative;
+}
+
+#lv-body {
+    height: 82.5vh;
+    padding: 10px;
+    position: relative;
+}
+
+#lv-body-status {
+    width: 100%;
+    text-align: center;
+}
+
+#lv-body-button-container {
+    height: 60vh;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 5px;
+}
+
+.lv-body-button-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.lv-body-button {
+    width: 50%;
+    padding: 5px;
+}
+
+.header-logo {
+    width: 23%;
+    max-width: 300px;
+    height: auto;
+}
+
+.big-button {
+    width: 50%;
+    height: 25vh;
+    margin: 5px;
+    font-size: 6vw;
+    border: none;
+    color: #ffffff;
+}
+
+.wide {
+    width: 100%;
+}

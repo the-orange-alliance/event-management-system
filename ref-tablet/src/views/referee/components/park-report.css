@@ -1,0 +1,56 @@
+.pr-container {
+  position: relative;
+  width: 12.5vw;
+  height: 22.5vw;
+
+  display: grid;
+  grid-template-columns: auto;
+  grid-row-gap: 1.875vw;
+  grid-column-gap: 2.5vw;
+}
+
+.pr-row-container {
+  padding-left: .625vw;
+  padding-top: 2.5vw;
+  padding-bottom: 2.5vw;
+  position: relative;
+  width: 99.375vw;
+  height: 22.5vw;
+  background-color: rgb(75, 175, 255);
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-row-gap: 1.875vw;
+  grid-column-gap: 1.25vw;
+}
+
+.pr-title {
+  margin-top: 8.75vw;
+  font-size: 3.125vw;
+  font-weight: bold;
+}
+
+@media (min-width: 801px) {
+  .pr-container {
+    width: 100px;
+    height: 180px;
+
+    grid-row-gap: 15px;
+    grid-column-gap: 20px;
+  }
+
+  .pr-row-container {
+    padding-left: 5px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 795px;
+    height: 180px;
+    grid-row-gap: 15px;
+    grid-column-gap: 10px;
+  }
+
+  .pr-title {
+    margin-top: 70px;
+    font-size: 25px;
+  }
+
+}

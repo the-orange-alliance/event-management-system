@@ -2,6 +2,9 @@ import {Socket, Server} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
+import ScoreManager from "../scoring/ScoreManager";
+import ScoringTimerContainer from "../scoring/ScoringTimerContainer";
+import RefereeEvents from "../scoring/energy-impact/RefereeEvents";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
@@ -39,11 +42,22 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("prestart", (matchKey: string) => {
       this._server.to("scoring").emit("prestart", matchKey);
+      const details: object = {
+        red: ScoreManager.getDetails("red").toJSON(),
+        blue: ScoreManager.getDetails("blue").toJSON()
+      };
+      this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "no"});
     });
     client.on("start", () => {
       if (!this._timer.inProgress()) {
         this._timer.start();
         this._timer.once("match-start", (timeLeft: number) => {
+          ScoreManager.resetMatch();
+          const details: object = {
+            red: ScoreManager.getDetails("red").toJSON(),
+            blue: ScoreManager.getDetails("blue").toJSON()
+          };
+          this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "no"});
           this._server.to("scoring").emit("match-start", timeLeft);
         });
         this._timer.once("match-auto", () => {
@@ -58,10 +72,14 @@ export default class ScoringRoom implements IRoom {
         this._timer.once("match-end", () => {
           this._server.to("scoring").emit("match-end");
           this._timer.removeAllListeners("match-abort");
+          ScoringTimerContainer.stopAll();
+          RefereeEvents.resetVariables();
         });
         this._timer.once("match-abort", () => {
           this._server.to("scoring").emit("match-abort");
           this._timer.removeAllListeners("match-end");
+          ScoringTimerContainer.stopAll();
+          RefereeEvents.resetVariables();
         });
       }
     });

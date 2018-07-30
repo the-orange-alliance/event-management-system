@@ -9,6 +9,9 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
+import ScoringTimerContainer from "./scoring/ScoringTimerContainer";
+import ScoreManager from "./scoring/ScoreManager";
+import ScoreCalculator from "./scoring/energy-impact/ScoreCalculator";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -35,7 +38,7 @@ const timer = new MatchTimer();
 const clients: Map<string, string> = new Map<string, string>();
 const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);
-const refereeRoom = new RefereeRoom(socket);
+const refereeRoom = new RefereeRoom(socket, timer);
 
 /**
  * Main socket connection/event logic. We're not trying to be super secure, but inside of EMS you will (eventually)
@@ -62,7 +65,59 @@ socket.on("connection", (client: Socket) => {
   client.on("disconnect", () => {
     scoringRoom.removeClient(client);
     eventRoom.removeClient(client);
+    refereeRoom.removeClient(client);
   });
+});
+
+const WIND = 0;
+const SOLAR_1 = 1;
+const SOLAR_2 = 2;
+const SOLAR_3 = 3;
+const SOLAR_4 = 4;
+const SOLAR_5 = 5;
+const REACTOR = 6;
+
+ScoringTimerContainer.on("updateMatchScoring", (obj) => {
+  console.log("Updating match scoring.");
+  if (timer.inProgress()) {
+    let alliance_str = (obj.alliance_index === 0) ? "red" : "blue";
+
+    switch(obj.scoreType) {
+      case WIND:
+        ScoreManager.getDetails(alliance_str).windTurbinePoints += 1;
+        break;
+      case SOLAR_1:
+        ScoreManager.getDetails(alliance_str).solarPanelPoints[0] += 1;
+        break;
+      case SOLAR_2:
+        ScoreManager.getDetails(alliance_str).solarPanelPoints[1] += 1;
+        break;
+      case SOLAR_3:
+        ScoreManager.getDetails(alliance_str).solarPanelPoints[2] += 1;
+        break;
+      case SOLAR_4:
+        ScoreManager.getDetails(alliance_str).solarPanelPoints[3] += 1;
+        break;
+      case SOLAR_5:
+        ScoreManager.getDetails(alliance_str).solarPanelPoints[4] += 1;
+        break;
+      case REACTOR:
+        ScoreManager.getDetails(alliance_str).solarPanelPoints[5] += 1;
+        break;
+    }
+
+    let score;
+    if(alliance_str === "red") {
+      score = ScoreCalculator.getRedSum();
+      ScoreManager.match.redScore = score;
+    } else {
+      score = ScoreCalculator.getBlueSum();
+      ScoreManager.match.blueScore = score;
+    }
+    console.log("Red score: ", ScoreManager.match.redScore); // TODO - Remove
+    console.log("Blue score: ", ScoreManager.match.blueScore); // TODO - Remove
+    socket.to("scoring").emit("score-update", ScoreManager.match.toJSON());
+  }
 });
 
 server.listen({

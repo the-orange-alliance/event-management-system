@@ -46,6 +46,7 @@ gulp.task("deploy-env", () => {
 	// gulp.src([".env"]).pipe(gulp.dest("ref-tablet"));
 	// gulp.src([".env"]).pipe(gulp.dest("pit-display"));
   gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("audience-display"));
+  gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("ref-tablet"));
 	gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-core"));
 	gulp.src(["ems-api.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-api"));
 	gulp.src(["ems-web.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-web"));

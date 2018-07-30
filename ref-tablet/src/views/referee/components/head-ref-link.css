@@ -1,0 +1,24 @@
+.hrl-box {
+	margin: 1.5vw;
+	margin-top: 20vw;
+	position: relative;
+	width: 15vw;
+	height: 10vw;
+	border: .5vw solid black;
+	border-radius: 1vw;
+	background: red;
+  font-size: 3.5vw;
+}
+
+@media (min-width: 801px) {
+	.hrl-box {
+		margin: 12px;
+		margin-top: 160px;
+		width: 120px;
+		height: 80px;
+		border: 4px solid black;
+		border-radius: 8px;
+		background: red;
+	  font-size: 28px;
+	}
+}

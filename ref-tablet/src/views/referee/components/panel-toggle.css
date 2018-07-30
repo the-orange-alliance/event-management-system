@@ -1,0 +1,9 @@
+.panel {
+		max-width: 17.5vw;
+}
+
+@media (min-width: 801px) {
+	.panel {
+			max-width: 140px;
+	}
+}

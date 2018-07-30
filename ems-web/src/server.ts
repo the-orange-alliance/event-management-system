@@ -29,11 +29,16 @@ const isProd: boolean = process.env.NODE_ENV === "production";
 let staticPath: string = "../../*/build";
 if (isProd) staticPath = "../../../public/*";
 app.use(express.static(path.join(__dirname, staticPath.replace("*", "audience-display"))));
-// app.use(express.static(path.join(__dirname, staticPath.replace("*", "ref-tablet"))));
+app.use(express.static(path.join(__dirname, staticPath.replace("*", "ref-tablet"))));
 
 app.use("/audience", (req: express.Request, res: express.Response) => {
   res.cookie("host", host, {secure: false, httpOnly: false, maxAge: 600000});
   res.sendFile(path.join(__dirname, staticPath.replace("*", "audience-display") + "/index.html"));
+});
+
+app.use("/ref", (req: express.Request, res: express.Response) => {
+  res.cookie("host", host, {secure: false, httpOnly: false, maxAge: 600000});
+  res.sendFile(path.join(__dirname, staticPath.replace("*", "ref-tablet") + "/index.html"));
 });
 
 app.use("/ping", (req: express.Request, res: express.Response) => {

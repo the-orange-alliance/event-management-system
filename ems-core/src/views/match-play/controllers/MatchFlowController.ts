@@ -60,7 +60,7 @@ class MatchFlowController {
 
   public commitScores(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      SocketProvider.emit("request-video", 3);
+      SocketProvider.send("request-video", 3);
       resolve();
     });
   }

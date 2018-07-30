@@ -20,9 +20,9 @@ export default class MatchTimer extends events.EventEmitter {
     super();
     this._delayTime = 0;
     this._autoTime = 0;
-    this._teleTime = 20;
+    this._teleTime = 50;
     this._endTime = 0;
-    this._totalTime = 20;
+    this._totalTime = 50;
 
     this._mode = MatchMode.RESET;
     this._timerID = null;

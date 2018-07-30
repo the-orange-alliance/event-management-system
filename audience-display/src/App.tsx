@@ -38,12 +38,12 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("127.0.0.1"); // Debug/local IPv4
-      EMSProvider.initialize("127.0.0.1"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.1.54"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.1.54"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
-      SocketProvider.emit("identify", "audience-display", "event", "scoring");
+      SocketProvider.emit("identify", "audience-display", "event", "scoring", "referee");
     });
     SocketProvider.on("disconnect", () => {
       console.log("Disconnected from SocketIO.");

@@ -1,0 +1,26 @@
+.toggle-button {
+		width: 8.93vw;
+  	height: 8.93vw;
+    background-color: grey;
+    cursor: pointer;
+}
+
+.toggle-button-pl {
+	width: 12.5vw;
+	height: 12.5vw;
+	cursor: pointer;
+	background-color: grey;
+	z-index: 2;
+}
+
+@media (min-width: 801px) {
+	.toggle-button {
+			width: 71.45px;
+	  	height: 71.45px;
+	}
+
+	.toggle-button-pl {
+		width: 100px;
+		height: 100px;
+	}
+}

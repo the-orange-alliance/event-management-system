@@ -1,0 +1,69 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial Black", Gadget, sans-serif;
+}
+
+.success {
+  color: #3cff00;
+}
+
+.error {
+  color: #f70000;
+}
+
+.red-btn {
+  background-color: #f70000;
+}
+
+.red-btn:active {
+  background-color: #f70000ce;
+}
+
+.red-btn:disabled {
+  background-color: rgba(180, 0, 0, 0.81);
+}
+
+.blue-btn {
+  background-color: #0702ff;
+}
+
+.blue-btn:active {
+  background-color: #0702ffce;
+}
+
+.blue-btn:disabled {
+  background-color: rgba(7, 2, 180, 0.81);
+}
+
+.yellow-btn {
+  background-color: #e4e009;
+}
+
+.yellow-btn:active {
+  background-color: #e4e009ce;
+}
+
+.yellow-btn:disabled {
+  background-color: rgba(195, 191, 9, 0.81);
+}
+
+.team-btn {
+  background-color: #3f3f3f;
+}
+
+.team-btn:active {
+  background-color: #3f3f3fcb;
+}
+
+.team-btn:disabled {
+  background-color: rgba(55, 55, 55, 0.8);
+}
+
+.yellow-card {
+  background-color: #e4e009 !important;
+}
+
+.red-card {
+  background-color: #f70000 !important;
+}

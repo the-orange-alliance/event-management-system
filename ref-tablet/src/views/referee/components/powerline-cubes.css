@@ -1,0 +1,54 @@
+.plc-container {
+  padding-top: 2.5vw;
+  padding-bottom: 2.5vw;
+  position: relative;
+  padding-left: .9375vw;
+  width: 99.0625vw;
+  height: 12.5vw;
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+  grid-column-gap: .625vw;
+  background-color: rgb(75, 175, 255);
+}
+
+.plc-container-icons {
+  position: relative;
+  width: 6.25vw;
+  height: 12.5vw;
+  display: grid;
+  grid-template-columns: 12.1875;
+  background-color: rgb(75, 175, 255);
+}
+
+.plc-icon {
+  max-width: 7.5vw;
+}
+
+.plc-icon-coal {
+  max-width: 6.25vw;
+}
+
+@media (min-width: 801px) {
+  .plc-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 7.5px;
+    width: 792.5px;
+    height: 100px;
+    grid-column-gap: 5px;
+  }
+
+  .plc-container-icons {
+    width: 50px;
+    height: 100px;
+    grid-template-columns: 97.50px;
+  }
+
+  .plc-icon {
+    max-width: 60px;
+  }
+
+  .plc-icon-coal {
+    max-width: 50px;
+  }
+}

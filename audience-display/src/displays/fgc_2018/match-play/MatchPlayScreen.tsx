@@ -28,6 +28,7 @@ import Match from "../../../shared/models/Match";
 import Team from "../../../shared/models/Team";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import SocketProvider from "../../../shared/providers/SocketProvider";
+import BasicMatch from "../../../shared/models/BasicMatch";
 
 interface IProps {
   match: Match
@@ -37,7 +38,9 @@ interface IState {
   match: Match,
   teams: Team[],
   time: moment.Duration,
-  timerID: any
+  timerID: any,
+  matchData: BasicMatch,
+  panels: number[]
 }
 
 class MatchPlayScreen extends React.Component<IProps, IState> {
@@ -47,7 +50,9 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       match: this.getUpdatedMatchInfo(),
       teams: this.getUpdatedTeamInfo(),
       time: moment.duration(0, "seconds"),
-      timerID: null
+      timerID: null,
+      matchData: new BasicMatch(),
+      panels: [0, 0]
     };
   }
 
@@ -62,12 +67,29 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     });
     SocketProvider.on("match-end", () => {
       this.stopTimer();
-    })
+    });
+    SocketProvider.on("score-update", (scoreObj: any) => {
+      this.setState({matchData: new BasicMatch().fromJSON(scoreObj)});
+    });
+    SocketProvider.on("onSolar", (solarObj) => {
+      const alliance = solarObj.alliance_index === 0 ? "red" : "blue";
+      if (solarObj.value === true) {
+        this.state.panels[alliance]++;
+      } else {
+        if (this.state.panels[alliance] > 0) {
+          this.state.panels[alliance]--;
+        }
+      }
+      this.forceUpdate();
+    });
   }
 
   public componentWillUnmount() {
     SocketProvider.off("match-start");
+    SocketProvider.off("match-end");
     SocketProvider.off("match-abort");
+    SocketProvider.off("score-update");
+    SocketProvider.off("onSolar");
   }
 
   public componentDidUpdate(prevProps: IProps) {
@@ -77,27 +99,42 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {match, teams, time} = this.state;
+    const {match, teams, time, matchData, panels} = this.state;
     const disMin = time.minutes() < 10 ? "0" + time.minutes().toString() : time.minutes().toString();
     const disSec = time.seconds() < 10 ? "0" + time.seconds().toString() : time.seconds().toString();
+
+    const redReactorStarted = matchData.shared.reactor_cubes > 0 || matchData.redDetails.nuclearReactorPowerlineOn;
+    const redReactorComplete = matchData.shared.reactor_cubes === 8 && matchData.redDetails.nuclearReactorPowerlineOn;
+    const redCombustionStarted = matchData.redDetails.combustionPowerlineOn || matchData.redDetails.lowCombustionPoints > 0 || matchData.redDetails.highCombustionPoints > 0;
+    const redCombustionComplete = matchData.redDetails.combustionPowerlineOn && (matchData.redDetails.lowCombustionPoints > 0 || matchData.redDetails.highCombustionPoints > 0);
+    const redTurbineStarted = matchData.redDetails.windTurbineCranked || matchData.redDetails.windTurbinePowerlineOn;
+    const redTurbineComplete = matchData.redDetails.windTurbineCranked && matchData.redDetails.windTurbinePowerlineOn;
+
+    const blueReactorStarted = matchData.shared.reactor_cubes > 0 || matchData.blueDetails.nuclearReactorPowerlineOn;
+    const blueReactorComplete = matchData.shared.reactor_cubes === 8 && matchData.blueDetails.nuclearReactorPowerlineOn;
+    const blueCombustionStarted = matchData.blueDetails.combustionPowerlineOn || matchData.blueDetails.lowCombustionPoints > 0 || matchData.blueDetails.highCombustionPoints > 0;
+    const blueCombustionComplete = matchData.blueDetails.combustionPowerlineOn && (matchData.blueDetails.lowCombustionPoints > 0 || matchData.blueDetails.highCombustionPoints > 0);
+    const blueTurbineStarted = matchData.blueDetails.windTurbineCranked || matchData.blueDetails.windTurbinePowerlineOn;
+    const blueTurbineComplete = matchData.blueDetails.windTurbineCranked && matchData.blueDetails.windTurbinePowerlineOn;
+    
     return (
       <div>
         <div id="play-display-base">
           <div id="play-display-base-top">
             <div id="play-display-left-details">
               <div className="top-details">
-                <ScoringComponent baseImg={REACTOR_BASE} startedImg={RED_REACTOR_STARTED} completedImg={RED_REACTOR_COMPLETE} started={false} completed={false}/>
-                <ScoringComponent baseImg={COMBUSTION_BASE} startedImg={RED_COMBUSTION_STARTED} completedImg={RED_COMBUSTION_COMPLETE} started={false} completed={false}/>
-                <ScoringComponent baseImg={TURBINE_BASE} startedImg={RED_TURBINE_STARTED} completedImg={RED_TURBINE_COMPLETE} started={false} completed={false}/>
+                <ScoringComponent baseImg={REACTOR_BASE} startedImg={RED_REACTOR_STARTED} completedImg={RED_REACTOR_COMPLETE} started={redReactorStarted} completed={redReactorComplete}/>
+                <ScoringComponent baseImg={COMBUSTION_BASE} startedImg={RED_COMBUSTION_STARTED} completedImg={RED_COMBUSTION_COMPLETE} started={redCombustionStarted} completed={redCombustionComplete}/>
+                <ScoringComponent baseImg={TURBINE_BASE} startedImg={RED_TURBINE_STARTED} completedImg={RED_TURBINE_COMPLETE} started={redTurbineStarted} completed={redTurbineComplete}/>
               </div>
               <div className="bottom-details">
-                <SolarCapsule allianceColor="red" solarPanelCount={0}/>
+                <SolarCapsule allianceColor="red" solarPanelCount={panels[0]}/>
               </div>
             </div>
             <div id="play-display-left-score">
               <div className="teams red-bg left-score">
                 <div className="team">
-                  <TeamCardStatus cardStatus={0}/>
+                  <TeamCardStatus cardStatus={matchData.cardStatuses[0]}/>
                   <div className="team-name-left">
                     <span>{teams[0].country}</span>
                   </div>
@@ -106,7 +143,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                   </div>
                 </div>
                 <div className="team">
-                  <TeamCardStatus cardStatus={2}/>
+                  <TeamCardStatus cardStatus={matchData.cardStatuses[1]}/>
                   <div className="team-name-left">
                     <span>{teams[1].country}</span>
                   </div>
@@ -115,7 +152,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                   </div>
                 </div>
                 <div className="team">
-                  <TeamCardStatus cardStatus={1}/>
+                  <TeamCardStatus cardStatus={matchData.cardStatuses[2]}/>
                   <div className="team-name-left">
                     <span>{teams[2].country}</span>
                   </div>
@@ -135,12 +172,12 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
               <div id="score-container-scores">
                 <div id="score-container-red">
                   <div className="red-bg center-items">
-                    <span>100</span>
+                    <span>{matchData.redScore}</span>
                   </div>
                 </div>
                 <div id="score-container-blue">
                   <div className="blue-bg center-items">
-                    <span>200</span>
+                    <span>{matchData.blueScore}</span>
                   </div>
                 </div>
               </div>
@@ -154,7 +191,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                   <div className="team-name-left">
                     <span>{teams[3].country}</span>
                   </div>
-                  <TeamCardStatus cardStatus={0}/>
+                  <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
                 </div>
                 <div className="team">
                   <div className="team-flag">
@@ -163,7 +200,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                   <div className="team-name-left">
                     <span>{teams[4].country}</span>
                   </div>
-                  <TeamCardStatus cardStatus={0}/>
+                  <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
                 </div>
                 <div className="team">
                   <div className="team-flag">
@@ -172,18 +209,18 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                   <div className="team-name-left">
                     <span>{teams[5].country}</span>
                   </div>
-                  <TeamCardStatus cardStatus={0}/>
+                  <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
                 </div>
               </div>
             </div>
             <div id="play-display-right-details">
               <div className="top-details">
-                <ScoringComponent baseImg={REACTOR_BASE} startedImg={BLUE_REACTOR_STARTED} completedImg={BLUE_REACTOR_COMPLETE} started={false} completed={false}/>
-                <ScoringComponent baseImg={COMBUSTION_BASE} startedImg={BLUE_COMBUSTION_STARTED} completedImg={BLUE_COMBUSTION_COMPLETE} started={false} completed={false}/>
-                <ScoringComponent baseImg={TURBINE_BASE} startedImg={BLUE_TURBINE_STARTED} completedImg={BLUE_TURBINE_COMPLETE} started={false} completed={false}/>
+                <ScoringComponent baseImg={REACTOR_BASE} startedImg={BLUE_REACTOR_STARTED} completedImg={BLUE_REACTOR_COMPLETE} started={blueReactorStarted} completed={blueReactorComplete}/>
+                <ScoringComponent baseImg={COMBUSTION_BASE} startedImg={BLUE_COMBUSTION_STARTED} completedImg={BLUE_COMBUSTION_COMPLETE} started={blueCombustionStarted} completed={blueCombustionComplete}/>
+                <ScoringComponent baseImg={TURBINE_BASE} startedImg={BLUE_TURBINE_STARTED} completedImg={BLUE_TURBINE_COMPLETE} started={blueTurbineStarted} completed={blueTurbineComplete}/>
               </div>
               <div className="bottom-details">
-                <SolarCapsule allianceColor="blue" solarPanelCount={1}/>
+                <SolarCapsule allianceColor="blue" solarPanelCount={panels[1]}/>
               </div>
             </div>
           </div>

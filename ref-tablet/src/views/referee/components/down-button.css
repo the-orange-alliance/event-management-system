@@ -1,0 +1,29 @@
+.down-button-arrow-blue {
+	  width: 0px;
+  	height: 0px;
+  	border-top: 5vw solid blue;
+  	border-left: 5vw solid transparent;
+  	border-right: 5vw solid transparent;
+}
+
+.down-button-arrow-red {
+	  width: 0px;
+  	height: 0px;
+  	border-top: 5vw solid red;
+  	border-left: 5vw solid transparent;
+  	border-right: 5vw solid transparent;
+}
+
+@media (min-width: 801px) {
+	.down-button-arrow-blue {
+	  	border-top: 40px solid blue;
+	  	border-left: 40px solid transparent;
+	  	border-right: 40px solid transparent;
+	}
+
+	.down-button-arrow-red {
+	  	border-top: 40px solid red;
+	  	border-left: 40px solid transparent;
+	  	border-right: 40px solid transparent;
+	}
+}

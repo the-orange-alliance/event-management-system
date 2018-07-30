@@ -1,0 +1,31 @@
+.sa-container {
+  position: relative;
+  width: 96.25vw;
+  height: 12.5vw;
+  padding-top: 2.5vw;
+  padding-bottom: 2.5vw;
+  padding-left: 3.75vw;
+
+  display: grid;
+  grid-template-columns: 17.5vw 17.5vw 17.5vw 17.5vw 17.5vw;
+  grid-column-gap: 1.25vw;
+  background-color: white;
+  grid-auto-columns: 11.25vw;
+  grid-auto-rows: 11.25vw;
+  background-color: rgb(75, 175, 255);
+}
+
+@media (min-width: 801px) {
+  .sa-container {
+    width: 770px;
+    height: 100px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 30px;
+
+    grid-template-columns: 140px 140px 140px 140px 140px;
+    grid-column-gap: 10px;
+    grid-auto-columns: 90px;
+    grid-auto-rows: 90px;
+  }
+}

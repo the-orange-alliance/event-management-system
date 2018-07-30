@@ -1,16 +1,20 @@
 import {Socket, Server} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
+import RefereeEvents from "../scoring/energy-impact/RefereeEvents";
+import MatchTimer from "../scoring/MatchTimer";
 
 export default class RefereeRoom implements IRoom {
   private readonly _server: Server;
   private readonly _clients: Socket[];
   private readonly _name: string;
+  private readonly _timer: MatchTimer;
 
-  constructor(server: Server) {
+  constructor(server: Server, timer: MatchTimer) {
     this._server = server;
     this._clients = [];
     this._name = "referee";
+    this._timer = timer;
   }
 
   public addClient(client: Socket) {
@@ -31,7 +35,8 @@ export default class RefereeRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
-    console.log("Initializing referee events...");
+    client.emit("connectPythonApp"); // For Will's field service app.
+    RefereeEvents.initialize(this._server, client, this._timer);
   }
 
   get name(): string {

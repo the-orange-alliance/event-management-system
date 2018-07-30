@@ -1,0 +1,69 @@
+.penalty-bar {
+	margin-top: 1%;
+	margin-left: 7.5%;
+	height: 3.5vw;
+	width: 25vw;
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	background-color: black;
+	border-radius: .4vw;
+}
+
+.penalty-brick {
+	margin: 1%;
+	height: 85%;
+	width: 33.3333%;
+	background-color: grey;
+	border-radius: .4vw;
+}
+
+.yellow-card-brick-activated {
+	margin: 1%;
+	height: 85%;
+	width: 33.3333%;
+	background-color: yellow;
+	border-radius: 2.5px;
+}
+
+.red-card-brick-activated {
+	margin: 1%;
+	height: 85%;
+	width: 33.3333%;
+	background-color: red;
+	border-radius: 2.5px;
+}
+
+@media (min-width: 801px) {
+	.penalty-bar {
+		margin-top: 1%;
+		margin-left: 7.5%;
+		height: 28px;
+		width: 200px;
+		border-radius: 2.5px;
+	}
+
+	.penalty-brick {
+		margin: 1%;
+		height: 85%;
+		width: 33.3333%;
+		background-color: grey;
+		border-radius: 2.5px;
+	}
+
+	.yellow-card-brick-activated {
+		margin: 1%;
+		height: 85%;
+		width: 33.3333%;
+		background-color: yellow;
+		border-radius: 2.5px;
+	}
+
+	.red-card-brick-activated {
+		margin: 1%;
+		height: 85%;
+		width: 33.3333%;
+		background-color: red;
+		border-radius: 2.5px;
+	}
+}

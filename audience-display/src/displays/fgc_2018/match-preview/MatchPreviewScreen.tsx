@@ -66,17 +66,17 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
               <div className="pre-match-alliance-row pre-match-border">
                 <div className="pre-match-rank">#0</div>
                 <div className="pre-match-team">{teams[0].teamNameShort}</div>
-                <div className="pre-match-flag">{teams[0].countryCode}</div>
+                <div className="pre-match-flag"><span className={"flag-icon flag-icon-" + teams[0].countryCode}/></div>
               </div>
               <div className="pre-match-alliance-row pre-match-border">
                 <div className="pre-match-rank">#0</div>
                 <div className="pre-match-team">{teams[1].teamNameShort}</div>
-                <div className="pre-match-flag">{teams[1].countryCode}</div>
+                <div className="pre-match-flag"><span className={"flag-icon flag-icon-" + teams[1].countryCode}/></div>
               </div>
               <div className="pre-match-alliance-row">
                 <div className="pre-match-rank">#0</div>
                 <div className="pre-match-team">{teams[2].teamNameShort}</div>
-                <div className="pre-match-flag">{teams[2].countryCode}</div>
+                <div className="pre-match-flag"><span className={"flag-icon flag-icon-" + teams[2].countryCode}/></div>
               </div>
             </div>
           </div>
@@ -88,17 +88,17 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
               <div className="pre-match-alliance-row pre-match-border">
                 <span className="pre-match-rank">#0</span>
                 <span className="pre-match-team">{teams[3].teamNameShort}</span>
-                <span className="pre-match-flag">{teams[3].countryCode}</span>
+                <span className="pre-match-flag"><span className={"flag-icon flag-icon-" + teams[3].countryCode}/></span>
               </div>
               <div className="pre-match-alliance-row pre-match-border">
                 <span className="pre-match-rank">#0</span>
                 <span className="pre-match-team">{teams[4].teamNameShort}</span>
-                <span className="pre-match-flag">{teams[4].countryCode}</span>
+                <span className="pre-match-flag"><span className={"flag-icon flag-icon-" + teams[4].countryCode}/></span>
               </div>
               <div className="pre-match-alliance-row">
                 <span className="pre-match-rank">#0</span>
                 <span className="pre-match-team">{teams[5].teamNameShort}</span>
-                <span className="pre-match-flag">{teams[5].countryCode}</span>
+                <span className="pre-match-flag"><span className={"flag-icon flag-icon-" + teams[5].countryCode}/></span>
               </div>
             </div>
           </div>

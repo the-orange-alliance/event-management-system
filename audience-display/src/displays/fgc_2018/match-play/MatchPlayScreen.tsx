@@ -142,7 +142,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <span>{teams[0].country}</span>
                   </div>
                   <div className="team-flag">
-                    <span>{teams[0].countryCode}</span>
+                    <span><span className={"flag-icon flag-icon-" + teams[0].countryCode}/></span>
                   </div>
                 </div>
                 <div className="team">
@@ -151,7 +151,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <span>{teams[1].country}</span>
                   </div>
                   <div className="team-flag">
-                    <span>{teams[1].countryCode}</span>
+                    <span><span className={"flag-icon flag-icon-" + teams[5].countryCode}/></span>
                   </div>
                 </div>
                 <div className="team">

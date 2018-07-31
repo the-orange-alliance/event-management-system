@@ -151,7 +151,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <span>{teams[1].country}</span>
                   </div>
                   <div className="team-flag">
-                    <span><span className={"flag-icon flag-icon-" + teams[5].countryCode}/></span>
+                    <span><span className={"flag-icon flag-icon-" + teams[1].countryCode}/></span>
                   </div>
                 </div>
                 <div className="team">
@@ -160,7 +160,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <span>{teams[2].country}</span>
                   </div>
                   <div className="team-flag">
-                    <span>{teams[2].countryCode}</span>
+                    <span><span className={"flag-icon flag-icon-" + teams[2].countryCode}/></span>
                   </div>
                 </div>
               </div>
@@ -189,7 +189,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
               <div className="teams blue-bg right-score">
                 <div className="team">
                   <div className="team-flag">
-                    <span>{teams[3].countryCode}</span>
+                    <span><span className={"flag-icon flag-icon-" + teams[3].countryCode}/></span>
                   </div>
                   <div className="team-name-left">
                     <span>{teams[3].country}</span>
@@ -198,7 +198,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                 </div>
                 <div className="team">
                   <div className="team-flag">
-                    <span>{teams[4].countryCode}</span>
+                    <span><span className={"flag-icon flag-icon-" + teams[4].countryCode}/></span>
                   </div>
                   <div className="team-name-left">
                     <span>{teams[4].country}</span>
@@ -207,7 +207,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                 </div>
                 <div className="team">
                   <div className="team-flag">
-                    <span>{teams[5].countryCode}</span>
+                    <span><span className={"flag-icon flag-icon-" + teams[5].countryCode}/></span>
                   </div>
                   <div className="team-name-left">
                     <span>{teams[5].country}</span>

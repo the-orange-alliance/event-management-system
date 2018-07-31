@@ -84,17 +84,17 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                   <div className="res-team-row bottom-red">
                     <div className="res-team-name">{teams[0].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag">{teams[0].countryCode}</div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[0].countryCode}/></div>
                   </div>
                   <div className="res-team-row bottom-red">
                     <div className="res-team-name">{teams[1].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag">{teams[1].countryCode}</div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[1].countryCode}/></div>
                   </div>
                   <div className="res-team-row">
                     <div className="res-team-name">{teams[2].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag">{teams[2].countryCode}</div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[2].countryCode}/></div>
                   </div>
                 </div>
                 <div className="res-card-details">
@@ -146,17 +146,17 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                   <div className="res-team-row bottom-blue">
                     <div className="res-team-name">{teams[3].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag">{teams[3].countryCode}</div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[3].countryCode}/></div>
                   </div>
                   <div className="res-team-row bottom-blue">
                     <div className="res-team-name">{teams[4].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag">{teams[4].countryCode}</div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[4].countryCode}/></div>
                   </div>
                   <div className="res-team-row">
                     <div className="res-team-name">{teams[5].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag">{teams[5].countryCode}</div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[5].countryCode}/></div>
                   </div>
                 </div>
                 <div className="res-card-details">

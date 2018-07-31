@@ -2,8 +2,8 @@ import * as React from "react";
 
 import "./MatchResultsScreen.css";
 import RED_WIN from "../res/Red_Win_Top.png";
-// import RED_LOSE from "../res/Red_Lose_Top.png";
-// import BLUE_WIN from "../res/Blue_Win_Top.png";
+import RED_LOSE from "../res/Red_Lose_Top.png";
+import BLUE_WIN from "../res/Blue_Win_Top.png";
 import BLUE_LOSE from "../res/Blue_Lose_Top.png";
 import Match from "../../../shared/models/Match";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
@@ -59,8 +59,11 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
     const blueReactorPoints = details.blueNuclearReactorOwnership * 3;
     const blueCombustionPoints = details.blueCombustionPowerlineOn ? ((details.blueHighCombustionGoals * 20) + (details.blueLowCombustionGoals * 5)) : 0;
     const blueParkingPoints = details.blueRobotsParked === 3 ? 50 : details.blueRobotsParked * 15;
-    const bluePenaltyPoints = (match.blueMinPen || 0) * 30;
+    const bluePenaltyPoints = (match.redMinPen || 0) * 30;
     const coopPoints = details.redDidCoopertition && details.blueDidCoopertition ? 100 : 0;
+
+    const redTop = match.redScore > match.blueScore ? RED_WIN : RED_LOSE;
+    const blueTop = match.blueScore > match.redScore ? BLUE_WIN : BLUE_LOSE;
 
     return (
       <div id="fgc-body">
@@ -77,24 +80,24 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
           <div id="res-alliance-container">
             <div className="res-alliance-card">
               <div className="res-card-top">
-                <img src={RED_WIN} className="fit-w"/>
+                <img src={redTop} className="fit-w"/>
               </div>
               <div className="res-card-middle red-bg">
                 <div className="res-card-teams">
                   <div className="res-team-row bottom-red">
                     <div className="res-team-name">{teams[0].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[0].countryCode}/></div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[0].countryCode}/></div>
                   </div>
                   <div className="res-team-row bottom-red">
                     <div className="res-team-name">{teams[1].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[1].countryCode}/></div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[1].countryCode}/></div>
                   </div>
                   <div className="res-team-row">
                     <div className="res-team-name">{teams[2].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[2].countryCode}/></div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
                   </div>
                 </div>
                 <div className="res-card-details">
@@ -139,24 +142,24 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
             </div>
             <div className="res-alliance-card">
               <div className="res-card-top">
-                <img src={BLUE_LOSE} className="fit-w"/>
+                <img src={blueTop} className="fit-w"/>
               </div>
               <div className="res-card-middle blue-bg">
                 <div className="res-card-teams">
                   <div className="res-team-row bottom-blue">
                     <div className="res-team-name">{teams[3].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[3].countryCode}/></div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
                   </div>
                   <div className="res-team-row bottom-blue">
                     <div className="res-team-name">{teams[4].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[4].countryCode}/></div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></div>
                   </div>
                   <div className="res-team-row">
                     <div className="res-team-name">{teams[5].teamNameShort}</div>
                     <div className="res-team-rank">#0</div>
-                    <div className="res-team-flag"><span className={"flag-icon flag-icon-" + teams[5].countryCode}/></div>
+                    <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></div>
                   </div>
                 </div>
                 <div className="res-card-details">

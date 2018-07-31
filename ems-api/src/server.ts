@@ -13,6 +13,7 @@ import {EventController} from "./controllers/Event";
 import {TeamController} from "./controllers/Team";
 import {ScheduleController} from "./controllers/Schedule";
 import {MatchController} from "./controllers/Match";
+import {RankingController} from "./controllers/Ranking";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -59,6 +60,7 @@ app.use("/api/event", EventController);
 app.use("/api/team", TeamController);
 app.use("/api/schedule", ScheduleController);
 app.use("/api/match", MatchController);
+app.use("/api/ranking", RankingController);
 
 /* If the user is trying to get to a route not previously handled, it wasn't found. */
 app.all("*", (req, res, next) => {

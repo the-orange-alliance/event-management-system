@@ -241,13 +241,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 2px 0 2px 0;
 }
 
 .team-flag > span {
-    background-repeat: no-repeat;
-    width: 66% !important;
-    height: 100% !important;
+    height: 1.5vw; /* 4:3 */
+    width: 2vw; /* 4:3 */
+    background-color: #000000;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
 }
 
 .info-col {

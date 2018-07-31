@@ -314,11 +314,11 @@ export default class RefereeEvents {
         if(alliance_str === "red") { //swapped on purpose since opposite alliance is affected on penalties
           ScoreManager.match.redMinPen += obj.value;
           score = ScoreCalculator.getBlueSum();
-          ScoreManager.match.redScore = score;
+          ScoreManager.match.blueScore = score;
         } else {
           ScoreManager.match.blueMinPen += obj.value;
           score = ScoreCalculator.getRedSum();
-          ScoreManager.match.blueScore = score;
+          ScoreManager.match.redScore = score;
         }
         console.log("Red score: ", ScoreManager.match.redScore);
         console.log("Blue score: ", ScoreManager.match.blueScore);
@@ -336,11 +336,11 @@ export default class RefereeEvents {
         if(alliance_str === "red") { //swapped on purpose since opposite alliance is affected on penalties
           ScoreManager.match.redMajPen += obj.value;
           score = ScoreCalculator.getBlueSum();
-          ScoreManager.match.redScore = score;
+          ScoreManager.match.blueScore = score;
         } else {
           ScoreManager.match.blueMajPen += obj.value;
           score = ScoreCalculator.getRedSum();
-          ScoreManager.match.blueScore = score;
+          ScoreManager.match.redScore = score;
         }
         console.log("Red score: ", ScoreManager.match.redScore);
         console.log("Blue score: ", ScoreManager.match.blueScore);

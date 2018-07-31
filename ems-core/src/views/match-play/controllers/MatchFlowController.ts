@@ -3,6 +3,7 @@ import Match from "../../../shared/models/Match";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import HttpError from "../../../shared/models/HttpError";
 import SocketProvider from "../../../shared/providers/SocketProvider";
+import {EMSEventTypes} from "../../../shared/AppTypes";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -54,11 +55,22 @@ class MatchFlowController {
     });
   }
 
-  public commitScores(match: Match): Promise<any> {
+  public commitScores(match: Match, eventType: EMSEventTypes): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.postMatchResults(match).then(() => {
-        SocketProvider.send("commit-scores", match.matchKey);
-        resolve();
+        if (match.tournamentLevel > 0) {
+          setTimeout(() => {
+            EMSProvider.calculateRankings(match.tournamentLevel, eventType).then(() => {
+              SocketProvider.send("commit-scores", match.matchKey);
+              resolve();
+            }).catch((rankError: HttpError) => {
+              reject(rankError);
+            });
+          }, 500);
+        } else {
+          SocketProvider.send("commit-scores", match.matchKey);
+          resolve();
+        }
       }).catch((error: any) => {
         reject(error);
       });

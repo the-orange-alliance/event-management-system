@@ -18,10 +18,12 @@ import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
 import Match from "../../../shared/models/Match";
+import Event from "../../../shared/models/Event";
 
 interface IProps {
   onComplete: () => void,
   navigationDisabled?: boolean,
+  event: Event,
   eventConfig?: EventConfiguration,
   teamList?: Team[],
   schedule?: Schedule,
@@ -98,8 +100,13 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
     EventPostingController.createMatchSchedule(1, this.props.qualificationMatches).then(() => {
-      this.props.setNavigationDisabled(false);
-      this.props.onComplete();
+      EventPostingController.createRanks(this.props.teamList, this.props.event.eventKey).then(() => {
+        this.props.setNavigationDisabled(false);
+        this.props.onComplete();
+      }).catch((rankError: HttpError) => {
+        this.props.setNavigationDisabled(false);
+        DialogManager.showErrorBox(rankError);
+      });
     }).catch((error: HttpError) => {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);
@@ -113,6 +120,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     navigationDisabled: internalState.navigationDisabled,
     teamList: internalState.teamList,
     eventConfig: configState.eventConfiguration,
+    event: configState.event,
     schedule: configState.qualificationSchedule,
     qualificationMatches: internalState.qualificationMatches
   };

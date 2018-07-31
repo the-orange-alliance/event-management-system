@@ -6,6 +6,7 @@ import Team from "../models/Team";
 import ScheduleItem from "../models/ScheduleItem";
 import Match from "../models/Match";
 import MatchParticipant from "../models/MatchParticipant";
+import Ranking from "../models/Ranking";
 
 const PORT = process.env.REACT_APP_EMS_API_PORT;
 
@@ -151,8 +152,20 @@ class EMSProvider {
     return this.get("api/match?level=" + tournamentLevel);
   }
 
+  public getRankings(): Promise<AxiosResponse> {
+    return this.get("api/ranking");
+  }
+
+  public calculateRankings(tournamentLevel: number, eventType: EMSEventTypes): Promise<AxiosResponse> {
+    return this.get("api/ranking/calculate/" + tournamentLevel + "?type=" + eventType)
+  }
+
   public deleteScheduleItems(type: TournamentLevels): Promise<AxiosResponse> {
     return this.delete("api/schedule/" + type);
+  }
+
+  public deleteRankings(): Promise<AxiosResponse> {
+    return this.delete("api/ranking");
   }
 
   public postEvent(event: Event): Promise<AxiosResponse> {
@@ -173,6 +186,10 @@ class EMSProvider {
 
   public postMatchScheduleParticipants(participants: MatchParticipant[]): Promise<AxiosResponse> {
     return this.post("api/match/participants", participants);
+  }
+
+  public postRankings(rankings: Ranking[]): Promise<AxiosResponse> {
+    return this.post("api/ranking", rankings);
   }
 
   public putActiveMatch(match: Match): Promise<AxiosResponse> {

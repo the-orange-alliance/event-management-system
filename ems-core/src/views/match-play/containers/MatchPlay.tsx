@@ -9,9 +9,9 @@ import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
 import MatchConfiguration from "../../../shared/models/MatchConfiguration";
 import MatchPlayTimerConfiguration from "../../../components/MatchPlayTimerConfiguration";
 import {MatchState} from "../../../shared/models/MatchState";
-import {ISetMatchState, IUpdateScoringObject} from "../../../stores/scoring/types";
+import {ISetActiveMatch, ISetMatchState, IUpdateScoringObject} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {setMatchState, updateScoringObject} from "../../../stores/scoring/actions";
+import {setActiveMatch, setMatchState, updateScoringObject} from "../../../stores/scoring/actions";
 import MatchFlowController from "../controllers/MatchFlowController";
 import * as moment from "moment";
 import HttpError from "../../../shared/models/HttpError";
@@ -25,6 +25,7 @@ import EnergyImpactDetails from "../../../shared/models/scoring/EnergyImpactDeta
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 
 interface IProps {
+  activeMatch: Match,
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
   matchState?: MatchState,
@@ -35,7 +36,8 @@ interface IProps {
   scoreObj: SocketMatch,
   setMatchState?: (matchState: MatchState) => ISetMatchState,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
-  updateScores?: (scoreObj: SocketMatch) => IUpdateScoringObject
+  updateScores?: (scoreObj: SocketMatch) => IUpdateScoringObject,
+  setActiveMatch?: (match: Match) => ISetActiveMatch
 }
 
 interface IState {
@@ -154,7 +156,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setMatchState(MatchState.PRESTART_READY);
   }
 
-  private prestart() {
+  private prestart() { // TODO - Emit field number that match is also prestarting on
     this.props.setNavigationDisabled(true);
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     const match: Match = new Match().fromJSON({
@@ -206,7 +208,8 @@ class MatchPlay extends React.Component<IProps, IState> {
       red_min_pen: this.props.scoreObj.redMinPen,
       red_maj_pen: this.props.scoreObj.redMajPen,
       blue_min_pen: this.props.scoreObj.blueMinPen,
-      blue_maj_pen: this.props.scoreObj.blueMajPen
+      blue_maj_pen: this.props.scoreObj.blueMajPen,
+      tournament_level: this.props.activeMatch.tournamentLevel
     });
     match.matchDetails = this.props.scoreObj.toMatchDetails();
     match.matchDetails.matchKey = this.state.selectedMatch;
@@ -218,7 +221,7 @@ class MatchPlay extends React.Component<IProps, IState> {
         card_status: status
       });
     });
-    MatchFlowController.commitScores(match).then(() => {
+    MatchFlowController.commitScores(match, this.props.eventConfig.eventType).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
       this.props.updateScores(new SocketMatch());
@@ -245,6 +248,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   private changeSelectedLevel(event: SyntheticEvent, props: DropdownProps) {
     const matches = this.getMatchesByTournamentLevel((props.value as TournamentLevels));
     if (matches.length > 0) {
+      this.props.setActiveMatch(matches[0]);
       this.setState({
         selectedLevel: (props.value as TournamentLevels),
         selectedMatch: matches[0].matchKey,
@@ -262,6 +266,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   private changeSelectedMatch(event: SyntheticEvent, props: DropdownProps) {
     for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
       if (match.matchKey === (props.value as string)) {
+        this.props.setActiveMatch(match);
         this.setState({
           selectedMatch: match.matchKey,
           selectedField: match.fieldNumber,
@@ -272,6 +277,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private changeSelectedField(event: SyntheticEvent, props: DropdownProps) {
+    this.props.activeMatch.fieldNumber = props.value as number;
     this.setState({
       selectedField: (props.value as number),
     });
@@ -280,6 +286,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
 export function mapStateToProps({configState, internalState, scoringState}: IApplicationState) {
   return {
+    activeMatch: scoringState.activeMatch,
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,
     matchState: scoringState.matchState,
@@ -295,7 +302,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setMatchState: (matchState: MatchState) => dispatch(setMatchState(matchState)),
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
-    updateScores: (scoreObj: SocketMatch) => dispatch(updateScoringObject(scoreObj))
+    updateScores: (scoreObj: SocketMatch) => dispatch(updateScoringObject(scoreObj)),
+    setActiveMatch: (match: Match) => dispatch(setActiveMatch(match))
   };
 }
 

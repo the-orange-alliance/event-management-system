@@ -7,6 +7,7 @@ import Team from "../../../shared/models/Team";
 import ScheduleItem from "../../../shared/models/ScheduleItem";
 import Match from "../../../shared/models/Match";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
+import Ranking from "../../../shared/models/Ranking";
 
 class EventPostingController {
   private static _instance: EventPostingController;
@@ -133,6 +134,39 @@ class EventPostingController {
           });
         }).catch((scheduleError: HttpError) => {
           reject(scheduleError);
+        });
+      });
+    });
+  }
+
+  public deleteRanks(): Promise<any> {
+    return EMSProvider.deleteRankings();
+  }
+
+  public createRanks(teams: Team[], eventKey: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      const rankings: Ranking[] = [];
+      for (const team of teams) {
+        const teamRanking: Ranking = new Ranking();
+        teamRanking.rankKey = eventKey + "-R" + team.teamKey;
+        teamRanking.teamKey = team.teamKey;
+        rankings.push(teamRanking);
+      }
+      EMSProvider.getRankings().then((rankRes: AxiosResponse) => {
+        if (rankRes.data && rankRes.data.payload && rankRes.data.payload.length > 0) {
+          resolve();
+        } else {
+          EMSProvider.postRankings(rankings).then(() => {
+            resolve();
+          }).catch((postError: HttpError) => {
+            reject(postError);
+          });
+        }
+      }).catch(() => {
+        EMSProvider.postRankings(rankings).then(() => {
+          resolve();
+        }).catch((postError: HttpError) => {
+          reject(postError);
         });
       });
     });

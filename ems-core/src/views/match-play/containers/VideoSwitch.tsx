@@ -13,7 +13,7 @@ class VideoSwitch extends React.Component {
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 1)}>Blank Screen</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 4)}>Blank Screen</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 0)}>Sponsor Screen</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
@@ -21,6 +21,19 @@ class VideoSwitch extends React.Component {
           </Card>
           <Card fluid={true} color={getTheme().secondary}>
             <Card.Content className="card-header"><h3>Match Play</h3></Card.Content>
+            <Card.Content>
+              <Grid columns="equal">
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 1)}>Match Preview</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 2)}>Match Play</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 3)}>Match Results</Button></Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 5)}>Match Timer</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 6)}>Rankings</Button></Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Card.Content>
           </Card>
         </Card.Group>
       </Tab.Pane>

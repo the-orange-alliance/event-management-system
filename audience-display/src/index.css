@@ -11,3 +11,9 @@ body {
   overflow: hidden;
   background-color: #ff00b5;
 }
+
+.flag-border {
+    background-color: #000000;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}

@@ -32,7 +32,7 @@ class App extends React.Component<IProps, IState> {
       event: new Event(),
       teams: [],
       loading: true,
-      videoID: 1,
+      videoID: 6,
       activeMatch: new Match()
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {

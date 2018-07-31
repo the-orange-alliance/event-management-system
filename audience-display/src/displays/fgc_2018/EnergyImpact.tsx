@@ -4,6 +4,7 @@ import SponsorScreen from "./sponsor/SponsorScreen";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";
 import MatchPlayScreen from "./match-play/MatchPlayScreen";
+import RankingsScreen from "./rankings/RankingsScreen";
 
 import "./EnergyImpact.css";
 import Team from "../../shared/models/Team";
@@ -39,6 +40,12 @@ class EnergyImpact extends React.Component<IProps> {
         break;
       case 4:
         view = <span/>; // Blank screen
+        break;
+      case 5:
+        view = <RankingsScreen/>;
+        break;
+      case 6:
+        view = <RankingsScreen/>;
         break;
       default:
         view = <SponsorScreen/>;

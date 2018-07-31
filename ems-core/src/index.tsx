@@ -58,6 +58,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
     });
 
     // The microservices aren't 100% ready when the application loads, so we give it some time here.
+    const time = process.env.NODE_ENV === "production" ? 2000 : 0;
     setTimeout(() => {
       console.log("Preloaded application state.");
       ipcRenderer.send("preload-finish");
@@ -67,7 +68,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
         </Provider>,
         document.getElementById('root') as HTMLElement
       );
-    }, 0); // For development, get rid of this, BUT production NEEDS this delay!
+    }, time);
   }).catch((error: AppError) => {
     console.log(error);
     const applicationStore = createStore(reducers);

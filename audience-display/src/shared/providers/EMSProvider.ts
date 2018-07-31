@@ -76,6 +76,10 @@ class EMSProvider {
   public getMatchDetails(matchKey: string): Promise<AxiosResponse> {
     return this.get("api/match/" + matchKey + "/details");
   }
+
+  public getRankingTeams(): Promise<AxiosResponse> {
+    return this.get("api/ranking/teams");
+  }
 }
 
 export default EMSProvider.getInstance();

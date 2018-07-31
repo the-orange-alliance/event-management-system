@@ -14,6 +14,14 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+router.get("/teams", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllFromJoinOrderBy("ranking", "team", "team_key", "\"ranking\".rank").then((rows: any) => {
+    res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  })
+});
+
 router.get("/calculate/:tournament_level", (req: Request, res: Response, next: NextFunction) => {
   if (!req.query.type) {
     next(Errors.MISSING_QUERY("type"));

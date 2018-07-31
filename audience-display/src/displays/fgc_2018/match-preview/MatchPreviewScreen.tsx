@@ -7,6 +7,7 @@ import BLUE_FLAG from "../res/Blue_Team_Tag.png";
 import Match from "../../../shared/models/Match";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import Team from "../../../shared/models/Team";
+import Ranking from "../../../shared/models/Ranking";
 
 interface IProps {
   match: Match,
@@ -14,7 +15,8 @@ interface IProps {
 
 interface IState {
   match: Match,
-  teams: Team[]
+  teams: Team[],
+  ranks: Ranking[]
 }
 
 class MatchPreviewScreen extends React.Component<IProps, IState> {
@@ -22,18 +24,19 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       match: this.getUpdatedMatchInfo(),
-      teams: this.getUpdatedTeamInfo()
+      teams: this.getUpdatedTeamInfo(),
+      ranks: this.getUpdatedRankInfo()
     };
   }
 
   public componentDidUpdate(prevProps: IProps) {
     if (prevProps.match.matchKey !== this.props.match.matchKey) {
-      this.setState({match: this.getUpdatedMatchInfo(), teams: this.getUpdatedTeamInfo()});
+      this.setState({match: this.getUpdatedMatchInfo(), teams: this.getUpdatedTeamInfo(), ranks: this.getUpdatedRankInfo()});
     }
   }
 
   public render() {
-    const {match, teams} = this.state;
+    const {match, teams, ranks} = this.state;
     return (
       <div id="fgc-body">
         <div id="fgc-container">
@@ -64,17 +67,17 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
             </div>
             <div className="pre-match-alliance-right">
               <div className="pre-match-alliance-row pre-match-border">
-                <div className="pre-match-rank">#0</div>
+                <div className="pre-match-rank">#{ranks[0].rank}</div>
                 <div className="pre-match-team">{teams[0].teamNameShort}</div>
                 <div className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[0].countryCode}/></div>
               </div>
               <div className="pre-match-alliance-row pre-match-border">
-                <div className="pre-match-rank">#0</div>
+                <div className="pre-match-rank">#{ranks[1].rank}</div>
                 <div className="pre-match-team">{teams[1].teamNameShort}</div>
                 <div className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[1].countryCode}/></div>
               </div>
               <div className="pre-match-alliance-row">
-                <div className="pre-match-rank">#0</div>
+                <div className="pre-match-rank">#{ranks[2].rank}</div>
                 <div className="pre-match-team">{teams[2].teamNameShort}</div>
                 <div className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
               </div>
@@ -86,17 +89,17 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
             </div>
             <div className="pre-match-alliance-right">
               <div className="pre-match-alliance-row pre-match-border">
-                <span className="pre-match-rank">#0</span>
+                <span className="pre-match-rank">#{ranks[3].rank}</span>
                 <span className="pre-match-team">{teams[3].teamNameShort}</span>
                 <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></span>
               </div>
               <div className="pre-match-alliance-row pre-match-border">
-                <span className="pre-match-rank">#0</span>
+                <span className="pre-match-rank">#{ranks[4].rank}</span>
                 <span className="pre-match-team">{teams[4].teamNameShort}</span>
                 <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></span>
               </div>
               <div className="pre-match-alliance-row">
-                <span className="pre-match-rank">#0</span>
+                <span className="pre-match-rank">#{ranks[5].rank}</span>
                 <span className="pre-match-team">{teams[5].teamNameShort}</span>
                 <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></span>
               </div>
@@ -143,6 +146,24 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
         teams.push(participant.team);
       }
       return teams;
+    }
+  }
+
+  private getUpdatedRankInfo(): Ranking[] {
+    if (typeof this.props.match.participants === "undefined") {
+      const ranks: Ranking[] = [];
+      for (let i = 0; i < 6; i++) {
+        ranks.push(new Ranking().fromJSON({
+          rank: 0
+        }));
+      }
+      return ranks;
+    } else {
+      const ranks: Ranking[] = [];
+      for (const participant of this.props.match.participants) {
+        ranks.push(participant.teamRank);
+      }
+      return ranks;
     }
   }
 }

@@ -187,6 +187,19 @@ class DatabaseManager {
     });
   }
 
+  public selectAllFromThreeJoinWhere(tableOne: string, tableTwo: string, tableThree: string, joinColumn: string, whereClause: string): Promise<any[]> {
+    return new Promise<any>((resolve, reject) => {
+      const query = `SELECT * FROM "${tableOne}", "${tableTwo}", "${tableThree}" WHERE "${tableOne}".${joinColumn}="${tableTwo}".${joinColumn} AND "${tableOne}".${joinColumn}="${tableThree}".${joinColumn} AND ${whereClause};"`;
+      this._db.all(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
+
   public selectAllFromJoinOrderBy(tableOne: string, tableTwo: string, joinColumn: string, orderByClause: string): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
       const query = `SELECT * FROM "${tableOne}", "${tableTwo}" WHERE "${tableOne}".${joinColumn}="${tableTwo}".${joinColumn} ORDER BY ${orderByClause};"`;

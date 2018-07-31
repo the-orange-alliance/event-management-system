@@ -41,9 +41,7 @@ interface IProps {
 }
 
 interface IState {
-  selectedLevel: TournamentLevels,
-  selectedMatch: string
-  selectedField: number,
+  selectedLevel: TournamentLevels
   configModalOpen: boolean
 }
 
@@ -52,8 +50,6 @@ class MatchPlay extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       selectedLevel: "Practice",
-      selectedMatch: "",
-      selectedField: 1,
       configModalOpen: false,
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
@@ -69,7 +65,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {selectedLevel, selectedMatch, selectedField} = this.state;
+    const {selectedLevel} = this.state;
     const {eventConfig, matchState, connected, matchDuration} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
@@ -94,8 +90,10 @@ class MatchPlay extends React.Component<IProps, IState> {
       };
     });
 
+    const activeMatch: Match = this.props.activeMatch === null ? new Match() : this.props.activeMatch;
+
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
-    const canPrestart = selectedMatch.length > 0 && selectedField > 0;
+    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
     const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
     const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
@@ -135,8 +133,8 @@ class MatchPlay extends React.Component<IProps, IState> {
                 <Grid columns={16}>
                   <Grid.Row>
                     <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
-                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={selectedMatch} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
-                    <Grid.Column computer={16} largeScreen={6} widescreen={4}><Form.Dropdown fluid={true} selection={true} value={selectedField} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={activeMatch.matchKey} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={6} widescreen={4}><Form.Dropdown fluid={true} selection={true} value={activeMatch.fieldNumber} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
                   </Grid.Row>
                   <Divider/>
                 </Grid>
@@ -159,12 +157,8 @@ class MatchPlay extends React.Component<IProps, IState> {
   private prestart() { // TODO - Emit field number that match is also prestarting on
     this.props.setNavigationDisabled(true);
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
-    const match: Match = new Match().fromJSON({
-      match_key: this.state.selectedMatch,
-      prestart_time: moment(),
-      active: 1
-    });
-    MatchFlowController.prestart(match).then(() => {
+    this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
+    MatchFlowController.prestart(this.props.activeMatch).then(() => {
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
       this.props.updateScores(new SocketMatch());
     }).catch((error: HttpError) => {
@@ -202,7 +196,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private commitScores() {
     const match: Match = new Match().fromJSON({
-      match_key: this.state.selectedMatch,
+      match_key: this.props.activeMatch.matchKey,
       red_score: this.props.scoreObj.redScore,
       blue_score: this.props.scoreObj.blueScore,
       red_min_pen: this.props.scoreObj.redMinPen,
@@ -211,13 +205,14 @@ class MatchPlay extends React.Component<IProps, IState> {
       blue_maj_pen: this.props.scoreObj.blueMajPen,
       tournament_level: this.props.activeMatch.tournamentLevel
     });
+    match.active = 0;
     match.matchDetails = this.props.scoreObj.toMatchDetails();
-    match.matchDetails.matchKey = this.state.selectedMatch;
-    match.matchDetails.matchDetailKey = this.state.selectedMatch + "D";
+    match.matchDetails.matchKey = this.props.activeMatch.matchKey;
+    match.matchDetails.matchDetailKey = this.props.activeMatch.matchKey + "D";
     match.participants = this.props.scoreObj.cardStatuses.map((status, index) => {
       return new MatchParticipant().fromJSON({
-        match_key: this.state.selectedMatch,
-        match_participant_key: this.state.selectedMatch + "-T" + (index + 1),
+        match_key: this.props.activeMatch.matchKey,
+        match_participant_key: this.props.activeMatch.matchKey + "-T" + (index + 1),
         card_status: status
       });
     });
@@ -251,14 +246,10 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.setActiveMatch(matches[0]);
       this.setState({
         selectedLevel: (props.value as TournamentLevels),
-        selectedMatch: matches[0].matchKey,
-        selectedField: matches[0].fieldNumber,
       });
     } else {
       this.setState({
-        selectedLevel: (props.value as TournamentLevels),
-        selectedMatch: "",
-        selectedField: -1,
+        selectedLevel: (props.value as TournamentLevels)
       });
     }
   }
@@ -267,10 +258,6 @@ class MatchPlay extends React.Component<IProps, IState> {
     for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
       if (match.matchKey === (props.value as string)) {
         this.props.setActiveMatch(match);
-        this.setState({
-          selectedMatch: match.matchKey,
-          selectedField: match.fieldNumber,
-        });
         break;
       }
     }
@@ -278,9 +265,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private changeSelectedField(event: SyntheticEvent, props: DropdownProps) {
     this.props.activeMatch.fieldNumber = props.value as number;
-    this.setState({
-      selectedField: (props.value as number),
-    });
+    this.forceUpdate();
   }
 }
 

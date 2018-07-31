@@ -1,4 +1,5 @@
 import Team from "./Team";
+import Ranking from "./Ranking";
 
 export default class MatchParticipant implements IPostableObject {
   private _matchParticipantKey: string;
@@ -12,6 +13,7 @@ export default class MatchParticipant implements IPostableObject {
 
   // Every match participant is a team. In the audience display, we link these two together.
   private _team: Team;
+  private _teamRank: Ranking;
 
   constructor() {
     this._matchParticipantKey = "";
@@ -48,6 +50,7 @@ export default class MatchParticipant implements IPostableObject {
     participant.surrogate = json.surrogated === 1;
     participant.noShow = json.no_show === 1;
     participant.team = new Team().fromJSON(json);
+    participant.teamRank = new Ranking().fromJSON(json);
     return participant;
   }
 
@@ -121,5 +124,13 @@ export default class MatchParticipant implements IPostableObject {
 
   set team(value: Team) {
     this._team = value;
+  }
+
+  get teamRank(): Ranking {
+    return this._teamRank;
+  }
+
+  set teamRank(value: Ranking) {
+    this._teamRank = value;
   }
 }

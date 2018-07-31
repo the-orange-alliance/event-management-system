@@ -32,7 +32,7 @@ class App extends React.Component<IProps, IState> {
       event: new Event(),
       teams: [],
       loading: true,
-      videoID: 6,
+      videoID: 1,
       activeMatch: new Match()
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
@@ -58,7 +58,7 @@ class App extends React.Component<IProps, IState> {
     });
     SocketProvider.on("prestart", (matchKey: string) => {
       EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
-        EMSProvider.getMatchTeams(matchKey).then((partRes: AxiosResponse) => {
+        EMSProvider.getMatchTeamRanks(matchKey).then((partRes: AxiosResponse) => {
           if (matchRes.data && partRes.data) {
             const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
             match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
@@ -73,15 +73,17 @@ class App extends React.Component<IProps, IState> {
     SocketProvider.on("commit-scores", (matchKey: string) => {
       EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
         EMSProvider.getMatchDetails(matchKey).then((detailRes: AxiosResponse) => {
-          if (matchRes.data && detailRes.data) {
-            const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-            match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
-            match.participants = this.state.activeMatch.participants;
-            this.setState({
-              activeMatch: match,
-              videoID: 3 // Universal Match Results Screen
-            });
-          }
+          EMSProvider.getMatchTeamRanks(matchKey).then((teamRes: AxiosResponse) => {
+            if (matchRes.data && detailRes.data && teamRes.data) {
+              const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
+              match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
+              match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
+              this.setState({
+                activeMatch: match,
+                videoID: 3 // Universal Match Results Screen
+              });
+            }
+          }).catch((teamRes: any) => console.error(teamRes));
         }).catch((detailsRes: any) => console.error(detailsRes));
       }).catch((matchRes: any) => console.error(matchRes));
     });

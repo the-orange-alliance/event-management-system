@@ -59,6 +59,14 @@ router.get("/:match_key/teams", (req: Request, res: Response, next: NextFunction
   });
 });
 
+router.get("/:match_key/teamranks", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllFromThreeJoinWhere("match_participant", "team", "ranking", "team_key", "\"match_participant\".match_key=\"" + req.params.match_key + "\"").then((rows: any[]) => {
+    res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   DatabaseManager.insertValues("match", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " matches in the database.");

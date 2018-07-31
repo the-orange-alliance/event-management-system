@@ -9,6 +9,7 @@ import Match from "../../../shared/models/Match";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import Team from "../../../shared/models/Team";
 import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
+import Ranking from "../../../shared/models/Ranking";
 
 interface IProps {
   match: Match,
@@ -16,7 +17,8 @@ interface IProps {
 
 interface IState {
   match: Match,
-  teams: Team[]
+  teams: Team[],
+  ranks: Ranking[]
 }
 
 class MatchResultsScreen extends React.Component<IProps, IState> {
@@ -24,18 +26,19 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       match: this.getUpdatedMatchInfo(),
-      teams: this.getUpdatedTeamInfo()
+      teams: this.getUpdatedTeamInfo(),
+      ranks: this.getUpdatedRankInfo()
     };
   }
 
   public componentDidUpdate(prevProps: IProps) {
     if (prevProps.match.matchKey !== this.props.match.matchKey) {
-      this.setState({match: this.getUpdatedMatchInfo(), teams: this.getUpdatedTeamInfo()});
+      this.setState({match: this.getUpdatedMatchInfo(), teams: this.getUpdatedTeamInfo(), ranks: this.getUpdatedRankInfo()});
     }
   }
 
   public render() {
-    const {match, teams} = this.state;
+    const {match, teams, ranks} = this.state;
 
     let details = match.matchDetails as EnergyImpactMatchDetails;
     if (typeof details === "undefined") {
@@ -86,17 +89,17 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                 <div className="res-card-teams">
                   <div className="res-team-row bottom-red">
                     <div className="res-team-name">{teams[0].teamNameShort}</div>
-                    <div className="res-team-rank">#0</div>
+                    <div className="res-team-rank">#{ranks[0].rank}</div>
                     <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[0].countryCode}/></div>
                   </div>
                   <div className="res-team-row bottom-red">
                     <div className="res-team-name">{teams[1].teamNameShort}</div>
-                    <div className="res-team-rank">#0</div>
+                    <div className="res-team-rank">#{ranks[1].rank}</div>
                     <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[1].countryCode}/></div>
                   </div>
                   <div className="res-team-row">
                     <div className="res-team-name">{teams[2].teamNameShort}</div>
-                    <div className="res-team-rank">#0</div>
+                    <div className="res-team-rank">#{ranks[2].rank}</div>
                     <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
                   </div>
                 </div>
@@ -148,17 +151,17 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                 <div className="res-card-teams">
                   <div className="res-team-row bottom-blue">
                     <div className="res-team-name">{teams[3].teamNameShort}</div>
-                    <div className="res-team-rank">#0</div>
+                    <div className="res-team-rank">#{ranks[3].rank}</div>
                     <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
                   </div>
                   <div className="res-team-row bottom-blue">
                     <div className="res-team-name">{teams[4].teamNameShort}</div>
-                    <div className="res-team-rank">#0</div>
+                    <div className="res-team-rank">#{ranks[4].rank}</div>
                     <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></div>
                   </div>
                   <div className="res-team-row">
                     <div className="res-team-name">{teams[5].teamNameShort}</div>
-                    <div className="res-team-rank">#0</div>
+                    <div className="res-team-rank">#{ranks[5].rank}</div>
                     <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></div>
                   </div>
                 </div>
@@ -244,6 +247,24 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
         teams.push(participant.team);
       }
       return teams;
+    }
+  }
+
+  private getUpdatedRankInfo(): Ranking[] {
+    if (typeof this.props.match.participants === "undefined") {
+      const ranks: Ranking[] = [];
+      for (let i = 0; i < 6; i++) {
+        ranks.push(new Ranking().fromJSON({
+          rank: 0
+        }));
+      }
+      return ranks;
+    } else {
+      const ranks: Ranking[] = [];
+      for (const participant of this.props.match.participants) {
+        ranks.push(participant.teamRank);
+      }
+      return ranks;
     }
   }
 }

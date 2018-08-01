@@ -1,13 +1,33 @@
-import {SET_ACTIVE_MATCH, SET_MATCH_DURATION, SET_MATCH_STATE, UPDATE_SCORING_OBJECT} from "./constants";
+import {
+  SET_ACTIVE_DETAILS,
+  SET_ACTIVE_MATCH, SET_ACTIVE_PARTICIPANTS,
+  SET_MATCH_DURATION,
+  SET_MATCH_STATE, UPDATE_PARTICIPANT_STATUS,
+} from "./constants";
 import Match from "../../shared/models/Match";
 import {MatchState} from "../../shared/models/MatchState";
 import * as moment from "moment";
-import SocketMatch from "../../shared/models/scoring/SocketMatch";
+import MatchParticipant from "../../shared/models/MatchParticipant";
+import MatchDetails from "../../shared/models/MatchDetails";
 
 export interface ISetActiveMatch {
   type: SET_ACTIVE_MATCH,
   payload: {
     activeMatch: Match
+  }
+}
+
+export interface ISetActiveParticipants {
+  type: SET_ACTIVE_PARTICIPANTS,
+  payload: {
+    participants: MatchParticipant[]
+  }
+}
+
+export interface ISetActiveDetails {
+  type: SET_ACTIVE_DETAILS,
+  payload: {
+    details: MatchDetails
   }
 }
 
@@ -25,11 +45,13 @@ export interface ISetMatchDuration {
   }
 }
 
-export interface IUpdateScoringObject {
-  type: UPDATE_SCORING_OBJECT,
+export interface IUpdateParticipantStatus {
+  type: UPDATE_PARTICIPANT_STATUS,
   payload: {
-    scoreObj: SocketMatch
+    index: number,
+    status: number
   }
 }
 
-export type ScoringActions = ISetActiveMatch | ISetMatchState | ISetMatchDuration | IUpdateScoringObject;
+export type ScoringActions = ISetActiveMatch | ISetMatchState | ISetMatchDuration | ISetActiveParticipants |
+  ISetActiveDetails | IUpdateParticipantStatus;

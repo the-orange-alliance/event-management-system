@@ -1,3 +1,5 @@
+import {TeamIdentifier} from "../AppTypes";
+
 export default class Team implements IPostableObject {
   private _teamKey: number;
   private _participantKey: string;
@@ -19,6 +21,19 @@ export default class Team implements IPostableObject {
     this.stateProv = "";
     this.country = "";
     this.countryCode = "";
+  }
+
+  public getFromIdentifier(identifier: TeamIdentifier) {
+    switch (identifier) {
+      case "country":
+        return this.country;
+      case "team_key":
+        return this.teamKey;
+      case "team_name_short":
+        return this.teamNameShort;
+      default:
+        return this.teamKey;
+    }
   }
 
   public toJSON(): object {

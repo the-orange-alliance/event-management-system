@@ -7,6 +7,7 @@ import {EMSEventTypes} from "../../../shared/AppTypes";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
 import MatchDetails from "../../../shared/models/MatchDetails";
+import Team from "../../../shared/models/Team";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -29,6 +30,18 @@ class MatchFlowController {
   public prestart(match: Match): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.makeActiveMatch(match).then(() => {
+        // Reset all of the scoring variables to show a new match is about to start...
+        // TODO - Maybe store this match, and if prestart is canceled, restore that match.
+        match.redScore = 0;
+        match.redMinPen = 0;
+        match.redMajPen = 0;
+        match.blueScore = 0;
+        match.blueMinPen = 0;
+        match.blueMajPen = 0;
+        match.matchDetails = this.getDetailsFromSeasonKey(match.matchKey.split("-")[0]);
+        for (const participant of match.participants) {
+          participant.cardStatus = 0;
+        }
         SocketProvider.send("prestart", match.matchKey);
         resolve();
       }).catch((error: HttpError) => {
@@ -90,6 +103,9 @@ class MatchFlowController {
         const match: Match = new Match().fromJSON(values[0].data.payload[0]);
         match.matchDetails = this.getDetailsFromSeasonKey(match.matchKey.split("-")[0]).fromJSON(values[1].data.payload[0]);
         match.participants = values[2].data.payload.map((json: any) => new MatchParticipant().fromJSON(json));
+        for (let i = 0; i < match.participants.length; i++) {
+          match.participants[i].team = new Team().fromJSON(values[2].data.payload[i]);
+        }
         resolve(match);
       }).catch((error: any) => {
         reject(error);
@@ -178,6 +194,8 @@ class MatchFlowController {
   }
 
   private postMatchResults(match: Match): Promise<any> {
+    match.matchDetails.matchKey = match.matchKey;
+    match.matchDetails.matchDetailKey = match.matchDetailKey;
     const promises: Array<Promise<any>> = [];
     promises.push(EMSProvider.putMatchResult(match));
     promises.push(EMSProvider.putMatchDetails(match.matchDetails));

@@ -9,9 +9,14 @@ import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
 import MatchConfiguration from "../../../shared/models/MatchConfiguration";
 import MatchPlayTimerConfiguration from "../../../components/MatchPlayTimerConfiguration";
 import {MatchState} from "../../../shared/models/MatchState";
-import {ISetActiveMatch, ISetMatchState, IUpdateScoringObject} from "../../../stores/scoring/types";
+import {
+  ISetActiveDetails,
+  ISetActiveMatch,
+  ISetActiveParticipants,
+  ISetMatchState
+} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {setActiveMatch, setMatchState, updateScoringObject} from "../../../stores/scoring/actions";
+import {setActiveDetails, setActiveMatch, setActiveParticipants, setMatchState} from "../../../stores/scoring/actions";
 import MatchFlowController from "../controllers/MatchFlowController";
 import * as moment from "moment";
 import HttpError from "../../../shared/models/HttpError";
@@ -23,9 +28,11 @@ import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 import SocketMatch from "../../../shared/models/scoring/SocketMatch";
 import EnergyImpactDetails from "../../../shared/models/scoring/EnergyImpactDetails";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
+import MatchDetails from "../../../shared/models/MatchDetails";
 
 interface IProps {
-  activeMatch: Match,
+  activeMatch?: Match,
+  activeParticipants?: MatchParticipant[]
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
   matchState?: MatchState,
@@ -33,11 +40,11 @@ interface IProps {
   qualificationMatches: Match[],
   connected: boolean,
   matchDuration?: moment.Duration,
-  scoreObj: SocketMatch,
   setMatchState?: (matchState: MatchState) => ISetMatchState,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
-  updateScores?: (scoreObj: SocketMatch) => IUpdateScoringObject,
-  setActiveMatch?: (match: Match) => ISetActiveMatch
+  setActiveMatch?: (match: Match) => ISetActiveMatch,
+  setActiveParticipants?: (participants: MatchParticipant[]) => ISetActiveParticipants,
+  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails
 }
 
 interface IState {
@@ -91,7 +98,6 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
 
     const activeMatch: Match = this.props.activeMatch === null ? new Match() : this.props.activeMatch;
-
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
     const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
@@ -160,7 +166,6 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
     MatchFlowController.prestart(this.props.activeMatch).then(() => {
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
-      this.props.updateScores(new SocketMatch());
     }).catch((error: HttpError) => {
       this.props.setMatchState(MatchState.PRESTART_READY);
       DialogManager.showErrorBox(error);
@@ -179,10 +184,30 @@ class MatchPlay extends React.Component<IProps, IState> {
       SocketProvider.off("score-update");
     });
     SocketProvider.on("score-update", (scoreObj: any) => {
-      this.props.updateScores(new SocketMatch().fromJSON(scoreObj, new EnergyImpactDetails()));
+      // TODO - This looks better. However, the scoreObj should eventually be coming through as an actual Match object.
+      const sckMatch: SocketMatch = new SocketMatch().fromJSON(scoreObj, new EnergyImpactDetails());
+      this.props.activeMatch.redScore = sckMatch.redScore;
+      this.props.activeMatch.redMinPen = sckMatch.redMinPen;
+      this.props.activeMatch.redMajPen = sckMatch.redMajPen;
+      this.props.activeMatch.blueScore = sckMatch.blueScore;
+      this.props.activeMatch.blueMinPen = sckMatch.blueMinPen;
+      this.props.activeMatch.blueMajPen = sckMatch.blueMajPen;
+      for (let i = 0; i < this.props.activeMatch.participants.length; i++) {
+        this.props.activeMatch.participants[i].cardStatus = sckMatch.cardStatuses[i];
+      }
+      // Since everything is 'technically' pass-by-reference, updating activeMatch from activeMatch doesn't do anything.
+      // Essentially, we are creating a different object with the same properties to properly update the scorecards.
+      const match: Match = new Match().fromJSON(this.props.activeMatch.toJSON());
+      match.matchDetails = sckMatch.toMatchDetails();
+      match.participants = this.props.activeMatch.participants;
+      this.props.setActiveMatch(match);
+      this.props.setActiveParticipants(match.participants);
+      this.props.setActiveDetails(match.matchDetails);
     });
     MatchFlowController.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);
+      this.props.setActiveMatch(this.props.activeMatch);
+      this.forceUpdate();
     });
   }
 
@@ -195,31 +220,12 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private commitScores() {
-    const match: Match = new Match().fromJSON({
-      match_key: this.props.activeMatch.matchKey,
-      red_score: this.props.scoreObj.redScore,
-      blue_score: this.props.scoreObj.blueScore,
-      red_min_pen: this.props.scoreObj.redMinPen,
-      red_maj_pen: this.props.scoreObj.redMajPen,
-      blue_min_pen: this.props.scoreObj.blueMinPen,
-      blue_maj_pen: this.props.scoreObj.blueMajPen,
-      tournament_level: this.props.activeMatch.tournamentLevel
-    });
-    match.active = 0;
-    match.matchDetails = this.props.scoreObj.toMatchDetails();
-    match.matchDetails.matchKey = this.props.activeMatch.matchKey;
-    match.matchDetails.matchDetailKey = this.props.activeMatch.matchKey + "D";
-    match.participants = this.props.scoreObj.cardStatuses.map((status, index) => {
-      return new MatchParticipant().fromJSON({
-        match_key: this.props.activeMatch.matchKey,
-        match_participant_key: this.props.activeMatch.matchKey + "-T" + (index + 1),
-        card_status: status
-      });
-    });
-    MatchFlowController.commitScores(match, this.props.eventConfig.eventType).then(() => {
+    // Make sure all of our 'active' objects are on the same page.
+    console.log(this.props.activeParticipants);
+    this.props.activeMatch.participants = this.props.activeParticipants;
+    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig.eventType).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
-      this.props.updateScores(new SocketMatch());
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
     });
@@ -261,6 +267,8 @@ class MatchPlay extends React.Component<IProps, IState> {
         // Temporarily set the match to what we have now, and then get ALL the details.
         MatchFlowController.getMatchResults(match.matchKey).then((data: Match) => {
           this.props.setActiveMatch(data);
+          this.props.setActiveParticipants(data.participants);
+          this.props.setActiveDetails(data.matchDetails);
         });
         break;
       }
@@ -276,14 +284,14 @@ class MatchPlay extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState, scoringState}: IApplicationState) {
   return {
     activeMatch: scoringState.activeMatch,
+    activeParticipants: scoringState.activeParticipants,
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,
     matchState: scoringState.matchState,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,
     connected: internalState.socketConnected,
-    matchDuration: scoringState.matchDuration,
-    scoreObj: scoringState.scoreObj
+    matchDuration: scoringState.matchDuration
   };
 }
 
@@ -291,8 +299,9 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setMatchState: (matchState: MatchState) => dispatch(setMatchState(matchState)),
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
-    updateScores: (scoreObj: SocketMatch) => dispatch(updateScoringObject(scoreObj)),
-    setActiveMatch: (match: Match) => dispatch(setActiveMatch(match))
+    setActiveMatch: (match: Match) => dispatch(setActiveMatch(match)),
+    setActiveParticipants: (participants: MatchParticipant[]) => dispatch(setActiveParticipants(participants)),
+    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
   };
 }
 

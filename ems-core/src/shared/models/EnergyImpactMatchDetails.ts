@@ -89,7 +89,7 @@ export default class EnergyImpactMatchDetails extends MatchDetails implements IP
       blue_reactor_powerline: this.blueNuclearReactorPowerlineOn ? 1 : 0,
       blue_combustion_powerline: this.blueCombustionPowerlineOn ? 1 : 0,
       blue_wind_turbine_cranked: this.blueWindTurbineCranked ? 1 : 0,
-      reactor_cubes: this.sharedNuclearReactorCubes
+      reactor_cubes: this.sharedNuclearReactorCubes || 0
     };
   }
 

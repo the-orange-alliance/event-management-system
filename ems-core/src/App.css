@@ -76,6 +76,15 @@
     color: #ffffff !important;
 }
 
+.no-margin {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.details, .details > .row > .column > .field > label, .details > .row > .column > .field > .checkbox > label {
+    color: #ffffff !important;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

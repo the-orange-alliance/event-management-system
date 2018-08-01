@@ -46,7 +46,6 @@ export default class MatchParticipant implements IPostableObject {
     participant.cardStatus = json.card_status;
     participant.surrogate = json.surrogated === 1;
     participant.noShow = json.no_show === 1;
-    participant.team = new Team().fromJSON(json);
     return participant;
   }
 

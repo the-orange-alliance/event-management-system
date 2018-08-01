@@ -1,15 +1,40 @@
 import {ActionCreator} from "redux";
-import {ISetActiveMatch, ISetMatchDuration, ISetMatchState, IUpdateScoringObject} from "./types";
+import {
+  ISetActiveDetails,
+  ISetActiveMatch, ISetActiveParticipants,
+  ISetMatchDuration,
+  ISetMatchState, IUpdateParticipantStatus,
+} from "./types";
 import Match from "../../shared/models/Match";
-import {SET_ACTIVE_MATCH, SET_MATCH_DURATION, SET_MATCH_STATE, UPDATE_SCORING_OBJECT} from "./constants";
+import {
+  SET_ACTIVE_DETAILS,
+  SET_ACTIVE_MATCH, SET_ACTIVE_PARTICIPANTS,
+  SET_MATCH_DURATION,
+  SET_MATCH_STATE, UPDATE_PARTICIPANT_STATUS
+} from "./constants";
 import {MatchState} from "../../shared/models/MatchState";
 import * as moment from "moment";
-import SocketMatch from "../../shared/models/scoring/SocketMatch";
+import MatchParticipant from "../../shared/models/MatchParticipant";
+import MatchDetails from "../../shared/models/MatchDetails";
 
 export const setActiveMatch: ActionCreator<ISetActiveMatch> = (activeMatch: Match) => ({
   type: SET_ACTIVE_MATCH,
   payload: {
     activeMatch: activeMatch
+  }
+});
+
+export const setActiveParticipants: ActionCreator<ISetActiveParticipants> = (participants: MatchParticipant[]) => ({
+  type: SET_ACTIVE_PARTICIPANTS,
+  payload: {
+    participants: participants
+  }
+});
+
+export const setActiveDetails: ActionCreator<ISetActiveDetails> = (details: MatchDetails) => ({
+  type: SET_ACTIVE_DETAILS,
+  payload: {
+    details: details
   }
 });
 
@@ -27,9 +52,10 @@ export const setMatchDuration: ActionCreator<ISetMatchDuration> = (duration: mom
   }
 });
 
-export const updateScoringObject: ActionCreator<IUpdateScoringObject> = (scoreObj: SocketMatch) => ({
-  type: UPDATE_SCORING_OBJECT,
+export const updateParticipantStatus: ActionCreator<IUpdateParticipantStatus> = (index: number, status: number) => ({
+  type: UPDATE_PARTICIPANT_STATUS,
   payload: {
-    scoreObj: scoreObj
+    index: index,
+    status: status
   }
 });

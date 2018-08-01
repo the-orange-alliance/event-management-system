@@ -1,6 +1,7 @@
 import * as React from "react";
 import {AllianceColors, EMSEventTypes} from "../shared/AppTypes";
-import EnergyImpactScorecard from "./game-specifics/EnergyImpactScorecard";
+import EnergyImpactRedScorecard from "./game-specifics/EnergyImpactRedScorecard";
+import EnergyImpactBlueScorecard from "./game-specifics/EnergyImpactBlueScorecard";
 
 interface IProps {
   type: EMSEventTypes,
@@ -17,7 +18,11 @@ class GameSpecificScorecard extends React.Component<IProps> {
     let display;
     switch (type) {
       case "fgc_2018":
-        display = <EnergyImpactScorecard alliance={alliance}/>;
+        if (alliance === "Red") {
+          display = <EnergyImpactRedScorecard/>;
+        } else {
+          display = <EnergyImpactBlueScorecard/>
+        }
         break;
       default:
         display = <span>Some default scorecard eventually.</span>;

@@ -1,3 +1,5 @@
+import Team from "./Team";
+
 export default class MatchParticipant implements IPostableObject {
   private _matchParticipantKey: string;
   private _matchKey: string;
@@ -7,6 +9,8 @@ export default class MatchParticipant implements IPostableObject {
   private _cardStatus: number;
   private _surrogate: boolean;
   private _noShow: boolean;
+
+  private _team: Team;
 
   constructor() {
     this._matchParticipantKey = "";
@@ -42,6 +46,7 @@ export default class MatchParticipant implements IPostableObject {
     participant.cardStatus = json.card_status;
     participant.surrogate = json.surrogated === 1;
     participant.noShow = json.no_show === 1;
+    participant.team = new Team().fromJSON(json);
     return participant;
   }
 
@@ -107,5 +112,13 @@ export default class MatchParticipant implements IPostableObject {
 
   set noShow(value: boolean) {
     this._noShow = value;
+  }
+
+  get team(): Team {
+    return this._team;
+  }
+
+  set team(value: Team) {
+    this._team = value;
   }
 }

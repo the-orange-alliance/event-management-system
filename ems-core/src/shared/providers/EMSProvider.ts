@@ -7,6 +7,7 @@ import ScheduleItem from "../models/ScheduleItem";
 import Match from "../models/Match";
 import MatchParticipant from "../models/MatchParticipant";
 import Ranking from "../models/Ranking";
+import MatchDetails from "../models/MatchDetails";
 
 const PORT = process.env.REACT_APP_EMS_API_PORT;
 
@@ -156,6 +157,18 @@ class EMSProvider {
     return this.get("api/ranking");
   }
 
+  public getMatch(matchKey: string): Promise<AxiosResponse> {
+    return this.get("api/match/" + matchKey);
+  }
+
+  public getMatchDetails(matchKey: string): Promise<AxiosResponse> {
+    return this.get("api/match/" + matchKey + "/details");
+  }
+
+  public getMatchParticipantTeams(matchKey: string): Promise<AxiosResponse> {
+    return this.get("api/match/" + matchKey + "/teams");
+  }
+
   public calculateRankings(tournamentLevel: number, eventType: EMSEventTypes): Promise<AxiosResponse> {
     return this.get("api/ranking/calculate/" + tournamentLevel + "?type=" + eventType)
   }
@@ -200,7 +213,7 @@ class EMSProvider {
     return this.put("api/match/" + match.matchKey + "/results", match);
   }
 
-  public putMatchDetails(details: IMatchDetails): Promise<AxiosResponse> {
+  public putMatchDetails(details: MatchDetails): Promise<AxiosResponse> {
     return this.put("api/match/" + details.matchKey + "/details", details);
   }
 

@@ -258,6 +258,10 @@ class MatchPlay extends React.Component<IProps, IState> {
     for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
       if (match.matchKey === (props.value as string)) {
         this.props.setActiveMatch(match);
+        // Temporarily set the match to what we have now, and then get ALL the details.
+        MatchFlowController.getMatchResults(match.matchKey).then((data: Match) => {
+          this.props.setActiveMatch(data);
+        });
         break;
       }
     }

@@ -1,3 +1,5 @@
-interface IMatchDetailsAdapter {
-  toMatchDetails(): IMatchDetails
+import MatchDetails from "../MatchDetails";
+
+export default interface IMatchDetailsAdapter {
+  toMatchDetails(): MatchDetails
 }

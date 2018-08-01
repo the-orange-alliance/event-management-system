@@ -1,6 +1,6 @@
-export default class EnergyImpactMatchDetails implements IMatchDetails, IPostableObject {
-  public matchDetailKey: string;
-  public matchKey: string;
+import MatchDetails from "./MatchDetails";
+
+export default class EnergyImpactMatchDetails extends MatchDetails implements IPostableObject {
   private _redSolarPanelOwnerships: number[];
   private _redWindTurbineOwnership: number;
   private _redNuclearReactorOwnership: number;
@@ -28,6 +28,8 @@ export default class EnergyImpactMatchDetails implements IMatchDetails, IPostabl
   private _sharedNuclearReactorCubes: number;
 
   constructor() {
+    super();
+
     this._redSolarPanelOwnerships = [0, 0, 0, 0, 0];
     this._redWindTurbineOwnership = 0;
     this._redNuclearReactorOwnership = 0;
@@ -93,6 +95,8 @@ export default class EnergyImpactMatchDetails implements IMatchDetails, IPostabl
 
   public fromJSON(json: any): EnergyImpactMatchDetails {
     const details: EnergyImpactMatchDetails = new EnergyImpactMatchDetails();
+    details.matchKey = json.match_key;
+    details.matchDetailKey = json.match_detail_key;
     details.redSolarPanelOwnerships = [json.red_solar_panel_one_ownership, json.red_solar_panel_two_ownership, json.red_solar_panel_three_ownership, json.red_solar_panel_four_ownership, json.red_solar_panel_five_ownership];
     details.redWindTurbineOwnership = json.red_wind_turbine_ownership;
     details.redNuclearReactorOwnership = json.red_nuclear_reactor_ownership;

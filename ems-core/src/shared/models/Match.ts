@@ -1,5 +1,6 @@
 import * as moment from "moment";
 import MatchParticipant from "./MatchParticipant";
+import MatchDetails from "./MatchDetails";
 
 export default class Match implements IPostableObject {
   private _matchKey: string;
@@ -21,7 +22,7 @@ export default class Match implements IPostableObject {
   private _uploaded: boolean;
 
   // This item is separate, and not recorded directly in the 'Match' table.
-  private _matchDetails: IMatchDetails;
+  private _matchDetails: MatchDetails;
   private _participants: MatchParticipant[];
 
   constructor() {
@@ -214,11 +215,11 @@ export default class Match implements IPostableObject {
     this._uploaded = value;
   }
 
-  get matchDetails(): IMatchDetails {
+  get matchDetails(): MatchDetails {
     return this._matchDetails;
   }
 
-  set matchDetails(value: IMatchDetails) {
+  set matchDetails(value: MatchDetails) {
     this._matchDetails = value;
   }
 

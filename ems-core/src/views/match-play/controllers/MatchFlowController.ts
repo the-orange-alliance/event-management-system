@@ -4,6 +4,9 @@ import EMSProvider from "../../../shared/providers/EMSProvider";
 import HttpError from "../../../shared/models/HttpError";
 import SocketProvider from "../../../shared/providers/SocketProvider";
 import {EMSEventTypes} from "../../../shared/AppTypes";
+import MatchParticipant from "../../../shared/models/MatchParticipant";
+import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
+import MatchDetails from "../../../shared/models/MatchDetails";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -71,6 +74,23 @@ class MatchFlowController {
           SocketProvider.send("commit-scores", match.matchKey);
           resolve();
         }
+      }).catch((error: any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getMatchResults(matchKey: string): Promise<Match> {
+    return new Promise<Match>((resolve, reject) => {
+      const promises: Array<Promise<any>> = [];
+      promises.push(EMSProvider.getMatch(matchKey));
+      promises.push(EMSProvider.getMatchDetails(matchKey));
+      promises.push(EMSProvider.getMatchParticipantTeams(matchKey));
+      Promise.all(promises).then((values: any[]) => {
+        const match: Match = new Match().fromJSON(values[0].data.payload[0]);
+        match.matchDetails = this.getDetailsFromSeasonKey(match.matchKey.split("-")[0]).fromJSON(values[1].data.payload[0]);
+        match.participants = values[2].data.payload.map((json: any) => new MatchParticipant().fromJSON(json));
+        resolve(match);
       }).catch((error: any) => {
         reject(error);
       });
@@ -163,6 +183,15 @@ class MatchFlowController {
     promises.push(EMSProvider.putMatchDetails(match.matchDetails));
     promises.push(EMSProvider.putMatchParticipants(match.participants));
     return Promise.all(promises);
+  }
+
+  private getDetailsFromSeasonKey(seasonKey: string): MatchDetails {
+    switch (seasonKey) {
+      case "2018":
+        return new EnergyImpactMatchDetails();
+      default:
+        return new EnergyImpactMatchDetails();
+    }
   }
 }
 

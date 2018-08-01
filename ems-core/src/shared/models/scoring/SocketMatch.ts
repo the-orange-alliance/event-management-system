@@ -1,17 +1,19 @@
 import EnergyImpactDetails from "./EnergyImpactDetails";
 import EnergyImpactMatchDetails from "../EnergyImpactMatchDetails";
+import IMatchDetailsAdapter from "./IMatchDetailsAdapter";
+import MatchDetails from "../MatchDetails";
 
-export type MatchDetails = EnergyImpactDetails;
+export type SocketMatchDetails = EnergyImpactDetails;
 
 export default class SocketMatch implements IPostableObject, IMatchDetailsAdapter {
   private _redScore: number;
   private _redMinPen: number;
   private _redMajPen: number;
-  private _redDetails: MatchDetails;
+  private _redDetails: SocketMatchDetails;
   private _blueScore: number;
   private _blueMinPen: number;
   private _blueMajPen: number;
-  private _blueDetails: MatchDetails;
+  private _blueDetails: SocketMatchDetails;
   private _cardStatuses: number[];
   private _shared: any;
 
@@ -28,7 +30,7 @@ export default class SocketMatch implements IPostableObject, IMatchDetailsAdapte
     this._shared = {};
   }
 
-  public toMatchDetails(): IMatchDetails {
+  public toMatchDetails(): MatchDetails {
     if (this.redDetails instanceof EnergyImpactDetails && this.blueDetails instanceof EnergyImpactDetails) {
       const details: EnergyImpactMatchDetails = new EnergyImpactMatchDetails();
       details.redSolarPanelOwnerships = this.redDetails.solarPanelPoints;
@@ -79,7 +81,7 @@ export default class SocketMatch implements IPostableObject, IMatchDetailsAdapte
     };
   }
 
-  public fromJSON(json: any, details?: MatchDetails): SocketMatch {
+  public fromJSON(json: any, details?: SocketMatchDetails): SocketMatch {
     const match: SocketMatch = new SocketMatch();
     match.redScore = json.red.score;
     match.redMinPen = json.red.minPen;
@@ -118,11 +120,11 @@ export default class SocketMatch implements IPostableObject, IMatchDetailsAdapte
     this._redMajPen = value;
   }
 
-  get redDetails(): MatchDetails {
+  get redDetails(): SocketMatchDetails {
     return this._redDetails;
   }
 
-  set redDetails(value: MatchDetails) {
+  set redDetails(value: SocketMatchDetails) {
     this._redDetails = value;
   }
 
@@ -150,11 +152,11 @@ export default class SocketMatch implements IPostableObject, IMatchDetailsAdapte
     this._blueMajPen = value;
   }
 
-  get blueDetails(): MatchDetails {
+  get blueDetails(): SocketMatchDetails {
     return this._blueDetails;
   }
 
-  set blueDetails(value: MatchDetails) {
+  set blueDetails(value: SocketMatchDetails) {
     this._blueDetails = value;
   }
 

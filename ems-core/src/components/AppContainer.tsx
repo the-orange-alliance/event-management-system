@@ -24,7 +24,7 @@ class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeItem: "About"
+      activeItems: "Event Manager"
     };
   }
 

@@ -21,6 +21,14 @@ export default class MatchDetails implements IPostableObject {
     return details;
   }
 
+  public getRedScore(minPen: number, majPen: number): number {
+    return 0;
+  }
+
+  public getBlueScore(minPen: number, majPen: number): number {
+    return 0;
+  }
+
   get matchKey(): string {
     return this._matchKey;
   }

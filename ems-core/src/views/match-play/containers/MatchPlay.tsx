@@ -32,6 +32,7 @@ import MatchDetails from "../../../shared/models/MatchDetails";
 
 interface IProps {
   activeMatch?: Match,
+  activeDetails?: MatchDetails,
   activeParticipants?: MatchParticipant[]
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
@@ -165,6 +166,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
     MatchFlowController.prestart(this.props.activeMatch).then(() => {
+      this.props.setActiveDetails(this.props.activeMatch.matchDetails);
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
     }).catch((error: HttpError) => {
       this.props.setMatchState(MatchState.PRESTART_READY);
@@ -221,7 +223,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private commitScores() {
     // Make sure all of our 'active' objects are on the same page.
-    console.log(this.props.activeParticipants);
+    this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
     MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig.eventType).then(() => {
       this.props.setNavigationDisabled(false);
@@ -284,6 +286,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState, scoringState}: IApplicationState) {
   return {
     activeMatch: scoringState.activeMatch,
+    activeDetails: scoringState.activeDetails,
     activeParticipants: scoringState.activeParticipants,
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,

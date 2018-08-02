@@ -134,7 +134,7 @@ export default class EnergyImpactMatchDetails extends MatchDetails implements IP
     score += this.blueCombustionPowerlineOn ? (this.blueHighCombustionGoals * 20) : 0;
     score += this.blueRobotsParked === 3 ? 50 : this.blueRobotsParked * 15;
     score += this.redDidCoopertition && this.blueDidCoopertition ? 100 : 0;
-    score += minPen * 30;
+    score += (minPen * 30);
     return score;
   }
 
@@ -143,12 +143,13 @@ export default class EnergyImpactMatchDetails extends MatchDetails implements IP
     for (const solarPanelPoints of this.redSolarPanelOwnerships) {
       score += solarPanelPoints;
     }
+    score += this.redWindTurbineOwnership;
     score += (this.redNuclearReactorOwnership * 3);
     score += this.redCombustionPowerlineOn ? (this.redLowCombustionGoals * 5) : 0;
     score += this.redCombustionPowerlineOn ? (this.redHighCombustionGoals * 20) : 0;
     score += this.redRobotsParked === 3 ? 50 : this.redRobotsParked * 15;
     score += this.redDidCoopertition && this.blueDidCoopertition ? 100 : 0;
-    score += minPen * 30;
+    score += (minPen * 30);
     return score;
   }
 

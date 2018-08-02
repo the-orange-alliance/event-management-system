@@ -54,6 +54,12 @@ body {
     padding: 2px;
 }
 
+.step-view-inner-table {
+    height: 68vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .tab-subview {
   width: 100%;
   max-height: 70vh;
@@ -128,6 +134,9 @@ body {
   .tab-subview {
     max-height: 75vh !important;
   }
+  .step-view-inner-table {
+    height: 80vh;
+  }
 }
 
 /* The following media queries are essentially for HD monitors. */
@@ -143,6 +152,9 @@ body {
   }
   .tab-subview {
     max-height: 80vh !important;
+  }
+  .step-view-inner-table {
+    height: 68vh;
   }
 }
 

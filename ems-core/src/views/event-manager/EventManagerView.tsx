@@ -11,6 +11,7 @@ import {incrementCompletedStep} from "../../stores/internal/actions";
 import {IIncrementCompletedStep} from "../../stores/internal/types";
 import EventQualificationSetup from "./containers/EventQualificationSetup";
 import EventFinalsSetup from "./containers/EventFinalsSetup";
+import EventAllianceSelection from "./containers/EventAllianceSelection";
 
 interface IProps {
   completedStep?: number,
@@ -138,6 +139,8 @@ class EventManagerView extends React.Component<IProps, IState> {
         return <EventPracticeSetup onComplete={this.completeStep.bind(this, 3)}/>;
       case 4:
         return <EventQualificationSetup onComplete={this.completeStep.bind(this, 4)}/>;
+      case 5:
+        return <EventAllianceSelection onComplete={this.completeStep.bind(this, 5)}/>;
       case 6:
         return this.props.eventConfig.postQualConfig === "finals" ? <EventFinalsSetup onComplete={this.completeStep.bind(this, 6)}/> : <span>Meep</span>;
       default:

@@ -83,7 +83,7 @@ class DataSyncConfig extends React.Component<IProps, IState> {
     )
   }
 
-  private purgeLocal() {
+  private purgeLocal() { // TODO - Flush out the redux state as well.
     this.props.setNavigationDisabled(true);
     EMSProvider.deleteEvent().then(() => {
       this.props.setCompletedStep(0);

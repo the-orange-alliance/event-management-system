@@ -53,6 +53,13 @@ const postRankings = [
   "rank"
 ];
 
+const postAlliance = [
+  "alliance_key",
+  "alliance_rank",
+  "team_key",
+  "is_captain"
+];
+
 const putActiveMatch = ["match_key", "active"];
 const putMatchScores = ["match_key", "red_score", "blue_score"];
 const putMatchDetails = ["match_detail_key"];
@@ -67,6 +74,7 @@ postRoutes.set("schedule", postSchedule);
 postRoutes.set("match", postMatch);
 postRoutes.set("match/participants", postMatchParticipants);
 postRoutes.set("ranking", postRankings);
+postRoutes.set("alliance", postAlliance);
 
 putRoutes.set("match", putActiveMatch);
 putRoutes.set("match/results", putMatchScores);

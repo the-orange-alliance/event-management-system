@@ -91,6 +91,19 @@ class DatabaseManager {
     });
   }
 
+  public selectAllOrderBy(table: string, orderByClause: string): Promise<any[]> {
+    return new Promise<any[]>((resolve, reject) => {
+      const query: string = "SELECT * FROM \"" + table + "\" ORDER BY " + orderByClause + ";";
+      this._db.all(query, (error: any, rows: any[]) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
+
   public deleteAllWhere(table: string, whereClause: string): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
       const query: string = "DELETE FROM \"" + table + "\" WHERE " + whereClause + ";";

@@ -8,6 +8,7 @@ import ScheduleItem from "../../../shared/models/ScheduleItem";
 import Match from "../../../shared/models/Match";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import Ranking from "../../../shared/models/Ranking";
+import AllianceMember from "../../../shared/models/AllianceMember";
 
 class EventPostingController {
   private static _instance: EventPostingController;
@@ -167,6 +168,28 @@ class EventPostingController {
           resolve();
         }).catch((postError: HttpError) => {
           reject(postError);
+        });
+      });
+    });
+  }
+
+  public postAlliances(members: AllianceMember[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.getAlliances().then((allianceResponse: AxiosResponse) => {
+        if (allianceResponse.data && allianceResponse.data.payload && allianceResponse.data.payload.length > 0) {
+          resolve();
+        } else {
+          EMSProvider.postAllianceMembers(members).then(() => {
+            resolve();
+          }).catch((error: HttpError) => {
+            reject(error);
+          });
+        }
+      }).catch(() => {
+        EMSProvider.postAllianceMembers(members).then(() => {
+          resolve();
+        }).catch((error: HttpError) => {
+          reject(error);
         });
       });
     });

@@ -7,7 +7,7 @@ import EnergyImpactRanker from "../shared/scoring/EnergyImpactRanker";
 const router: Router = Router();
 
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  DatabaseManager.selectAll("ranking").then((rows: any[]) => {
+  DatabaseManager.selectAllOrderBy("ranking", "\"ranking\".rank").then((rows: any[]) => {
     res.send({payload: rows});
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));

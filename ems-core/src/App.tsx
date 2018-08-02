@@ -120,6 +120,11 @@ class App extends React.Component<IProps> {
                     this.props.setCompletedStep(6);
                   }
                 });
+                EMSProvider.getAlliances().then((allianceResponse: AxiosResponse) => {
+                  if (allianceResponse.data && allianceResponse.data.payload && allianceResponse.data.payload.length > 0) {
+                    this.props.setCompletedStep(5);
+                  }
+                });
               }
             });
           }

@@ -9,6 +9,7 @@ export default class MatchParticipant implements IPostableObject {
   private _cardStatus: number;
   private _surrogate: boolean;
   private _noShow: boolean;
+  private _allianceKey: string;
 
   private _team: Team;
 
@@ -21,6 +22,7 @@ export default class MatchParticipant implements IPostableObject {
     this._cardStatus = 0;
     this._surrogate = false;
     this._noShow = false;
+    this._allianceKey = "";
   }
 
   public toJSON(): object {
@@ -32,7 +34,8 @@ export default class MatchParticipant implements IPostableObject {
       disqualified: this.disqualified ? 1 : 0,
       card_status: this.cardStatus,
       surrogate: this.surrogate ? 1 : 0,
-      no_show: this.noShow ? 1 : 0
+      no_show: this.noShow ? 1 : 0,
+      alliance_key: this._allianceKey
     };
   }
 
@@ -46,6 +49,7 @@ export default class MatchParticipant implements IPostableObject {
     participant.cardStatus = json.card_status;
     participant.surrogate = json.surrogated === 1;
     participant.noShow = json.no_show === 1;
+    participant.allianceKey = json.alliance_key;
     return participant;
   }
 
@@ -119,5 +123,13 @@ export default class MatchParticipant implements IPostableObject {
 
   set team(value: Team) {
     this._team = value;
+  }
+
+  get allianceKey(): string {
+    return this._allianceKey;
+  }
+
+  set allianceKey(value: string) {
+    this._allianceKey = value;
   }
 }

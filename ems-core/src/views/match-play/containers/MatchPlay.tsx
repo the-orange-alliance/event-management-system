@@ -140,9 +140,9 @@ class MatchPlay extends React.Component<IProps, IState> {
               <Form>
                 <Grid columns={16}>
                   <Grid.Row>
-                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
-                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown fluid={true} selection={true} value={activeMatch.matchKey} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
-                    <Grid.Column computer={16} largeScreen={6} widescreen={4}><Form.Dropdown fluid={true} selection={true} value={activeMatch.fieldNumber} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown disabled={hasPrestarted} fluid={true} selection={true} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={8} widescreen={6}><Form.Dropdown disabled={hasPrestarted} fluid={true} selection={true} value={activeMatch.matchKey} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
+                    <Grid.Column computer={16} largeScreen={6} widescreen={4}><Form.Dropdown disabled={hasPrestarted} fluid={true} selection={true} value={activeMatch.fieldNumber} options={availableFields} onChange={this.changeSelectedField} label="Field"/></Grid.Column>
                   </Grid.Row>
                   <Divider/>
                 </Grid>
@@ -166,6 +166,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(true);
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
+    console.log("Prestarting match " + this.props.activeMatch.matchKey + "...");
     MatchFlowController.prestart(this.props.activeMatch).then(() => {
       this.props.setActiveDetails(this.props.activeMatch.matchDetails);
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);

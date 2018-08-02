@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS "match_participant" (
     card_status INT,
     surrogate INT,
     no_show INT,
+    alliance_key VARCHAR(25),
     FOREIGN KEY (match_key) REFERENCES "match"(match_key),
     FOREIGN KEY (team_key) REFERENCES "team"(team_key)
 );

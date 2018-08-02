@@ -13,4 +13,5 @@ export interface IConfigState {
   masterHost: string,
   practiceSchedule: Schedule,
   qualificationSchedule: Schedule
+  finalsSchedule: Schedule
 }

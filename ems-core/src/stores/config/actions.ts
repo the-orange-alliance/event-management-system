@@ -1,7 +1,7 @@
 import {ActionCreator} from "redux";
 import {
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
+  SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID,
@@ -9,7 +9,7 @@ import {
 } from "./constants";
 import {
   ISetEvent,
-  ISetEventConfiguration, ISetMasterHost, ISetMatchConfig,
+  ISetEventConfiguration, ISetFinalsSchedule, ISetMasterHost, ISetMatchConfig,
   ISetNetworkHost,
   ISetPracticeSchedule,
   ISetQualificationSchedule, ISetSlaveID,
@@ -57,6 +57,13 @@ export const setPracticeSchedule: ActionCreator<ISetPracticeSchedule> = (schedul
 
 export const setQualificationSchedule: ActionCreator<ISetQualificationSchedule> = (schedule: Schedule) => ({
   type: SET_QUALIFICATION_SCHEDULE,
+  payload: {
+    schedule: schedule
+  }
+});
+
+export const setFinalsSchedule: ActionCreator<ISetFinalsSchedule> = (schedule: Schedule) => ({
+  type: SET_FINALS_SCHEDULE,
   payload: {
     schedule: schedule
   }

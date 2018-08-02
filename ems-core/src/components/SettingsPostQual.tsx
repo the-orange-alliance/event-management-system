@@ -15,11 +15,15 @@ import ConfirmActionModal from "./ConfirmActionModal";
 import {CONFIG_STORE} from "../shared/AppStore";
 import AppError from "../shared/models/AppError";
 import DialogManager from "../shared/managers/DialogManager";
+import {IIncrementCompletedStep} from "../stores/internal/types";
+import {incrementCompletedStep} from "../stores/internal/actions";
 
 interface IProps {
   eventConfig?: EventConfiguration,
   setEventConfig?: (eventConfig: EventConfiguration) => ISetEventConfiguration,
-  teamList: Team[]
+  completedStep?: number,
+  teamList?: Team[],
+  setCompletedStep?: (step: number) => IIncrementCompletedStep
 }
 
 interface IState {
@@ -128,7 +132,11 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     this.closeConfirmModal();
     this.props.setEventConfig(this.state.configCopy);
     CONFIG_STORE.set("eventConfig", this.state.configCopy.toJSON()).then((data: any) => {
-      console.log(data);
+      if (this.state.configCopy.postQualConfig === "finals" && this.props.completedStep === 4) {
+        this.props.setCompletedStep(5);
+      } else if (this.state.configCopy.postQualConfig === "elims" && this.props.completedStep !== 4) {
+        this.props.setCompletedStep(4);
+      }
     }).catch((error: AppError) => {
       DialogManager.showErrorBox(error);
     });
@@ -139,13 +147,15 @@ class SettingsPostQual extends React.Component<IProps, IState> {
 function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
+    completedStep: internalState.completedStep,
     teamList: internalState.teamList
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    setEventConfig: (eventConfig: EventConfiguration) => (dispatch(setEventConfiguration(eventConfig)))
+    setEventConfig: (eventConfig: EventConfiguration) => (dispatch(setEventConfiguration(eventConfig))),
+    setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step))
   };
 }
 

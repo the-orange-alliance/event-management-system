@@ -89,7 +89,7 @@ function getTournamentLevelFromType(type) {
     case "Qualification":
       return 1;
     case "Finals":
-      return 2;
+      return 6;
     default:
       return 0;
   }

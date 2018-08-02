@@ -10,5 +10,6 @@ export interface IInternalState {
   teamList: Team[],
   practiceMatches: Match[],
   qualificationMatches: Match[],
+  finalsMatches: Match[],
   socketConnected: boolean
 }

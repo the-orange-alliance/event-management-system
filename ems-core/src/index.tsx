@@ -46,6 +46,9 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       if (typeof configStore.schedule.Qualification !== "undefined") {
         configState.qualificationSchedule = configState.qualificationSchedule.fromJSON(configStore.schedule.Qualification);
       }
+      if (typeof configStore.schedule.Finals !== "undefined") {
+        configState.finalsSchedule = configState.finalsSchedule.fromJSON(configStore.schedule.Finals);
+      }
     }
 
     if (typeof configStore.matchConfig !== "undefined") {
@@ -58,7 +61,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
     });
 
     // The microservices aren't 100% ready when the application loads, so we give it some time here.
-    const time = process.env.NODE_ENV === "production" ? 2000 : 0;
+    const time = process.env.NODE_ENV === "production" ? 4000 : 0;
     setTimeout(() => {
       console.log("Preloaded application state.");
       ipcRenderer.send("preload-finish");

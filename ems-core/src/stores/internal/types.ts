@@ -8,7 +8,7 @@ import {
   ADD_TEAM,
   ALTER_TEAM,
   REMOVE_TEAM,
-  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES, SET_SOCKET_CONNECTED
+  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES, SET_SOCKET_CONNECTED, SET_FINALS_MATCHES
 } from "./constants";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
@@ -85,6 +85,13 @@ export interface ISetQualificationMatches extends Action {
   }
 }
 
+export interface ISetFinalsMatches extends Action {
+  type: SET_FINALS_MATCHES,
+  payload: {
+    matches: Match[]
+  }
+}
+
 export interface ISetSocketConnected extends Action {
   type: SET_SOCKET_CONNECTED,
   payload: {
@@ -94,4 +101,4 @@ export interface ISetSocketConnected extends Action {
 
 export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation |
   IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetPracticeMatches |
-  ISetQualificationMatches | ISetSocketConnected;
+  ISetFinalsMatches | ISetQualificationMatches | ISetSocketConnected;

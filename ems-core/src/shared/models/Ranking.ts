@@ -1,9 +1,13 @@
+import Team from "./Team";
+
 export default class Ranking implements IPostableObject {
   private _rankKey: string;
   private _teamKey: number;
   private _rank: number;
   private _rankChange: number;
   private _played: number;
+
+  private _team: Team;
 
   constructor() {
     this._rankKey = "";
@@ -71,5 +75,13 @@ export default class Ranking implements IPostableObject {
 
   set played(value: number) {
     this._played = value;
+  }
+
+  get team(): Team {
+    return this._team;
+  }
+
+  set team(value: Team) {
+    this._team = value;
   }
 }

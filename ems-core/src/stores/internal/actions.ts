@@ -8,14 +8,21 @@ import {
   ADD_TEAM,
   ALTER_TEAM,
   REMOVE_TEAM,
-  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES, SET_SOCKET_CONNECTED
+  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES, SET_SOCKET_CONNECTED, SET_FINALS_MATCHES
 } from "./constants";
 import {
   IUpdateProcessList,
   IDisableNavigation,
   IIncrementCompletedStep,
   ISetProcessActionsDisabled,
-  IUpdateTeamList, IAddTeam, IAlterTeam, IRemoveTeam, ISetPracticeMatches, ISetQualificationMatches, ISetSocketConnected
+  IUpdateTeamList,
+  IAddTeam,
+  IAlterTeam,
+  IRemoveTeam,
+  ISetPracticeMatches,
+  ISetQualificationMatches,
+  ISetSocketConnected,
+  ISetFinalsMatches
 } from "./types";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
@@ -87,6 +94,13 @@ export const setPracticeMatches: ActionCreator<ISetPracticeMatches> = (matches: 
 
 export const setQualificationMatches: ActionCreator<ISetQualificationMatches> = (matches: Match[]) => ({
   type: SET_QUALIFICATION_MATCHES,
+  payload: {
+    matches: matches
+  }
+});
+
+export const setFinalsMatches: ActionCreator<ISetFinalsMatches> = (matches: Match[]) => ({
+  type: SET_FINALS_MATCHES,
   payload: {
     matches: matches
   }

@@ -23,7 +23,8 @@ export const initialState: IConfigState = {
   networkHost: undefined,
   masterHost: undefined,
   practiceSchedule: new Schedule("Practice"),
-  qualificationSchedule: new Schedule("Qualification")
+  qualificationSchedule: new Schedule("Qualification"),
+  finalsSchedule: new Schedule("Finals")
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {

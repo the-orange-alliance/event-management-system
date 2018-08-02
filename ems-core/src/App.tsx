@@ -3,14 +3,14 @@ import './App.css';
 import AppContainer from "./components/AppContainer";
 import {ApplicationActions, IApplicationState} from "./stores";
 import {
-  IIncrementCompletedStep,
+  IIncrementCompletedStep, ISetFinalsMatches,
   ISetPracticeMatches, ISetQualificationMatches, ISetSocketConnected,
   IUpdateTeamList
 } from "./stores/internal/types";
 import {Dispatch} from "redux";
 import {connect} from "react-redux";
 import {
-  incrementCompletedStep,
+  incrementCompletedStep, setFinalsMatches,
   setPracticeMatches,
   setQualificationMatches, setSocketConnected,
   updateTeamList
@@ -28,6 +28,7 @@ interface IProps {
   setTeamList?: (teams: Team[]) => IUpdateTeamList,
   setPracticeMatches?: (matches: Match[]) => ISetPracticeMatches,
   setQualificationMatches?: (matches: Match[]) => ISetQualificationMatches,
+  setFinalsMatches?: (matches: Match[]) => ISetFinalsMatches,
   setSocketConnected?: (connected: boolean) => ISetSocketConnected
 }
 
@@ -97,6 +98,28 @@ class App extends React.Component<IProps> {
                 }
                 this.props.setQualificationMatches(qualMatches);
                 this.props.setCompletedStep(4);
+                EMSProvider.getMatches(6).then((finalsMatchesResponse: AxiosResponse) => {
+                  if (finalsMatchesResponse.data && finalsMatchesResponse.data.payload && finalsMatchesResponse.data.payload.length > 0) {
+                    const finalsMatches: Match[] = [];
+                    for (const matchJSON of finalsMatchesResponse.data.payload) {
+                      const match: Match = new Match().fromJSON(matchJSON);
+                      const participants: MatchParticipant[] = [];
+                      for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
+                        const participant: MatchParticipant = new MatchParticipant();
+                        participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
+                        participant.matchKey = match.matchKey;
+                        participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
+                        participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
+                        participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
+                        participants.push(participant);
+                      }
+                      match.participants = participants;
+                      finalsMatches.push(match);
+                    }
+                    this.props.setFinalsMatches(finalsMatches);
+                    this.props.setCompletedStep(6);
+                  }
+                });
               }
             });
           }
@@ -135,6 +158,7 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     setTeamList: (teams: Team[]) => dispatch(updateTeamList(teams)),
     setPracticeMatches: (matches: Match[]) => dispatch(setPracticeMatches(matches)),
     setQualificationMatches: (matches: Match[]) => dispatch(setQualificationMatches(matches)),
+    setFinalsMatches: (matches: Match[]) => dispatch(setFinalsMatches(matches)),
     setSocketConnected: (connected: boolean) => dispatch(setSocketConnected(connected))
   };
 }

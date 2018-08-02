@@ -21,9 +21,10 @@
     "build-webapps": "npm run build-audience && npm run build-ref && npm run build-core",
     "build-services": "npm run build-api && npm run build-sck && npm run build-web",
     "prebuild": "gulp prebuild:prod",
-    "build": "npm run build-services && npm run build-core",
+    "build": "npm run build-services && npm run build-webapps",
     "postbuild": "gulp postbuild",
     "start:prod": "electron build/ems/public/desktop/electron.js",
+    "predist": "gulp predist",
     "dist": "build"
   },
   "dependencies": {

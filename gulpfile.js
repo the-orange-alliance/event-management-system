@@ -54,14 +54,14 @@ gulp.task("deploy-env", () => {
 });
 
 gulp.task("post-build", () => {
-	// gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
-	// gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
-	// gulp.src(["pit-display/build/**/*"]).pipe(gulp.dest("build/ems/public/pit-display"));
 	gulp.src(["ems-api/**/*", "!ems-api/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-api"));
 	gulp.src(["ems-web/**/*", "!ems-web/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
 	gulp.src(["ems-socket/**/*", "!ems-socket/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));
 	gulp.src(["ems-core/build/**/*"]).pipe(gulp.dest("build/ems/public/desktop"));
   gulp.src(["ems-core/main/**/*"]).pipe(gulp.dest("build/ems/public/desktop/main"));
+  gulp.src(["ems-core/match-maker/**/*"]).pipe(gulp.dest("build/ems/public/desktop/match-maker"));
+  gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
+  gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
 	gulp.src(["ecosystem.config.js"]).pipe(gulp.dest("build/ems/server/"));
 
 	gulp.src(["ems-core/.env"]).pipe(gulp.dest("build/ems/public/desktop"));
@@ -114,6 +114,10 @@ gulp.task("update-pkg", () => {
   fs.writeFileSync("build/ems/package.json", JSON.stringify(mainContents));
 });
 
+gulp.task("place-binary", () => {
+  gulp.src(["ems-api/node_modules/sqlite3/lib/binding/**/*"]).pipe(gulp.dest("build/ems/node_modules/sqlite3/lib/binding"));
+});
+
 /* .env tasks */
 gulp.task("update-env:prod", ["generate-env:prod", "deploy-env"]);
 gulp.task("update-env", ["generate-env", "deploy-env"]);
@@ -125,3 +129,6 @@ gulp.task("prebuild", ["generate-env", "deploy-env"]);
 
 /* Postbuild tasks */
 gulp.task("postbuild", ["clean-build", "post-build", "update-pkg"]);
+
+/* Predist tasks */
+gulp.task("predist", ["place-binary"]);

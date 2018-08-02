@@ -23,6 +23,7 @@ class EnergyImpactTeamStatus extends React.Component<IProps> {
     super(props);
   }
 
+  // TODO - What if there are more than 3 teams? Should be easy to implement. Check match tournament level.
   public render() {
     const teams = this.getTeams();
     const disabled = this.props.matchState === MatchState.MATCH_IN_PROGRESS;

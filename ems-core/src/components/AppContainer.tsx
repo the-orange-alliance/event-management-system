@@ -7,6 +7,8 @@ import {IApplicationState} from "../stores";
 import EventManagerView from "../views/event-manager/EventManagerView";
 import SettingsView from "../views/settings/SettingsView";
 import MatchPlayView from "../views/match-play/MatchPlayView";
+import MatchTestView from "../views/match-test/MatchTestView";
+import AboutView from "../views/about/AboutView";
 
 interface IProps {
   slaveMode?: boolean,
@@ -22,7 +24,7 @@ class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeItem: "Match Play"
+      activeItem: "About"
     };
   }
 
@@ -64,6 +66,10 @@ class AppContainer extends React.Component<IProps, IState> {
         return <SettingsView/>;
       case "Match Play":
         return <MatchPlayView/>;
+      case "Match Test":
+        return <MatchTestView/>;
+      case "About":
+        return <AboutView/>;
       default:
         return <span>View Not Found.</span>;
     }

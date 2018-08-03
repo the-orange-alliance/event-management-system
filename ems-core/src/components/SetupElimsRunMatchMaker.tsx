@@ -1,7 +1,6 @@
 import * as React from "react";
 import {Button, Card, Form, InputProps, Tab} from "semantic-ui-react";
 import {getTheme} from "../shared/AppTheme";
-import MatchMakerManager from "../shared/managers/MatchMakerManager";
 import {ApplicationActions, IApplicationState} from "../stores";
 import AppError from "../shared/models/AppError";
 import DialogManager from "../shared/managers/DialogManager";
@@ -17,6 +16,7 @@ import {AxiosResponse} from "axios";
 import EliminationsSchedule from "../shared/models/EliminationsSchedule";
 import AllianceMember from "../shared/models/AllianceMember";
 import {SyntheticEvent} from "react";
+import AllianceBracketManager from "../shared/managers/AllianceBracketManager";
 
 interface IProps {
   onComplete: (matches: Match[]) => void,
@@ -94,9 +94,9 @@ class SetupElimsRunMatchMaker extends React.Component<IProps, IState> {
 
   private runMatchMaker() {
     this.props.setNavigationDisabled(true);
-    MatchMakerManager.createBracket({
+    AllianceBracketManager.generateBracket({
       allianceCaptains: this.props.schedule.allianceCaptains,
-      format: "bo3",
+      format: this.props.schedule.eliminationsFormat,
       allianceMembers: this.props.allianceMembers,
       eventKey: this.props.event.eventKey,
       fields: this.state.fieldCount

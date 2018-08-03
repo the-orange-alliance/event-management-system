@@ -1,4 +1,4 @@
-import {EMSEventTypes, PostQualConfig, TeamIdentifier} from "../AppTypes";
+import {EliminationsFormats, EMSEventTypes, PostQualConfig, TeamIdentifier} from "../AppTypes";
 
 export default class EventConfiguration implements IPostableObject {
   private _eventType: EMSEventTypes;
@@ -11,9 +11,15 @@ export default class EventConfiguration implements IPostableObject {
   // Variables that are post-qual specific
   private _allianceCaptains: number;
   private _rankingCutoff: number;
+  private _elimsFormat: EliminationsFormats;
 
   // Variables that aren't necessary in standard mode
   private _fieldsControlled: number[];
+
+  constructor() {
+    this._elimsFormat = "bo3";
+  }
+
 
   public toJSON(): object {
     return {
@@ -25,7 +31,8 @@ export default class EventConfiguration implements IPostableObject {
       post_qual_teams_per_alliance: this.postQualTeamsPerAlliance,
       alliance_captains: this.allianceCaptains,
       ranking_cutoff: this.rankingCutoff,
-      fields_controlled: this.fieldsControlled
+      fields_controlled: this.fieldsControlled,
+      elims_format: this.elimsFormat
     };
   }
 
@@ -40,6 +47,7 @@ export default class EventConfiguration implements IPostableObject {
     config.allianceCaptains = json.alliance_captains;
     config.rankingCutoff = json.ranking_cutoff;
     config.fieldsControlled = json.fields_controlled;
+    config.elimsFormat = json.elims_format;
     return config;
   }
 
@@ -113,6 +121,14 @@ export default class EventConfiguration implements IPostableObject {
 
   set fieldsControlled(value: number[]) {
     this._fieldsControlled = value;
+  }
+
+  get elimsFormat(): EliminationsFormats {
+    return this._elimsFormat;
+  }
+
+  set elimsFormat(value: EliminationsFormats) {
+    this._elimsFormat = value;
   }
 }
 

@@ -271,6 +271,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
       CONFIG_STORE.set("schedule", schedule).then(() => {
         this.props.onComplete(this.props.schedule.generateSchedule(this.props.event));
       }).catch((err) => {
+        console.log(err);
         DialogManager.showErrorBox(err);
       });
     }).catch((err) => {

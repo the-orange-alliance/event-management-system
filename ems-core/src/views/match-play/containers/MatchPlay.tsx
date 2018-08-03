@@ -40,6 +40,7 @@ interface IProps {
   practiceMatches: Match[],
   qualificationMatches: Match[],
   finalsMatches: Match[],
+  elimsMatches: Match[],
   connected: boolean,
   matchDuration?: moment.Duration,
   setMatchState?: (matchState: MatchState) => ISetMatchState,
@@ -247,6 +248,8 @@ class MatchPlay extends React.Component<IProps, IState> {
         return this.props.qualificationMatches;
       case "Finals":
         return this.props.finalsMatches;
+      case "Eliminations":
+        return this.props.elimsMatches;
       default:
         return [];
     }
@@ -298,6 +301,7 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,
     finalsMatches: internalState.finalsMatches,
+    elimsMatches: internalState.eliminationsMatches,
     connected: internalState.socketConnected,
     matchDuration: scoringState.matchDuration
   };

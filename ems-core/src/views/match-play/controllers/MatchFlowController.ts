@@ -42,7 +42,7 @@ class MatchFlowController {
         for (const participant of match.participants) {
           participant.cardStatus = 0;
         }
-        SocketProvider.send("prestart", match.matchKey);
+        SocketProvider.sendTwo("prestart", match.matchKey, match.fieldNumber);
         resolve();
       }).catch((error: HttpError) => {
         reject(error);

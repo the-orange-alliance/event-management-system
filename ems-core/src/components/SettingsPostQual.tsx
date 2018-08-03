@@ -7,9 +7,9 @@ import {connect} from "react-redux";
 import {Dispatch} from "redux";
 import {ISetEventConfiguration} from "../stores/config/types";
 import {setEventConfiguration} from "../stores/config/actions";
-import {AllianceCaptainItems, PostQualItems} from "../shared/data/DropdownItemOptions";
+import {AllianceCaptainItems, EliminationsFormatItems, PostQualItems} from "../shared/data/DropdownItemOptions";
 import {SyntheticEvent} from "react";
-import {PostQualConfig} from "../shared/AppTypes";
+import {EliminationsFormats, PostQualConfig} from "../shared/AppTypes";
 import Team from "../shared/models/Team";
 import ConfirmActionModal from "./ConfirmActionModal";
 import {CONFIG_STORE} from "../shared/AppStore";
@@ -42,6 +42,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     this.closeConfirmModal = this.closeConfirmModal.bind(this);
     this.setPostQualConfig = this.setPostQualConfig.bind(this);
     this.setAllianceCaptainConfig = this.setAllianceCaptainConfig.bind(this);
+    this.setElimsFormatConfig = this.setElimsFormatConfig.bind(this);
     this.setRankingCutoffConfig = this.setRankingCutoffConfig.bind(this);
     this.updateConfig = this.updateConfig.bind(this);
   }
@@ -82,6 +83,13 @@ class SettingsPostQual extends React.Component<IProps, IState> {
               </Grid.Row>
             }
             {
+              this.state.configCopy.postQualConfig === "elims" &&
+              <Grid.Row>
+                <Grid.Column><span>Eliminations Format</span></Grid.Column>
+                <Grid.Column><Dropdown fluid={true} selection={true} value={this.state.configCopy.elimsFormat} options={EliminationsFormatItems} onChange={this.setElimsFormatConfig}/></Grid.Column>
+              </Grid.Row>
+            }
+            {
               this.state.configCopy.postQualConfig === "finals" &&
               <Grid.Row>
                 <Grid.Column><span>Ranking Cutoff</span></Grid.Column>
@@ -118,6 +126,12 @@ class SettingsPostQual extends React.Component<IProps, IState> {
       this.state.configCopy.allianceCaptains = parseInt(value, 10);
       this.forceUpdate();
     }
+  }
+
+  private setElimsFormatConfig(event: SyntheticEvent, props: DropdownProps) {
+    const value: string = props.value.toString();
+    this.state.configCopy.elimsFormat = value as EliminationsFormats;
+    this.forceUpdate();
   }
 
   private setRankingCutoffConfig(event: SyntheticEvent, props: DropdownProps) {

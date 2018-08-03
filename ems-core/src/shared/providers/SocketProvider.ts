@@ -33,6 +33,12 @@ class SocketProvider {
     }
   }
 
+  public sendTwo(event: string, arg: any, arg2: any): void {
+    if (typeof this._client !== "undefined") {
+      this._client.emit(event, arg, arg2);
+    }
+  }
+
   public on(event: string, listener: (...args: any[]) => any) {
     if (typeof this._client !== "undefined") {
       this._client.on(event, listener);

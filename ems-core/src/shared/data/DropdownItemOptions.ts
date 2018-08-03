@@ -7,7 +7,7 @@ export const PostQualItems = [
     text: "Finals",
     value: "finals"
   }
-];
+]; // TODO - Maybe round robin?
 
 export const AllianceCaptainItems = [
   {
@@ -17,6 +17,25 @@ export const AllianceCaptainItems = [
   {
     text: "8 (Quarterfinals)",
     value: 8
+  },
+  {
+    text: "16 (Octofinals)",
+    value: 16
+  }
+];
+
+export const EliminationsFormatItems = [
+  {
+    text: "Best of 1 (Bo1)",
+    value: "bo1"
+  },
+  {
+    text: "Best of 3 (Bo3)",
+    value: "bo3"
+  },
+  {
+    text: "Best of 5 (Bo5)",
+    value: "bo5"
   }
 ];
 

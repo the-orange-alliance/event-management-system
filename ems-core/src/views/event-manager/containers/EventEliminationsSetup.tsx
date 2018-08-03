@@ -40,6 +40,7 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
     };
     this.props.schedule.teamsPerAlliance = this.props.eventConfig.postQualTeamsPerAlliance;
     this.props.schedule.allianceCaptains = this.props.eventConfig.allianceCaptains;
+    this.props.schedule.eliminationsFormat = this.props.eventConfig.elimsFormat;
     this.onTabChange = this.onTabChange.bind(this);
     this.onParamsComplete = this.onParamsComplete.bind(this);
     this.onMatchMakerComplete = this.onMatchMakerComplete.bind(this);

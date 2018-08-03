@@ -49,6 +49,9 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       if (typeof configStore.schedule.Finals !== "undefined") {
         configState.finalsSchedule = configState.finalsSchedule.fromJSON(configStore.schedule.Finals);
       }
+      if (typeof configStore.schedule.Eliminations !== "undefined") {
+        configState.eliminationsSchedule = configState.eliminationsSchedule.fromJSON(configStore.schedule.Eliminations);
+      }
     }
 
     if (typeof configStore.matchConfig !== "undefined") {

@@ -1,5 +1,6 @@
 import {ActionCreator} from "redux";
 import {
+  SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
@@ -8,6 +9,7 @@ import {
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {
+  ISetEliminationsSchedule,
   ISetEvent,
   ISetEventConfiguration, ISetFinalsSchedule, ISetMasterHost, ISetMatchConfig,
   ISetNetworkHost,
@@ -19,6 +21,7 @@ import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
 import MatchConfiguration from "../../shared/models/MatchConfiguration";
+import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
 
 export const enableSlaveMode: ActionCreator<IToggleSlaveMode> = (slaveModeEnabled: boolean) => ({
   type: TOGGLE_SLAVE_MODE,
@@ -64,6 +67,13 @@ export const setQualificationSchedule: ActionCreator<ISetQualificationSchedule> 
 
 export const setFinalsSchedule: ActionCreator<ISetFinalsSchedule> = (schedule: Schedule) => ({
   type: SET_FINALS_SCHEDULE,
+  payload: {
+    schedule: schedule
+  }
+});
+
+export const setEliminationsSchedule: ActionCreator<ISetEliminationsSchedule> = (schedule: EliminationsSchedule) => ({
+  type: SET_ELIMINATIONS_SCHEDULE,
   payload: {
     schedule: schedule
   }

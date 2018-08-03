@@ -1,5 +1,6 @@
 import {Action} from "redux";
 import {
+  SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
@@ -11,6 +12,7 @@ import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
 import MatchConfiguration from "../../shared/models/MatchConfiguration";
+import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
 
 export interface IToggleSlaveMode extends Action {
   type: TOGGLE_SLAVE_MODE,
@@ -61,6 +63,13 @@ export interface ISetFinalsSchedule extends Action {
   }
 }
 
+export interface ISetEliminationsSchedule extends Action {
+  type: SET_ELIMINATIONS_SCHEDULE,
+  payload: {
+    schedule: EliminationsSchedule
+  }
+}
+
 export interface ISetMatchConfig extends Action {
   type: SET_MATCH_CONFIG,
   payload: {
@@ -83,5 +92,5 @@ export interface ISetSlaveID extends Action {
 }
 
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
-  ISetPracticeSchedule | ISetQualificationSchedule | ISetFinalsSchedule| ISetMatchConfig | ISetMasterHost |
-  ISetSlaveID;
+  ISetPracticeSchedule | ISetQualificationSchedule | ISetFinalsSchedule| ISetEliminationsSchedule |
+  ISetMatchConfig | ISetMasterHost | ISetSlaveID;

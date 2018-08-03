@@ -1,7 +1,8 @@
 import {Reducer} from "redux";
 import {
+  SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
+  SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID,
@@ -13,6 +14,7 @@ import * as EventConfig from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
 import MatchConfiguration from "../../shared/models/MatchConfiguration";
+import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
 
 export const initialState: IConfigState = {
   slaveModeEnabled: false,
@@ -24,7 +26,8 @@ export const initialState: IConfigState = {
   masterHost: undefined,
   practiceSchedule: new Schedule("Practice"),
   qualificationSchedule: new Schedule("Qualification"),
-  finalsSchedule: new Schedule("Finals")
+  finalsSchedule: new Schedule("Finals"),
+  eliminationsSchedule: new EliminationsSchedule()
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {
@@ -41,6 +44,10 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, practiceSchedule: action.payload.schedule};
     case SET_QUALIFICATION_SCHEDULE:
       return {...state, qualificationSchedule: action.payload.schedule};
+    case SET_FINALS_SCHEDULE:
+      return {...state, finalsSchedule: action.payload.schedule};
+    case SET_ELIMINATIONS_SCHEDULE:
+      return {...state, eliminationsSchedule: action.payload.schedule};
     case SET_MATCH_CONFIG:
       return {...state, matchConfig: action.payload.matchConfig};
     case SET_MASTER_HOST:

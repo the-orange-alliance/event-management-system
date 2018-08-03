@@ -74,7 +74,7 @@ class MatchFlowController {
   public commitScores(match: Match, eventType: EMSEventTypes): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.postMatchResults(match).then(() => {
-        if (match.tournamentLevel > 0) {
+        if (match.tournamentLevel > 0 && match.tournamentLevel < 10) {
           setTimeout(() => {
             EMSProvider.calculateRankings(match.tournamentLevel, eventType).then(() => {
               SocketProvider.send("commit-scores", match.matchKey);

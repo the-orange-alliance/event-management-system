@@ -2,6 +2,7 @@ import EventConfiguration from "../../shared/models/EventConfiguration";
 import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
 import MatchConfiguration from "../../shared/models/MatchConfiguration";
+import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
 
 export interface IConfigState {
   slaveModeEnabled: boolean,
@@ -14,4 +15,5 @@ export interface IConfigState {
   practiceSchedule: Schedule,
   qualificationSchedule: Schedule
   finalsSchedule: Schedule
+  eliminationsSchedule: EliminationsSchedule
 }

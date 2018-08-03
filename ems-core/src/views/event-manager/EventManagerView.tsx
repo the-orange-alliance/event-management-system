@@ -143,7 +143,10 @@ class EventManagerView extends React.Component<IProps, IState> {
       case 5:
         return <EventAllianceSelection onComplete={this.completeStep.bind(this, 5)}/>;
       case 6:
-        return this.props.eventConfig.postQualConfig === "finals" ? <EventFinalsSetup onComplete={this.completeStep.bind(this, 6)}/> : <EventEliminationsSetup/>;
+        return this.props.eventConfig.postQualConfig === "finals" ?
+          <EventFinalsSetup onComplete={this.completeStep.bind(this, 6)}/>
+          :
+          <EventEliminationsSetup onComplete={this.completeStep.bind(this, 6)}/>;
       default:
         return <span>View not found.</span>;
     }

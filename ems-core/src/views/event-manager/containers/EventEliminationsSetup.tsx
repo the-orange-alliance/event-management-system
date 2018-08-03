@@ -9,17 +9,23 @@ import ScheduleItem from "../../../shared/models/ScheduleItem";
 import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
-import {IDisableNavigation} from "../../../stores/internal/types";
+import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
-import {disableNavigation} from "../../../stores/internal/actions";
+import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
 import EliminationsSchedule from "../../../shared/models/EliminationsSchedule";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
+import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
+import Match from "../../../shared/models/Match";
+import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
 
 interface IProps {
+  onComplete: () => void,
   eventConfig?: EventConfiguration,
   navigationDisabled?: boolean,
   schedule?: EliminationsSchedule,
-  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
+  elimsMatches?: Match[],
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  setEliminationsMatches?: (matches: Match[]) => ISetEliminationsMatches
 }
 
 interface IState {
@@ -36,6 +42,8 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
     this.props.schedule.allianceCaptains = this.props.eventConfig.allianceCaptains;
     this.onTabChange = this.onTabChange.bind(this);
     this.onParamsComplete = this.onParamsComplete.bind(this);
+    this.onMatchMakerComplete = this.onMatchMakerComplete.bind(this);
+    this.onPublishSchedule = this.onPublishSchedule.bind(this);
   }
 
   public render() {
@@ -44,8 +52,8 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
           { menuItem: "Schedule Parameters", render: () => <SetupElimsScheduleParams onComplete={this.onParamsComplete} schedule={this.props.schedule}/>},
           { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Eliminations"}/>},
-          { menuItem: "Match Maker Parameters", render: () => <span/>},
-          { menuItem: "Match Schedule Overview", render: () => <span/>}
+          { menuItem: "Match Maker Parameters", render: () => <SetupElimsRunMatchMaker schedule={this.props.schedule} onComplete={this.onMatchMakerComplete}/>},
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Eliminations" matchList={this.props.elimsMatches} onComplete={this.onPublishSchedule}/>},
         ]}
         />
       </div>
@@ -68,19 +76,38 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
       DialogManager.showErrorBox(error);
     });
   }
+
+  private onMatchMakerComplete(matches: Match[]) {
+    this.props.setEliminationsMatches(matches);
+    this.setState({activeIndex: 3});
+  }
+
+  private onPublishSchedule() {
+    this.props.setNavigationDisabled(true);
+    EventPostingController.createElimsSchedule(this.props.elimsMatches).then(() => {
+      this.props.setNavigationDisabled(false);
+      this.props.onComplete();
+    }).catch((error: HttpError) => {
+      console.log(error);
+      this.props.setNavigationDisabled(false);
+      DialogManager.showErrorBox(error);
+    });
+  }
 }
 
 export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
     navigationDisabled: internalState.navigationDisabled,
     eventConfig: configState.eventConfiguration,
-    schedule: configState.eliminationsSchedule
+    schedule: configState.eliminationsSchedule,
+    elimsMatches: internalState.eliminationsMatches
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
+    setEliminationsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches))
   };
 }
 

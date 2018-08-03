@@ -150,7 +150,7 @@ class EMSProvider {
     return this.get("api/schedule/" + type);
   }
 
-  public getMatches(tournamentLevel: number): Promise<AxiosResponse> {
+  public getMatches(tournamentLevel: number | string): Promise<AxiosResponse> {
     return this.get("api/match?level=" + tournamentLevel);
   }
 

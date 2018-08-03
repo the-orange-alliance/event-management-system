@@ -49,7 +49,7 @@ export default class EliminationsSchedule extends Schedule {
       }
       start = 12;
     }
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 6; i++) {
       const series = i % 2 === 1 ? 2 : (i % 2) + 1;
       const match = Math.floor(i / 2) + 1;
       const matchStr = match === 3 ? "Tiebreaker" : `Match ${match}`;

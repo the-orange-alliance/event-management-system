@@ -3,14 +3,14 @@ import './App.css';
 import AppContainer from "./components/AppContainer";
 import {ApplicationActions, IApplicationState} from "./stores";
 import {
-  IIncrementCompletedStep, ISetFinalsMatches,
+  IIncrementCompletedStep, ISetAllianceMembers, ISetEliminationsMatches, ISetFinalsMatches,
   ISetPracticeMatches, ISetQualificationMatches, ISetSocketConnected,
   IUpdateTeamList
 } from "./stores/internal/types";
 import {Dispatch} from "redux";
 import {connect} from "react-redux";
 import {
-  incrementCompletedStep, setFinalsMatches,
+  incrementCompletedStep, setAllianceMembers, setEliminationsMatches, setFinalsMatches,
   setPracticeMatches,
   setQualificationMatches, setSocketConnected,
   updateTeamList
@@ -21,6 +21,7 @@ import {AxiosResponse} from "axios";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
 import SocketProvider from "./shared/providers/SocketProvider";
+import AllianceMember from "./shared/models/AllianceMember";
 
 interface IProps {
   networkHost: string,
@@ -29,6 +30,8 @@ interface IProps {
   setPracticeMatches?: (matches: Match[]) => ISetPracticeMatches,
   setQualificationMatches?: (matches: Match[]) => ISetQualificationMatches,
   setFinalsMatches?: (matches: Match[]) => ISetFinalsMatches,
+  setElimsMatches?: (matches: Match[]) => ISetEliminationsMatches,
+  setAllianceMembers?: (members: AllianceMember[]) => ISetAllianceMembers,
   setSocketConnected?: (connected: boolean) => ISetSocketConnected
 }
 
@@ -122,7 +125,35 @@ class App extends React.Component<IProps> {
                 });
                 EMSProvider.getAlliances().then((allianceResponse: AxiosResponse) => {
                   if (allianceResponse.data && allianceResponse.data.payload && allianceResponse.data.payload.length > 0) {
+                    const members: AllianceMember[] = [];
+                    for (const memberJSON of allianceResponse.data.payload) {
+                      members.push(new AllianceMember().fromJSON(memberJSON));
+                    }
+                    this.props.setAllianceMembers(members);
                     this.props.setCompletedStep(5);
+                    EMSProvider.getMatches("elims").then((elimsMatchesResposne: AxiosResponse) => {
+                      if (elimsMatchesResposne.data && elimsMatchesResposne.data.payload && elimsMatchesResposne.data.payload.length > 0) {
+                        const elimsMatches: Match[] = [];
+                        for (const matchJSON of elimsMatchesResposne.data.payload) {
+                          const match: Match = new Match().fromJSON(matchJSON);
+                          const participants: MatchParticipant[] = [];
+                          for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
+                            const participant: MatchParticipant = new MatchParticipant();
+                            participant.allianceKey = matchJSON.alliance_keys.split(",")[i];
+                            participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
+                            participant.matchKey = match.matchKey;
+                            participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
+                            participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
+                            participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
+                            participants.push(participant);
+                          }
+                          match.participants = participants;
+                          elimsMatches.push(match);
+                        }
+                        this.props.setElimsMatches(elimsMatches);
+                        this.props.setCompletedStep(6);
+                      }
+                    });
                   }
                 });
               }
@@ -164,6 +195,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     setPracticeMatches: (matches: Match[]) => dispatch(setPracticeMatches(matches)),
     setQualificationMatches: (matches: Match[]) => dispatch(setQualificationMatches(matches)),
     setFinalsMatches: (matches: Match[]) => dispatch(setFinalsMatches(matches)),
+    setElimsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches)),
+    setAllianceMembers: (members: AllianceMember[]) => dispatch(setAllianceMembers(members)),
     setSocketConnected: (connected: boolean) => dispatch(setSocketConnected(connected))
   };
 }

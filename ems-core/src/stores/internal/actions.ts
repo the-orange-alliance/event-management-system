@@ -8,7 +8,12 @@ import {
   ADD_TEAM,
   ALTER_TEAM,
   REMOVE_TEAM,
-  SET_PRACTICE_MATCHES, SET_QUALIFICATION_MATCHES, SET_SOCKET_CONNECTED, SET_FINALS_MATCHES
+  SET_PRACTICE_MATCHES,
+  SET_QUALIFICATION_MATCHES,
+  SET_SOCKET_CONNECTED,
+  SET_FINALS_MATCHES,
+  SET_ELIMINATIONS_MATCHES,
+  SET_ALLIANCE_MEMBERS
 } from "./constants";
 import {
   IUpdateProcessList,
@@ -22,11 +27,12 @@ import {
   ISetPracticeMatches,
   ISetQualificationMatches,
   ISetSocketConnected,
-  ISetFinalsMatches
+  ISetFinalsMatches, ISetEliminationsMatches, ISetAllianceMembers
 } from "./types";
 import Process from "../../shared/models/Process";
 import Team from "../../shared/models/Team";
 import Match from "../../shared/models/Match";
+import AllianceMember from "../../shared/models/AllianceMember";
 
 export const updateProcessList: ActionCreator<IUpdateProcessList> = (processList: Process[]) => ({
   type: UPDATE_PROCESS_LIST,
@@ -103,6 +109,20 @@ export const setFinalsMatches: ActionCreator<ISetFinalsMatches> = (matches: Matc
   type: SET_FINALS_MATCHES,
   payload: {
     matches: matches
+  }
+});
+
+export const setEliminationsMatches: ActionCreator<ISetEliminationsMatches> = (matches: Match[]) => ({
+  type: SET_ELIMINATIONS_MATCHES,
+  payload: {
+    matches: matches
+  }
+});
+
+export const setAllianceMembers: ActionCreator<ISetAllianceMembers> = (members: AllianceMember[]) => ({
+  type: SET_ALLIANCE_MEMBERS,
+  payload: {
+    members: members
   }
 });
 

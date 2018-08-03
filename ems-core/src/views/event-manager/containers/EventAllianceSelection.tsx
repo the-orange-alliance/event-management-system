@@ -13,9 +13,9 @@ import Team from "../../../shared/models/Team";
 import {SyntheticEvent} from "react";
 import AllianceMember from "../../../shared/models/AllianceMember";
 import Event from "../../../shared/models/Event";
-import {IDisableNavigation} from "../../../stores/internal/types";
+import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
-import {disableNavigation} from "../../../stores/internal/actions";
+import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
 import EventPostingController from "../controllers/EventPostingController";
 
 interface IProps {
@@ -23,7 +23,8 @@ interface IProps {
   eventConfig?: EventConfiguration,
   event?: Event,
   navigationDisabled?: boolean,
-  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  setAllianceMembers?: (members: AllianceMember[]) => ISetAllianceMembers
 }
 
 interface IState {
@@ -216,6 +217,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       members.push(member);
     }
     EventPostingController.postAlliances(members).then(() => {
+      this.props.setAllianceMembers(members);
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {
@@ -235,7 +237,8 @@ export function mapStateToProps({configState, internalState}: IApplicationState)
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
+    setAllianceMembers: (members: AllianceMember[]) => dispatch(setAllianceMembers(members))
   };
 }
 

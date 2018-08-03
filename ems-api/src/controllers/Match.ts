@@ -13,11 +13,19 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
       next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
     });
   } else if (req.query.level) {
-    DatabaseManager.getMatchAndParticipants(req.query.level).then((rows: any[]) => {
-      res.send({payload: rows});
-    }).catch((error: any) => {
-      next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
-    });
+    if (req.query.level.toString() === "elims") {
+      DatabaseManager.getMatchAndParticipants(10, ">").then((rows: any[]) => {
+        res.send({payload: rows});
+      }).catch((error: any) => {
+        next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+      });
+    } else {
+      DatabaseManager.getMatchAndParticipants(req.query.level).then((rows: any[]) => {
+        res.send({payload: rows});
+      }).catch((error: any) => {
+        next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+      });
+    }
   } else {
     DatabaseManager.selectAllWhere("match", "active>\"0\"").then((rows: any[]) => {
       res.send({payload: rows});

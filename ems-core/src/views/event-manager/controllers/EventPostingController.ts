@@ -140,6 +140,28 @@ class EventPostingController {
     });
   }
 
+  public createElimsSchedule(matches: Match[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.postMatchSchedule(matches).then(() => {
+        const participants: MatchParticipant[] = [];
+        for (const match of matches) {
+          if (typeof match.participants !== "undefined") {
+            for (const participant of match.participants) {
+              participants.push(participant);
+            }
+          }
+        }
+        EMSProvider.postMatchScheduleParticipants(participants).then(() => {
+          resolve();
+        }).catch((participantError: HttpError) => {
+          reject(participantError);
+        });
+      }).catch((scheduleError: HttpError) => {
+        reject(scheduleError);
+      });
+    });
+  }
+
   public deleteRanks(): Promise<any> {
     return EMSProvider.deleteRankings();
   }

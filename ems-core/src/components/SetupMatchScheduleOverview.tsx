@@ -53,11 +53,20 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
     }
 
     const matchesView = this.props.matchList.map(match => {
-      const participantsView = match.participants.map(participant => {
-        return (
-          <Table.Cell key={participant.matchParticipantKey} width={2}>{participant.surrogate ? (participant.teamKey + "*") : participant.teamKey}</Table.Cell>
-        );
-      });
+      let participantsView: any[] = [];
+      if (typeof match.participants === "undefined") {
+        for (let i = 0; i < (tpa * 2); i++) {
+          participantsView.push(
+            <Table.Cell key={match.matchKey + "-" + i} width={2}><b>TBD</b></Table.Cell>
+          );
+        }
+      } else {
+        participantsView = match.participants.map(participant => {
+          return (
+            <Table.Cell key={participant.matchParticipantKey} width={2}>{participant.surrogate ? (participant.teamKey + "*") : participant.teamKey}</Table.Cell>
+          );
+        });
+      }
       return (
         <Table.Row key={match.matchKey}>
           <Table.Cell width={2}>{match.matchName}</Table.Cell>

@@ -80,6 +80,7 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 
   private onMatchMakerComplete(matches: Match[]) {
     this.props.setEliminationsMatches(matches);
+    console.log(matches);
     this.setState({activeIndex: 3});
   }
 

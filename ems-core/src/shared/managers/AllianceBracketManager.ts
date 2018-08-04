@@ -1,6 +1,7 @@
 import AllianceMember from "../models/AllianceMember";
 import {EliminationsFormats} from "../AppTypes";
 import Match from "../models/Match";
+import MatchParticipant from "../models/MatchParticipant";
 
 interface IBracketOptions {
   allianceCaptains: number,
@@ -25,10 +26,9 @@ class AllianceBracketManager {
   public generateBracket(options: IBracketOptions): Promise<Match[]> {
     return new Promise<Match[]>((resolve, reject) => {
       const alliances: Map<number, AllianceMember[]> = this.getAllianceMap(options.allianceMembers);
-      console.log(alliances);
       const results: Match[] = [];
       // Octofinal matches
-      if (options.allianceCaptains === 16) {
+      if (options.allianceCaptains >= 16) {
         for (let i = 0; i < this.getMatchesFromFormat(options.format); i++) { // Matches
           for (let j = 0; j < 8; j++) { // Series
             let matchStr = "";
@@ -41,9 +41,16 @@ class AllianceBracketManager {
             match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
             match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
             match.matchName = `Octofinal ${j + 1} ${matchStr}`;
-            match.tournamentLevel = i + 10;
+            match.tournamentLevel = j + 10;
             match.fieldNumber = (j + 1) % options.fields === 0 ? options.fields : (j + 1) % options.fields;
             results.push(match);
+            if (options.allianceCaptains === 16) {
+              match.participants = this.getOctofinalTeams(j + 1, alliances);
+              for (let k = 0; k < match.participants.length; k++) {
+                match.participants[k].matchKey = match.matchKey;
+                match.participants[k].matchParticipantKey = match.matchKey + "-T" + (k + 1);
+              }
+            }
           }
         }
       }
@@ -61,9 +68,16 @@ class AllianceBracketManager {
             match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
             match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
             match.matchName = `Quarterfinal ${j + 1} ${matchStr}`;
-            match.tournamentLevel = i + 20;
+            match.tournamentLevel = j + 20;
             match.fieldNumber = (j + 1) % options.fields === 0 ? options.fields : (j + 1) % options.fields;
             results.push(match);
+            if (options.allianceCaptains === 8) {
+              match.participants = this.getQuarterfinalTeams(j + 1, alliances);
+              for (let k = 0; k < match.participants.length; k++) {
+                match.participants[k].matchKey = match.matchKey;
+                match.participants[k].matchParticipantKey = match.matchKey + "-T" + (k + 1);
+              }
+            }
           }
         }
       }
@@ -81,9 +95,16 @@ class AllianceBracketManager {
             match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
             match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
             match.matchName = `Semifinal ${j + 1} ${matchStr}`;
-            match.tournamentLevel = i + 30;
+            match.tournamentLevel = j + 30;
             match.fieldNumber = (j + 1) % options.fields === 0 ? options.fields : (j + 1) % options.fields;
             results.push(match);
+            if (options.allianceCaptains === 4) {
+              match.participants = this.getSemifinalTeams(j + 1, alliances);
+              for (let k = 0; k < match.participants.length; k++) {
+                match.participants[k].matchKey = match.matchKey;
+                match.participants[k].matchParticipantKey = match.matchKey + "-T" + (k + 1);
+              }
+            }
           }
         }
       }
@@ -100,6 +121,107 @@ class AllianceBracketManager {
       }
       resolve(results);
     });
+  }
+
+  private getOctofinalTeams(series: number, alliances: Map<number, AllianceMember[]>): MatchParticipant[] {
+    let redAlliance: AllianceMember[] = [];
+    let blueAlliance: AllianceMember[] = [];
+    switch (series) {
+      case 1:
+        redAlliance = alliances.get(1);
+        blueAlliance = alliances.get(16);
+        break;
+      case 2:
+        redAlliance = alliances.get(8);
+        blueAlliance = alliances.get(9);
+        break;
+      case 3:
+        redAlliance = alliances.get(2);
+        blueAlliance = alliances.get(15);
+        break;
+      case 4:
+        redAlliance = alliances.get(7);
+        blueAlliance = alliances.get(10);
+        break;
+      case 5:
+        redAlliance = alliances.get(3);
+        blueAlliance = alliances.get(14);
+        break;
+      case 6:
+        redAlliance = alliances.get(6);
+        blueAlliance = alliances.get(11);
+        break;
+      case 7:
+        redAlliance = alliances.get(4);
+        blueAlliance = alliances.get(13);
+        break;
+      case 8:
+        redAlliance = alliances.get(5);
+        blueAlliance = alliances.get(12);
+        break;
+    }
+    return this.getParticipantsFromAlliance(redAlliance, blueAlliance);
+  }
+
+  private getQuarterfinalTeams(series: number, alliances: Map<number, AllianceMember[]>): MatchParticipant[] {
+    let redAlliance: AllianceMember[] = [];
+    let blueAlliance: AllianceMember[] = [];
+    switch (series) {
+      case 1:
+        redAlliance = alliances.get(1);
+        blueAlliance = alliances.get(8);
+        break;
+      case 2:
+        redAlliance = alliances.get(4);
+        blueAlliance = alliances.get(5);
+        break;
+      case 3:
+        redAlliance = alliances.get(2);
+        blueAlliance = alliances.get(7);
+        break;
+      case 4:
+        redAlliance = alliances.get(3);
+        blueAlliance = alliances.get(6);
+        break;
+    }
+    return this.getParticipantsFromAlliance(redAlliance, blueAlliance);
+  }
+
+  private getSemifinalTeams(series: number, alliances: Map<number, AllianceMember[]>): MatchParticipant[] {
+    let redAlliance: AllianceMember[] = [];
+    let blueAlliance: AllianceMember[] = [];
+    switch (series) {
+      case 1:
+        redAlliance = alliances.get(1);
+        blueAlliance = alliances.get(4);
+        break;
+      case 2:
+        redAlliance = alliances.get(2);
+        blueAlliance = alliances.get(3);
+        break;
+    }
+    return this.getParticipantsFromAlliance(redAlliance, blueAlliance);
+  }
+
+  private getParticipantsFromAlliance(redAlliance: AllianceMember[], blueAlliance: AllianceMember[]): MatchParticipant[] {
+    const participants: MatchParticipant[] = [];
+    for (let i = 0; i < redAlliance.length; i++) {
+      const participant: MatchParticipant = new MatchParticipant();
+      participant.allianceKey = redAlliance[i].allianceKey;
+      participant.teamKey = redAlliance[i].teamKey;
+      participant.surrogate = false;
+      participant.station = 10 + i;
+      participants.push(participant);
+    }
+    for (let i = 0; i < blueAlliance.length; i++) {
+      const participant: MatchParticipant = new MatchParticipant();
+      participant.allianceKey = blueAlliance[i].allianceKey;
+      participant.teamKey = blueAlliance[i].teamKey;
+      participant.surrogate = false;
+      participant.station = 20 + i;
+      participants.push(participant);
+    }
+    return participants;
   }
 
   private getAllianceMap(allianceMembers: AllianceMember[]): Map<number, AllianceMember[]> {

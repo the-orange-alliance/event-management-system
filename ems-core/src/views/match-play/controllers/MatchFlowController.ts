@@ -8,6 +8,7 @@ import MatchParticipant from "../../../shared/models/MatchParticipant";
 import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
 import MatchDetails from "../../../shared/models/MatchDetails";
 import Team from "../../../shared/models/Team";
+import {AxiosResponse} from "axios";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -84,6 +85,9 @@ class MatchFlowController {
             });
           }, 500);
         } else {
+          if (match.tournamentLevel >= 10) {
+            this.checkForAdvancements(match.tournamentLevel);
+          }
           SocketProvider.send("commit-scores", match.matchKey);
           resolve();
         }
@@ -187,6 +191,12 @@ class MatchFlowController {
         states[COMMIT_ID] = true;
     }
     return states;
+  }
+
+  private checkForAdvancements(tournamentLevel: number) {
+    EMSProvider.getMatches(tournamentLevel).then((response: AxiosResponse) => {
+      console.log(response);
+    });
   }
 
   private makeActiveMatch(match: Match): Promise<any> {

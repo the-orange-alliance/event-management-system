@@ -102,7 +102,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
     const activeMatch: Match = this.props.activeMatch === null ? new Match() : this.props.activeMatch;
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
-    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0;
+    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
     const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
     const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
@@ -197,8 +197,12 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.activeMatch.blueScore = sckMatch.blueScore;
       this.props.activeMatch.blueMinPen = sckMatch.blueMinPen;
       this.props.activeMatch.blueMajPen = sckMatch.blueMajPen;
-      for (let i = 0; i < this.props.activeMatch.participants.length; i++) {
+      for (let i = 0; i < sckMatch.cardStatuses.length / 2; i++) {
         this.props.activeMatch.participants[i].cardStatus = sckMatch.cardStatuses[i];
+      }
+      for (let i = sckMatch.cardStatuses.length / 2; i < sckMatch.cardStatuses.length; i++) {
+        const index = (this.props.activeMatch.participants.length / 2) + (i - (sckMatch.cardStatuses.length / 2));
+        this.props.activeMatch.participants[index].cardStatus = sckMatch.cardStatuses[i];
       }
       // Since everything is 'technically' pass-by-reference, updating activeMatch from activeMatch doesn't do anything.
       // Essentially, we are creating a different object with the same properties to properly update the scorecards.

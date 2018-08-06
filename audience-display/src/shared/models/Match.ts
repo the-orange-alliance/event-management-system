@@ -1,5 +1,6 @@
 import * as moment from "moment";
 import MatchParticipant from "./MatchParticipant";
+import AllianceMember from "./AllianceMember";
 
 export default class Match implements IPostableObject {
   private _matchKey: string;
@@ -23,6 +24,8 @@ export default class Match implements IPostableObject {
   // This item is separate, and not recorded directly in the 'Match' table.
   private _matchDetails: IMatchDetails;
   private _participants: MatchParticipant[];
+  private _allianceMembers: AllianceMember[];
+  private _allianceMap: Map<number, AllianceMember[]>;
 
   constructor() {
     this._matchKey = "";
@@ -32,6 +35,7 @@ export default class Match implements IPostableObject {
     this._scheduledStartTime = moment();
     this._fieldNumber = -1;
     this._active = 0;
+    this._allianceMap = new Map<number, AllianceMember[]>();
   }
 
   public toJSON(): object {
@@ -76,6 +80,47 @@ export default class Match implements IPostableObject {
     match.active = json.active;
     match.uploaded = json.uploaded === 1;
     return match;
+  }
+
+  get abbreviatedName(): string {
+    if (this.tournamentLevel > 10) {
+      switch (this.tournamentLevel) {
+        case 10:
+          return "OF 1";
+        case 11:
+          return "OF 2";
+        case 12:
+          return "OF 3";
+        case 13:
+          return "OF 4";
+        case 14:
+          return "OF 5";
+        case 15:
+          return "OF 6";
+        case 16:
+          return "OF 7";
+        case 17:
+          return "OF 8";
+        case 20:
+          return "QF 1";
+        case 21:
+          return "QF 2";
+        case 22:
+          return "QF 3";
+        case 23:
+          return "QF 4";
+        case 30:
+          return "SF 1";
+        case 31:
+          return "SF 2";
+        case 40:
+          return "FINALS";
+        default:
+          return "TEST";
+      }
+    } else {
+      return this.matchName.toString().split(" ")[2];
+    }
   }
 
   get matchKey(): string {
@@ -228,5 +273,29 @@ export default class Match implements IPostableObject {
 
   set participants(value: MatchParticipant[]) {
     this._participants = value;
+  }
+
+  get allianceMembers(): AllianceMember[] {
+    return this._allianceMembers;
+  }
+
+  set allianceMembers(allianceMembers: AllianceMember[]) {
+    this._allianceMembers = allianceMembers;
+    const alliances: Map<number, AllianceMember[]> = new Map<number, AllianceMember[]>();
+    for (const member of allianceMembers) {
+      if (typeof alliances.get(member.allianceRank) === "undefined") {
+        alliances.set(member.allianceRank, []);
+      }
+      (alliances.get(member.allianceRank) as AllianceMember[]).push(member);
+    }
+    this.allianceMap = alliances;
+  }
+
+  get allianceMap(): Map<number, AllianceMember[]> {
+    return this._allianceMap;
+  }
+
+  set allianceMap(map: Map<number, AllianceMember[]>) {
+    this._allianceMap = map;
   }
 }

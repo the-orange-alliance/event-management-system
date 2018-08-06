@@ -9,10 +9,12 @@ import EventConfiguration from "../../shared/models/EventConfiguration";
 import {IUpdateParticipantStatus} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {updateParticipantStatus} from "../../stores/scoring/actions";
+import Match from "../../shared/models/Match";
 
 interface IProps {
   alliance: AllianceColors,
-  eventConfig?: EventConfiguration
+  eventConfig?: EventConfiguration,
+  activeMatch?: Match,
   activeParticipants?: MatchParticipant[],
   matchState?: MatchState,
   updateParticipantStatus?: (index: number, status: number) => IUpdateParticipantStatus
@@ -124,7 +126,7 @@ class EnergyImpactTeamStatus extends React.Component<IProps> {
         return participants;
       } else {
         const participants: MatchParticipant[] = [];
-        for (let i = 3; i < this.props.activeParticipants.length; i++) {
+        for (let i = (this.props.activeParticipants.length / 2); i < this.props.activeParticipants.length; i++) {
           participants.push(this.props.activeParticipants[i]);
         }
         return participants;
@@ -136,6 +138,7 @@ class EnergyImpactTeamStatus extends React.Component<IProps> {
 export function mapStateToProps({configState, scoringState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
+    activeMatch: scoringState.activeMatch,
     activeParticipants: scoringState.activeParticipants,
     matchState: scoringState.matchState
   };

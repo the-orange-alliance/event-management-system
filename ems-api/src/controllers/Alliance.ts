@@ -13,6 +13,14 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+router.get("/:alliance_key", (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllWhere("alliance", "alliance_key=\"" + req.params.alliance_key + "\"").then((rows: any[]) => {
+    res.send({payload: rows});
+  }).catch((error: any) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   DatabaseManager.insertValues("alliance", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " alliance members in the database.");

@@ -206,6 +206,11 @@ class MatchFlowController {
   private postMatchResults(match: Match): Promise<any> {
     match.matchDetails.matchKey = match.matchKey;
     match.matchDetails.matchDetailKey = match.matchDetailKey;
+    for (const participant of match.participants) {
+      if (typeof participant.cardStatus === "undefined") {
+        participant.cardStatus = 0;
+      }
+    }
     const promises: Array<Promise<any>> = [];
     promises.push(EMSProvider.putMatchResult(match));
     promises.push(EMSProvider.putMatchDetails(match.matchDetails));

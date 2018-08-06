@@ -9,6 +9,7 @@ import SettingsView from "../views/settings/SettingsView";
 import MatchPlayView from "../views/match-play/MatchPlayView";
 import MatchTestView from "../views/match-test/MatchTestView";
 import AboutView from "../views/about/AboutView";
+import ReportsView from "../views/reports/ReportsView";
 
 interface IProps {
   slaveMode?: boolean,
@@ -24,7 +25,7 @@ class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeItem: "Event Manager"
+      activeItem: "Reports"
     };
   }
 
@@ -68,6 +69,8 @@ class AppContainer extends React.Component<IProps, IState> {
         return <MatchPlayView/>;
       case "Match Test":
         return <MatchTestView/>;
+      case "Reports":
+        return <ReportsView/>;
       case "About":
         return <AboutView/>;
       default:

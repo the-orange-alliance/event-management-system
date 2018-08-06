@@ -126,11 +126,11 @@ class SettingsSlave extends React.Component<IProps, IState> {
     EMSProvider.getEvent().then((response: AxiosResponse) => {
       if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
         this.requestConfig(this.state.masterAddress).then((config: any) => {
-          EMSProvider.initialize(this.state.masterAddress);
+          EMSProvider.initialize(this.props.networkHost);
           this.setState({
             verifying: false,
             masterEvent: new Event().fromJSON(response.data.payload[0]),
-            masterEventConfig: new EventConfiguration().fromJSON(response.data.payload[0]),
+            masterEventConfig: new EventConfiguration().fromJSON(config),
             masterAddressVerified: true
           });
         }).catch((error: any) => {

@@ -22,8 +22,8 @@ import * as moment from "moment";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
 import SocketProvider from "../../../shared/providers/SocketProvider";
-import {IDisableNavigation} from "../../../stores/internal/types";
-import {disableNavigation} from "../../../stores/internal/actions";
+import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
+import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 import SocketMatch from "../../../shared/models/scoring/SocketMatch";
 import EnergyImpactDetails from "../../../shared/models/scoring/EnergyImpactDetails";
@@ -47,7 +47,8 @@ interface IProps {
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   setActiveMatch?: (match: Match) => ISetActiveMatch,
   setActiveParticipants?: (participants: MatchParticipant[]) => ISetActiveParticipants,
-  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails
+  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails,
+  setEliminationsMatches?: (matches: Match[]) => ISetEliminationsMatches
 }
 
 interface IState {
@@ -72,10 +73,6 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.startMatch = this.startMatch.bind(this);
     this.abortMatch = this.abortMatch.bind(this);
     this.commitScores = this.commitScores.bind(this);
-  }
-
-  public componentDidMount() {
-    MatchFlowController.checkForAdvancements(20, this.props.eventConfig.elimsFormat); // DEBUG
   }
 
   public render() {
@@ -242,8 +239,13 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
       if (this.props.activeMatch.tournamentLevel >= 10) {
-        MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat);
-        // TODO - Once checked, then update scoringState.elimsMatches
+        MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
+          if (this.props.elimsMatches.length < matches.length) {
+            this.props.setEliminationsMatches(matches);
+          }
+        }).catch((error: HttpError) => {
+          console.error(error);
+        });
       }
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
@@ -327,7 +329,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
     setActiveMatch: (match: Match) => dispatch(setActiveMatch(match)),
     setActiveParticipants: (participants: MatchParticipant[]) => dispatch(setActiveParticipants(participants)),
-    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
+    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details)),
+    setEliminationsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches))
   };
 }
 

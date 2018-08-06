@@ -122,12 +122,12 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                     <div className="res-team-row bottom-red">
                       <div className="res-team-name">{teams[2].teamNameShort}</div>
                       <div className="res-team-rank"/>
-                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[1].countryCode}/></div>
+                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
                     </div>
                     <div className="res-team-row">
                       <div className="res-team-name">{teams[3].teamNameShort}</div>
                       <div className="res-team-rank"/>
-                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
+                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
                     </div>
                   </div>
                 }

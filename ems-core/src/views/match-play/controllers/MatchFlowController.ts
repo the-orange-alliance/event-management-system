@@ -191,7 +191,7 @@ class MatchFlowController {
     return states;
   }
 
-  public checkForAdvancements(tournamentLevel: number, format: EliminationsFormats): Promise<any> {
+  public checkForAdvancements(tournamentLevel: number, format: EliminationsFormats): Promise<Match[]> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getMatches(tournamentLevel).then((response: AxiosResponse) => {
         if (response.data && response.data.payload && response.data.payload.length > 0) {
@@ -220,14 +220,26 @@ class MatchFlowController {
           if (redWins >= advancementWins) {
             console.log("Advancing red to the next series...");
             this.advanceAlliance(tournamentLevel, participants.filter((participant) => participant.station < 20)).then(() => {
-              resolve();
+              setTimeout(() => {
+                this.fetchElimsMatches().then((elimsMatches: Match[]) => {
+                  resolve(elimsMatches);
+                }).catch((elimsError: HttpError) => {
+                  reject(elimsError);
+                });
+              }, 250);
             }).catch((advanceError: HttpError) => {
               reject(advanceError);
             });
           } else if (blueWins >= advancementWins) {
             console.log("Advancing blue to the next series...");
             this.advanceAlliance(tournamentLevel, participants.filter((participant) => participant.station >= 20)).then(() => {
-              resolve();
+              setTimeout(() => {
+                this.fetchElimsMatches().then((elimsMatches: Match[]) => {
+                  resolve(elimsMatches);
+                }).catch((elimsError: HttpError) => {
+                  reject(elimsError);
+                });
+              }, 250);
             }).catch((advanceError: HttpError) => {
               reject(advanceError);
             });
@@ -306,7 +318,7 @@ class MatchFlowController {
               if (participant.station < 20) {
                 participant.matchParticipantKey = match.matchKey + "-T" + (participant.station - 9);
               } else {
-                participant.matchParticipantKey = match.matchKey + "-T" + (participant.station - 19);
+                participant.matchParticipantKey = match.matchKey + "-T" + ((participant.station - 19) + (alliance.length));
               }
               participants.push(participant);
             }
@@ -325,6 +337,35 @@ class MatchFlowController {
         }
       }).catch((error: HttpError) => {
         reject(error);
+      });
+    });
+  }
+
+  private fetchElimsMatches(): Promise<Match[]> {
+    return new Promise<Match[]>((resolve, reject) => {
+      EMSProvider.getMatches("elims").then((elimsMatchesResposne: AxiosResponse) => {
+        if (elimsMatchesResposne.data && elimsMatchesResposne.data.payload && elimsMatchesResposne.data.payload.length > 0) {
+          const elimsMatches: Match[] = [];
+          for (const matchJSON of elimsMatchesResposne.data.payload) {
+            const match: Match = new Match().fromJSON(matchJSON);
+            const participants: MatchParticipant[] = [];
+            for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
+              const participant: MatchParticipant = new MatchParticipant();
+              participant.allianceKey = matchJSON.alliance_keys.split(",")[i];
+              participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
+              participant.matchKey = match.matchKey;
+              participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
+              participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
+              participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
+              participants.push(participant);
+            }
+            match.participants = participants;
+            elimsMatches.push(match);
+          }
+          resolve(elimsMatches);
+        } else {
+          reject(new HttpError(500, "ERR_NO_RESULTS", "No eliminations matches were found."));
+        }
       });
     });
   }

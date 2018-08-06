@@ -166,6 +166,10 @@ class EMSProvider {
     return this.get("api/match/" + matchKey);
   }
 
+  public getMatchResults(tournamentLevel: number): Promise<AxiosResponse> {
+    return this.get("api/match?tournament_level=" + tournamentLevel);
+  }
+
   public getMatchDetails(matchKey: string): Promise<AxiosResponse> {
     return this.get("api/match/" + matchKey + "/details");
   }
@@ -233,6 +237,7 @@ class EMSProvider {
   public putMatchParticipants(participants: MatchParticipant[]): Promise<AxiosResponse> {
     return this.put("api/match/" + participants[0].matchKey + "/participants", participants);
   }
+
 }
 
 export default EMSProvider.getInstance();

@@ -74,6 +74,10 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.commitScores = this.commitScores.bind(this);
   }
 
+  public componentDidMount() {
+    MatchFlowController.checkForAdvancements(20, this.props.eventConfig.elimsFormat); // DEBUG
+  }
+
   public render() {
     const {selectedLevel} = this.state;
     const {eventConfig, matchState, connected, matchDuration} = this.props;
@@ -102,7 +106,9 @@ class MatchPlay extends React.Component<IProps, IState> {
 
     const activeMatch: Match = this.props.activeMatch === null ? new Match() : this.props.activeMatch;
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
-    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null;
+    const hasRedAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station < 20).length > 0;
+    const hasBlueAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station >= 20).length > 0;
+    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
     const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
     const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
@@ -232,9 +238,13 @@ class MatchPlay extends React.Component<IProps, IState> {
     // Make sure all of our 'active' objects are on the same page.
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
-    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig.eventType).then(() => {
+    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
+      if (this.props.activeMatch.tournamentLevel >= 10) {
+        MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat);
+        // TODO - Once checked, then update scoringState.elimsMatches
+      }
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
     });

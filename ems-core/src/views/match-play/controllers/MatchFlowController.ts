@@ -3,12 +3,13 @@ import Match from "../../../shared/models/Match";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import HttpError from "../../../shared/models/HttpError";
 import SocketProvider from "../../../shared/providers/SocketProvider";
-import {EMSEventTypes} from "../../../shared/AppTypes";
+import {AllianceColors, EliminationsFormats} from "../../../shared/AppTypes";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
 import MatchDetails from "../../../shared/models/MatchDetails";
 import Team from "../../../shared/models/Team";
 import {AxiosResponse} from "axios";
+import EventConfiguration from "../../../shared/models/EventConfiguration";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -72,12 +73,12 @@ class MatchFlowController {
     });
   }
 
-  public commitScores(match: Match, eventType: EMSEventTypes): Promise<any> {
+  public commitScores(match: Match, config: EventConfiguration): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.postMatchResults(match).then(() => {
         if (match.tournamentLevel > 0 && match.tournamentLevel < 10) {
           setTimeout(() => {
-            EMSProvider.calculateRankings(match.tournamentLevel, eventType).then(() => {
+            EMSProvider.calculateRankings(match.tournamentLevel, config.eventType).then(() => {
               SocketProvider.send("commit-scores", match.matchKey);
               resolve();
             }).catch((rankError: HttpError) => {
@@ -85,9 +86,6 @@ class MatchFlowController {
             });
           }, 500);
         } else {
-          if (match.tournamentLevel >= 10) {
-            this.checkForAdvancements(match.tournamentLevel);
-          }
           SocketProvider.send("commit-scores", match.matchKey);
           resolve();
         }
@@ -193,9 +191,141 @@ class MatchFlowController {
     return states;
   }
 
-  private checkForAdvancements(tournamentLevel: number) {
-    EMSProvider.getMatches(tournamentLevel).then((response: AxiosResponse) => {
-      console.log(response);
+  public checkForAdvancements(tournamentLevel: number, format: EliminationsFormats): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.getMatches(tournamentLevel).then((response: AxiosResponse) => {
+        if (response.data && response.data.payload && response.data.payload.length > 0) {
+          const matches: Match[] = response.data.payload.map((matchJSON: any) => new Match().fromJSON(matchJSON));
+          const advancementWins = this.getWinsFromFormat(format);
+          let redWins: number = 0;
+          let blueWins: number = 0;
+          for (const match of matches) {
+            if (match.redScore !== null && match.blueScore !== null) {
+              if (match.redScore > match.blueScore) {
+                redWins++;
+              } else if (match.redScore < match.blueScore) {
+                blueWins++;
+              }
+            }
+          }
+          const participants: MatchParticipant[] = [];
+          for (let i = 0; i < response.data.payload[0].participants.split(",").length; i++) {
+            const participant: MatchParticipant = new MatchParticipant();
+            participant.allianceKey = response.data.payload[0].alliance_keys.split(",")[i];
+            participant.teamKey = parseInt(response.data.payload[0].participants.split(",")[i], 10);
+            participant.surrogate = response.data.payload[0].surrogates.split(",")[i] === "1";
+            participant.station = parseInt(response.data.payload[0].stations.split(",")[i], 10);
+            participants.push(participant);
+          }
+          if (redWins >= advancementWins) {
+            console.log("Advancing red to the next series...");
+            this.advanceAlliance(tournamentLevel, participants.filter((participant) => participant.station < 20)).then(() => {
+              resolve();
+            }).catch((advanceError: HttpError) => {
+              reject(advanceError);
+            });
+          } else if (blueWins >= advancementWins) {
+            console.log("Advancing blue to the next series...");
+            this.advanceAlliance(tournamentLevel, participants.filter((participant) => participant.station >= 20)).then(() => {
+              resolve();
+            }).catch((advanceError: HttpError) => {
+              reject(advanceError);
+            });
+          }
+        }
+      }).catch((error: HttpError) => {
+        reject(error);
+      });
+    });
+  }
+
+  private advanceAlliance(tournamentLevel: number, alliance: MatchParticipant[]): Promise<any> {
+    switch (tournamentLevel) {
+      case 10:
+        // Advance to RED of 20
+        return this.makeAndPostParticipants(20, alliance, "Red");
+      case 11:
+        // Advance to BLUE of 20
+        return this.makeAndPostParticipants(20, alliance, "Blue");
+      case 12:
+        // Advance to RED of 21
+        return this.makeAndPostParticipants(21, alliance, "Red");
+      case 13:
+        // Advance to BLUE of 21
+        return this.makeAndPostParticipants(21, alliance, "Blue");
+      case 14:
+        // Advance to RED of 22
+        return this.makeAndPostParticipants(22, alliance, "Red");
+      case 15:
+        // Advance to BLUE of 22
+        return this.makeAndPostParticipants(22, alliance, "Blue");
+      case 16:
+        // Advance to RED of 23
+        return this.makeAndPostParticipants(23, alliance, "Red");
+      case 17:
+        // Advance to BLUE of 23
+        return this.makeAndPostParticipants(23, alliance, "Blue");
+      case 20:
+        // Advance to RED of 30
+        return this.makeAndPostParticipants(30, alliance, "Red");
+      case 21:
+        // Advance to BLUE of 30
+        return this.makeAndPostParticipants(30, alliance, "Blue");
+      case 22:
+        // Advance to RED of 31
+        return this.makeAndPostParticipants(31, alliance, "Red");
+      case 23:
+        // Advance to BLUE of 31
+        return this.makeAndPostParticipants(31, alliance, "Blue");
+      case 30:
+        // Advance to RED of 40
+        return this.makeAndPostParticipants(40, alliance, "Red");
+      case 31:
+        // Advance to BLUE of 40
+        return this.makeAndPostParticipants(40, alliance, "Blue");
+      default:
+        return new Promise<any>((resolve, reject) => reject());
+    }
+  }
+
+  private makeAndPostParticipants(advancementLevel: number, alliance: MatchParticipant[], allianceColor: AllianceColors): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.getMatchResults(advancementLevel).then((response: AxiosResponse) => {
+        if (response.data && response.data.payload && response.data.payload.length > 0) {
+          const participants: MatchParticipant[] = [];
+          const matches: Match[] = response.data.payload.map((matchJSON: any) => new Match().fromJSON(matchJSON));
+          for (const match of matches) {
+            for (let i = 0; i < alliance.length; i++) {
+              const participant: MatchParticipant = new MatchParticipant().fromJSON(alliance[i].toJSON()); // Essentially de-referencing
+              participant.matchKey = match.matchKey;
+              if (allianceColor === "Red") {
+                participant.station = 10 + i;
+              } else {
+                participant.station = 20 + i;
+              }
+              if (participant.station < 20) {
+                participant.matchParticipantKey = match.matchKey + "-T" + (participant.station - 9);
+              } else {
+                participant.matchParticipantKey = match.matchKey + "-T" + (participant.station - 19);
+              }
+              participants.push(participant);
+            }
+          }
+          EMSProvider.postMatchScheduleParticipants(participants).then(() => {
+            resolve();
+          }).catch(() => {
+            EMSProvider.putMatchParticipants(participants).then(() => {
+              resolve();
+            }).catch((error: HttpError) => {
+              reject(error);
+            });
+          });
+        } else {
+          reject(new HttpError(500, "ERR_NO_RESULTS", "There are no match results for " + advancementLevel + "."));
+        }
+      }).catch((error: HttpError) => {
+        reject(error);
+      });
     });
   }
 
@@ -224,6 +354,19 @@ class MatchFlowController {
         return new EnergyImpactMatchDetails();
       default:
         return new EnergyImpactMatchDetails();
+    }
+  }
+
+  private getWinsFromFormat(format: EliminationsFormats): number {
+    switch (format) {
+      case "bo1":
+        return 1;
+      case "bo3":
+        return 2;
+      case "bo5":
+        return 3;
+      default:
+        return 1;
     }
   }
 }

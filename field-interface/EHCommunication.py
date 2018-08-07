@@ -59,6 +59,7 @@ B_COMBUSTION = 2
 
 # hub2 Motors
 R_WIND_ROTOR = 1
+R_ENC = 3
 B_WIND_ROTOR = 0
 
 # ----------------------- wiring map -----------------------
@@ -78,6 +79,7 @@ class FieldComms():
         self.coop = [None, None]
         self.redRotor = [None, None]
         self.blueRotor = [None, None]
+        self.redEnc = [None, None]  # need a seperate set of motor objects for red windmill since only 0 and 3 work with the magnetic sensor
 
         self.redWind_PWM = [DEFAULT_PWM, DEFAULT_PWM]
         self.blueWind_PWM = [DEFAULT_PWM, DEFAULT_PWM]
@@ -361,7 +363,7 @@ class FieldComms():
                 # print(str(not self.manualMode) + "     " + str(self.matchActive) + "     " + str(self.fieldNum == i))
                 if not self.manualMode and self.matchActive and self.fieldNum == i:
                     try:
-                        red = self.redRotor[i].getPosition(self.fieldNum)
+                        red = self.redEnc[i].getPosition(self.fieldNum)
                         blue = self.blueRotor[i].getPosition(self.fieldNum)
                         print("Red: " + str(red) + " Blue: " + str(blue))
                         if not self.redRotorEnable[i] and red >= 25:
@@ -572,9 +574,11 @@ class FieldComms():
         # MOTORS
         print("init hub 1: field " + str(field) + ", module " + str(moduleNum))
         self.redRotor[field] = self.modules[moduleNum].motors[R_WIND_ROTOR]
-        self.redRotor[field].resetEncoder(field)
         self.blueRotor[field] = self.modules[moduleNum].motors[B_WIND_ROTOR]
+
         self.blueRotor[field].resetEncoder(field)
+        self.redEnc[field] = self.modules[moduleNum].motors[R_ENC]
+        self.redEnc[field].resetEncoder(field)
 
         #LEDs
         self.blueCombustion[field] = self.modules[moduleNum].servos[B_COMBUSTION]
@@ -704,7 +708,7 @@ class FieldComms():
     def stopAllMotorsInCurrentField(self):
         self.stopMotor("red")
         self.stopMotor("blue")
-        self.redRotor[self.fieldNum].resetEncoder(self.fieldNum)
+        self.redEnc[self.fieldNum].resetEncoder(self.fieldNum)
         self.blueRotor[self.fieldNum].resetEncoder(self.fieldNum)
         toGuiStack.put("resetRotors")
 

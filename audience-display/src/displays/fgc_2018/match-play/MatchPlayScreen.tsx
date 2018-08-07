@@ -186,35 +186,70 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
               </div>
             </div>
             <div id="play-display-right-score">
-              <div className="teams blue-bg right-score">
-                <div className="team">
-                  <div className="team-flag">
-                    <span className={"flag-icon flag-icon-" + teams[3].countryCode}/>
+              {
+                match.tournamentLevel < 10 &&
+                <div className="teams blue-bg right-score">
+                  <div className="team">
+                    <div className="team-flag">
+                      <span className={"flag-icon flag-icon-" + teams[3].countryCode}/>
+                    </div>
+                    <div className="team-name-left">
+                      <span>{teams[3].country}</span>
+                    </div>
+                    <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
                   </div>
-                  <div className="team-name-left">
-                    <span>{teams[3].country}</span>
+                  <div className="team">
+                    <div className="team-flag">
+                      <span className={"flag-icon flag-icon-" + teams[4].countryCode}/>
+                    </div>
+                    <div className="team-name-left">
+                      <span>{teams[4].country}</span>
+                    </div>
+                    <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
                   </div>
-                  <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
+                  <div className="team">
+                    <div className="team-flag">
+                      <span className={"flag-icon flag-icon-" + teams[5].countryCode}/>
+                    </div>
+                    <div className="team-name-left">
+                      <span>{teams[5].country}</span>
+                    </div>
+                    <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
+                  </div>
                 </div>
-                <div className="team">
-                  <div className="team-flag">
-                    <span className={"flag-icon flag-icon-" + teams[4].countryCode}/>
+              }
+              {
+                match.tournamentLevel >= 10 &&
+                <div className="teams blue-bg right-score">
+                  <div className="team">
+                    <div className="team-flag">
+                      <span className={"flag-icon flag-icon-" + teams[4].countryCode}/>
+                    </div>
+                    <div className="team-name-left">
+                      <span>{teams[4].country}</span>
+                    </div>
+                    <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
                   </div>
-                  <div className="team-name-left">
-                    <span>{teams[4].country}</span>
+                  <div className="team">
+                    <div className="team-flag">
+                      <span className={"flag-icon flag-icon-" + teams[5].countryCode}/>
+                    </div>
+                    <div className="team-name-left">
+                      <span>{teams[5].country}</span>
+                    </div>
+                    <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
                   </div>
-                  <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
+                  <div className="team">
+                    <div className="team-flag">
+                      <span className={"flag-icon flag-icon-" + teams[6].countryCode}/>
+                    </div>
+                    <div className="team-name-left">
+                      <span>{teams[6].country}</span>
+                    </div>
+                    <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
+                  </div>
                 </div>
-                <div className="team">
-                  <div className="team-flag">
-                    <span className={"flag-icon flag-icon-" + teams[5].countryCode}/>
-                  </div>
-                  <div className="team-name-left">
-                    <span>{teams[5].country}</span>
-                  </div>
-                  <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
-                </div>
-              </div>
+              }
             </div>
             <div id="play-display-right-details">
               <div className="top-details">

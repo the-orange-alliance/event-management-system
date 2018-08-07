@@ -22,8 +22,8 @@ import * as moment from "moment";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
 import SocketProvider from "../../../shared/providers/SocketProvider";
-import {IDisableNavigation} from "../../../stores/internal/types";
-import {disableNavigation} from "../../../stores/internal/actions";
+import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
+import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 import SocketMatch from "../../../shared/models/scoring/SocketMatch";
 import EnergyImpactDetails from "../../../shared/models/scoring/EnergyImpactDetails";
@@ -47,7 +47,8 @@ interface IProps {
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   setActiveMatch?: (match: Match) => ISetActiveMatch,
   setActiveParticipants?: (participants: MatchParticipant[]) => ISetActiveParticipants,
-  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails
+  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails,
+  setEliminationsMatches?: (matches: Match[]) => ISetEliminationsMatches
 }
 
 interface IState {
@@ -102,7 +103,9 @@ class MatchPlay extends React.Component<IProps, IState> {
 
     const activeMatch: Match = this.props.activeMatch === null ? new Match() : this.props.activeMatch;
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
-    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0;
+    const hasRedAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station < 20).length > 0;
+    const hasBlueAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station >= 20).length > 0;
+    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
     const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
     const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
@@ -197,8 +200,12 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.activeMatch.blueScore = sckMatch.blueScore;
       this.props.activeMatch.blueMinPen = sckMatch.blueMinPen;
       this.props.activeMatch.blueMajPen = sckMatch.blueMajPen;
-      for (let i = 0; i < this.props.activeMatch.participants.length; i++) {
+      for (let i = 0; i < sckMatch.cardStatuses.length / 2; i++) {
         this.props.activeMatch.participants[i].cardStatus = sckMatch.cardStatuses[i];
+      }
+      for (let i = sckMatch.cardStatuses.length / 2; i < sckMatch.cardStatuses.length; i++) {
+        const index = (this.props.activeMatch.participants.length / 2) + (i - (sckMatch.cardStatuses.length / 2));
+        this.props.activeMatch.participants[index].cardStatus = sckMatch.cardStatuses[i];
       }
       // Since everything is 'technically' pass-by-reference, updating activeMatch from activeMatch doesn't do anything.
       // Essentially, we are creating a different object with the same properties to properly update the scorecards.
@@ -228,9 +235,18 @@ class MatchPlay extends React.Component<IProps, IState> {
     // Make sure all of our 'active' objects are on the same page.
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
-    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig.eventType).then(() => {
+    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
+      if (this.props.activeMatch.tournamentLevel >= 10) {
+        MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
+          if (this.props.elimsMatches.length < matches.length) {
+            this.props.setEliminationsMatches(matches);
+          }
+        }).catch((error: HttpError) => {
+          console.error(error);
+        });
+      }
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
     });
@@ -313,7 +329,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
     setActiveMatch: (match: Match) => dispatch(setActiveMatch(match)),
     setActiveParticipants: (participants: MatchParticipant[]) => dispatch(setActiveParticipants(participants)),
-    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
+    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details)),
+    setEliminationsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches))
   };
 }
 

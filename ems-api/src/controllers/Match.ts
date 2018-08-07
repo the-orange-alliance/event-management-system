@@ -26,6 +26,12 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
         next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
       });
     }
+  } else if (req.query.tournament_level) {
+    DatabaseManager.selectAllWhere("match", "tournament_level=\"" + req.query.tournament_level + "\"").then((rows: any[]) => {
+      res.send({payload: rows});
+    }).catch((error: any) => {
+      next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+    });
   } else {
     DatabaseManager.selectAllWhere("match", "active>\"0\"").then((rows: any[]) => {
       res.send({payload: rows});

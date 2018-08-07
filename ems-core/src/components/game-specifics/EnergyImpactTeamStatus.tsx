@@ -9,10 +9,12 @@ import EventConfiguration from "../../shared/models/EventConfiguration";
 import {IUpdateParticipantStatus} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {updateParticipantStatus} from "../../stores/scoring/actions";
+import Match from "../../shared/models/Match";
 
 interface IProps {
   alliance: AllianceColors,
-  eventConfig?: EventConfiguration
+  eventConfig?: EventConfiguration,
+  activeMatch?: Match,
   activeParticipants?: MatchParticipant[],
   matchState?: MatchState,
   updateParticipantStatus?: (index: number, status: number) => IUpdateParticipantStatus
@@ -27,34 +29,23 @@ class EnergyImpactTeamStatus extends React.Component<IProps> {
   public render() {
     const teams = this.getTeams();
     const disabled = this.props.matchState === MatchState.MATCH_IN_PROGRESS;
-    let teamOneName: any = teams[0].teamKey;
-    if (typeof teams[0].team !== "undefined") {
-      teamOneName = teams[0].team.getFromIdentifier(this.props.eventConfig.teamIdentifier);
-    }
 
-    let teamTwoName: any = teams[1].teamKey;
-    if (typeof teams[1].team !== "undefined") {
-      teamTwoName = teams[1].team.getFromIdentifier(this.props.eventConfig.teamIdentifier);
-    }
+    const teamsView = teams.map((team, index) => {
+      let displayName: any = team.teamKey;
+      if (typeof team.team !== "undefined") {
+        displayName = team.team.getFromIdentifier(this.props.eventConfig.teamIdentifier);
+      }
+      return (
+        <Grid.Row key={index} className="no-margin">
+          <Grid.Column width={10} className="center-left-items">{displayName}</Grid.Column>
+          <Grid.Column width={6}><Button onClick={this.changeCardStatus.bind(this, index)} disabled={disabled} color={this.getButtonColor(team.cardStatus)} fluid={true}>{this.getButtonText(team.cardStatus)}</Button></Grid.Column>
+        </Grid.Row>
+      );
+    });
 
-    let teamThreeName: any = teams[2].teamKey;
-    if (typeof teams[2].team !== "undefined") {
-      teamThreeName = teams[2].team.getFromIdentifier(this.props.eventConfig.teamIdentifier);
-    }
     return (
       <Grid columns={16}>
-        <Grid.Row className="no-margin">
-          <Grid.Column width={10} className="center-left-items">{teamOneName}</Grid.Column>
-          <Grid.Column width={6}><Button onClick={this.changeCardStatus.bind(this, 0)} disabled={disabled} color={this.getButtonColor(teams[0].cardStatus)} fluid={true}>{this.getButtonText(teams[0].cardStatus)}</Button></Grid.Column>
-        </Grid.Row>
-        <Grid.Row className="no-margin">
-          <Grid.Column width={10} className="center-left-items">{teamTwoName}</Grid.Column>
-          <Grid.Column width={6}><Button onClick={this.changeCardStatus.bind(this, 1)} disabled={disabled} color={this.getButtonColor(teams[1].cardStatus)} fluid={true}>{this.getButtonText(teams[1].cardStatus)}</Button></Grid.Column>
-        </Grid.Row>
-        <Grid.Row className="no-margin">
-          <Grid.Column width={10} className="center-left-items">{teamThreeName}</Grid.Column>
-          <Grid.Column width={6}><Button onClick={this.changeCardStatus.bind(this, 2)} disabled={disabled} color={this.getButtonColor(teams[2].cardStatus)} fluid={true}>{this.getButtonText(teams[2].cardStatus)}</Button></Grid.Column>
-        </Grid.Row>
+        {teamsView}
       </Grid>
     );
   }
@@ -117,17 +108,9 @@ class EnergyImpactTeamStatus extends React.Component<IProps> {
       return participants;
     } else {
       if (this.props.alliance === "Red") {
-        const participants: MatchParticipant[] = [];
-        for (let i = 0; i < (this.props.activeParticipants.length / 2); i++) {
-          participants.push(this.props.activeParticipants[i]);
-        }
-        return participants;
+        return this.props.activeParticipants.filter((participant) => participant.station < 20);
       } else {
-        const participants: MatchParticipant[] = [];
-        for (let i = 3; i < this.props.activeParticipants.length; i++) {
-          participants.push(this.props.activeParticipants[i]);
-        }
-        return participants;
+        return this.props.activeParticipants.filter((participant) => participant.station >= 20);
       }
     }
   }
@@ -136,6 +119,7 @@ class EnergyImpactTeamStatus extends React.Component<IProps> {
 export function mapStateToProps({configState, scoringState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
+    activeMatch: scoringState.activeMatch,
     activeParticipants: scoringState.activeParticipants,
     matchState: scoringState.matchState
   };

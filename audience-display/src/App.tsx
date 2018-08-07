@@ -10,6 +10,7 @@ import Team from "./shared/models/Team";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
 import EnergyImpactMatchDetails from "./shared/models/EnergyImpactMatchDetails";
+import AllianceMember from "./shared/models/AllianceMember";
 
 interface IProps {
   cookies: Cookies
@@ -62,10 +63,20 @@ class App extends React.Component<IProps, IState> {
           if (matchRes.data && partRes.data) {
             const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
             match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-            this.setState({
-              activeMatch: match,
-              videoID: 1 // Universal Match Preview Screen
-            });
+            if (match.participants[0].allianceKey !== null && match.participants[0].allianceKey.length > 0) {
+              EMSProvider.getAlliances().then((allianceRes: AxiosResponse) => {
+                match.allianceMembers = allianceRes.data.payload.map((member: any) => new AllianceMember().fromJSON(member));
+                this.setState({
+                  activeMatch: match,
+                  videoID: 1 // Universal Match Preview Screen
+                });
+              });
+            } else {
+              this.setState({
+                activeMatch: match,
+                videoID: 1 // Universal Match Preview Screen
+              });
+            }
           }
         }).catch((partErr) => console.error(partErr));
       }).catch((matchRes: any) => console.error(matchRes));

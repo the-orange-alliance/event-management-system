@@ -84,6 +84,10 @@ class EMSProvider {
   public getRankingTeams(): Promise<AxiosResponse> {
     return this.get("api/ranking/teams");
   }
+
+  public getAlliances(): Promise<AxiosResponse> {
+    return this.get("api/alliance");
+  }
 }
 
 export default EMSProvider.getInstance();

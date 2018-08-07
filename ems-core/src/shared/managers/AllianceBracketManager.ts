@@ -115,7 +115,7 @@ class AllianceBracketManager {
         match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
         match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
         match.matchName = `Finals ${matchStr}`;
-        match.tournamentLevel = i + 30;
+        match.tournamentLevel = 40;
         match.fieldNumber = 1;
         results.push(match);
       }

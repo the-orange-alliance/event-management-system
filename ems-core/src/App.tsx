@@ -41,6 +41,7 @@ class App extends React.Component<IProps> {
   }
 
   public componentDidMount() {
+    document.title = "Event Management System";
     this.initializeSocket(this.props.networkHost);
 
     EMSProvider.initialize(this.props.networkHost);

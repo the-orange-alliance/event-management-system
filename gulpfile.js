@@ -114,8 +114,16 @@ gulp.task("update-pkg", () => {
   fs.writeFileSync("build/ems/package.json", JSON.stringify(mainContents));
 });
 
+gulp.task("install-deps", () => {
+  gulp.src("build/ems/package.json").pipe(install({npm: "--production"}));
+});
+
 gulp.task("place-binary", () => {
   gulp.src(["ems-api/node_modules/sqlite3/lib/binding/**/*"]).pipe(gulp.dest("build/ems/node_modules/sqlite3/lib/binding"));
+});
+
+gulp.task("place-icon", () => {
+  gulp.src(["ems-core/public/favicon.ico"]).pipe(rename("icon.ico")).pipe(gulp.dest("build/resources"));
 });
 
 /* .env tasks */
@@ -131,4 +139,4 @@ gulp.task("prebuild", ["generate-env", "deploy-env"]);
 gulp.task("postbuild", ["clean-build", "post-build", "update-pkg"]);
 
 /* Predist tasks */
-gulp.task("predist", ["place-binary"]);
+gulp.task("predist", ["install-deps", "place-binary", "place-icon"]);

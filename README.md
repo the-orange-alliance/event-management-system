@@ -32,7 +32,8 @@ If you're interested in building the project from source, there are a few specia
 3. For windows, make sure your user account has write access to `C:\Program Files (x86)\MSBuild\14.0`
 4. Run an `npm run build` from the root directory of EMS
 5. After the build finishes, change directory to build/ems, and run `npm install sqlite3 --build-from-source --runtime=electron --target=2.0.4 --dist-url=https://atom.io/download/electron`
-6. Profit.
+6. While in the same directory, run an `npm install --production`.
+6. To build an executable, run `npm run dist` from the root of EMS (not the build/ems directory).
 
 ## Using gulp.js with EMS
 After globally installing the `gulp-cli`, the following are some of the tasks associated with the EMS build process:

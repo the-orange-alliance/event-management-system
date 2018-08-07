@@ -20,7 +20,7 @@ class SettingsView extends React.Component<IProps, IState> {
     super(props);
 
     this.state = {
-      activeIndex: 2
+      activeIndex: 0
     };
 
     this.onTabChange = this.onTabChange.bind(this);

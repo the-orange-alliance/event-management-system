@@ -125,10 +125,12 @@ ipcMain.on("restart-process", (event, procName) => {
 });
 
 function startProcess(scriptLoc, procName, args) {
+  const modulesPath = path.join(__dirname, "../../../node_modules"); // Services in production need to know the node_modules path
   args = args || "";
   return new Promise((resolve, reject) => {
     pm2.start({
       args: args,
+      env: isProd ? {NODE_PATH: modulesPath} : {},
       name: procName,
       script: scriptLoc
     }, (err, apps) => {

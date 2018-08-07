@@ -47,7 +47,7 @@ export default class MatchParticipant implements IPostableObject {
     participant.station = json.station;
     participant.disqualified = json.disqualified === 1;
     participant.cardStatus = json.card_status;
-    participant.surrogate = json.surrogated === 1;
+    participant.surrogate = json.surrogate === 1;
     participant.noShow = json.no_show === 1;
     participant.allianceKey = json.alliance_key;
     return participant;

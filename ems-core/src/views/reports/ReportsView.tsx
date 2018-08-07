@@ -5,6 +5,15 @@ import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import {getTheme} from "../../shared/AppTheme";
 import EventConfiguration from "../../shared/models/EventConfiguration";
+import PracticeSchedule from "./reports/PracticeSchedule";
+import QualificationSchedule from "./reports/QualificationSchedule";
+import EliminationsSchedule from "./reports/EliminationsSchedule";
+import FinalsSchedule from "./reports/FinalsSchedule";
+import PracticeScheduleByTeam from "./reports/PracticeScheduleByTeam";
+import QualificationScheduleByTeam from "./reports/QualificationScheduleByTeam";
+import EliminationsScheduleByTeam from "./reports/EliminationsScheduleByTeam";
+import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
+import QualificationRankings from "./reports/QualificationRankings";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -28,14 +37,25 @@ class ReportsView extends React.Component<IProps, IState> {
     this.onTabChange = this.onTabChange.bind(this);
     this.renderReports = this.renderReports.bind(this);
     this.renderGeneratedReport = this.renderGeneratedReport.bind(this);
+    this.generateReport = this.generateReport.bind(this);
+    this.updateHTML = this.updateHTML.bind(this);
+    this.generatePracticeSchedule = this.generatePracticeSchedule.bind(this);
+    this.generateQualificationSchedule = this.generateQualificationSchedule.bind(this);
+    this.generatePostQualSchedule = this.generatePostQualSchedule.bind(this);
+    this.generatePracticeScheduleByTeam = this.generatePracticeScheduleByTeam.bind(this);
+    this.generateQualificationScheduleByTeam = this.generateQualificationScheduleByTeam.bind(this);
+    this.generatePostQualScheduleByTeam = this.generatePostQualScheduleByTeam.bind(this);
+    this.generateQualificationRankings = this.generateQualificationRankings.bind(this);
   }
 
   public render() {
     return (
-      <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
-        { menuItem: "Reports", render: this.renderReports},
-        { menuItem: "Generated Report", render: this.renderGeneratedReport},
-      ]}/>
+      <div className="view">
+        <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
+          { menuItem: "Reports", render: this.renderReports},
+          { menuItem: "Generated Report", render: this.renderGeneratedReport},
+        ]}/>
+      </div>
     );
   }
 
@@ -49,8 +69,12 @@ class ReportsView extends React.Component<IProps, IState> {
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Schedule Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePracticeSchedule}>Schedule Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Cycle Time Report</Button></Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePracticeScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
+                  <Grid.Column/>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -60,12 +84,12 @@ class ReportsView extends React.Component<IProps, IState> {
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Schedule Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationSchedule}>Schedule Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Cycle Time Report</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Schedule By Team Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Rankings Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationRankings}>Rankings Report</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
@@ -90,11 +114,11 @@ class ReportsView extends React.Component<IProps, IState> {
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Schedule Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualSchedule}>Schedule Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Cycle Time Report</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Schedule By Team Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
                   {
                     eventConfig.postQualConfig === "elims" &&
                     <Grid.Column><Button fluid={true} color={getTheme().primary}>Bracket Report</Button></Grid.Column>
@@ -152,7 +176,7 @@ class ReportsView extends React.Component<IProps, IState> {
 
     let component;
 
-    if (typeof generatedReport === "undefined") {
+    if (typeof generatedReport === "undefined" || !hasGeneratedReport) {
       component = (
         <span>There is currently no generated report.</span>
       );
@@ -175,6 +199,49 @@ class ReportsView extends React.Component<IProps, IState> {
     if (!this.props.navigationDisabled) {
       this.setState({activeIndex: parseInt(props.activeIndex as string, 10)});
     }
+  }
+
+  private generateReport(reportComponent: JSX.Element) {
+    this.setState({activeIndex: 1, generatedReport: reportComponent, hasGeneratedReport: true});
+  }
+
+  private updateHTML(htmlStr: string) {
+    console.log(htmlStr);
+  }
+
+  private generatePracticeSchedule() {
+    this.generateReport(<PracticeSchedule onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generateQualificationSchedule() {
+    this.generateReport(<QualificationSchedule onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generatePostQualSchedule() {
+    if (this.props.eventConfig.postQualConfig === "elims") {
+      this.generateReport(<EliminationsSchedule onHTMLUpdate={this.updateHTML}/>);
+    } else {
+      this.generateReport(<FinalsSchedule onHTMLUpdate={this.updateHTML}/>);
+    }
+  }
+
+  private generatePracticeScheduleByTeam() {
+    this.generateReport(<PracticeScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generateQualificationScheduleByTeam() {
+    this.generateReport(<QualificationScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generatePostQualScheduleByTeam() {
+    if (this.props.eventConfig.postQualConfig === "elims") {
+      this.generateReport(<EliminationsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    } else {
+      this.generateReport(<FinalsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    }
+  }
+  private generateQualificationRankings() {
+    this.generateReport(<QualificationRankings onHTMLUpdate={this.updateHTML}/>);
   }
 }
 

@@ -38,10 +38,10 @@ class AddressDebugging:
                 try:
                     red = self.redEnc.getPosition(port)
                     blue = self.blueEnc.getPosition(port)
-                    # red = self.redEnc.getInput()
+
                     print("Red: " + str(red) + " Blue: " + str(blue))
-                    # self.redVar.set("Red rotor: " + str(red) + "/25")
-                    # self.blueVar.set("Blue rotor: " + str(blue) + "/25")
+                    self.redVar.set("Red rotor: " + str(red) + "/25")
+                    self.blueVar.set("Blue rotor: " + str(blue) + "/25")
                     self.root.update_idletasks()
                     self.root.update()
                 except AttributeError:
@@ -54,7 +54,7 @@ class AddressDebugging:
                         Tk.Label(self.root, text="Magnetic encoder error. May have been caused by abruptly unplugging a sensor.", font='Helvetica 14 bold').pack()
                         self.root.mainloop()
                 except Tk.TclError:
-                    pass
+                    break
         self.commObj.closeActivePort(port)
 
     def setup_field(self, port):

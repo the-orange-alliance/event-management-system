@@ -16,13 +16,13 @@ def setAllDIOOutputs ( commObj, destination, values ):
 
    commObj.sendAndReceive( setAllDIOOutputs, destination )
 
-def setDIODirection ( commObj, destination, dioPin, directionOutput ):
+def setDIODirection ( port, commObj, destination, dioPin, directionOutput ):
    setDIODirection = REVMsg.SetDIODirection()
 
    setDIODirection.payload.dioPin = dioPin
    setDIODirection.payload.directionOutput = directionOutput
 
-   commObj.sendAndReceive( setDIODirection, destination )
+   commObj.sendAndReceive( port, setDIODirection, destination )
 
 def getDIODirection ( commObj, destination, dioPin ):
    getDIODirection = REVMsg.GetDIODirection()
@@ -33,12 +33,12 @@ def getDIODirection ( commObj, destination, dioPin ):
 
    return packet.payload.directionOutput
 
-def getSingleDIOInput ( commObj, destination, dioPin ):
+def getSingleDIOInput ( port, commObj, destination, dioPin ):
    getSingleDIOInput = REVMsg.GetSingleDIOInput()
 
    getSingleDIOInput.payload.dioPin = dioPin
 
-   packet = commObj.sendAndReceive( getSingleDIOInput, destination )
+   packet = commObj.sendAndReceive( port, getSingleDIOInput, destination )
 
    return packet.payload.inputValue
 
@@ -50,10 +50,11 @@ def getAllDIOInputs ( commObj, destination ):
    return packet.payload.inputValues
 
 class DIOPin:
-   def __init__ ( self, commObj, pinNumber, destinationModule ):
+   def __init__ ( self, port, commObj, pinNumber, destinationModule ):
       self.destinationModule = destinationModule
       self.pinNumber = pinNumber
       self.commObj = commObj
+      self.port = port
 
    def setDestination ( self, destinationModule ):
       self.destinationModule = destinationModule
@@ -71,13 +72,13 @@ class DIOPin:
       setSingleDIOOutput(self.commObj, self.destinationModule, self.pinNumber, value )
 
    def getInput ( self ):
-      return getSingleDIOInput(self.commObj, self.destinationModule, self.pinNumber )
+      return getSingleDIOInput(self.port, self.commObj, self.destinationModule, self.pinNumber )
 
    def setAsOutput ( self ):
       setDIODirection(self.commObj, self.destinationModule, self.pinNumber, 1 )
 
    def setAsInput ( self ):
-      setDIODirection(self.commObj, self.destinationModule, self.pinNumber, 0 )
+      setDIODirection(self.port, self.commObj, self.destinationModule, self.pinNumber, 0 )
 
    def getDirection ( self ):
       getDIODirection(self.commObj, self.destinationModule, self.pinNumber )

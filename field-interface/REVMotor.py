@@ -124,7 +124,7 @@ def setMotorTargetPosition ( port, commObj, destination, motorChannel, position,
 
    commObj.sendAndReceive( port, setMotorTargetPositionMsg, destination )
 
-def getMotorTargetPosition ( port, ommObj, destination, motorChannel ):
+def getMotorTargetPosition ( port, commObj, destination, motorChannel ):
    getMotorTargetPositionMsg = REVMsg.GetMotorTargetPosition()
 
    getMotorTargetPositionMsg.payload.motorChannel = motorChannel

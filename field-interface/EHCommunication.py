@@ -14,7 +14,7 @@ import Tkinter as Tk
 # from REVgui import MAINgui, DCgui
 hostname = socket.gethostname()
 HOST = socket.gethostbyname(hostname) # Get my computer's IP
-PORT = 8081
+PORT = 8800
 
 # ----------------------- PWM shite -----------------------
 BLACK = 1997
@@ -358,6 +358,7 @@ class FieldComms():
                 elif self.bluePowerlinesActive[i][2]:
                     self.setLEDPWM("blue", "combustion", "active")
 
+                # print(str(not self.manualMode) + "     " + str(self.matchActive) + "     " + str(self.fieldNum == i))
                 if not self.manualMode and self.matchActive and self.fieldNum == i:
                     try:
                         red = self.redRotor[i].getPosition(self.fieldNum)
@@ -379,18 +380,22 @@ class FieldComms():
     def _socket_thread(self):
         print("SocketIO client operating on " + HOST + ":" + str(PORT))
         self.socketio = SocketIO(HOST, PORT)
-        self.socketio.on('connectPythonApp', self.on_connect)
+        self.socketio.emit("connection")
+        self.socketio.emit("identify", ["field-service", "scoring", "referee"])
+        if self.socketio.connected:
+            print('[Connected]')
+            toGuiStack.put("socket connected")
         self.socketio.on('disconnect', self.on_disconnect)
         self.socketio.on('reconnect', self.on_reconnect)
-        self.socketio.on('onMatchPrestart', self.on_onPrestart)
+        self.socketio.on('prestart', self.prestart)
         self.socketio.on('setLED', self.on_setLED)
         self.socketio.on('onWindCrank', self.on_onWindCrank)
-        self.socketio.on('onMatchAbort', self.on_onMatchAbort)
-        self.socketio.on('onMatchEnd', self.on_onMatchEnd)
+        self.socketio.on('match-abort', self.on_match_abort)
+        self.socketio.on('match-end', self.on_match_end)
         self.socketio.on('reactorFull', self.on_reactorFull)
         self.socketio.on('combustionScored', self.on_combustionScored)
-        self.socketio.on('onMatchCommit', self.on_onMatchCommit)
-        self.socketio.on('onMatchStart', self.on_onMatchStart)
+        self.socketio.on('commit-scores', self.on_commit_scores)
+        self.socketio.on('match-start', self.on_match_start)
         self.socketio.wait()
 
     def main(self):
@@ -409,10 +414,6 @@ class FieldComms():
 
     # ----------------------- SOCKET STUFF -----------------------
 
-    def on_connect(self):
-        print('[Connected]')
-        toGuiStack.put("socket connected")
-
     def on_reconnect(self):
         print('[Reconnected]')
 
@@ -420,14 +421,14 @@ class FieldComms():
         print('[Disconnected]')
         toGuiStack.put("socket disconnected")
 
-    def on_onPrestart(self, fieldNum):
-        if fieldNum['fieldNum'] < 0 or fieldNum['fieldNum'] > 4:
+    def prestart(self, matchkey, fieldNum):
+        if fieldNum < 0 or fieldNum > 4:
             raise ValueError("Field num from socket is out of range")
         if not self.manualMode:
-            if fieldNum['fieldNum'] < 3:
-                fn = fieldNum['fieldNum'] - 1
+            if fieldNum < 3:
+                fn = fieldNum - 1
             else:
-                fn = fieldNum['fieldNum'] - 3
+                fn = fieldNum - 3
 
             print('Field number: ' + str(fn))
             toGuiStack.put({"fieldChange": fn})
@@ -435,23 +436,23 @@ class FieldComms():
             self.fieldNum = fn
             self.setPrestart(fn)
 
-    def on_onMatchStart(self, obj):
+    def on_match_start(self, obj):
         self.setStart(self.fieldNum)
         self.matchActive = True
 
-    def on_onMatchAbort(self):
+    def on_match_abort(self):
         print("Match Aborted.")
         self.fieldAbort(self.fieldNum)
         self.matchActive = False
         toGuiStack.put("match over")
 
-    def on_onMatchEnd(self):
+    def on_match_end(self):
         print("Match Ended.")
         self.fieldReview(self.fieldNum)
         self.matchActive = False
         toGuiStack.put("match over")
 
-    def on_onMatchCommit(self, obj):
+    def on_commit_scores(self, obj):
         print("Match Ended.")
         self.fieldClear(self.fieldNum)
 
@@ -785,7 +786,7 @@ class FieldComms():
         toGuiStack.put("resetRotors")
 
     def setStart(self, field):
-        self.setAllPWMInField(field, DEFAULT_PWM)
+        self.setAllPWMInField(field, WHITE)
         self.stopAllMotorsInCurrentField()
         toGuiStack.put("resetRotors")
 
@@ -834,6 +835,12 @@ class FieldComms():
                         else:
                             self.controlMode = self.init_modules()
                             toGuiStack.put("Notes empty")
+                        if not self.socketio.connected:
+                            self.socketio.emit("connection")
+                            self.socketio.emit("identify", ["field-service", "scoring", "referee"])
+                        if self.socketio.connected:
+                            print('[Connected]')
+                            toGuiStack.put("socket connected")
                         toGuiStack.put("refresh done")
                         self.setupDone = True
                     else:
@@ -844,7 +851,6 @@ class FieldComms():
                 toGuiStack.put("module discovery error")
         else:
             toGuiStack.put("USB not plugged in")
-        toGuiStack.put("refresh done")
 
 
 if __name__ == '__main__':

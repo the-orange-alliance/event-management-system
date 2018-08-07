@@ -26,7 +26,7 @@ class Module:
          self.i2cChannels.append( REVI2C.I2CChannel(self.commObj, i, self.address ) )
 
       for j in range( 0, 8 ):
-         self.dioPins.append( REVDIO.DIOPin(self.commObj, j, self.address ) )
+         self.dioPins.append( REVDIO.DIOPin(port, self.commObj, j, self.address ) )
 
       for k in range( 0, 6 ):
          self.servos.append( REVServo.Servo( self.commObj, k, self.address ) )

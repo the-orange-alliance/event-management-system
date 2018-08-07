@@ -35,7 +35,6 @@ export default class RefereeRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
-    client.emit("connectPythonApp"); // For Will's field service app.
     RefereeEvents.initialize(this._server, client, this._timer);
   }
 

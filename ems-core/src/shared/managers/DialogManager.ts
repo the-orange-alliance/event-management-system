@@ -55,6 +55,18 @@ class DialogManager {
   public showErrorBox(error: AppError | HttpError) {
     ipcRenderer.send("show-error", error);
   }
+
+  public generateReport(html: string) {
+    ipcRenderer.send("generate-report", html);
+  }
+
+  public viewReport() {
+    ipcRenderer.send("view-report");
+  }
+
+  public printReport() {
+    ipcRenderer.send("print-report");
+  }
 }
 
 export default DialogManager.getInstance();

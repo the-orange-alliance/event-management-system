@@ -1,5 +1,9 @@
-const {ipcMain, BrowserWindow, dialog} = require("electron");
+const {ipcMain, BrowserWindow, dialog, app} = require("electron");
 const fs = require("fs");
+const url = require("url");
+const path = require("path");
+const open = require("open");
+const logger = require("./logger");
 
 ipcMain.on("parse-csv", (event, file) => {
   if (!file.endsWith(".csv")) {
@@ -52,4 +56,53 @@ ipcMain.on("show-error", (event, error) => {
       type: "error"
     });
   }
+});
+
+ipcMain.on("generate-report", (event, reportHTML) => {
+  const appDataPath = app.getPath("appData") + path.sep + app.getName();
+  const cssCurPath = path.join(__dirname, "../build/css/semantic.min.css");
+  const reportPath = path.join(appDataPath, "report.html");
+  const cssCpyPath = path.join(appDataPath, "semantic.min.css");
+  fs.writeFile(reportPath, reportHTML, (writeErr) => {
+    if (writeErr) {
+      logger.error(writeErr);
+    } else {
+      fs.copyFile(cssCurPath, cssCpyPath, (err) => {
+        if (err) {
+          logger.error(err);
+        } else {
+          logger.debug("Successfully generated report.")
+        }
+      });
+    }
+  });
+});
+
+ipcMain.on("print-report", () => {
+  const appDataPath = app.getPath("appData") + path.sep + app.getName();
+  const reportPath = path.join(appDataPath, "report.html");
+  let printWindow = new BrowserWindow({
+    center: true,
+    parent: BrowserWindow.getFocusedWindow()
+  });
+  printWindow.webContents.once("did-finish-load", () => {
+    setTimeout(() => {
+      printWindow.webContents.print();
+    }, 1000);
+  });
+  printWindow.on("close", () => {
+    printWindow = null;
+  });
+  printWindow.loadURL(url.format({
+    pathname: reportPath,
+    protocol: "file:",
+    slashes: true
+  }));
+  printWindow.setMenu(null);
+});
+
+ipcMain.on("view-report", () => {
+  const appDataPath = app.getPath("appData") + path.sep + app.getName();
+  const reportPath = path.join(appDataPath, "report.html");
+  open(reportPath);
 });

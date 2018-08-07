@@ -14,6 +14,7 @@ import QualificationScheduleByTeam from "./reports/QualificationScheduleByTeam";
 import EliminationsScheduleByTeam from "./reports/EliminationsScheduleByTeam";
 import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
 import QualificationRankings from "./reports/QualificationRankings";
+import DialogManager from "../../shared/managers/DialogManager";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -23,7 +24,8 @@ interface IProps {
 interface IState {
   activeIndex: number,
   generatedReport: JSX.Element,
-  hasGeneratedReport: boolean
+  hasGeneratedReport: boolean,
+  htmlString: string
 }
 
 class ReportsView extends React.Component<IProps, IState> {
@@ -32,9 +34,12 @@ class ReportsView extends React.Component<IProps, IState> {
     this.state = {
       activeIndex: 0,
       generatedReport: <span><i>There is currently no generated report.</i></span>,
-      hasGeneratedReport: false
+      hasGeneratedReport: false,
+      htmlString: ""
     };
     this.onTabChange = this.onTabChange.bind(this);
+    this.openReportInBrowser = this.openReportInBrowser.bind(this);
+    this.printReport = this.printReport.bind(this);
     this.renderReports = this.renderReports.bind(this);
     this.renderGeneratedReport = this.renderGeneratedReport.bind(this);
     this.generateReport = this.generateReport.bind(this);
@@ -176,7 +181,7 @@ class ReportsView extends React.Component<IProps, IState> {
 
     let component;
 
-    if (typeof generatedReport === "undefined" || !hasGeneratedReport) {
+    if (typeof generatedReport === "undefined") {
       component = (
         <span>There is currently no generated report.</span>
       );
@@ -188,8 +193,8 @@ class ReportsView extends React.Component<IProps, IState> {
       <Tab.Pane className="tab-subview">
         {component}
         <div>
-          <Button disabled={!hasGeneratedReport} color={getTheme().primary}>Print</Button>
-          <Button disabled={!hasGeneratedReport} color={getTheme().primary}>Open in Browser</Button>
+          <Button disabled={!hasGeneratedReport} color={getTheme().primary} onClick={this.printReport}>Print</Button>
+          <Button disabled={!hasGeneratedReport} color={getTheme().primary} onClick={this.openReportInBrowser}>Open in Browser</Button>
         </div>
       </Tab.Pane>
     );
@@ -201,12 +206,30 @@ class ReportsView extends React.Component<IProps, IState> {
     }
   }
 
+  private openReportInBrowser() {
+    DialogManager.viewReport();
+  }
+
+  private printReport() {
+    DialogManager.printReport();
+  }
+
   private generateReport(reportComponent: JSX.Element) {
-    this.setState({activeIndex: 1, generatedReport: reportComponent, hasGeneratedReport: true});
+    this.setState({activeIndex: 1, generatedReport: reportComponent});
+  }
+
+  private generateReportHTML(htmlStr: string): string {
+    const templateHTML = "<html lang=\"en\"><head><meta charSet=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" /><link rel=\"stylesheet\" href=\"./semantic.min.css\" /><title>Generated Report</title><style>%STYLE%</style></head><body>%BODY%</body></html>";
+    return templateHTML.replace("%STYLE%", "@media print {.new-page { page-break-after: always; }}").replace("%BODY%", htmlStr);
   }
 
   private updateHTML(htmlStr: string) {
-    console.log(htmlStr);
+    const generatedHTML = this.generateReportHTML(htmlStr);
+    this.setState({
+      htmlString: generatedHTML,
+      hasGeneratedReport: true
+    });
+    DialogManager.generateReport(generatedHTML);
   }
 
   private generatePracticeSchedule() {

@@ -30,6 +30,11 @@ import MatchParticipant from "../../../shared/models/MatchParticipant";
 import SocketProvider from "../../../shared/providers/SocketProvider";
 import BasicMatch from "../../../shared/models/BasicMatch";
 
+import MATCH_START from "../res/sounds/match_start.wav";
+import MATCH_ENDGAME from "../res/sounds/match_end_start.wav";
+import MATCH_END from "../res/sounds/match_end.wav";
+import MATCH_ABORT from "../res/sounds/match_estop.wav";
+
 interface IProps {
   match: Match
 }
@@ -63,12 +68,18 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     SocketProvider.on("match-start", (matchTime: number) => {
       this.setState({time: moment.duration(matchTime, "seconds")});
       this.startTimer();
+      this.playSound(MATCH_START);
+    });
+    SocketProvider.on("match-endgame", () => {
+      this.playSound(MATCH_ENDGAME);
     });
     SocketProvider.on("match-abort", () => {
       this.setState({time: moment.duration(0, "seconds")});
       this.stopTimer();
+      this.playSound(MATCH_ABORT);
     });
     SocketProvider.on("match-end", () => {
+      this.playSound(MATCH_END);
       this.stopTimer();
     });
     SocketProvider.on("score-update", (scoreObj: any) => {
@@ -329,6 +340,12 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       }
       return teams;
     }
+  }
+
+  private playSound(url: any): Promise<any> {
+    const audio = new Audio(url);
+    audio.volume = 0.5;
+    return audio.play();
   }
 }
 

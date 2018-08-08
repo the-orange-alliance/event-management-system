@@ -91,17 +91,17 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                   <div className="res-card-teams">
                     <div className="res-team-row bottom-red">
                       <div className="res-team-name">{teams[0].teamNameShort}</div>
-                      <div className="res-team-rank">#{ranks[0].rank}</div>
+                      <div className="res-team-rank">{match.tournamentLevel > 0 ? "#" + ranks[0].rank : ""}</div>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[0].countryCode}/></div>
                     </div>
                     <div className="res-team-row bottom-red">
                       <div className="res-team-name">{teams[1].teamNameShort}</div>
-                      <div className="res-team-rank">#{ranks[1].rank}</div>
+                      <div className="res-team-rank">{match.tournamentLevel > 0 ? "#" + ranks[1].rank : ""}</div>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[1].countryCode}/></div>
                     </div>
                     <div className="res-team-row">
                       <div className="res-team-name">{teams[2].teamNameShort}</div>
-                      <div className="res-team-rank">#{ranks[2].rank}</div>
+                      <div className="res-team-rank">{match.tournamentLevel > 0 ? "#" + ranks[2].rank : ""}</div>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
                     </div>
                   </div>
@@ -181,17 +181,17 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                   <div className="res-card-teams">
                     <div className="res-team-row bottom-blue">
                       <div className="res-team-name">{teams[3].teamNameShort}</div>
-                      <div className="res-team-rank">#{ranks[3].rank}</div>
+                      <div className="res-team-rank">{match.tournamentLevel > 0 ? "#" + ranks[3].rank : ""}</div>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
                     </div>
                     <div className="res-team-row bottom-blue">
                       <div className="res-team-name">{teams[4].teamNameShort}</div>
-                      <div className="res-team-rank">#{ranks[4].rank}</div>
+                      <div className="res-team-rank">{match.tournamentLevel > 0 ? "#" + ranks[4].rank : ""}</div>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></div>
                     </div>
                     <div className="res-team-row">
                       <div className="res-team-name">{teams[5].teamNameShort}</div>
-                      <div className="res-team-rank">#{ranks[5].rank}</div>
+                      <div className="res-team-rank">{match.tournamentLevel > 0 ? "#" + ranks[5].rank : ""}</div>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></div>
                     </div>
                   </div>
@@ -302,6 +302,7 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
       for (const participant of this.props.match.participants) {
         teams.push(participant.team);
       }
+      console.log(teams, this.props.match.participants);
       return teams;
     }
   }

@@ -12,6 +12,8 @@ import MatchParticipant from "./shared/models/MatchParticipant";
 import EnergyImpactMatchDetails from "./shared/models/EnergyImpactMatchDetails";
 import AllianceMember from "./shared/models/AllianceMember";
 
+import MATCH_START from "./displays/fgc_2018/res/sounds/match_start.wav";
+
 interface IProps {
   cookies: Cookies
 }
@@ -62,44 +64,74 @@ class App extends React.Component<IProps, IState> {
       EMSProvider.initialize(masterHost);
       this.initState();
     });
+    SocketProvider.on("test-audience", () => {
+      this.playSound(MATCH_START).then(() => {
+        SocketProvider.emit("test-audience-success");
+      });
+    });
     SocketProvider.on("prestart", (matchKey: string) => {
       EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
-        EMSProvider.getMatchTeamRanks(matchKey).then((partRes: AxiosResponse) => {
-          if (matchRes.data && partRes.data) {
-            const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-            match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-            if (match.participants[0].allianceKey !== null && match.participants[0].allianceKey.length > 0) {
-              EMSProvider.getAlliances().then((allianceRes: AxiosResponse) => {
-                match.allianceMembers = allianceRes.data.payload.map((member: any) => new AllianceMember().fromJSON(member));
+        if (matchRes.data) {
+          const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
+          if (match.tournamentLevel > 0) {
+            EMSProvider.getMatchTeamRanks(matchKey).then((partRes: AxiosResponse) => {
+              match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
+              if (match.participants[0].allianceKey !== null && match.participants[0].allianceKey.length > 0) {
+                EMSProvider.getAlliances().then((allianceRes: AxiosResponse) => {
+                  match.allianceMembers = allianceRes.data.payload.map((member: any) => new AllianceMember().fromJSON(member));
+                  this.setState({
+                    activeMatch: match,
+                    videoID: 1 // Universal Match Preview Screen
+                  });
+                });
+              } else {
                 this.setState({
                   activeMatch: match,
                   videoID: 1 // Universal Match Preview Screen
                 });
-              });
-            } else {
+              }
+            });
+          } else {
+            EMSProvider.getMatchTeams(matchKey).then((partRes: AxiosResponse) => {
+              match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
               this.setState({
                 activeMatch: match,
                 videoID: 1 // Universal Match Preview Screen
               });
-            }
+            });
           }
-        }).catch((partErr) => console.error(partErr));
+        }
       }).catch((matchRes: any) => console.error(matchRes));
     });
     SocketProvider.on("commit-scores", (matchKey: string) => {
       EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
         EMSProvider.getMatchDetails(matchKey).then((detailRes: AxiosResponse) => {
-          EMSProvider.getMatchTeamRanks(matchKey).then((teamRes: AxiosResponse) => {
-            if (matchRes.data && detailRes.data && teamRes.data) {
-              const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-              match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
-              match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-              this.setState({
-                activeMatch: match,
-                videoID: 3 // Universal Match Results Screen
-              });
+          if (matchRes.data && detailRes.data) {
+            const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
+            if (match.tournamentLevel > 0) {
+              EMSProvider.getMatchTeamRanks(matchKey).then((teamRes: AxiosResponse) => {
+                if (teamRes.data) {
+                  match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
+                  match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
+                  this.setState({
+                    activeMatch: match,
+                    videoID: 3 // Universal Match Results Screen
+                  });
+                }
+              }).catch((teamRes: any) => console.error(teamRes));
+            } else {
+              EMSProvider.getMatchTeams(matchKey).then((teamRes: AxiosResponse) => {
+                if (teamRes.data) {
+                  match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
+                  match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
+                  this.setState({
+                    activeMatch: match,
+                    videoID: 3 // Universal Match Results Screen
+                  });
+                }
+              }).catch((teamRes: any) => console.error(teamRes));
             }
-          }).catch((teamRes: any) => console.error(teamRes));
+          }
         }).catch((detailsRes: any) => console.error(detailsRes));
       }).catch((matchRes: any) => console.error(matchRes));
     });
@@ -167,6 +199,12 @@ class App extends React.Component<IProps, IState> {
       this.setState({loading: false});
       console.error(error);
     });
+  }
+
+  private playSound(url: any): Promise<any> {
+    const audio = new Audio(url);
+    audio.volume = 0.5;
+    return audio.play();
   }
 }
 

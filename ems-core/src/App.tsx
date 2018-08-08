@@ -22,11 +22,13 @@ import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
 import SocketProvider from "./shared/providers/SocketProvider";
 import AllianceMember from "./shared/models/AllianceMember";
+import MatchConfiguration from "./shared/models/MatchConfiguration";
 
 interface IProps {
   slaveModeEnabled: boolean,
   masterHost: string,
   networkHost: string,
+  matchTimerConfig: MatchConfiguration,
   setCompletedStep?: (step: number) => IIncrementCompletedStep,
   setTeamList?: (teams: Team[]) => IUpdateTeamList,
   setPracticeMatches?: (matches: Match[]) => ISetPracticeMatches,
@@ -199,7 +201,8 @@ export function mapStateToProps(state: IApplicationState) {
   return {
     slaveModeEnabled: state.configState.slaveModeEnabled,
     masterHost: state.configState.masterHost,
-    networkHost: state.configState.networkHost
+    networkHost: state.configState.networkHost,
+    matchTimerConfig: state.configState.matchConfig
   };
 }
 

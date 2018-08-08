@@ -12,6 +12,7 @@ import {Dispatch} from "redux";
 import {setMatchConfig} from "../stores/config/actions";
 import {connect} from "react-redux";
 import RestrictedAccessModal from "./RestrictedAccessModal";
+import SocketProvider from "../shared/providers/SocketProvider";
 
 interface IProps {
   matchConfig?: MatchConfiguration,
@@ -96,6 +97,7 @@ class MatchPlayTimerConfiguration extends React.Component<IProps, IState> {
   private updateConfig() {
     this.closeModal();
     this.props.setMatchConfig(this.state.configCopy);
+    SocketProvider.emit("update-timer", this.state.configCopy.toJSON());
     CONFIG_STORE.set("matchConfig", this.state.configCopy.toJSON()).catch((error: AppError) => {
       DialogManager.showErrorBox(error);
     });

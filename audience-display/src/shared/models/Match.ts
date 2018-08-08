@@ -31,7 +31,7 @@ export default class Match implements IPostableObject {
     this._matchKey = "";
     this._matchDetailKey = "";
     this._matchName = "";
-    this._tournamentLevel = -1;
+    this._tournamentLevel = 1;
     this._scheduledStartTime = moment();
     this._fieldNumber = -1;
     this._active = 0;

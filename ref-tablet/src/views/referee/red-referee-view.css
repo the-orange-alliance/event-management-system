@@ -37,7 +37,7 @@ div > red-text {
   position: relative;
   display: flex;
   flex-direction: row;
-  background-color: rgb(66, 150, 244);
+  background-color: #ff3333;
   height: 57.5vw;
 }
 

@@ -12,7 +12,7 @@ handleClick(index) {
 
 	render() {
 		return (
-        <div className="sa-container">
+        <div className="sa-container" style={(this.props.alliance == "blue") ? {backgroundColor:'rgb(55, 102, 255)'}:{backgroundColor:'rgb(255, 80, 80)'}}>
           <PanelToggle toggleParent={() => {this.handleClick(0)}} light={this.props.panelArray[0]}/>
           <PanelToggle toggleParent={() => {this.handleClick(1)}} light={this.props.panelArray[1]}/>
           <PanelToggle toggleParent={() => {this.handleClick(2)}} light={this.props.panelArray[2]}/>

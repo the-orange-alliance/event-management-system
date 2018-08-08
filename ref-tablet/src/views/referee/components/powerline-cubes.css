@@ -17,15 +17,11 @@
   height: 12.5vw;
   display: grid;
   grid-template-columns: 12.1875;
-  background-color: rgb(75, 175, 255);
+  /* background-color: rgb(75, 175, 255); */
 }
 
 .plc-icon {
   max-width: 7.5vw;
-}
-
-.plc-icon-coal {
-  max-width: 6.25vw;
 }
 
 @media (min-width: 801px) {

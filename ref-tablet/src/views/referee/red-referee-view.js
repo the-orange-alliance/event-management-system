@@ -11,13 +11,6 @@ import ParkReport from './components/park-report';
 const RED = "red";
 
 class RedRefereeView extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			selector: [0, 0, 0]
-		};
-}
 
 	handleUpdatePowerlines(index) {
 		let powerlines = this.props.parentState.powerlines[0];
@@ -68,26 +61,20 @@ class RedRefereeView extends Component {
 		this.props.emitData("reactorCubes", {alliance: RED, cubes: filled});
 	}
 
-	handlePenaltyAssignment(selector, alliance) {
-		let state = this.state;
-		state.selector = selector;
+	handlePenaltyAssignment(selectors, alliance_index) {
+		let alliance_str = (alliance_index == 1) ? "blue" : "red";
 		for(var i = 0; i < 3; i++) {
-			switch(state.selector[i]) {
-				case 0:
-					/* Do nothing */
-					break;
+			switch(selectors[i]) {
 				case 1:
-					this.props.emitData("modifyFoul", {alliance: RED, value: 1});
-					this.props.emitData("modifyCard", {team: i, cardId: 1});
+					this.props.emitData("modifyFoul", {alliance_str: RED, value: 1});
+					this.props.emitData("modifyCard", {alliance_index: 0, team: i, cardId: 1});
 					break;
 				case 2:
-					this.props.emitData("modifyTechFoul", {alliance: RED, value: 1});
-					this.props.emitData("modifyCard", {team: i, cardId: 2});
+					this.props.emitData("modifyTechFoul", {alliance_str: RED, value: 1});
+					this.props.emitData("modifyCard", {alliance_index: 0, team: i, cardId: 2});
 					break;
 			}
 		}
-		state.selector = [0, 0, 0];
-		this.setState(state);
 	}
 
 	render() {
@@ -108,8 +95,8 @@ class RedRefereeView extends Component {
 					<ButtonGrid gridToParent={this.handleUpdateGrid.bind(this)} parentData={this.props.parentState.filled[0]} />
 					<SideCounter color="red" scoreUpdate={this.handleCombustionUpdate.bind(this)} cubes={this.props.parentState.cubes[0]} min="0" max="48"/>
 				</div>
-				<SolarArray gridToParent={this.handleSolarUpdate.bind(this)} panelArray={this.props.parentState.panelArray[0]} />
-				<Penalties alliance={0} teams={this.props.parentState.redAlliance} yellowCards={this.props.parentState.yellowCards[0]} redCards={this.props.parentState.redCards[0]} selector={this.state.selector} handlePenaltyAssignment={this.handlePenaltyAssignment.bind(this)} />
+				<SolarArray alliance="red" gridToParent={this.handleSolarUpdate.bind(this)} panelArray={this.props.parentState.panelArray[0]} />
+				<Penalties alliance={0} teams={this.props.parentState.redAlliance} yellowCards={this.props.parentState.yellowCards[0]} redCards={this.props.parentState.redCards[0]} handlePenaltyAssignment={this.handlePenaltyAssignment.bind(this)} />
 				<ParkReport teams={this.props.parentState.redAlliance} botsParked={this.props.parentState.botsParked[0]} updateParent={this.handleParked.bind(this)}/>
 			</div>
 

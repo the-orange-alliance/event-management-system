@@ -16,7 +16,7 @@
   position: relative;
   /* width: 97.25vw; */
   height: 22.5vw;
-  background-color: rgb(75, 175, 255);
+  background-color: #cccccc;
   display: grid;
   grid-template-columns: auto auto auto auto;
   grid-row-gap: 1.875vw;

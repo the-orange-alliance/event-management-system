@@ -10,15 +10,17 @@
 
 .p-row-container {
   padding-left: 1.5vw;
-  padding-top: 1.4vw;
-  padding-bottom: 4vw;
+  padding-top: 1.275vw;
+  padding-bottom: 3.875vw;
   position: relative;
   /* width: 96.35vw; */
   height: 21vw;
-  background-color: rgb(66, 150, 244);
+  background-color: #cccccc;
   display: grid;
   grid-template-columns: 21vw 13vw 13vw auto;
   grid-column-gap: 2vw;
+  border-top: .125vw solid black;
+  border-bottom: .125vw solid black;
 }
 
 .p-penalties {
@@ -41,7 +43,6 @@
     padding-bottom: 32px;
     /* width: 780px; */
     height: 168px;
-    background-color: rgb(66, 150, 244);
     grid-template-columns: 168px 104px 104px 312px;
     grid-column-gap: 16px;
   }

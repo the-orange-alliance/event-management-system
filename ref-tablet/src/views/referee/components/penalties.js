@@ -8,7 +8,7 @@ class Penalties extends Component {
 constructor(props) {
   super(props);
   this.state = {
-    selector: this.props.selector
+    selector: [0, 0, 0]
   };
 }
 
@@ -32,7 +32,7 @@ handleSubmit() {
 	render() {
     let msg = this.props.alliance ? "Blue Penalties" : "Red Penalties";
 		return (
-    <div className="p-row-container" style={this.props.alliance ? {backgroundColor:'rgb(65, 100, 244)'}:{backgroundColor:'rgb(244, 66, 66)'}}>
+    <div className="p-row-container">
       <div className="p-penalties">{msg}</div>
       <div className="p-container">
           <RoundedToggleTriple name={this.props.teams[0]} toggleSelector={() => {this.handleTripleClick(0)}} parentData={this.state.selector[0]}/>

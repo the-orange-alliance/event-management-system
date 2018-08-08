@@ -85,7 +85,7 @@ class App extends Component {
 					blue = [teams[3], teams[4], teams[5]];
 				}
 				this.setState({redAlliance: red, blueAlliance: blue});
-				// console.log("teams at state change: ", red, " ", blue);
+	      this.socket.emit("freshTablet",{});
 			}).catch((err) => {
 				console.error(err);
 			});
@@ -111,11 +111,10 @@ class App extends Component {
 			}, 1000);
 		});
 
-		this.socket.on("onScoreUpdate", (basicMatchModel) => {
+		this.socket.on("score-update", (basicMatchModel) => {
 			let scores = this.state.scores;
 			scores[0] = basicMatchModel["red"].score;
 			scores[1] = basicMatchModel["blue"].score;
-			console.log("Scores: ", scores);
 			this.setState({scores: scores});
 		});
 

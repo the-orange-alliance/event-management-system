@@ -6,10 +6,10 @@
 
 .sc-col-arrows {
   position: relative;
-  top: -1vw;
+  top: -2.5vw;
   display: flex;
   flex-direction: column;
-  height: 11.5vw;
+  height: 15vw;
   justify-content: space-between;
 }
 

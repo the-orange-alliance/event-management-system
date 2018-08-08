@@ -1,22 +1,25 @@
-import {Socket, Server} from "socket.io";
+import {Server, Socket} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import ScoreManager from "../scoring/ScoreManager";
 import ScoringTimerContainer from "../scoring/ScoringTimerContainer";
 import RefereeEvents from "../scoring/energy-impact/RefereeEvents";
+import {MatchMode} from "../scoring/MatchMode";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
   private readonly _clients: Socket[];
   private readonly _name: string;
   private readonly _timer: MatchTimer;
+  private _hasCommittedScore: boolean;
 
   constructor(server: Server, matchTimer: MatchTimer) {
     this._server = server;
     this._clients = [];
     this._name = "scoring";
     this._timer = matchTimer;
+    this._hasCommittedScore = false;
   }
 
   public addClient(client: Socket) {
@@ -37,6 +40,15 @@ export default class ScoringRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
+    // In case EMS disconnects mid-match.
+    if (!this._timer.inProgress() && this._timer.mode === MatchMode.ENDED && !this._hasCommittedScore) {
+      logger.info("Detected that client previously disconnected during match. Sending last match results.");
+      client.emit("score-update", ScoreManager.match.toJSON());
+      setTimeout(() => {
+        client.emit("match-end");
+      }, 250);
+    }
+
     client.on("request-video", (id: number) => {
       this._server.to("scoring").emit("video-switch", id);
     });
@@ -48,21 +60,22 @@ export default class ScoringRoom implements IRoom {
         red: ScoreManager.getDetails("red").toJSON(),
         blue: ScoreManager.getDetails("blue").toJSON()
       };
-      logger.info('fresh tablet.')
+      logger.info('fresh tablet.');
       this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "PRESTART"});
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);
+      this._hasCommittedScore = true;
     });
     client.on("start", () => {
       if (!this._timer.inProgress()) {
-        this._timer.start();
         this._timer.once("match-start", (timeLeft: number) => {
           const details: object = {
             red: ScoreManager.getDetails("red").toJSON(),
             blue: ScoreManager.getDetails("blue").toJSON()
           };
           this._server.to("scoring").emit("match-start", timeLeft);
+          this._hasCommittedScore = false;
         });
         this._timer.once("match-auto", () => {
           this._server.to("scoring").emit("match-auto");
@@ -85,6 +98,7 @@ export default class ScoringRoom implements IRoom {
           ScoringTimerContainer.stopAll();
           RefereeEvents.resetVariables();
         });
+        this._timer.start();
       }
     });
     client.on("abort", () => {

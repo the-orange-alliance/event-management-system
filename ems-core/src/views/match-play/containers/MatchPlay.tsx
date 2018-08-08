@@ -53,7 +53,8 @@ interface IProps {
 
 interface IState {
   selectedLevel: TournamentLevels
-  configModalOpen: boolean
+  configModalOpen: boolean,
+  activeMatch: Match
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -62,6 +63,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.state = {
       selectedLevel: "Practice",
       configModalOpen: false,
+      activeMatch: this.props.activeMatch
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
@@ -73,6 +75,10 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.startMatch = this.startMatch.bind(this);
     this.abortMatch = this.abortMatch.bind(this);
     this.commitScores = this.commitScores.bind(this);
+  }
+
+  public componentDidMount() {
+    this.setState({activeMatch: this.props.activeMatch});
   }
 
   public render() {
@@ -182,44 +188,51 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private setAudienceDisplay() {
     MatchFlowController.setAudienceDisplay().then(() => {
+      console.log(this.props.activeMatch.matchKey);
       this.props.setMatchState(MatchState.AUDIENCE_DISPLAY_SET);
     });
   }
 
   private startMatch() {
     SocketProvider.once("match-end", () => {
+      console.log(this.props.activeMatch.matchKey);
       this.props.setMatchState(MatchState.MATCH_COMPLETE);
       SocketProvider.off("score-update");
     });
     SocketProvider.on("score-update", (scoreObj: any) => {
       // TODO - This looks better. However, the scoreObj should eventually be coming through as an actual Match object.
       const sckMatch: SocketMatch = new SocketMatch().fromJSON(scoreObj, new EnergyImpactDetails());
-      this.props.activeMatch.redScore = sckMatch.redScore;
-      this.props.activeMatch.redMinPen = sckMatch.redMinPen;
-      this.props.activeMatch.redMajPen = sckMatch.redMajPen;
-      this.props.activeMatch.blueScore = sckMatch.blueScore;
-      this.props.activeMatch.blueMinPen = sckMatch.blueMinPen;
-      this.props.activeMatch.blueMajPen = sckMatch.blueMajPen;
+      this.state.activeMatch.redScore = sckMatch.redScore;
+      this.state.activeMatch.redMinPen = sckMatch.redMinPen;
+      this.state.activeMatch.redMajPen = sckMatch.redMajPen;
+      this.state.activeMatch.blueScore = sckMatch.blueScore;
+      this.state.activeMatch.blueMinPen = sckMatch.blueMinPen;
+      this.state.activeMatch.blueMajPen = sckMatch.blueMajPen;
       for (let i = 0; i < sckMatch.cardStatuses.length / 2; i++) {
-        this.props.activeMatch.participants[i].cardStatus = sckMatch.cardStatuses[i];
+        this.state.activeMatch.participants[i].cardStatus = sckMatch.cardStatuses[i];
       }
       for (let i = sckMatch.cardStatuses.length / 2; i < sckMatch.cardStatuses.length; i++) {
-        const index = (this.props.activeMatch.participants.length / 2) + (i - (sckMatch.cardStatuses.length / 2));
-        this.props.activeMatch.participants[index].cardStatus = sckMatch.cardStatuses[i];
+        const index = (this.state.activeMatch.participants.length / 2) + (i - (sckMatch.cardStatuses.length / 2));
+        this.state.activeMatch.participants[index].cardStatus = sckMatch.cardStatuses[i];
       }
       // Since everything is 'technically' pass-by-reference, updating activeMatch from activeMatch doesn't do anything.
       // Essentially, we are creating a different object with the same properties to properly update the scorecards.
-      const match: Match = new Match().fromJSON(this.props.activeMatch.toJSON());
+      const match: Match = new Match().fromJSON(this.state.activeMatch.toJSON());
       match.matchDetails = sckMatch.toMatchDetails();
-      match.participants = this.props.activeMatch.participants;
+      match.participants = this.state.activeMatch.participants.map(participant => new MatchParticipant().fromJSON(participant.toJSON()));
+      for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
+        if (typeof this.state.activeMatch.participants[i].team !== "undefined") {
+          match.participants[i].team = this.state.activeMatch.participants[i].team;
+        }
+      }
       this.props.setActiveMatch(match);
       this.props.setActiveParticipants(match.participants);
       this.props.setActiveDetails(match.matchDetails);
     });
     MatchFlowController.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);
-      this.props.setActiveMatch(this.props.activeMatch);
       this.forceUpdate();
+      console.log(this.props.activeMatch.matchKey);
     });
   }
 
@@ -294,6 +307,7 @@ class MatchPlay extends React.Component<IProps, IState> {
           this.props.setActiveMatch(data);
           this.props.setActiveParticipants(data.participants);
           this.props.setActiveDetails(data.matchDetails);
+          this.setState({activeMatch: data});
         });
         break;
       }

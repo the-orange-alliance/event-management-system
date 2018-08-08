@@ -27,7 +27,7 @@ class ReportTemplate extends React.Component<IProps> {
   public render() {
     const {event, children, generated, name} = this.props;
     return (
-      <div ref={this._ref}>
+      <div ref={this._ref} className="new-page">
         <Dimmer active={!generated}>
           <Loader />
         </Dimmer>

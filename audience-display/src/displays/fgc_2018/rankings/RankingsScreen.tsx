@@ -35,6 +35,7 @@ class RankingsScreen extends React.Component<{}, IState> {
           ranking.team = new Team().fromJSON(rankJSON);
           rankings.push(ranking);
         }
+        console.log(this.getTotalScrollTime(rankings.length));
         this.scrollAndLoop(this.getTotalScrollTime(rankings.length), this.getReturnScrollTime(rankings.length)); // TODO - Make these functions based upon window height and items in the list * 40px
         this.setState({rankings: rankings, loading: false});
       } else {
@@ -101,15 +102,14 @@ class RankingsScreen extends React.Component<{}, IState> {
   }
 
   private getTotalScrollTime(rankingsLength: number): number {
-    return (((window.innerHeight * 0.7) - 44) / (rankingsLength * 40)) * 30000;
+    return (rankingsLength / window.innerHeight) * 500000;
   }
 
   private getReturnScrollTime(rankingsLength: number): number {
-    return (((window.innerHeight * 0.7) - 44) / (rankingsLength * 40)) * 10000;
+    return (rankingsLength / window.innerHeight) * 100000;
   }
 
   private scrollAndLoop(bottomScrollDuration: number, topScrollDuration: number): void {
-    this.scrollThroughRankings(bottomScrollDuration, topScrollDuration);
     this._timerID = global.setInterval(() => {
       this.scrollThroughRankings(bottomScrollDuration, topScrollDuration);
       console.log("Starting ranking animation.");
@@ -130,6 +130,7 @@ class RankingsScreen extends React.Component<{}, IState> {
   }
 
   private scrollToBottom(duration: number): void {
+    console.log(duration);
     ReactScroll.scroller.scrollTo("rankings-bottom", {
       duration: duration,
       delay: ANIMATION_DELAY,

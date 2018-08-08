@@ -90,6 +90,9 @@ class EventCreationValidator {
     if (typeof str === "undefined") {
       return true;
     }
+    if (str === null) {
+      return true;
+    }
     return str.match(/[\t\r\n]|(--[^\r\n]*)|(\/\*[\w\W]*?(?=\*)\*\/)/gi) === null;
   }
 

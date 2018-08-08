@@ -15,6 +15,11 @@ import DialogManager from "../shared/managers/DialogManager";
 import * as socket from "socket.io-client";
 import {ISetEvent, ISetEventConfiguration, IToggleSlaveMode} from "../stores/config/types";
 import {enableSlaveMode, setEvent, setEventConfiguration} from "../stores/config/actions";
+import {CONFIG_STORE} from "../shared/AppStore";
+import AppError from "../shared/models/AppError";
+import {IIncrementCompletedStep} from "../stores/internal/types";
+import {incrementCompletedStep} from "../stores/internal/actions";
+import SocketProvider from "../shared/providers/SocketProvider";
 
 interface IProps {
   event?: Event,
@@ -25,7 +30,8 @@ interface IProps {
   networkHost?: string,
   setEvent: (event: Event) => ISetEvent,
   setEventConfig: (eventConfig: EventConfiguration) => ISetEventConfiguration,
-  setSlaveModeEnabled: (enabled: boolean) => IToggleSlaveMode
+  setSlaveModeEnabled: (enabled: boolean) => IToggleSlaveMode,
+  setCompletedStep: (step: number) => IIncrementCompletedStep
 }
 
 interface IState {
@@ -72,7 +78,7 @@ class SettingsSlave extends React.Component<IProps, IState> {
                 <Button fluid={true} disabled={slaveModeStarted || slaveMode || verifying} color={getTheme().secondary} onClick={this.startSlaveMode}>ENABLE SLAVE MODE</Button>
               </Grid.Column>
               <Grid.Column>
-                <Button fluid={true} disabled={!slaveModeStarted || verifying} color={getTheme().primary} onClick={this.disableSlaveMode}>DISABLE SLAVE MODE</Button>
+                <Button fluid={true} disabled={(!slaveModeStarted || verifying) && !slaveMode} color={getTheme().primary} onClick={this.disableSlaveMode}>DISABLE SLAVE MODE</Button>
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
@@ -103,9 +109,14 @@ class SettingsSlave extends React.Component<IProps, IState> {
   }
 
   private disableSlaveMode() {
-    this.props.setSlaveModeEnabled(false);
-    this.setState({slaveModeStarted: false, masterAddressVerified: false});
-    // TODO - Set config
+    CONFIG_STORE.setAll({}).then(() => {
+      this.props.setSlaveModeEnabled(false);
+      this.props.setCompletedStep(0);
+      document.title = "Event Management System";
+      this.setState({slaveModeStarted: false, masterAddressVerified: false});
+    }).catch((error: AppError) => {
+      DialogManager.showErrorBox(error);
+    });
   }
 
   private updateMasterAddress(event: SyntheticEvent, props: InputProps) {
@@ -114,10 +125,20 @@ class SettingsSlave extends React.Component<IProps, IState> {
   }
 
   private enableSlaveMode() {
-    this.props.setSlaveModeEnabled(true);
-    this.props.setEvent(this.state.masterEvent);
-    this.props.setEventConfig(this.state.masterEventConfig);
-    // TODO - Set config
+    CONFIG_STORE.setAll({
+      event: this.state.masterEvent.toJSON(),
+      eventConfig: this.state.masterEventConfig.toJSON(),
+      masterHost: this.state.masterAddress
+    }).then(() => {
+      SocketProvider.emit("enter-slave", this.state.masterAddress);
+      this.props.setSlaveModeEnabled(true);
+      this.props.setEvent(this.state.masterEvent);
+      this.props.setEventConfig(this.state.masterEventConfig);
+      // TODO - Basically re-perform the steps that App.tsx on application start. A restart will work, but let's be efficient!
+      DialogManager.showInfoBox("Configuration", "Slave mode enabled. Please restart EMS.");
+    }).catch((error: AppError) => {
+      DialogManager.showErrorBox(error);
+    });
   }
 
   private verifyAddress() {
@@ -186,7 +207,8 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setEvent: (event: Event) => dispatch(setEvent(event)),
     setEventConfig: (eventConfig: EventConfiguration) => dispatch(setEventConfiguration(eventConfig)),
-    setSlaveModeEnabled: (enabled: boolean) => dispatch(enableSlaveMode(enabled))
+    setSlaveModeEnabled: (enabled: boolean) => dispatch(enableSlaveMode(enabled)),
+    setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step))
   };
 }
 

@@ -58,6 +58,11 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.matchConfig = configState.matchConfig.fromJSON(configStore.matchConfig);
     }
 
+    if (typeof configStore.masterHost !== "undefined") {
+      configState.slaveModeEnabled = true;
+      configState.masterHost = configStore.masterHost;
+    }
+
     const applicationStore = createStore(reducers, {
       configState: configState,
       internalState: internalState

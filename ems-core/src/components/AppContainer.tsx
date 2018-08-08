@@ -25,7 +25,7 @@ class AppContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeItem: "Event Manager"
+      activeItem: this.props.slaveMode ? "Match Play" : "Event Manager"
     };
   }
 
@@ -83,8 +83,9 @@ class AppContainer extends React.Component<IProps, IState> {
   };
 }
 
-export function mapStateToProps({internalState}: IApplicationState) {
+export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
+    slaveMode: configState.slaveModeEnabled,
     navigationDisabled: internalState.navigationDisabled,
     completedStep: internalState.completedStep
   };

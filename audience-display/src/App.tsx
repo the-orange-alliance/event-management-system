@@ -57,6 +57,11 @@ class App extends React.Component<IProps, IState> {
       });
       this.forceUpdate();
     });
+    SocketProvider.on("enter-slave", (masterHost: string) => {
+      console.log("Entered slave mode with master address " + masterHost);
+      EMSProvider.initialize(masterHost);
+      this.initState();
+    });
     SocketProvider.on("prestart", (matchKey: string) => {
       EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
         EMSProvider.getMatchTeamRanks(matchKey).then((partRes: AxiosResponse) => {
@@ -106,29 +111,7 @@ class App extends React.Component<IProps, IState> {
    * event.
    */
   public componentDidMount() {
-    EMSProvider.getEvent().then((response: AxiosResponse) => {
-      if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
-        EMSProvider.getAllTeams().then((teamsResponse: AxiosResponse) => {
-          if (teamsResponse.data.payload && teamsResponse.data.payload.length > 0) {
-            this.setState({
-              event: new Event().fromJSON(response.data.payload[0]),
-              teams: teamsResponse.data.payload.map((teamJSON: any) => new Team().fromJSON(teamJSON)),
-              loading: false
-            });
-          } else {
-            this.setState({loading: false});
-          }
-        }).catch((err: any) => {
-          this.setState({loading: false});
-          console.error(err);
-        });
-      } else {
-        this.setState({loading: false});
-      }
-    }).catch((error: any) => {
-      this.setState({loading: false});
-      console.error(error);
-    });
+    this.initState();
   }
 
   public render() {
@@ -158,6 +141,32 @@ class App extends React.Component<IProps, IState> {
       default:
         return new EnergyImpactMatchDetails();
     }
+  }
+
+  private initState() {
+    EMSProvider.getEvent().then((response: AxiosResponse) => {
+      if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
+        EMSProvider.getAllTeams().then((teamsResponse: AxiosResponse) => {
+          if (teamsResponse.data.payload && teamsResponse.data.payload.length > 0) {
+            this.setState({
+              event: new Event().fromJSON(response.data.payload[0]),
+              teams: teamsResponse.data.payload.map((teamJSON: any) => new Team().fromJSON(teamJSON)),
+              loading: false
+            });
+          } else {
+            this.setState({loading: false});
+          }
+        }).catch((err: any) => {
+          this.setState({loading: false});
+          console.error(err);
+        });
+      } else {
+        this.setState({loading: false});
+      }
+    }).catch((error: any) => {
+      this.setState({loading: false});
+      console.error(error);
+    });
   }
 }
 

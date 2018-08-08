@@ -10,10 +10,15 @@ export default class EventRoom implements IRoom {
   private readonly _clients: Socket[];
   private readonly _name: string;
 
+  private isSlaveEnabled: boolean;
+  private masterAddress: string;
+
   constructor(server: Server) {
     this._server = server;
     this._clients = [];
     this._name = "event";
+    this.isSlaveEnabled = false;
+    this.masterAddress = "";
   }
 
   public addClient(client: Socket) {
@@ -34,6 +39,10 @@ export default class EventRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
+    if (this.isSlaveEnabled) {
+      this._server.to(this._name).emit("enter-slave", this.masterAddress);
+    }
+
     client.on("request-config", () => {
       const fileName = path.resolve(getAppDataPath("") + "/ems-core/config.json");
       fs.readFile(fileName, ((err, data) => {
@@ -43,6 +52,12 @@ export default class EventRoom implements IRoom {
         this._server.to(this._name).emit("config-receive", JSON.parse(data.toString()).eventConfig);
       }));
       // this._server.to(this._name).emit("config-receive", host);
+    });
+    client.on("enter-slave", (masterHost: string) => {
+      this.isSlaveEnabled = true;
+      this.masterAddress = masterHost;
+      logger.info("Asking all clients to enable slave mode on " + masterHost + ".");
+      this._server.to(this._name).emit("enter-slave", masterHost);
     });
   }
 

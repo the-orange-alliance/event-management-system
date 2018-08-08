@@ -100,7 +100,7 @@ class App extends Component {
 			});
 		});
 
-		this.socket.on("enableSlaveMode", (hostIP) => {
+		this.socket.on("enter-slave", (hostIP) => {
 			console.log("Enabling slave mode...");
 			setTimeout(() => {
 				enableSlaveMode(hostIP);

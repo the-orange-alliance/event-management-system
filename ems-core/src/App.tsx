@@ -24,6 +24,8 @@ import SocketProvider from "./shared/providers/SocketProvider";
 import AllianceMember from "./shared/models/AllianceMember";
 
 interface IProps {
+  slaveModeEnabled: boolean,
+  masterHost: string,
   networkHost: string,
   setCompletedStep?: (step: number) => IIncrementCompletedStep,
   setTeamList?: (teams: Team[]) => IUpdateTeamList,
@@ -41,10 +43,15 @@ class App extends React.Component<IProps> {
   }
 
   public componentDidMount() {
-    document.title = "Event Management System";
     this.initializeSocket(this.props.networkHost);
 
-    EMSProvider.initialize(this.props.networkHost);
+    if (this.props.slaveModeEnabled) {
+      document.title = "Event Management System (Slave to " + this.props.masterHost + ")";
+      EMSProvider.initialize(this.props.masterHost);
+    } else {
+      document.title = "Event Management System";
+      EMSProvider.initialize(this.props.networkHost);
+    }
 
     // Preload app-wide variables like team list, schedule, etc.
     EMSProvider.getEvent().then((eventResponse: AxiosResponse) => {
@@ -176,6 +183,11 @@ class App extends React.Component<IProps> {
     SocketProvider.on("connect", () => {
       SocketProvider.emit("identify", "ems-core", "scoring", "event");
       this.props.setSocketConnected(true);
+      if (this.props.slaveModeEnabled) {
+        setTimeout(() => {
+          SocketProvider.emit("enter-slave", this.props.masterHost);
+        }, 250);
+      }
     });
     SocketProvider.on("disconnect", () => {
       this.props.setSocketConnected(false);
@@ -185,6 +197,8 @@ class App extends React.Component<IProps> {
 
 export function mapStateToProps(state: IApplicationState) {
   return {
+    slaveModeEnabled: state.configState.slaveModeEnabled,
+    masterHost: state.configState.masterHost,
     networkHost: state.configState.networkHost
   };
 }

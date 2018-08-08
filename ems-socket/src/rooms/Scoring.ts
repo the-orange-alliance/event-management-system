@@ -91,6 +91,22 @@ export default class ScoringRoom implements IRoom {
         this._timer.abort();
       }
     });
+    client.on("update-timer", (timerJSON: any) => {
+      if (!this._timer.inProgress()) {
+        if (typeof timerJSON.delay_time !== "undefined") {
+          this._timer.delayTime = timerJSON.delay_time;
+        }
+        if (typeof timerJSON.auto_time !== "undefined") {
+          this._timer.autoTime = timerJSON.auto_time;
+        }
+        if (typeof timerJSON.tele_time !== "undefined") {
+          this._timer.teleTime = timerJSON.tele_time;
+        }
+        if (typeof timerJSON.end_time !== "undefined") {
+          this._timer.endTime = timerJSON.end_time;
+        }
+      }
+    });
   }
 
   get name(): string {

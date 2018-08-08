@@ -1,9 +1,11 @@
+/* Kept blue and red just in case we want to switch back easily */
+
 .up-button-arrow-blue {
 		width: 0;
   	height: 0;
 		border-left: 5vw solid transparent;
   	border-right: 5vw solid transparent;
-	  border-bottom: 5vw solid blue;
+	  border-bottom: 5vw solid white;
 }
 
 .up-button-arrow-red {
@@ -11,7 +13,7 @@
   	height: 0;
 		border-left: 5vw solid transparent;
   	border-right: 5vw solid transparent;
-	  border-bottom: 5vw solid red;
+	  border-bottom: 5vw solid white;
 		z-index: 2;
 }
 
@@ -19,13 +21,13 @@
 	.up-button-arrow-blue {
 			border-left: 40px solid transparent;
 	  	border-right: 40px solid transparent;
-		  border-bottom: 40px solid blue;
+		  border-bottom: 40px solid white;
 	}
 
 	.up-button-arrow-red {
 			border-left: 40px solid transparent;
 	  	border-right: 40px solid transparent;
-		  border-bottom: 40px solid red;
+		  border-bottom: 40px solid white;
 			z-index: 2;
 	}
 }

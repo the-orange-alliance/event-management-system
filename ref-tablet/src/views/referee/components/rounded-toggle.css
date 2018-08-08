@@ -2,8 +2,10 @@
 		width: 12.5vw;
   	height: 5vw;
     border-radius: .625vw;
+		color: #cccccc;
     background-color: grey;
   	font-size: 2.5vw;
+		font-weight: bold;
     cursor: pointer;
 		line-height: 5vw;
 		vertical-align: middle;
@@ -18,6 +20,7 @@
 		line-height: 5vw;
 		vertical-align: middle;
   	font-size: 1.375vw;
+		font-weight: bold;
     cursor: pointer;
 		z-index: 1;
 }

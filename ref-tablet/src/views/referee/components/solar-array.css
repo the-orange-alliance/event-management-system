@@ -4,7 +4,7 @@
   height: 12.5vw;
   padding-top: 2.5vw;
   padding-bottom: 2.5vw;
-  padding-left: 2.375vw;
+  padding-left: 3.75vw;;
 
   display: grid;
   grid-template-columns: 17.5vw 17.5vw 17.5vw 17.5vw 17.5vw;
@@ -27,12 +27,5 @@
     grid-column-gap: 10px;
     grid-auto-columns: 90px;
     grid-auto-rows: 90px;
-  }
-}
-
-@media (max-width: 595px) {
-  .sa-container {
-    /* width: 96.25vw; */
-    padding-left: 3.75vw;
   }
 }

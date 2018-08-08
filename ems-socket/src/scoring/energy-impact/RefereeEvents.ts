@@ -302,33 +302,31 @@ export default class RefereeEvents {
 
     client.on("modifyFoul", (obj) => {
       if (timer.inProgress()) {
-        let alliance_str = obj.alliance;
-        if (alliance_str !== "red" && alliance_str !== "blue") return;
-        // console.log("Adding minor penalty to ", alliance_str);
+        console.log("alliance_str: ", obj.alliance_str);
+        if (obj.alliance_str !== "red" && obj.alliance_str !== "blue") return;
         let score;
-        if(alliance_str === "red") { //swapped on purpose since opposite alliance is affected on penalties
+        if(obj.alliance_str === "red") { //swapped on purpose since opposite alliance is affected on penalties
           ScoreManager.match.redMinPen += obj.value;
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
+          console.log("blue score: ", score);
         } else {
           ScoreManager.match.blueMinPen += obj.value;
           score = ScoreCalculator.getRedSum();
           ScoreManager.match.redScore = score;
+          console.log("red score: ", score);
         }
-        console.log("Red score: ", ScoreManager.match.redScore);
-        console.log("Blue score: ", ScoreManager.match.blueScore);
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });
 
     client.on("modifyTechFoul", (obj) => {
       if (timer.inProgress()) {
-        let alliance_str = obj.alliance;
-        if (alliance_str !== "red" && alliance_str !== "blue") return;
+        if (obj.alliance_str !== "red" && obj.alliance_str !== "blue") return;
         // console.log("Adding major penalty to ", alliance_str);
 
         let score;
-        if(alliance_str === "red") { //swapped on purpose since opposite alliance is affected on penalties
+        if(obj.alliance_str === "red") { //swapped on purpose since opposite alliance is affected on penalties
           ScoreManager.match.redMajPen += obj.value;
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
@@ -337,8 +335,6 @@ export default class RefereeEvents {
           score = ScoreCalculator.getRedSum();
           ScoreManager.match.redScore = score;
         }
-        console.log("Red score: ", ScoreManager.match.redScore);
-        console.log("Blue score: ", ScoreManager.match.blueScore);
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });
@@ -351,19 +347,14 @@ export default class RefereeEvents {
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
 
         if(obj.team < 3) {
-          server.to("referee").emit("onModifyCard", {alliance_index: 0, team_index: obj.team, cardId: obj.cardId});
+          server.to("referee").emit("onModifyCard", {alliance_index: obj.alliance_index, team_index: obj.team, cardId: obj.cardId});
           if(obj.cardId === 1) {
             this._prevYellowCards[0][obj.team]++;
           } else {
             this._prevRedCards[0][obj.team]++;
           }
         } else {
-          server.to("referee").emit("onModifyCard", {alliance_index: 1, team_index: obj.team - 3, cardId: obj.cardId});
-          if(obj.cardId === 1) {
-            this._prevYellowCards[1][obj.team - 3]++;
-          } else {
-            this._prevRedCards[1][obj.team - 3]++;
-          }
+          console.log("Why is there a team index > 2?");
         }
       }
     });

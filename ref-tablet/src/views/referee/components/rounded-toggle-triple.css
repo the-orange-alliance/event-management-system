@@ -2,8 +2,10 @@
 	width: 13vw;
 	height: 6.5vw;
 	border-radius: .6vw;
+	color: #cccccc;
 	background-color: grey;
 	font-size: 2.8vw;
+	font-weight: bold;
 	cursor: pointer;
 	line-height: 6.5vw;
 	vertical-align: middle;
@@ -13,8 +15,10 @@
 	width: 13vw;
 	height: 6.5vw;
 	border-radius: .6vw;
+	color: #cccccc;
 	background-color: yellow;
 	font-size: 2.8vw;
+	font-weight: bold;
 	cursor: pointer;
 	line-height: 6.5vw;
 	vertical-align: middle;
@@ -24,8 +28,10 @@
 	width: 13vw;
 	height: 6.5vw;
 	border-radius: .6vw;
+	color: #cccccc;
 	background-color: red;
 	font-size: 2.8vw;
+	font-weight: bold;
 	cursor: pointer;
 	line-height: 6.5vw;
 	vertical-align: middle;

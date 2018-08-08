@@ -67,6 +67,9 @@ socket.on("connection", (client: Socket) => {
     eventRoom.removeClient(client);
     refereeRoom.removeClient(client);
   });
+  client.on("drip", () => {
+    client.emit("drop");
+  });
 });
 
 const WIND = 0;

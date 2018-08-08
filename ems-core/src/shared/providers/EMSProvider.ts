@@ -130,6 +130,10 @@ class EMSProvider {
     });
   }
 
+  public ping(): Promise<AxiosResponse> {
+    return this.get("ping");
+  }
+
   public createEvent(eventType: EMSEventTypes): Promise<AxiosResponse> {
     return this.get("api/event/create?type=" + eventType);
   }

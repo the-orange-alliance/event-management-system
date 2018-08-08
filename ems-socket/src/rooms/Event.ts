@@ -59,6 +59,12 @@ export default class EventRoom implements IRoom {
       logger.info("Asking all clients to enable slave mode on " + masterHost + ".");
       this._server.to(this._name).emit("enter-slave", masterHost);
     });
+    client.on("test-audience", () => {
+      this._server.to(this._name).emit("test-audience");
+    });
+    client.on("test-audience-success", () => {
+      this._server.to(this._name).emit("test-audience-success");
+    });
   }
 
   get name(): string {

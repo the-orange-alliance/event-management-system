@@ -13,7 +13,7 @@
   padding-top: 1.4vw;
   padding-bottom: 4vw;
   position: relative;
-  width: 100%;
+  /* width: 96.35vw; */
   height: 21vw;
   background-color: rgb(66, 150, 244);
   display: grid;
@@ -39,7 +39,7 @@
     padding-left: 20px;
     padding-top: 11.2px;
     padding-bottom: 32px;
-    width: 780px;
+    /* width: 780px; */
     height: 168px;
     background-color: rgb(66, 150, 244);
     grid-template-columns: 168px 104px 104px 312px;
@@ -50,5 +50,11 @@
     margin-top: 52px;
     font-size: 32px;
     font-weight: bold;
+  }
+}
+
+@media (max-width: 595px) {
+  .p-row-container {
+    /* width: 98.5%; */
   }
 }

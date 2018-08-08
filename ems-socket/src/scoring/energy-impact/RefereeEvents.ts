@@ -22,22 +22,19 @@ export default class RefereeEvents {
   public static initialize(server: Server, client: Socket, timer: MatchTimer) {
     /* Load ref tablet data */
     client.on("freshTablet", () => {
-      console.log("Fresh tablet asking for ref data."); // TODO - Remove
       const details: object = {
         red: ScoreManager.getDetails("red").toJSON(),
         blue: ScoreManager.getDetails("blue").toJSON()
       };
-      client.emit("onFreshTablet", {scores: [ScoreCalculator.getRedSum(), ScoreCalculator.getBlueSum()], md: details, prevReactor: this._prevReactor, prevYellowCards: this._prevYellowCards, prevRedCards: this._prevRedCards, prevBotsParked: this._prevBotsParked, status: "no"});
+      client.emit("onFreshTablet", {scores: [ScoreCalculator.getRedSum(), ScoreCalculator.getBlueSum()], md: details, prevReactor: this._prevReactor, prevYellowCards: this._prevYellowCards, prevRedCards: this._prevRedCards, prevBotsParked: this._prevBotsParked, status: "PRESTART"});
     });
 
     client.on("reactorCubes", (obj) => {
-      // console.log("Got reactor.");
       if (timer.inProgress()) {
         let alliance_str = obj.alliance;
         let alliance_index = (alliance_str === "red") ? 0 : 1;
         let opposite_alliance_index = (alliance_str === "red") ? 1 : 0;
 
-        // console.log("Got reactor. Alliance = ", alliance_str, ", cubes = ", obj.cubes);
         this._prevReactor[alliance_index] = obj.cubes;
         this._prevReactor[opposite_alliance_index] = [obj.cubes[3], obj.cubes[2], obj.cubes[1], obj.cubes[0], obj.cubes[7], obj.cubes[6], obj.cubes[5], obj.cubes[4]];
         ScoreManager.match.shared.reactor_cubes = this.countCubesInGrid(obj.cubes);
@@ -127,8 +124,6 @@ export default class RefereeEvents {
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
         }
-        console.log("Red score: ", ScoreManager.match.redScore); // TODO - Remove
-        console.log("Blue score: ", ScoreManager.match.blueScore); // TODO - Remove
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });

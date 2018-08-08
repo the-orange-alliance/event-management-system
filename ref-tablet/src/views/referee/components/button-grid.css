@@ -38,3 +38,9 @@
     max-width: 400px;
   }
 }
+
+@media (max-width: 599px) {
+  .bg-container {
+    top: -27.4vw;
+  }
+}

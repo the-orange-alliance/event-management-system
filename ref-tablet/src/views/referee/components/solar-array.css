@@ -1,10 +1,10 @@
 .sa-container {
   position: relative;
-  width: 96.25vw;
+  /* width: 95.5vw; */
   height: 12.5vw;
   padding-top: 2.5vw;
   padding-bottom: 2.5vw;
-  padding-left: 3.75vw;
+  padding-left: 2.375vw;
 
   display: grid;
   grid-template-columns: 17.5vw 17.5vw 17.5vw 17.5vw 17.5vw;
@@ -17,7 +17,7 @@
 
 @media (min-width: 801px) {
   .sa-container {
-    width: 770px;
+    /* width: 770px; */
     height: 100px;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -27,5 +27,12 @@
     grid-column-gap: 10px;
     grid-auto-columns: 90px;
     grid-auto-rows: 90px;
+  }
+}
+
+@media (max-width: 595px) {
+  .sa-container {
+    /* width: 96.25vw; */
+    padding-left: 3.75vw;
   }
 }

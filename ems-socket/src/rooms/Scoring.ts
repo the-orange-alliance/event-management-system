@@ -42,11 +42,14 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("prestart", (matchKey: string, fieldNumber: number) => {
       this._server.to("scoring").emit("prestart", matchKey, fieldNumber);
+      RefereeEvents.resetVariables();
+      ScoreManager.resetMatch();
       const details: object = {
         red: ScoreManager.getDetails("red").toJSON(),
         blue: ScoreManager.getDetails("blue").toJSON()
       };
-      this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "no"});
+      logger.info('fresh tablet.')
+      this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "PRESTART"});
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);
@@ -55,12 +58,10 @@ export default class ScoringRoom implements IRoom {
       if (!this._timer.inProgress()) {
         this._timer.start();
         this._timer.once("match-start", (timeLeft: number) => {
-          ScoreManager.resetMatch();
           const details: object = {
             red: ScoreManager.getDetails("red").toJSON(),
             blue: ScoreManager.getDetails("blue").toJSON()
           };
-          this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "no"});
           this._server.to("scoring").emit("match-start", timeLeft);
         });
         this._timer.once("match-auto", () => {

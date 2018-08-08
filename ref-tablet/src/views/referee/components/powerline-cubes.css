@@ -2,8 +2,8 @@
   padding-top: 2.5vw;
   padding-bottom: 2.5vw;
   position: relative;
-  padding-left: .9375vw;
-  width: 99.0625vw;
+  padding-left: .5vw;
+  /* width: 97.35vw; */
   height: 12.5vw;
   display: grid;
   grid-template-columns: auto auto auto auto auto auto auto auto;
@@ -33,7 +33,7 @@
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 7.5px;
-    width: 792.5px;
+    /* width: 792.5px; */
     height: 100px;
     grid-column-gap: 5px;
   }
@@ -50,5 +50,12 @@
 
   .plc-icon-coal {
     max-width: 50px;
+  }
+}
+
+@media (max-width: 595px) {
+  .plc-container {
+    padding-left: .9375vw;
+    /* width: 99.0625vw; */
   }
 }

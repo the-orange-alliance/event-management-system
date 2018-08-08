@@ -114,8 +114,6 @@ ScoringTimerContainer.on("updateMatchScoring", (obj) => {
       score = ScoreCalculator.getBlueSum();
       ScoreManager.match.blueScore = score;
     }
-    //console.log("Red score: ", ScoreManager.match.redScore); // TODO - Remove
-    //console.log("Blue score: ", ScoreManager.match.blueScore); // TODO - Remove
     socket.to("scoring").emit("score-update", ScoreManager.match.toJSON());
   }
 });

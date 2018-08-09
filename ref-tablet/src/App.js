@@ -53,7 +53,7 @@ class App extends Component {
 			console.log("Connected");
       this.setState({connected: true});
 			this.socket.emit("identify", ["referee-tablet", "referee", "scoring", "event"]);
-			setTimeout(() => {
+			setTimeout(() => { //wait for socket connection
         this.socket.emit("freshTablet",{});
       }, 250);
 		});
@@ -61,6 +61,18 @@ class App extends Component {
 			console.log("Disconnected");
 			this.setState({connected: false});
 		});
+
+		this.socket.on("enter-slave", (hostIP) => {
+			console.log("Enabling slave mode...");
+			setTimeout(() => {
+				enableSlaveMode(hostIP);
+				console.log("Slave mode enabled on host " + hostIP);
+				this.setState({
+					slaveInstance: 2 // TODO - If more than 2 matches, how do we determine this? DB?
+				});
+			}, 1000);
+		});
+
 		this.socket.on("match-start", () => {
 			this.setState({matchStatus: "PLAYING", freshTablet: true});
 		});
@@ -75,7 +87,7 @@ class App extends Component {
 		});
 		this.socket.on("prestart", () => {
 			this.setState({matchStatus: "PRESTART"});
-			this.getTeams().then((response) => {
+			this.getCountries().then((response) => {
 				let teams = response;
 				let red = ["C1", "C2", "C3"];
 				let blue = ["C4", "C5", "C6"];
@@ -85,12 +97,14 @@ class App extends Component {
 					blue = [teams[3], teams[4], teams[5]];
 				}
 				this.setState({redAlliance: red, blueAlliance: blue});
-	      this.socket.emit("freshTablet",{});
+				setTimeout(() => { //wait for api connection
+	        this.socket.emit("freshTablet",{});
+	      }, 500);
 			}).catch((err) => {
 				console.error(err);
 			});
 			this.getMatchName().then((response) => {
-				let matchName = -1;
+				let matchName = "Waiting for match";
 				if(response !== null && response !== undefined) {
 					matchName = response;
 				}
@@ -98,17 +112,6 @@ class App extends Component {
 			}).catch((err) => {
 				console.error(err);
 			});
-		});
-
-		this.socket.on("enter-slave", (hostIP) => {
-			console.log("Enabling slave mode...");
-			setTimeout(() => {
-				enableSlaveMode(hostIP);
-				console.log("Slave mode enabled on host " + hostIP);
-				this.setState({
-					slaveInstance: 2 // TODO - If more than 2 matches, how do we determine this? DB?
-				});
-			}, 1000);
 		});
 
 		this.socket.on("score-update", (basicMatchModel) => {
@@ -138,24 +141,26 @@ class App extends Component {
 				state.scores = obj.scores;
 				state.matchStatus = obj.status;
 				console.log("status: ", state.matchStatus);
-				this.getTeams().then((response) => {
-					let teams = response;
-					if(teams !== null && teams !== undefined) {
-						state.redAlliance = [teams[0], teams[1], teams[2]];
-						state.blueAlliance = [teams[3], teams[4], teams[5]];
-						this.setState(state);
-					}
-				}).catch((err) => {
-					console.error(err);
-				});
-				this.getMatchName().then((response) => {
-					if(response !== null && response !== undefined) {
-						state.matchName = response;
-						this.setState(state);
-					}
-				}).catch((err) => {
-					console.error(err);
-				});
+				setTimeout(() => { //wait for api connection
+					this.getCountries().then((response) => {
+						let teams = response;
+						if(teams !== null && teams !== undefined) {
+							state.redAlliance = [teams[0], teams[1], teams[2]];
+							state.blueAlliance = [teams[3], teams[4], teams[5]];
+							this.setState(state);
+						}
+					}).catch((err) => {
+						console.error(err);
+					});
+					this.getMatchName().then((response) => {
+						if(response !== null && response !== undefined) {
+							state.matchName = response;
+							this.setState(state);
+						}
+					}).catch((err) => {
+						console.error(err);
+					});
+	      }, 2000);
 				console.log("setting states");
 
 			}
@@ -261,7 +266,7 @@ class App extends Component {
 		}
 	}
 
-	getTeams() {
+	getCountries() {
 		let teams;
 		let key;
 		let teamArr = [];
@@ -269,10 +274,11 @@ class App extends Component {
 			LOCAL_PROVIDER.getActiveMatch().then((response) => {
 				key = response.data.payload[0].match_key;
 
-				LOCAL_PROVIDER.getMatchParticipants(key).then((response) => {
+				LOCAL_PROVIDER.getTeams(key).then((response) => {
+					console.log(response);
 					teams = response.data.payload;
 					for(let i = 0; i < teams.length; i++) {
-						teamArr.push(teams[i].team_key.toString());
+						teamArr.push(teams[i].country);
 					}
 					resolve(teamArr);
 				}).catch((err) => {

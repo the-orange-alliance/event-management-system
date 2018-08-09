@@ -48,7 +48,11 @@ class LocalProvider {
 		return this.get("api/match");
 	}
 
-	getMatchParticipants(match_key) {
+	getTeams(match_key) { // will give participants + other data like countries
+		return this.get("api/match/" + match_key + "/teams");
+	}
+
+	getMatchParticipants(match_key) { //team number
 		return this.get("api/match/" + match_key + "/participants");
 	}
 

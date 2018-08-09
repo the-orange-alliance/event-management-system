@@ -11,15 +11,16 @@ class HeadRefereeView extends Component {
 
 	handlePenaltyAssignment(selectors, alliance_index) {
 		let alliance_str = (alliance_index == 1) ? "blue" : "red";
+		let team = (alliance_index == 1) ? 3 : 0;
 		for(var i = 0; i < 3; i++) {
 			switch(selectors[i]) {
 				case 1:
 					this.props.emitData("modifyFoul", {alliance_str: alliance_str, value: 1});
-					this.props.emitData("modifyCard", {alliance_index: alliance_index, team: i, cardId: 1});
+					this.props.emitData("modifyCard", {alliance_index: alliance_index, team: team + i, cardId: 1});
 					break;
 				case 2:
 					this.props.emitData("modifyTechFoul", {alliance_str: alliance_str, value: 1});
-					this.props.emitData("modifyCard", {alliance_index: alliance_index, team: i, cardId: 2});
+					this.props.emitData("modifyCard", {alliance_index: alliance_index, team: team + i, cardId: 2});
 					break;
 			}
 		}

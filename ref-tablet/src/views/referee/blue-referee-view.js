@@ -67,11 +67,11 @@ class BlueRefereeView extends Component {
 			switch(selectors[i]) {
 				case 1:
 					this.props.emitData("modifyFoul", {alliance_str: BLUE, value: 1});
-					this.props.emitData("modifyCard", {alliance_index: 1, team: i, cardId: 1});
+					this.props.emitData("modifyCard", {alliance_index: 1, team: 3 + i, cardId: 1});
 					break;
 				case 2:
 					this.props.emitData("modifyTechFoul", {alliance_str: BLUE, value: 1});
-					this.props.emitData("modifyCard", {alliance_index: 1, team: i, cardId: 2});
+					this.props.emitData("modifyCard", {alliance_index: 1, team: 3 + i, cardId: 2});
 					break;
 			}
 		}

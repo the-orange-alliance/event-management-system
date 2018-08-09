@@ -342,19 +342,23 @@ export default class RefereeEvents {
     client.on("modifyCard", (obj) => {
       if (timer.inProgress()) {
         if ((obj.team < 0 || obj.team > 5) && (obj.cardId < 0 || obj.cardId > 2)) return;
-        // console.log("Penalty going to team ", obj.team);
         ScoreManager.match.cardStatuses[obj.team] = obj.cardId;
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
 
         if(obj.team < 3) {
           server.to("referee").emit("onModifyCard", {alliance_index: obj.alliance_index, team_index: obj.team, cardId: obj.cardId});
           if(obj.cardId === 1) {
-            this._prevYellowCards[0][obj.team]++;
+            this._prevYellowCards[obj.alliance_index][obj.team]++;
           } else {
-            this._prevRedCards[0][obj.team]++;
+            this._prevRedCards[obj.alliance_index][obj.team]++;
           }
         } else {
-          console.log("Why is there a team index > 2?");
+          server.to("referee").emit("onModifyCard", {alliance_index: obj.alliance_index, team_index: obj.team - 3, cardId: obj.cardId});
+          if(obj.cardId === 1) {
+            this._prevYellowCards[obj.alliance_index][obj.team - 3]++;
+          } else {
+            this._prevRedCards[obj.alliance_index][obj.team - 3]++;
+          }
         }
       }
     });

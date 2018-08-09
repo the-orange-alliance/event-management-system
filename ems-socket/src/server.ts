@@ -81,7 +81,6 @@ const SOLAR_5 = 5;
 const REACTOR = 6;
 
 ScoringTimerContainer.on("updateMatchScoring", (obj) => {
-  console.log("Updating match scoring.");
   if (timer.inProgress()) {
     let alliance_str = (obj.alliance_index === 0) ? "red" : "blue";
 

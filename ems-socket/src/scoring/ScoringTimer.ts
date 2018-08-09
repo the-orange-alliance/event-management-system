@@ -42,7 +42,6 @@ export class ScoringTimer extends events.EventEmitter {
     this.stopped = true;
     this.currTime = -1;
     if (this.timerObj != null) {
-      console.log("Clearing a timer."); // TODO - Remove
       clearInterval(this.timerObj);
       this.timerObj = null;
     }

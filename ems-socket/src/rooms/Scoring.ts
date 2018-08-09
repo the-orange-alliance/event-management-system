@@ -60,11 +60,7 @@ export default class ScoringRoom implements IRoom {
         red: ScoreManager.getDetails("red").toJSON(),
         blue: ScoreManager.getDetails("blue").toJSON()
       };
-<<<<<<< HEAD
-      logger.info('fresh tablet.');
       this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "PRESTART"});
-=======
->>>>>>> 2e47299e48e91d570021e35a972dd2a1316300da
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);

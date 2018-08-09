@@ -168,8 +168,8 @@ export default class RefereeEvents {
 
         ScoreManager.match.blueScore = ScoreCalculator.getBlueSum();
         ScoreManager.match.redScore = ScoreCalculator.getRedSum();
-        console.log("Red score: ", ScoreManager.match.redScore);
-        console.log("Blue score: ", ScoreManager.match.blueScore);
+        // console.log("Red score: ", ScoreManager.match.redScore);
+        // console.log("Blue score: ", ScoreManager.match.blueScore);
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });
@@ -238,8 +238,8 @@ export default class RefereeEvents {
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
         }
-        console.log("Red score: ", ScoreManager.match.redScore);
-        console.log("Blue score: ", ScoreManager.match.blueScore);
+        // console.log("Red score: ", ScoreManager.match.redScore);
+        // console.log("Blue score: ", ScoreManager.match.blueScore);
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });
@@ -266,8 +266,8 @@ export default class RefereeEvents {
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
         }
-        console.log("Red score: ", ScoreManager.match.redScore);
-        console.log("Blue score: ", ScoreManager.match.blueScore);
+        // console.log("Red score: ", ScoreManager.match.redScore);
+        // console.log("Blue score: ", ScoreManager.match.blueScore);
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });
@@ -294,8 +294,8 @@ export default class RefereeEvents {
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
         }
-        console.log("Red score: ", ScoreManager.match.redScore);
-        console.log("Blue score: ", ScoreManager.match.blueScore);
+        // console.log("Red score: ", ScoreManager.match.redScore);
+        // console.log("Blue score: ", ScoreManager.match.blueScore);
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }
     });
@@ -309,12 +309,12 @@ export default class RefereeEvents {
           ScoreManager.match.redMinPen += obj.value;
           score = ScoreCalculator.getBlueSum();
           ScoreManager.match.blueScore = score;
-          console.log("blue score: ", score);
+          // console.log("blue score: ", score);
         } else {
           ScoreManager.match.blueMinPen += obj.value;
           score = ScoreCalculator.getRedSum();
           ScoreManager.match.redScore = score;
-          console.log("red score: ", score);
+          // console.log("red score: ", score);
         }
         server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       }

@@ -56,11 +56,11 @@ export default class ScoringRoom implements IRoom {
       this._server.to("scoring").emit("prestart", matchKey, fieldNumber);
       RefereeEvents.resetVariables();
       ScoreManager.resetMatch();
-      const details: object = {
-        red: ScoreManager.getDetails("red").toJSON(),
-        blue: ScoreManager.getDetails("blue").toJSON()
-      };
-      this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "PRESTART"});
+      // const details: object = {
+      //   red: ScoreManager.getDetails("red").toJSON(),
+      //   blue: ScoreManager.getDetails("blue").toJSON()
+      // };
+      // this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "PRESTART"});
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);

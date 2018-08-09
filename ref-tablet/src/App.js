@@ -86,7 +86,7 @@ class App extends Component {
 			this.setState({matchStatus: "COMMITTED"});
 		});
 		this.socket.on("prestart", () => {
-			this.setState({matchStatus: "PRESTART"});
+			this.setState({matchStatus: "PRESTART", freshTablet: true});
 			this.getCountries().then((response) => {
 				let teams = response;
 				let red = ["C1", "C2", "C3"];
@@ -97,7 +97,7 @@ class App extends Component {
 					blue = [teams[3], teams[4], teams[5]];
 				}
 				this.setState({redAlliance: red, blueAlliance: blue});
-				setTimeout(() => { //wait for api connection
+				setTimeout(() => {
 	        this.socket.emit("freshTablet",{});
 	      }, 500);
 			}).catch((err) => {

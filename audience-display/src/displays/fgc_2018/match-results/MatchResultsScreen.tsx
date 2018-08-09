@@ -124,11 +124,14 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                       <div className="res-team-rank"/>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
                     </div>
-                    <div className="res-team-row">
-                      <div className="res-team-name">{teams[3].teamNameShort}</div>
-                      <div className="res-team-rank"/>
-                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
-                    </div>
+                    {
+                      teams.length > 6 &&
+                      <div className="res-team-row">
+                        <div className="res-team-name">{teams[3].teamNameShort}</div>
+                        <div className="res-team-rank"/>
+                        <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
+                      </div>
+                    }
                   </div>
                 }
                 <div className="res-card-details">
@@ -198,6 +201,7 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                 }
                 {
                   match.tournamentLevel >= 10 &&
+                  teams.length > 6 &&
                   <div className="res-card-teams">
                     <div className="res-team-row bottom-blue">
                       <div className="res-team-name">{teams[4].teamNameShort}</div>
@@ -218,6 +222,27 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                       <div className="res-team-name">{teams[7].teamNameShort}</div>
                       <div className="res-team-rank"/>
                       <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[7].countryCode}/></div>
+                    </div>
+                  </div>
+                }
+                {
+                  match.tournamentLevel >= 10 &&
+                  teams.length <= 6 &&
+                  <div className="res-card-teams">
+                    <div className="res-team-row bottom-blue">
+                      <div className="res-team-name">{teams[3].teamNameShort}</div>
+                      <div className="res-team-rank">#{match.participants[3].getAllianceRankFromKey()}</div>
+                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
+                    </div>
+                    <div className="res-team-row bottom-blue">
+                      <div className="res-team-name">{teams[4].teamNameShort}</div>
+                      <div className="res-team-rank"/>
+                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></div>
+                    </div>
+                    <div className="res-team-row bottom-blue">
+                      <div className="res-team-name">{teams[5].teamNameShort}</div>
+                      <div className="res-team-rank"/>
+                      <div className="res-team-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></div>
                     </div>
                   </div>
                 }

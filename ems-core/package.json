@@ -1,6 +1,6 @@
 {
   "name": "ems-core",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "private": true,
   "main": "public/electron.js",
   "dependencies": {

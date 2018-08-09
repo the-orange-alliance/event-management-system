@@ -23,7 +23,7 @@ class App extends Component {
 
 		this.state = {                     /* All arrays formatted: [red, blue] */
 			freshTablet: true, /*Never updated anything itself, just loaded. */
-			matchName: -1,
+			matchName: "Waiting for match",
 			connected: this.socket.connected, /*TODO - update these based upon socket*/
 			matchStatus: "WAITING...",
 			powerlines: [[false, false, false, false],[false, false, false, false]], /*Wind Reactor Combustion Coop*/

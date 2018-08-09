@@ -81,7 +81,7 @@ class RedRefereeView extends Component {
 		return (
 			<div className="red-rv">
 				<div className="red-rv-info-bar">
-					<div>{"Match: " + this.props.parentState.matchName}</div>
+					<div>{this.props.parentState.matchName}</div>
 					<div>{"Status: "}
 						<red-text>{this.props.parentState.matchStatus}</red-text>
 					</div>

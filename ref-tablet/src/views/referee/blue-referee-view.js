@@ -81,7 +81,7 @@ class BlueRefereeView extends Component {
 		return (
 			<div className="blue-rv">
 				<div className="blue-rv-info-bar">
-					<div>{"Match: " + this.props.parentState.matchName}</div>
+					<div>{this.props.parentState.matchName}</div>
 					<div>{"Status: "}
 						<red-text>{this.props.parentState.matchStatus}</red-text>
 					</div>

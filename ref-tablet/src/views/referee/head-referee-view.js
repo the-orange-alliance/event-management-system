@@ -31,7 +31,7 @@ class HeadRefereeView extends Component {
 			<div>
 				<div className="head-rv">
 					<div className="info-bar">
-						<div>{"Match: " + this.props.parentState.matchName}</div>
+						<div>{this.props.parentState.matchName}</div>
 						<div>{"Status: "}
 							<red-text>{this.props.parentState.matchStatus}</red-text>
 						</div>

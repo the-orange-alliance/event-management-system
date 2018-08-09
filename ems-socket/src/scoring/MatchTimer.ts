@@ -107,13 +107,13 @@ export default class MatchTimer extends events.EventEmitter {
           }
       }
     } else {
-      this._modeTimeLeft--;
-      this._timeLeft--;
-
       if (this.endTime > 0 && this._timeLeft === this.endTime) {
         this.emit("match-endgame");
         logger.info("Endgame started.")
       }
+
+      this._modeTimeLeft--;
+      this._timeLeft--;
     }
   }
 

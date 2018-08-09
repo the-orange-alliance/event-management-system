@@ -103,11 +103,14 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
                   <div className="pre-match-team">{teams[2].teamNameShort}</div>
                   <div className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
                 </div>
-                <div className="pre-match-alliance-row">
-                  <div className="pre-match-rank"/>
-                  <div className="pre-match-team">{teams[3].teamNameShort}</div>
-                  <div className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[2].countryCode}/></div>
-                </div>
+                {
+                  teams.length > 6 &&
+                  <div className="pre-match-alliance-row">
+                    <div className="pre-match-rank"/>
+                    <div className="pre-match-team">{teams[3].teamNameShort}</div>
+                    <div className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></div>
+                  </div>
+                }
               </div>
             }
           </div>
@@ -137,25 +140,47 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
             }
             {
               match.tournamentLevel >= 10 &&
+              teams.length > 6 &&
               <div className="pre-match-alliance-right">
                 <div className="pre-match-alliance-row pre-match-border">
                   <span className="pre-match-rank">#{match.participants[4].getAllianceRankFromKey()}</span>
                   <span className="pre-match-team">{teams[4].teamNameShort}</span>
-                  <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></span>
-                </div>
-                <div className="pre-match-alliance-row pre-match-border">
-                  <span className="pre-match-rank"/>
-                  <span className="pre-match-team">{teams[5].teamNameShort}</span>
                   <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></span>
                 </div>
                 <div className="pre-match-alliance-row pre-match-border">
                   <span className="pre-match-rank"/>
-                  <span className="pre-match-team">{teams[6].teamNameShort}</span>
+                  <span className="pre-match-team">{teams[5].teamNameShort}</span>
                   <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></span>
+                </div>
+                <div className="pre-match-alliance-row pre-match-border">
+                  <span className="pre-match-rank"/>
+                  <span className="pre-match-team">{teams[6].teamNameShort}</span>
+                  <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[6].countryCode}/></span>
                 </div>
                 <div className="pre-match-alliance-row">
                   <span className="pre-match-rank"/>
                   <span className="pre-match-team">{teams[7].teamNameShort}</span>
+                  <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[7].countryCode}/></span>
+                </div>
+              </div>
+            }
+            {
+              match.tournamentLevel >= 10 &&
+              teams.length <= 6 &&
+              <div className="pre-match-alliance-right">
+                <div className="pre-match-alliance-row pre-match-border">
+                  <span className="pre-match-rank">#{match.participants[3].getAllianceRankFromKey()}</span>
+                  <span className="pre-match-team">{teams[3].teamNameShort}</span>
+                  <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[3].countryCode}/></span>
+                </div>
+                <div className="pre-match-alliance-row pre-match-border">
+                  <span className="pre-match-rank"/>
+                  <span className="pre-match-team">{teams[4].teamNameShort}</span>
+                  <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[4].countryCode}/></span>
+                </div>
+                <div className="pre-match-alliance-row pre-match-border">
+                  <span className="pre-match-rank"/>
+                  <span className="pre-match-team">{teams[5].teamNameShort}</span>
                   <span className="pre-match-flag"><span className={"flag-icon flag-border flag-icon-" + teams[5].countryCode}/></span>
                 </div>
               </div>

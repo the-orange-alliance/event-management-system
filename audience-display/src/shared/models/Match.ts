@@ -83,7 +83,7 @@ export default class Match implements IPostableObject {
   }
 
   get abbreviatedName(): string {
-    if (this.tournamentLevel > 10) {
+    if (this.tournamentLevel >= 10) {
       switch (this.tournamentLevel) {
         case 10:
           return "OF 1";

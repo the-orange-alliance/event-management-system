@@ -68,6 +68,11 @@ class RankingsScreen extends React.Component<{}, IState> {
         </tr>
       );
     });
+    standings.push(
+      <tr key={"rankings-bottom"}>
+        <td><ReactScroll.Element name="rankings-bottom"/></td>
+      </tr>
+    )
     return (
       <div id="fgc-body">
         <div id="fgc-container-wide">
@@ -93,7 +98,6 @@ class RankingsScreen extends React.Component<{}, IState> {
                 {standings}
                 </tbody>
               </table>
-              <ReactScroll.Element name="rankings-bottom"/>
             </div>
           </div>
         </div>

@@ -260,5 +260,4 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EnergyImpactBlueScorecard as any);
-// This is 100% not type safe, but TypeScript started randomly complaining and all other components are fine.
+export default connect(mapStateToProps, mapDispatchToProps)(EnergyImpactBlueScorecard);

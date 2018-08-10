@@ -86,8 +86,10 @@ class MatchFlowController {
             });
           }, 500);
         } else {
-          SocketProvider.send("commit-scores", match.matchKey);
-          resolve();
+          setTimeout(() => {
+            SocketProvider.send("commit-scores", match.matchKey);
+            resolve();
+          }, 250);
         }
       }).catch((error: any) => {
         reject(error);

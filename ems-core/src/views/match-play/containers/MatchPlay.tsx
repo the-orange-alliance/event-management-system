@@ -54,7 +54,8 @@ interface IProps {
 interface IState {
   selectedLevel: TournamentLevels
   configModalOpen: boolean,
-  activeMatch: Match
+  activeMatch: Match,
+  committingScores: boolean
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -63,7 +64,8 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.state = {
       selectedLevel: "Practice",
       configModalOpen: false,
-      activeMatch: this.props.activeMatch
+      activeMatch: this.props.activeMatch,
+      committingScores: false
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
@@ -82,7 +84,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {selectedLevel} = this.state;
+    const {selectedLevel, committingScores} = this.state;
     const {eventConfig, matchState, connected, matchDuration} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
@@ -111,7 +113,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
     const hasRedAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station < 20).length > 0;
     const hasBlueAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station >= 20).length > 0;
-    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance;
+    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance && connected;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
     const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
     const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
@@ -139,7 +141,7 @@ class MatchPlay extends React.Component<IProps, IState> {
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[1]} color="blue" onClick={this.setAudienceDisplay}>Set Audience Display</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[2]} color="yellow" onClick={this.startMatch}>Start Match</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[3]} color="red" onClick={this.abortMatch}>Abort Match</Button></Grid.Column>
-            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4]} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
+            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4] || !connected} loading={committingScores} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
           </Grid.Row>
         </Grid>
         <Divider/>
@@ -246,11 +248,13 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   private commitScores() {
     // Make sure all of our 'active' objects are on the same page.
+    this.setState({committingScores: true});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
     MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
+      this.setState({committingScores: false});
       if (this.props.activeMatch.tournamentLevel >= 10) {
         MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
           if (this.props.elimsMatches.length < matches.length) {
@@ -261,6 +265,7 @@ class MatchPlay extends React.Component<IProps, IState> {
         });
       }
     }).catch((error: HttpError) => {
+      this.setState({committingScores: false});
       DialogManager.showErrorBox(error);
     });
   }
@@ -272,13 +277,13 @@ class MatchPlay extends React.Component<IProps, IState> {
   private getMatchesByTournamentLevel(tournamentLevel: TournamentLevels): Match[] { // TODO - Only show fields that EMS controls
     switch (tournamentLevel) {
       case "Practice":
-        return this.props.practiceMatches;
+        return this.props.practiceMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Qualification":
-        return this.props.qualificationMatches;
+        return this.props.qualificationMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Finals":
-        return this.props.finalsMatches;
+        return this.props.finalsMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Eliminations":
-        return this.props.elimsMatches;
+        return this.props.elimsMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       default:
         return [];
     }

@@ -15,6 +15,7 @@ import EliminationsScheduleByTeam from "./reports/EliminationsScheduleByTeam";
 import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
 import QualificationRankings from "./reports/QualificationRankings";
 import DialogManager from "../../shared/managers/DialogManager";
+import OtherCompetingTeams from "./reports/OtherCompetingTeams";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -51,6 +52,7 @@ class ReportsView extends React.Component<IProps, IState> {
     this.generateQualificationScheduleByTeam = this.generateQualificationScheduleByTeam.bind(this);
     this.generatePostQualScheduleByTeam = this.generatePostQualScheduleByTeam.bind(this);
     this.generateQualificationRankings = this.generateQualificationRankings.bind(this);
+    this.generateCompetingTeams = this.generateCompetingTeams.bind(this);
   }
 
   public render() {
@@ -97,8 +99,8 @@ class ReportsView extends React.Component<IProps, IState> {
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationRankings}>Rankings Report</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
+                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
+                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -134,8 +136,8 @@ class ReportsView extends React.Component<IProps, IState> {
                   }
                 </Grid.Row>
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
+                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
+                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -147,14 +149,14 @@ class ReportsView extends React.Component<IProps, IState> {
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Qualification Cards Report</Button></Grid.Column>
+                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Qualification Cards Report</Button></Grid.Column>
                   {
                     eventConfig.postQualConfig === "elims" &&
-                    <Grid.Column><Button fluid={true} color={getTheme().primary}>Eliminations Cards Report</Button></Grid.Column>
+                    <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Eliminations Cards Report</Button></Grid.Column>
                   }
                   {
                     eventConfig.postQualConfig === "finals" &&
-                    <Grid.Column><Button fluid={true} color={getTheme().primary}>Finals Cards Report</Button></Grid.Column>
+                    <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Finals Cards Report</Button></Grid.Column>
                   }
                 </Grid.Row>
               </Grid>
@@ -165,7 +167,7 @@ class ReportsView extends React.Component<IProps, IState> {
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary}>Competing Team List Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateCompetingTeams}>Competing Team List Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Awards Report</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
@@ -265,6 +267,10 @@ class ReportsView extends React.Component<IProps, IState> {
   }
   private generateQualificationRankings() {
     this.generateReport(<QualificationRankings onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generateCompetingTeams() {
+    this.generateReport(<OtherCompetingTeams onHTMLUpdate={this.updateHTML}/>)
   }
 }
 

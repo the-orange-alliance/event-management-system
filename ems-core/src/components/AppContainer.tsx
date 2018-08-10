@@ -10,6 +10,7 @@ import MatchPlayView from "../views/match-play/MatchPlayView";
 import MatchTestView from "../views/match-test/MatchTestView";
 import AboutView from "../views/about/AboutView";
 import ReportsView from "../views/reports/ReportsView";
+import MatchReviewView from "../views/match-review/MatchReviewView";
 
 interface IProps {
   slaveMode?: boolean,
@@ -69,6 +70,8 @@ class AppContainer extends React.Component<IProps, IState> {
         return <MatchPlayView/>;
       case "Match Test":
         return <MatchTestView/>;
+      case "Match Review":
+        return <MatchReviewView/>;
       case "Reports":
         return <ReportsView/>;
       case "About":

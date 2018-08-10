@@ -2,7 +2,7 @@
   "name": "ems-core",
   "author": "The Orange Alliance",
   "description": "An improved event experience.",
-  "version": "2.1.10",
+  "version": "2.2.1",
   "private": true,
   "main": "public/desktop/electron.js",
   "homepage": "./public/desktop/"

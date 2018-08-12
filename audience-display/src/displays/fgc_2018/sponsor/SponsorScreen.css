@@ -8,3 +8,18 @@
   color: #ffffff;
   padding: 20px;
 }
+
+#fgc-sponsor-header {
+    height: 15%;
+    display: flex;
+    align-items: center;
+    font-family: "Roboto", sans-serif;
+    font-size: 2vw;
+}
+
+#fgc-sponsor-image {
+    height: 85%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

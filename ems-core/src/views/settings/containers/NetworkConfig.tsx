@@ -32,7 +32,8 @@ interface IProps {
 interface IState {
   updateIP: string,
   updateIPValid: boolean,
-  modalOpen: boolean
+  networkModalOpen: boolean,
+  processModalOpen: boolean
 }
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
@@ -43,13 +44,17 @@ class NetworkConfig extends React.Component<IProps, IState> {
     this.state = {
       updateIP: "",
       updateIPValid: false,
-      modalOpen: false
+      networkModalOpen: false,
+      processModalOpen: false
     };
 
     this.setUpdateIP = this.setUpdateIP.bind(this);
     this.updateNetworkHost = this.updateNetworkHost.bind(this);
+    this.deleteProcesses = this.deleteProcesses.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.openProcessModal = this.openProcessModal.bind(this);
+    this.closeProcessModal = this.closeProcessModal.bind(this);
   }
 
   public componentWillMount() {
@@ -59,7 +64,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {updateIP, updateIPValid, modalOpen} = this.state;
+    const {updateIP, updateIPValid, networkModalOpen, processModalOpen} = this.state;
     const processes = this.props.processList.map(process => {
       return <ProcessDescriptor key={process.id} process={process}/>;
     });
@@ -68,7 +73,8 @@ class NetworkConfig extends React.Component<IProps, IState> {
     });
     return (
       <Tab.Pane className="tab-subview">
-        <RestrictedAccessModal open={modalOpen} onClose={this.closeModal} onSuccess={this.updateNetworkHost}/>
+        <RestrictedAccessModal open={networkModalOpen} onClose={this.closeModal} onSuccess={this.updateNetworkHost}/>
+        <RestrictedAccessModal open={processModalOpen} onClose={this.closeProcessModal} onSuccess={this.deleteProcesses}/>
         <h3>Network Config</h3>
         <Divider />
         <Card fluid={true} color={getTheme().secondary}>
@@ -114,17 +120,11 @@ class NetworkConfig extends React.Component<IProps, IState> {
             <Card.Content className="card-header"><h3>Process Management</h3></Card.Content>
             <Card.Content>
               {processActions}
-              {/*<Grid columns="equal">*/}
-                {/*<Grid.Row>*/}
-                  {/*<Grid.Column><Button fluid={true} color="red">Stop All</Button></Grid.Column>*/}
-                {/*</Grid.Row>*/}
-                {/*<Grid.Row>*/}
-                  {/*<Grid.Column><Button fluid={true} color="green">Start All</Button></Grid.Column>*/}
-                {/*</Grid.Row>*/}
-                {/*<Grid.Row>*/}
-                  {/*<Grid.Column><Button fluid={true} color="orange">Restart All</Button></Grid.Column>*/}
-                {/*</Grid.Row>*/}
-              {/*</Grid>*/}
+              <Grid columns="equal">
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color="red" onClick={this.openProcessModal}>Delete All (Restricted)</Button></Grid.Column>
+                </Grid.Row>
+              </Grid>
             </Card.Content>
           </Card>
         </Card.Group>
@@ -160,12 +160,41 @@ class NetworkConfig extends React.Component<IProps, IState> {
     });
   }
 
+  private deleteProcesses() {
+    this.props.setNavigationDisabled(true);
+    this.props.setProcessActionsDisabled(true);
+    ProcessManager.killEcosystem().then(() => {
+      ProcessManager.listEcosystem().then((procList: Process[]) => {
+        this.props.updateProcessList(procList);
+        this.props.setNavigationDisabled(false);
+        this.props.setProcessActionsDisabled(false);
+        DialogManager.showInfoBox("EMS", "All processes have been killed. Please restart EMS, or else the entire system will not function.");
+      }).catch((error: AppError) => {
+        this.props.setNavigationDisabled(false);
+        this.props.setProcessActionsDisabled(false);
+        DialogManager.showInfoBox("EMS", "All processes have been killed. Please restart EMS, or else the entire system will not function.");
+      });
+    }).catch((error: AppError) => {
+      this.props.setNavigationDisabled(false);
+      this.props.setProcessActionsDisabled(false);
+      DialogManager.showErrorBox(error);
+    });
+  }
+
   private openModal() {
-    this.setState({modalOpen: true});
+    this.setState({networkModalOpen: true});
   }
 
   private closeModal() {
-    this.setState({modalOpen: false});
+    this.setState({networkModalOpen: false});
+  }
+
+  private openProcessModal() {
+    this.setState({processModalOpen: true});
+  }
+
+  private closeProcessModal() {
+    this.setState({processModalOpen: false});
   }
 }
 

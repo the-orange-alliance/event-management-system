@@ -262,4 +262,4 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EnergyImpactRedScorecard);
+export default connect(mapStateToProps, mapDispatchToProps)(EnergyImpactRedScorecard as any);

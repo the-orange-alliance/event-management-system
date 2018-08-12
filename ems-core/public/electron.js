@@ -15,7 +15,7 @@ let win;
 
 function createWindow () {
   // Create the splash screen window.
-  let splashWin = new BrowserWindow({width: 480, height: 360, alwaysOnTop: true, frame: false, show: false});
+  let splashWin = new BrowserWindow({width: 480, height: 360, frame: false, show: false});
   splashWin.loadURL(url.format({
     pathname: path.join(__dirname, "./splash.html"),
     protocol: "file:",

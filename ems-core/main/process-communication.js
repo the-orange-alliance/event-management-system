@@ -6,6 +6,24 @@ const localIPv4 = require("local-ipv4-address");
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 const isProd = process.env.NODE_ENV === "production";
 
+ipcMain.on("kill-ecosystem", (event) => {
+  logger.info("Killing application ecosystem...");
+  pm2.connect((err) => {
+    if (err) {
+      event.sender.send("kill-ecosystem-error", err);
+    } else {
+      pm2.killDaemon((errList) => {
+        pm2.disconnect();
+        if (errList) {
+          event.sender.send("kill-ecosystem-error");
+        } else {
+          event.sender.send("kill-ecosystem-success");
+        }
+      });
+    }
+  });
+});
+
 ipcMain.on("list-ecosystem", (event) => {
   logger.info("Listing application ecosystem...");
   pm2.connect((err) => {

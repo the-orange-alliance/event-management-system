@@ -260,4 +260,4 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EnergyImpactBlueScorecard);
+export default connect(mapStateToProps, mapDispatchToProps)(EnergyImpactBlueScorecard as any);

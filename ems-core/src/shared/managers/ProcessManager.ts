@@ -67,6 +67,18 @@ class ProcessManager {
     });
   }
 
+  public killEcosystem(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      ipcRenderer.once("kill-ecosystem-success", () => {
+        resolve();
+      });
+      ipcRenderer.once("kill-ecosystem-error", (event: any, error: any) => {
+        reject(new AppError(1015, "PM2_KILL", error));
+      });
+      ipcRenderer.send("kill-ecosystem");
+    });
+  }
+
   public startProcess(process: Process, host?: string): Promise<Process> {
     return new Promise<Process>((resolve, reject) => {
       ipcRenderer.once("start-process-success", (event: any, startedProcess: any) => {

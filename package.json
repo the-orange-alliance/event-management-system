@@ -1,7 +1,7 @@
 {
   "name": "event-management-system",
   "description": "Hub for all programs in the EMS suite.",
-  "version": "2.4.0",
+  "version": "2.4.10",
   "private": true,
   "scripts": {
     "api": "cd ems-api/ && npm start",

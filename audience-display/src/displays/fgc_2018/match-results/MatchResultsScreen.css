@@ -137,12 +137,19 @@
 .res-detail-row:nth-child(odd) {
     background-color: #ffffff;
 }
-.res-detail-left {
-    width: 75%;
+.res-detail-icon {
+    width: 15%;
     height: 100%;
     display: flex;
     align-items: center;
-    padding-left: 5%;
+    justify-content: center;
+    padding: 3px;
+}
+.res-detail-left {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 .res-detail-right {
     width: 25%;

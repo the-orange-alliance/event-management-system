@@ -83,6 +83,7 @@ class QualificationScheduleByTeam extends React.Component<IProps, IState> {
         return (
           <Table.Row key={match.matchKey}>
             <Table.Cell>{match.matchName}</Table.Cell>
+            <Table.Cell>{match.fieldNumber}</Table.Cell>
             <Table.Cell>{match.scheduledStartTime.format("dddd h:mm a")}</Table.Cell>
             {participants}
           </Table.Row>
@@ -99,6 +100,7 @@ class QualificationScheduleByTeam extends React.Component<IProps, IState> {
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell rowSpan={2}>Match</Table.HeaderCell>
+              <Table.HeaderCell rowSpan={2}>Field</Table.HeaderCell>
               <Table.HeaderCell rowSpan={2}>Time</Table.HeaderCell>
               <Table.HeaderCell colSpan={eventConfig.teamsPerAlliance}>Red Alliance</Table.HeaderCell>
               <Table.HeaderCell colSpan={eventConfig.teamsPerAlliance}>Blue Alliance</Table.HeaderCell>

@@ -11,6 +11,14 @@ import Team from "../../../shared/models/Team";
 import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
 import Ranking from "../../../shared/models/Ranking";
 
+import SOLAR_ICON from "../res/Grey_Solar_Icon.png";
+import WIND_ICON from "../res/Black_Wind_Icon.png";
+import REACTOR_ICON from "../res/Black_Reactor_Icon.png";
+import COMBUSTION_ICON from "../res/Black_Burning_Icon.png";
+import COOP_ICON from "../res/Grey_Coop_Icon.png";
+import PARKING_ICON from "../res/Grey_Parking_Icon.png";
+import PENALTY_ICON from "../res/Grey_Penalty_Icon.png";
+
 interface IProps {
   match: Match,
 }
@@ -136,30 +144,37 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                 }
                 <div className="res-card-details">
                   <div className="res-detail-row bottom-red">
-                    <div className="res-detail-left right-red">SOLAR</div>
+                    <div className="res-detail-icon"><img src={SOLAR_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-red">SOLAR FACTORY</div>
                     <div className="res-detail-right">{redSolarPanelPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-red">
-                    <div className="res-detail-left right-red">WIND</div>
+                    <div className="res-detail-icon"><img src={WIND_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-red">WIND TURBINE</div>
                     <div className="res-detail-right">{redWindPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-red">
-                    <div className="res-detail-left right-red">REACTOR</div>
+                    <div className="res-detail-icon"><img src={REACTOR_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-red">REACTION PLANT</div>
                     <div className="res-detail-right">{redReactorPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-red">
-                    <div className="res-detail-left right-red">COMBUSTION</div>
+                    <div className="res-detail-icon"><img src={COMBUSTION_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-red">COMBUSTION PLANT</div>
                     <div className="res-detail-right">{redCombustionPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-red">
-                    <div className="res-detail-left right-red">CO-OP</div>
+                    <div className="res-detail-icon"><img src={COOP_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-red">COOPERTITION BONUS</div>
                     <div className="res-detail-right">{coopPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-red">
-                    <div className="res-detail-left right-red">PARKING</div>
+                    <div className="res-detail-icon"><img src={PARKING_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-red">PARKING BONUS</div>
                     <div className="res-detail-right">{redParkingPoints}</div>
                   </div>
                   <div className="res-detail-row">
+                    <div className="res-detail-icon"><img src={PENALTY_ICON} className="fit-h"/></div>
                     <div className="res-detail-left penalty right-red">PENALTY</div>
                     <div className="res-detail-right penalty">{redPenaltyPoints}</div>
                   </div>
@@ -248,30 +263,37 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                 }
                 <div className="res-card-details">
                   <div className="res-detail-row bottom-blue">
-                    <div className="res-detail-left right-blue">SOLAR</div>
+                    <div className="res-detail-icon"><img src={SOLAR_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-blue">SOLAR FACTORY</div>
                     <div className="res-detail-right">{blueSolarPanelPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
-                    <div className="res-detail-left right-blue">WIND</div>
+                    <div className="res-detail-icon"><img src={WIND_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-blue">WIND TURBINE</div>
                     <div className="res-detail-right">{blueWindPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
-                    <div className="res-detail-left right-blue">REACTOR</div>
+                    <div className="res-detail-icon"><img src={REACTOR_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-blue">REACTION PLANT</div>
                     <div className="res-detail-right">{blueReactorPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
-                    <div className="res-detail-left right-blue">COMBUSTION</div>
+                    <div className="res-detail-icon"><img src={COMBUSTION_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-blue">COMBUSTION PLANT</div>
                     <div className="res-detail-right">{blueCombustionPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
-                    <div className="res-detail-left right-blue">CO-OP</div>
+                    <div className="res-detail-icon"><img src={COOP_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-blue">COOPERTITION BONUS</div>
                     <div className="res-detail-right">{coopPoints}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
-                    <div className="res-detail-left right-blue">PARKING</div>
+                    <div className="res-detail-icon"><img src={PARKING_ICON} className="fit-h"/></div>
+                    <div className="res-detail-left right-blue">PARKING BONUS</div>
                     <div className="res-detail-right">{blueParkingPoints}</div>
                   </div>
                   <div className="res-detail-row">
+                    <div className="res-detail-icon"><img src={PENALTY_ICON} className="fit-h"/></div>
                     <div className="res-detail-left penalty right-blue">PENALTY</div>
                     <div className="res-detail-right penalty">{bluePenaltyPoints}</div>
                   </div>

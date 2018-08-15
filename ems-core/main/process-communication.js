@@ -48,7 +48,7 @@ ipcMain.on("start-ecosystem", (event, host) => {
     if (typeof host === "undefined" || host === null) {
       host = localHost;
       logger.info(`Starting services with a default ${host} address.`);
-    } else if (host.match(ipRegex) === null) {
+    } else if (host.match(ipRegex) === null || localHost.match(ipRegex) === null) {
       host = "127.0.0.1";
       logger.info(`Starting services with a default ${host} address.`);
     } else {

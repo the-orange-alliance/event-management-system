@@ -35,6 +35,11 @@ import MATCH_ENDGAME from "../res/sounds/match_end_start.wav";
 import MATCH_END from "../res/sounds/match_end.wav";
 import MATCH_ABORT from "../res/sounds/match_estop.wav";
 
+const START_AUDIO = initAudio(MATCH_START);
+const ENDGAME_AUDIO = initAudio(MATCH_ENDGAME);
+const END_AUDIO = initAudio(MATCH_END);
+const ABORT_AUDIO = initAudio(MATCH_ABORT);
+
 interface IProps {
   match: Match
 }
@@ -68,18 +73,18 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     SocketProvider.on("match-start", (matchTime: number) => {
       this.setState({time: moment.duration(matchTime, "seconds")});
       this.startTimer();
-      this.playSound(MATCH_START);
+      START_AUDIO.play();
     });
     SocketProvider.on("match-endgame", () => {
-      this.playSound(MATCH_ENDGAME);
+      ENDGAME_AUDIO.play();
     });
     SocketProvider.on("match-abort", () => {
       this.setState({time: moment.duration(0, "seconds")});
       this.stopTimer();
-      this.playSound(MATCH_ABORT);
+      ABORT_AUDIO.play();
     });
     SocketProvider.on("match-end", () => {
-      this.playSound(MATCH_END);
+      END_AUDIO.play();
       this.stopTimer();
     });
     SocketProvider.on("score-update", (scoreObj: any) => {
@@ -204,7 +209,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[3].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[3].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
@@ -213,7 +218,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[4].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[4].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
@@ -222,7 +227,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[5].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[5].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
@@ -237,7 +242,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[4].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[4].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
@@ -246,7 +251,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[5].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[5].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
@@ -255,7 +260,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[6].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[6].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
@@ -270,7 +275,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[3].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[3].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[3]}/>
@@ -279,7 +284,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[4].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[4].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[4]}/>
@@ -288,7 +293,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
                     <div className="team-flag">
                       <span className={"flag-icon flag-icon-" + teams[5].countryCode}/>
                     </div>
-                    <div className="team-name-left">
+                    <div className="team-name-right">
                       <span>{teams[5].country}</span>
                     </div>
                     <TeamCardStatus cardStatus={matchData.cardStatuses[5]}/>
@@ -323,9 +328,11 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
 
   private startTimer() {
     const timerID = global.setInterval(() => {
-      this.setState({
-        time: moment.duration(this.state.time).subtract(1, "s")
-      });
+      if (moment.duration(this.state.time).subtract(1, "s").asSeconds() >= 0) {
+        this.setState({
+          time: moment.duration(this.state.time).subtract(1, "s")
+        });
+      }
     }, 1000);
     this.setState({timerID: timerID});
   }
@@ -375,12 +382,12 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       return teams;
     }
   }
+}
 
-  private playSound(url: any): Promise<any> {
-    const audio = new Audio(url);
-    audio.volume = 0.5;
-    return audio.play();
-  }
+function initAudio(url: any): any {
+  const audio = new Audio(url);
+  audio.volume = 0.5;
+  return audio;
 }
 
 export default MatchPlayScreen;

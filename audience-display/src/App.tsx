@@ -35,15 +35,15 @@ class App extends React.Component<IProps, IState> {
       event: new Event(),
       teams: [],
       loading: true,
-      videoID: 0,
+      videoID: 4,
       activeMatch: new Match()
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.100.114"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.100.114"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.43.160"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.43.160"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");

@@ -215,7 +215,7 @@ class DatabaseManager {
 
   public selectAllFromJoinOrderBy(tableOne: string, tableTwo: string, joinColumn: string, orderByClause: string): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
-      const query = `SELECT * FROM "${tableOne}", "${tableTwo}" WHERE "${tableOne}".${joinColumn}="${tableTwo}".${joinColumn} ORDER BY ${orderByClause};"`;
+      const query = `SELECT * FROM "${tableOne}", "${tableTwo}" WHERE "${tableOne}".${joinColumn}="${tableTwo}".${joinColumn} ORDER BY ${orderByClause};`;
       this._db.all(query, (err, data) => {
         if (err) {
           reject(err);

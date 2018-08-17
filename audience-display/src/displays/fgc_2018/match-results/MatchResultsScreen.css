@@ -129,7 +129,7 @@
     align-items: center;
     font-family: Roboto, sans-serif;
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 .res-detail-row:nth-child(even) {
     background-color: #e6e6e6;

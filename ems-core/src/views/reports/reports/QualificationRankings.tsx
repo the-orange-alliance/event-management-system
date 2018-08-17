@@ -7,9 +7,11 @@ import {AxiosResponse} from "axios";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
 import Ranking from "../../../shared/models/Ranking";
-import {Table} from "semantic-ui-react";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
+import {EMSEventTypes} from "../../../shared/AppTypes";
+import EnergyImpactRanking from "../../../shared/models/EnergyImpactRanking";
+import EnergyImpactRankTable from "../../../components/game-specifics/EnergyImpactRankTable";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -35,9 +37,9 @@ class QualificationRankings extends React.Component<IProps, IState> {
       const rankings: Ranking[] = [];
       if (rankRes.data && rankRes.data.payload && rankRes.data.payload.length > 0) {
         for (const rankJSON of rankRes.data.payload) {
-          const rank: Ranking = new Ranking().fromJSON(rankJSON);
-          rank.team = new Team().fromJSON(rankJSON);
-          rankings.push(rank);
+          const ranking: Ranking = this.getByEventType(this.props.eventConfig.eventType).fromJSON(rankJSON);
+          ranking.team = new Team().fromJSON(rankJSON);
+          rankings.push(ranking);
         }
       }
       this.setState({generated: true, rankings: rankings});
@@ -51,29 +53,7 @@ class QualificationRankings extends React.Component<IProps, IState> {
   public render() {
     const {onHTMLUpdate, eventConfig} = this.props;
     const {generated, rankings} = this.state;
-    const ranks = rankings.map(ranking => {
-      return (
-        <Table.Row key={ranking.rankKey}>
-          <Table.Cell>{ranking.rank}</Table.Cell>
-          <Table.Cell>{ranking.team.getFromIdentifier(eventConfig.teamIdentifier)}</Table.Cell>
-          <Table.Cell>{ranking.played}</Table.Cell>
-        </Table.Row>
-      );
-    });
-    let view = (
-      <Table celled={true} structured={true} textAlign="center">
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Rank</Table.HeaderCell>
-            <Table.HeaderCell>Team</Table.HeaderCell>
-            <Table.HeaderCell>Matches Played</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {ranks}
-        </Table.Body>
-      </Table>
-    );
+    let view = this.getRankingTable(eventConfig.eventType);
     if (rankings.length <= 0) {
       view = (<span>There are no rankings to report.</span>);
     }
@@ -85,6 +65,24 @@ class QualificationRankings extends React.Component<IProps, IState> {
         children={view}
       />
     );
+  }
+
+  private getByEventType(eventType: EMSEventTypes): Ranking {
+    switch (eventType) {
+      case "fgc_2018":
+        return new EnergyImpactRanking();
+      default:
+        return new Ranking();
+    }
+  }
+
+  private getRankingTable(eventType: EMSEventTypes) {
+    switch (eventType) {
+      case "fgc_2018":
+        return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]} identifier={this.props.eventConfig.teamIdentifier}/>;
+      default:
+        return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]}/>;
+    }
   }
 }
 

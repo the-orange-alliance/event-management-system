@@ -16,6 +16,7 @@ import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
 import QualificationRankings from "./reports/QualificationRankings";
 import DialogManager from "../../shared/managers/DialogManager";
 import OtherCompetingTeams from "./reports/OtherCompetingTeams";
+import QualificationMatchResults from "./reports/QualificationMatchResults";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -53,6 +54,7 @@ class ReportsView extends React.Component<IProps, IState> {
     this.generatePostQualScheduleByTeam = this.generatePostQualScheduleByTeam.bind(this);
     this.generateQualificationRankings = this.generateQualificationRankings.bind(this);
     this.generateCompetingTeams = this.generateCompetingTeams.bind(this);
+    this.generateQualificationMatchResults = this.generateQualificationMatchResults.bind(this);
   }
 
   public render() {
@@ -99,7 +101,7 @@ class ReportsView extends React.Component<IProps, IState> {
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationRankings}>Rankings Report</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
-                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationMatchResults}>Match Results Report</Button></Grid.Column>
                   <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
@@ -271,6 +273,10 @@ class ReportsView extends React.Component<IProps, IState> {
 
   private generateCompetingTeams() {
     this.generateReport(<OtherCompetingTeams onHTMLUpdate={this.updateHTML}/>)
+  }
+
+  private generateQualificationMatchResults() {
+    this.generateReport(<QualificationMatchResults onHTMLUpdate={this.updateHTML}/>)
   }
 }
 

@@ -14,7 +14,7 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
     });
   } else if (req.query.level) {
     if (req.query.level.toString() === "elims") {
-      DatabaseManager.getMatchAndParticipants(10, ">").then((rows: any[]) => {
+      DatabaseManager.getMatchAndParticipants(10, ">=").then((rows: any[]) => {
         res.send({payload: rows});
       }).catch((error: any) => {
         next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));

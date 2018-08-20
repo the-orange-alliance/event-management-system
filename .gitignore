@@ -39,3 +39,6 @@ ems-api/bin/practice.json
 ems-api/bin/qualification.json
 ems-api/bin/post-quals.json
 package-lock.json
+
+# (temporarily) copyrighted files
+field-interface/

@@ -53,3 +53,30 @@ export const TeamIdentifierItems = [
     value: "country"
   }
 ];
+
+export const EventTypeItems = [
+  {
+    text: "Qualifier",
+    value: "qual" 
+  },
+  {
+    text: "League Meet",
+    value: "league_meet"
+  },
+  {
+    text: "Region Championship",
+    value: "region_cmp"
+  },
+  {
+    text: "Super Regional",
+    value: "region_super"
+  },
+  {
+    text: "Championship",
+    value: "cmp"
+  },
+  {
+    text: "Offseason",
+    value: "off"
+  }
+];

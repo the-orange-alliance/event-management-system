@@ -27,6 +27,11 @@ class EventCreationValidator {
       key.length < (6 + (this._event.region.regionKey.length) + 5);
   }
 
+  public isValidEventType(): boolean {
+    const type = this._event.eventType;
+    return typeof type !== "undefined" && this.isSafe(type.toString()) && type.length > 0;
+  }
+
   public isValidEventName(): boolean {
     const name = this._event.eventName;
     return typeof name === "string" && this.isSafe(name) && name.length > 10;
@@ -83,7 +88,7 @@ class EventCreationValidator {
   private checkIfValid(): void {
     this._isValid = this.isValidEventKey() && this.isValidEventName() && this.isValidEventVenue() && this.isValidCity()
       && this.isValidStateProv() && this.isValidCountry() && this.isValidWebsite() && this.isValidFieldCount()
-      && this.isValidTPA() && this.isValidPostQualTPA() && this.isValidAllianceCaptains();
+      && this.isValidTPA() && this.isValidPostQualTPA() && this.isValidAllianceCaptains() && this.isValidEventType();
   }
 
   private isSafe(str: string): boolean {

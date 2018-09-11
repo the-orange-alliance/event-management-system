@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "event" (
     event_name VARCHAR(255) NOT NULL,
     division_name VARCHAR(255) NULL,
     venue VARCHAR(255),
-    event_type_key VARCHAR(255),
+    event_type_key VARCHAR(25),
     city VARCHAR(255),
     state_prov VARCHAR(255),
     country VARCHAR(255),

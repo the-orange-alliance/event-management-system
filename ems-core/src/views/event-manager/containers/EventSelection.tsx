@@ -22,7 +22,7 @@ import ExplanationIcon from "../../../components/ExplanationIcon";
 import {getFromEMSEventType, getFromSeasonKey, SeasonItems} from "../../../shared/data/Seasons";
 import {getFromRegionKey, RegionItems} from "../../../shared/data/Regions";
 import {SyntheticEvent} from "react";
-import {AllianceCaptainItems, PostQualItems} from "../../../shared/data/DropdownItemOptions";
+import {AllianceCaptainItems, PostQualItems, EventTypeItems} from "../../../shared/data/DropdownItemOptions";
 import {PostQualConfig} from "../../../shared/AppTypes";
 import EventCreationValidator from "../controllers/EventCreationValidator";
 import HttpError from "../../../shared/models/HttpError";
@@ -54,6 +54,7 @@ class EventSelection extends React.Component<IProps, IState> {
     this.setAllianceCaptainConfig = this.setAllianceCaptainConfig.bind(this);
     this.setRankingCutoff = this.setRankingCutoff.bind(this);
     this.setEventRegion = this.setEventRegion.bind(this);
+    this.setEventType = this.setEventType.bind(this);
     this.setEventCode = this.setEventCode.bind(this);
     this.setEventName = this.setEventName.bind(this);
     this.setEventVenue = this.setEventVenue.bind(this);
@@ -152,6 +153,15 @@ class EventSelection extends React.Component<IProps, IState> {
   private setEventRegion(event: SyntheticEvent, props: DropdownProps) {
     if (typeof props.value === "string") {
       this.props.event.region = getFromRegionKey(props.value);
+      this.props.setEvent(this.props.event);
+      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this.forceUpdate();
+    }
+  }
+
+  private setEventType(event: SyntheticEvent, props: DropdownProps) {
+    if (typeof props.value === "string") {
+      this.props.event.eventType = props.value;
       this.props.setEvent(this.props.event);
       this.state.eventValidator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
@@ -303,6 +313,7 @@ class EventSelection extends React.Component<IProps, IState> {
   private renderBasicEventInformation(): JSX.Element {
     const {eventValidator} = this.state;
     const selectedRegion = typeof this.props.event.region === "undefined" ? RegionItems[0].value : this.props.event.region.regionKey;
+    const selectedEventType = typeof this.props.event.eventType === "undefined" ? EventTypeItems[0].value : this.props.event.eventType;
     const event = this.props.event;
     return (
       <Form>
@@ -318,6 +329,7 @@ class EventSelection extends React.Component<IProps, IState> {
               !this.props.eventConfig.requiresTOA &&
               <Grid.Column width={4}><Form.Input fluid={true} value={event.eventCode} onChange={this.setEventCode} error={!eventValidator.isValidEventKey()} label={<ExplanationIcon title={"Event Code"} content={"An event's code is a 3-4 letter combination that is used to represent the event. For example, Great Lakes Bay Region event could be coded into GLBR."}/>}/></Grid.Column>
             }
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={EventTypeItems} value={selectedEventType} onChange={this.setEventType} error={typeof event.eventType === "undefined"} label="Event Type"/></Grid.Column>
           </Grid.Row>
           <Grid.Row columns={16}>
             <Grid.Column width={8}><Form.Input fluid={true} value={event.eventName} onChange={this.setEventName} error={!eventValidator.isValidEventName()} label="Event Name"/></Grid.Column>

@@ -1,13 +1,7 @@
-import Region from "./Region";
-import Season from "./Season";
-import * as Regions from "../data/Regions";
-import * as Seasons from "../data/Seasons";
-
 export default class Event implements IPostableObject {
 
-  private _season: Season;
-  private _region: Region;
-  private _eventType: string;
+  private _seasonKey: number;
+  private _regionKey: string;
   private _eventCode: string;
   private _eventName: string;
   private _venue: string;
@@ -15,14 +9,13 @@ export default class Event implements IPostableObject {
   private _stateProv: string;
   private _country: string;
   private _fieldCount: number;
-  private _website?: string;
-  private _divisionName?: string;
+  private _website: string;
+  private _divisionName: string;
 
   public toJSON(): object {
     return {
-      season_key: this.season.seasonKey,
-      region_key: this.region.regionKey,
-      event_type_key: this.eventType,
+      season_key: this.seasonKey,
+      region_key: this.regionKey,
       event_key: this.eventKey,
       event_name: this.eventName,
       venue: this.venue,
@@ -37,9 +30,8 @@ export default class Event implements IPostableObject {
 
   public fromJSON(json: any): Event {
     const e: Event = new Event();
-    e.season = Seasons.getFromSeasonKey(json.season_key);
-    e.region = Regions.getFromRegionKey(json.region_key);
-    e.eventType = json.event_type_key;
+    e.seasonKey = json.season_key;
+    e.regionKey = json.region_key;
     e.eventCode = json.event_key.split("-")[2];
     e.eventName = json.event_name;
     e.venue = json.venue;
@@ -52,28 +44,20 @@ export default class Event implements IPostableObject {
     return e;
   }
 
-  get season(): Season {
-    return this._season;
+  get seasonKey(): number {
+    return this._seasonKey;
   }
 
-  set season(value: Season) {
-    this._season = value;
+  set seasonKey(value: number) {
+    this._seasonKey = value;
   }
 
-  get region(): Region {
-    return this._region;
+  get regionKey(): string {
+    return this._regionKey;
   }
 
-  set region(value: Region) {
-    this._region = value;
-  }
-
-  get eventType(): string {
-    return this._eventType;
-  }
-
-  set eventType(value: string) {
-    this._eventType = value;
+  set regionKey(value: string) {
+    this._regionKey = value;
   }
 
   get eventCode(): string {
@@ -87,10 +71,10 @@ export default class Event implements IPostableObject {
   }
 
   get eventKey(): string {
-    if (typeof this.season === "undefined" || typeof this.region === "undefined") {
+    if (typeof this.seasonKey === "undefined" || typeof this.regionKey === "undefined") {
       return "";
     } else {
-      return this.season.seasonKey + "-" + this.region.regionKey + "-" + (this.eventCode || "");
+      return this.seasonKey + "-" + this.regionKey + "-" + (this.eventCode || "");
     }
   }
 

@@ -1,28 +1,76 @@
-.App {
-  text-align: center;
+#app-container {
+
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+#app-top {
+  height: 40vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+#app-top-name {
+  font-weight: bold;
+  font-size: 5vh;
 }
 
-.App-title {
-  font-size: 1.5em;
+#app-top-event {
+  margin-top: 5%;
+  font-size: 3.5vh;
 }
 
-.App-intro {
-  font-size: large;
+#app-bottom {
+  height: 60vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.app-input {
+  margin-top: 7.5vh;
+  width: 50vw;
+  height: 4vh;
+  font-size: 2vh;
+  border: none;
+  background-color: #000000;
+  border-bottom: 2px solid #ffffff;
+  color: #ffffff;
+  -webkit-transition: all 0.25s;
+  -moz-transition: all 0.25s;
+  -ms-transition: all 0.25s;
+  -o-transition: all 0.25s;
+  transition: all 0.25s;
+}
+
+.app-input:focus {
+  outline: none;
+  -webkit-transition: all 0.25s;
+  -moz-transition: all 0.25s;
+  -ms-transition: all 0.25s;
+  -o-transition: all 0.25s;
+  transition: all 0.25s;
+  border-bottom: 2px solid #0085ff;
+}
+
+.app-button {
+  margin-top: 5vh;
+  width: 50vw;
+  height: 5vh;
+  font-size: 2vh;
+  border-radius: 10px;
+  background-color: #0085ff;
+  color: #ffffff;
+  border: none;
+}
+
+.app-button:focus {
+  outline: none;
+}
+
+.app-button:active {
+  background-color: #0069cd;
 }

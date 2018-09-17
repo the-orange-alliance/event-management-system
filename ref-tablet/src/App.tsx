@@ -8,26 +8,50 @@ import MainView from "./views/MainView";
 import RedView from "./views/RedView";
 import BlueView from "./views/BlueView";
 import HeadRefereeView from "./views/HeadRefereeView";
+import EMSProvider from "./shared/providers/EMSProvider";
+import SocketProvider from "./shared/providers/SocketProvider";
+import {AxiosResponse} from "axios";
 
 interface IProps {
   cookies: Cookies
 }
 
 interface IState {
-  event: Event
+  event: Event,
+  connected: boolean
 }
 
 class App extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      event: new Event()
+      event: new Event(),
+      connected: false
     };
     this.renderLoginView = this.renderLoginView.bind(this);
     this.renderRedView = this.renderRedView.bind(this);
     this.renderBlueView = this.renderBlueView.bind(this);
     this.renderHeadRefereeView = this.renderHeadRefereeView.bind(this);
     this.renderMainView = this.renderMainView.bind(this);
+  }
+
+  public componentDidMount() {
+    EMSProvider.initialize("127.0.0.1");
+    SocketProvider.initialize("127.0.0.1");
+    SocketProvider.on("connect", () => {
+      console.log("Connected to SocketIO.");
+      SocketProvider.emit("identify","ref-tablet", "event", "scoring", "referee");
+      this.setState({connected: true});
+    });
+    SocketProvider.on("disconnect", () => {
+      console.log("Disconnected from SocketIO.");
+      this.setState({connected: false});
+    });
+    EMSProvider.getEvent().then((response: AxiosResponse) => {
+      if (response.data.payload && response.data.payload.length > 0) {
+        this.setState({event: new Event().fromJSON(response.data.payload[0])});
+      }
+    });
   }
 
   public render() {
@@ -77,7 +101,7 @@ class App extends React.Component<IProps, IState> {
       !this.props.cookies.get("login")) {
       return <Redirect to={"/"}/>
     } else {
-      return <RedView/>;
+      return <RedView event={this.state.event}/>;
     }
   }
 
@@ -86,7 +110,7 @@ class App extends React.Component<IProps, IState> {
       !this.props.cookies.get("login")) {
       return <Redirect to={"/"}/>
     } else {
-      return <BlueView/>;
+      return <BlueView event={this.state.event}/>;
     }
   }
 
@@ -107,10 +131,11 @@ class App extends React.Component<IProps, IState> {
     return <MainView
       cookies={this.props.cookies}
       onLoginFailure={navigateToLogin}
-      connected={false}
+      connected={this.state.connected}
       onRedAllianceLogin={navigateToRed}
       onBlueAllianceLogin={navigateToBlue}
       onHeadRefereeLogin={navigateToHeadRef}
+      event={this.state.event}
     />;
   }
 }

@@ -1,6 +1,6 @@
-export default class EnergyImpactMatchDetails implements IMatchDetails, IPostableObject {
-  public matchDetailKey: string;
-  public matchKey: string;
+import MatchDetails from "./MatchDetails";
+
+export default class EnergyImpactMatchDetails extends MatchDetails implements IPostableObject {
   private _redSolarPanelOwnerships: number[];
   private _redWindTurbineOwnership: number;
   private _redNuclearReactorOwnership: number;
@@ -28,6 +28,8 @@ export default class EnergyImpactMatchDetails implements IMatchDetails, IPostabl
   private _sharedNuclearReactorCubes: number;
 
   constructor() {
+    super();
+
     this._redSolarPanelOwnerships = [0, 0, 0, 0, 0];
     this._redWindTurbineOwnership = 0;
     this._redNuclearReactorOwnership = 0;
@@ -87,12 +89,14 @@ export default class EnergyImpactMatchDetails implements IMatchDetails, IPostabl
       blue_reactor_powerline: this.blueNuclearReactorPowerlineOn ? 1 : 0,
       blue_combustion_powerline: this.blueCombustionPowerlineOn ? 1 : 0,
       blue_wind_turbine_cranked: this.blueWindTurbineCranked ? 1 : 0,
-      reactor_cubes: this.sharedNuclearReactorCubes
+      reactor_cubes: this.sharedNuclearReactorCubes || 0
     };
   }
 
   public fromJSON(json: any): EnergyImpactMatchDetails {
     const details: EnergyImpactMatchDetails = new EnergyImpactMatchDetails();
+    details.matchKey = json.match_key;
+    details.matchDetailKey = json.match_detail_key;
     details.redSolarPanelOwnerships = [json.red_solar_panel_one_ownership, json.red_solar_panel_two_ownership, json.red_solar_panel_three_ownership, json.red_solar_panel_four_ownership, json.red_solar_panel_five_ownership];
     details.redWindTurbineOwnership = json.red_wind_turbine_ownership;
     details.redNuclearReactorOwnership = json.red_nuclear_reactor_ownership;
@@ -130,7 +134,7 @@ export default class EnergyImpactMatchDetails implements IMatchDetails, IPostabl
     score += this.blueCombustionPowerlineOn ? (this.blueHighCombustionGoals * 20) : 0;
     score += this.blueRobotsParked === 3 ? 50 : this.blueRobotsParked * 15;
     score += this.redDidCoopertition && this.blueDidCoopertition ? 100 : 0;
-    score += minPen * 30;
+    score += (minPen * 30);
     return score;
   }
 
@@ -139,12 +143,13 @@ export default class EnergyImpactMatchDetails implements IMatchDetails, IPostabl
     for (const solarPanelPoints of this.redSolarPanelOwnerships) {
       score += solarPanelPoints;
     }
+    score += this.redWindTurbineOwnership;
     score += (this.redNuclearReactorOwnership * 3);
     score += this.redCombustionPowerlineOn ? (this.redLowCombustionGoals * 5) : 0;
     score += this.redCombustionPowerlineOn ? (this.redHighCombustionGoals * 20) : 0;
     score += this.redRobotsParked === 3 ? 50 : this.redRobotsParked * 15;
     score += this.redDidCoopertition && this.blueDidCoopertition ? 100 : 0;
-    score += minPen * 30;
+    score += (minPen * 30);
     return score;
   }
 

@@ -88,11 +88,13 @@
   height: 17.5vh;
   padding: 10px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   border-bottom: 3px solid #ffffff23;
   position: relative;
+  font-size: 3vh;
 }
 
 #login-body {
@@ -124,6 +126,104 @@
 .login-body-button {
   width: 50%;
   padding: 5px;
+}
+
+.status-bar-container {
+  width: 100vw;
+  height: 5vh;
+  background-color: orange;
+  color: #ffffff;
+  font-size: 2vh;
+  font-weight: bold;
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-bar-container > div {
+  width: 100%;
+  height: 100%;
+}
+
+.mode-bar-container {
+  width: 100vw;
+  height: 5vh;
+  background-color: orange;
+  color: #ffffff;
+  font-size: 2vh;
+  font-weight: bold;
+  padding: 10px 15px 10px 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.mode-bar-container > div {
+  width: 100%;
+  max-width: 200px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.mode-bar-container > .selected {
+  border-radius: 15px;
+  background-color: #ffffff;
+  color: orange;
+}
+
+.state-switcher-container {
+  width: 100%;
+  height: 12.5vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.state-switcher-team-container {
+  width: 25%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 4vh;
+}
+
+.state-switcher-state-container {
+  width: 75%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.state-switcher-state-container > div {
+  width: 100%;
+  height: 75%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 2vh;
+  margin: 5px;
+  background-color: lightslategrey;
+  border: 4px solid lightslategrey;
+}
+
+.state-switcher-state-container > div.selected {
+  border: 4px solid green;
+}
+
+.alliance-view {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .header-logo {
@@ -187,4 +287,24 @@
 
 .yellow-btn:disabled {
   background-color: rgba(195, 191, 9, 0.81);
+}
+
+.red-bg {
+  background-color: #f70000;
+}
+
+.blue-bg {
+  background-color: #0702ff;
+}
+
+.center {
+  text-align: center;
+}
+
+.left {
+  text-align: left;
+}
+
+.right {
+  text-align: right;
 }

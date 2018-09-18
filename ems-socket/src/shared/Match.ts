@@ -1,6 +1,5 @@
 import * as moment from "moment";
 import MatchParticipant from "./MatchParticipant";
-import AllianceMember from "./AllianceMember";
 import MatchDetails from "./MatchDetails";
 import RoverRuckusMatchDetails from "./RoverRuckusMatchDetails";
 
@@ -26,8 +25,6 @@ export default class Match implements IPostableObject {
   // This item is separate, and not recorded directly in the 'Match' table.
   private _matchDetails: IMatchDetails;
   private _participants: MatchParticipant[];
-  private _allianceMembers: AllianceMember[];
-  private _allianceMap: Map<number, AllianceMember[]>;
 
   constructor() {
     this._matchKey = "";
@@ -37,7 +34,6 @@ export default class Match implements IPostableObject {
     this._scheduledStartTime = moment();
     this._fieldNumber = -1;
     this._active = 0;
-    this._allianceMap = new Map<number, AllianceMember[]>();
   }
 
   public static getDetailsFromSeasonKey(seasonKey: number): MatchDetails {
@@ -284,29 +280,5 @@ export default class Match implements IPostableObject {
 
   set participants(value: MatchParticipant[]) {
     this._participants = value;
-  }
-
-  get allianceMembers(): AllianceMember[] {
-    return this._allianceMembers;
-  }
-
-  set allianceMembers(allianceMembers: AllianceMember[]) {
-    this._allianceMembers = allianceMembers;
-    const alliances: Map<number, AllianceMember[]> = new Map<number, AllianceMember[]>();
-    for (const member of allianceMembers) {
-      if (typeof alliances.get(member.allianceRank) === "undefined") {
-        alliances.set(member.allianceRank, []);
-      }
-      (alliances.get(member.allianceRank) as AllianceMember[]).push(member);
-    }
-    this.allianceMap = alliances;
-  }
-
-  get allianceMap(): Map<number, AllianceMember[]> {
-    return this._allianceMap;
-  }
-
-  set allianceMap(map: Map<number, AllianceMember[]>) {
-    this._allianceMap = map;
   }
 }

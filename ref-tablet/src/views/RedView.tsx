@@ -14,7 +14,10 @@ class RedView extends React.Component<IProps> {
 
   public render() {
     const {event} = this.props;
+
+    // Temporary
     const match: Match = new Match();
+    match.matchDetails = Match.getDetailsFromSeasonKey(event.seasonKey);
 
     let display;
 

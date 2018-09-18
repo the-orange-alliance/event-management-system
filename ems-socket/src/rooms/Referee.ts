@@ -1,7 +1,6 @@
 import {Socket, Server} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
-import RefereeEvents from "../scoring/energy-impact/RefereeEvents";
 import MatchTimer from "../scoring/MatchTimer";
 
 export default class RefereeRoom implements IRoom {
@@ -35,7 +34,7 @@ export default class RefereeRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
-    RefereeEvents.initialize(this._server, client, this._timer);
+    // RefereeEvents.initialize(this._server, client, this._timer);
   }
 
   get name(): string {

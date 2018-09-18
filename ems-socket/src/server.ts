@@ -72,54 +72,6 @@ socket.on("connection", (client: Socket) => {
   });
 });
 
-const WIND = 0;
-const SOLAR_1 = 1;
-const SOLAR_2 = 2;
-const SOLAR_3 = 3;
-const SOLAR_4 = 4;
-const SOLAR_5 = 5;
-const REACTOR = 6;
-
-ScoringTimerContainer.on("updateMatchScoring", (obj) => {
-  if (timer.inProgress()) {
-    let alliance_str = (obj.alliance_index === 0) ? "red" : "blue";
-
-    switch(obj.scoreType) {
-      case WIND:
-        ScoreManager.getDetails(alliance_str).windTurbinePoints += 1;
-        break;
-      case SOLAR_1:
-        ScoreManager.getDetails(alliance_str).solarPanelPoints[0] += 1;
-        break;
-      case SOLAR_2:
-        ScoreManager.getDetails(alliance_str).solarPanelPoints[1] += 1;
-        break;
-      case SOLAR_3:
-        ScoreManager.getDetails(alliance_str).solarPanelPoints[2] += 1;
-        break;
-      case SOLAR_4:
-        ScoreManager.getDetails(alliance_str).solarPanelPoints[3] += 1;
-        break;
-      case SOLAR_5:
-        ScoreManager.getDetails(alliance_str).solarPanelPoints[4] += 1;
-        break;
-      case REACTOR:
-        ScoreManager.getDetails(alliance_str).nuclearReactorPoints += 1;
-        break;
-    }
-
-    let score;
-    if(alliance_str === "red") {
-      score = ScoreCalculator.getRedSum();
-      ScoreManager.match.redScore = score;
-    } else {
-      score = ScoreCalculator.getBlueSum();
-      ScoreManager.match.blueScore = score;
-    }
-    socket.to("scoring").emit("score-update", ScoreManager.match.toJSON());
-  }
-});
-
 server.listen({
   port: port,
   host: host

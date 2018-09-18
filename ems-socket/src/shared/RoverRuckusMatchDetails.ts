@@ -54,7 +54,7 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     this._blueEndRobotsInCraterFull = 0;
   }
 
-  toJSON(): object {
+  public toJSON(): object {
     return {
       match_key: this.matchKey,
       match_detail_key: this.matchDetailKey,
@@ -85,7 +85,7 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     };
   }
 
-  fromJSON(json: any): RoverRuckusMatchDetails {
+  public fromJSON(json: any): RoverRuckusMatchDetails {
     const details: RoverRuckusMatchDetails = new RoverRuckusMatchDetails();
     details.matchKey = json.match_key;
     details.matchDetailKey = json.match_detail_key;

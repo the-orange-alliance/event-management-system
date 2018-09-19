@@ -11,6 +11,8 @@ import HeadRefereeView from "./views/HeadRefereeView";
 import EMSProvider from "./shared/providers/EMSProvider";
 import SocketProvider from "./shared/providers/SocketProvider";
 import {AxiosResponse} from "axios";
+import Match from "./shared/models/Match";
+import MatchParticipant from "./shared/models/MatchParticipant";
 
 interface IProps {
   cookies: Cookies
@@ -18,6 +20,7 @@ interface IProps {
 
 interface IState {
   event: Event,
+  match: Match,
   connected: boolean
 }
 
@@ -26,6 +29,7 @@ class App extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       event: new Event(),
+      match: new Match(),
       connected: false
     };
     this.renderLoginView = this.renderLoginView.bind(this);
@@ -46,6 +50,17 @@ class App extends React.Component<IProps, IState> {
     SocketProvider.on("disconnect", () => {
       console.log("Disconnected from SocketIO.");
       this.setState({connected: false});
+    });
+    SocketProvider.on("score-update", (matchJSON: any) => {
+      const match: Match = new Match().fromJSON(matchJSON);
+      if (typeof matchJSON.details !== "undefined") {
+        const seasonKey: number = parseInt(match.matchKey.split("-")[0], 10);
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      }
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
+      }
+      this.setState({match: match});
     });
     EMSProvider.getEvent().then((response: AxiosResponse) => {
       if (response.data.payload && response.data.payload.length > 0) {
@@ -101,7 +116,7 @@ class App extends React.Component<IProps, IState> {
       !this.props.cookies.get("login")) {
       return <Redirect to={"/"}/>
     } else {
-      return <RedView event={this.state.event}/>;
+      return <RedView event={this.state.event} match={this.state.match}/>;
     }
   }
 
@@ -110,7 +125,7 @@ class App extends React.Component<IProps, IState> {
       !this.props.cookies.get("login")) {
       return <Redirect to={"/"}/>
     } else {
-      return <BlueView event={this.state.event}/>;
+      return <BlueView event={this.state.event} match={this.state.match}/>;
     }
   }
 

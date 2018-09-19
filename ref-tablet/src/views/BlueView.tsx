@@ -4,7 +4,8 @@ import Match from "../shared/models/Match";
 import BlueAllianceView from "./ftc_1819/BlueAllianceView";
 
 interface IProps {
-  event: Event
+  event: Event,
+  match: Match
 }
 
 class BlueView extends React.Component<IProps> {
@@ -13,8 +14,7 @@ class BlueView extends React.Component<IProps> {
   }
 
   public render() {
-    const {event} = this.props;
-    const match: Match = new Match();
+    const {event, match} = this.props;
 
     let display;
 

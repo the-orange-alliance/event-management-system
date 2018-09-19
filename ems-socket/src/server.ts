@@ -9,9 +9,6 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
-import ScoringTimerContainer from "./scoring/ScoringTimerContainer";
-import ScoreManager from "./scoring/ScoreManager";
-import ScoreCalculator from "./scoring/energy-impact/ScoreCalculator";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of

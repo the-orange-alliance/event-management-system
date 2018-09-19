@@ -2,10 +2,8 @@ import {Server, Socket} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
-import ScoreManager from "../scoring/ScoreManager";
-import ScoringTimerContainer from "../scoring/ScoringTimerContainer";
-import RefereeEvents from "../scoring/energy-impact/RefereeEvents";
 import {MatchMode} from "../scoring/MatchMode";
+import ScoreManager from "../scoring/ScoreManager";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
@@ -54,13 +52,7 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("prestart", (matchKey: string, fieldNumber: number) => {
       this._server.to("scoring").emit("prestart", matchKey, fieldNumber);
-      RefereeEvents.resetVariables();
-      ScoreManager.resetMatch();
-      // const details: object = {
-      //   red: ScoreManager.getDetails("red").toJSON(),
-      //   blue: ScoreManager.getDetails("blue").toJSON()
-      // };
-      // this._server.to("referee").emit("onFreshTablet", {scores: [ScoreManager.match.redScore, ScoreManager.match.blueScore], md: details, prevReactor: RefereeEvents.prevReactor, prevYellowCards: RefereeEvents.prevYellowCards, prevRedCards: RefereeEvents.prevRedCards, prevBotsParked: RefereeEvents.prevBotsParked, status: "PRESTART"});
+      ScoreManager.reset();
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);
@@ -69,10 +61,6 @@ export default class ScoringRoom implements IRoom {
     client.on("start", () => {
       if (!this._timer.inProgress()) {
         this._timer.once("match-start", (timeLeft: number) => {
-          const details: object = {
-            red: ScoreManager.getDetails("red").toJSON(),
-            blue: ScoreManager.getDetails("blue").toJSON()
-          };
           this._server.to("scoring").emit("match-start", timeLeft);
           this._hasCommittedScore = false;
         });
@@ -88,14 +76,16 @@ export default class ScoringRoom implements IRoom {
         this._timer.once("match-end", () => {
           this._server.to("scoring").emit("match-end");
           this._timer.removeAllListeners("match-abort");
-          ScoringTimerContainer.stopAll();
-          RefereeEvents.resetVariables();
+          this._timer.removeAllListeners("match-auto");
+          this._timer.removeAllListeners("match-tele");
+          this._timer.removeAllListeners("match-endgame");
         });
         this._timer.once("match-abort", () => {
           this._server.to("scoring").emit("match-abort");
           this._timer.removeAllListeners("match-end");
-          ScoringTimerContainer.stopAll();
-          RefereeEvents.resetVariables();
+          this._timer.removeAllListeners("match-auto");
+          this._timer.removeAllListeners("match-tele");
+          this._timer.removeAllListeners("match-endgame");
         });
         this._timer.start();
       }

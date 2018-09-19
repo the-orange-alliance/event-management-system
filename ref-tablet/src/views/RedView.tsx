@@ -4,7 +4,8 @@ import RedAllianceView from "./ftc_1819/RedAllianceView";
 import Match from "../shared/models/Match";
 
 interface IProps {
-  event: Event
+  event: Event,
+  match: Match,
 }
 
 class RedView extends React.Component<IProps> {
@@ -13,11 +14,7 @@ class RedView extends React.Component<IProps> {
   }
 
   public render() {
-    const {event} = this.props;
-
-    // Temporary
-    const match: Match = new Match();
-    match.matchDetails = Match.getDetailsFromSeasonKey(event.seasonKey);
+    const {event, match} = this.props;
 
     let display;
 

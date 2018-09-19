@@ -35,9 +35,21 @@ export default class Match implements IPostableObject {
     this._matchName = "";
     this._tournamentLevel = 1;
     this._scheduledStartTime = moment();
+    this._startTime = moment();
+    this._prestartTime = moment();
     this._fieldNumber = -1;
+    this._cycleTime = 0;
+    this._redScore = 0;
+    this._blueScore = 0;
+    this._redMinPen = 0;
+    this._redMajPen = 0;
+    this._blueMinPen = 0;
+    this._blueMajPen = 0;
+    this._uploaded = false;
     this._active = 0;
-    this._allianceMap = new Map<number, AllianceMember[]>();
+
+    this._matchDetails = new MatchDetails();
+    this._participants = [];
   }
 
   public static getDetailsFromSeasonKey(seasonKey: number): MatchDetails {
@@ -48,7 +60,7 @@ export default class Match implements IPostableObject {
         return new MatchDetails();
     }
   }
-  
+
   public toJSON(): object {
     return {
       match_key: this.matchKey,
@@ -67,7 +79,9 @@ export default class Match implements IPostableObject {
       blue_min_pen: this.blueMinPen,
       blue_maj_pen: this.blueMajPen,
       active: this.active,
-      uploaded: this.uploaded ? 1 : 0
+      uploaded: this.uploaded ? 1 : 0,
+      details: this.matchDetails.matchKey.length > 0 ? this.matchDetails.toJSON() : undefined,
+      participants: this.participants.length > 0 ? this.participants.map((p: MatchParticipant) => p.toJSON()) : undefined
     };
   }
 

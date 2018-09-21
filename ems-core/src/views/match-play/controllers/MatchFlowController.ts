@@ -5,8 +5,6 @@ import HttpError from "../../../shared/models/HttpError";
 import SocketProvider from "../../../shared/providers/SocketProvider";
 import {AllianceColors, EliminationsFormats} from "../../../shared/AppTypes";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
-import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
-import MatchDetails from "../../../shared/models/MatchDetails";
 import Team from "../../../shared/models/Team";
 import {AxiosResponse} from "axios";
 import EventConfiguration from "../../../shared/models/EventConfiguration";
@@ -32,6 +30,7 @@ class MatchFlowController {
   public prestart(match: Match): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.makeActiveMatch(match).then(() => {
+        const seasonKey: string = match.matchKey.split("-")[0];
         // Reset all of the scoring variables to show a new match is about to start...
         // TODO - Maybe store this match, and if prestart is canceled, restore that match.
         match.redScore = 0;
@@ -40,7 +39,7 @@ class MatchFlowController {
         match.blueScore = 0;
         match.blueMinPen = 0;
         match.blueMajPen = 0;
-        match.matchDetails = this.getDetailsFromSeasonKey(match.matchKey.split("-")[0]);
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
         for (const participant of match.participants) {
           participant.cardStatus = 0;
         }
@@ -105,7 +104,8 @@ class MatchFlowController {
       promises.push(EMSProvider.getMatchParticipantTeams(matchKey));
       Promise.all(promises).then((values: any[]) => {
         const match: Match = new Match().fromJSON(values[0].data.payload[0]);
-        match.matchDetails = this.getDetailsFromSeasonKey(match.matchKey.split("-")[0]).fromJSON(values[1].data.payload[0]);
+        const seasonKey = match.matchKey.split("-")[0];
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(values[1].data.payload[0]);
         match.participants = values[2].data.payload.map((json: any) => new MatchParticipant().fromJSON(json));
         for (let i = 0; i < match.participants.length; i++) {
           match.participants[i].team = new Team().fromJSON(values[2].data.payload[i]);
@@ -389,15 +389,6 @@ class MatchFlowController {
     promises.push(EMSProvider.putMatchDetails(match.matchDetails));
     promises.push(EMSProvider.putMatchParticipants(match.participants));
     return Promise.all(promises);
-  }
-
-  private getDetailsFromSeasonKey(seasonKey: string): MatchDetails {
-    switch (seasonKey) {
-      case "2018":
-        return new EnergyImpactMatchDetails();
-      default:
-        return new EnergyImpactMatchDetails();
-    }
   }
 
   private getWinsFromFormat(format: EliminationsFormats): number {

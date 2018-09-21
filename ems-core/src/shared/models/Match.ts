@@ -1,6 +1,8 @@
 import * as moment from "moment";
 import MatchParticipant from "./MatchParticipant";
 import MatchDetails from "./MatchDetails";
+import RoverRuckusMatchDetails from "./RoverRuckusMatchDetails";
+import EnergyImpactMatchDetails from "./EnergyImpactMatchDetails";
 
 export default class Match implements IPostableObject {
   private _matchKey: string;
@@ -33,6 +35,17 @@ export default class Match implements IPostableObject {
     this._scheduledStartTime = moment();
     this._fieldNumber = -1;
     this._active = 0;
+  }
+
+  public static getDetailsFromSeasonKey(seasonKey: number | string): MatchDetails {
+    switch (seasonKey) {
+      case 2018 || "2018":
+        return new EnergyImpactMatchDetails();
+      case 1819 || "1819":
+        return new RoverRuckusMatchDetails();
+      default:
+        return new MatchDetails();
+    }
   }
 
   public toJSON(): object {

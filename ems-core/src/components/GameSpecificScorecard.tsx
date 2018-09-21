@@ -2,6 +2,8 @@ import * as React from "react";
 import {AllianceColors, EMSEventTypes} from "../shared/AppTypes";
 import EnergyImpactRedScorecard from "./game-specifics/EnergyImpactRedScorecard";
 import EnergyImpactBlueScorecard from "./game-specifics/EnergyImpactBlueScorecard";
+import RoverRuckusRedScorecard from "./game-specifics/RoverRuckusRedScorecard";
+import RoverRuckusBlueScorecard from "./game-specifics/RoverRuckusBlueScorecard";
 
 interface IProps {
   type: EMSEventTypes,
@@ -22,6 +24,13 @@ class GameSpecificScorecard extends React.Component<IProps> {
           display = <EnergyImpactRedScorecard/>;
         } else {
           display = <EnergyImpactBlueScorecard/>
+        }
+        break;
+      case "ftc_1819":
+        if (alliance === "Red") {
+          display = <RoverRuckusRedScorecard/>;
+        } else {
+          display = <RoverRuckusBlueScorecard/>
         }
         break;
       default:

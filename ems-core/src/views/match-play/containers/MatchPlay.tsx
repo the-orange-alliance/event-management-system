@@ -25,8 +25,6 @@ import SocketProvider from "../../../shared/providers/SocketProvider";
 import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
 import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
-import SocketMatch from "../../../shared/models/scoring/SocketMatch";
-import EnergyImpactDetails from "../../../shared/models/scoring/EnergyImpactDetails";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import MatchDetails from "../../../shared/models/MatchDetails";
 
@@ -201,35 +199,39 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.setMatchState(MatchState.MATCH_COMPLETE);
       SocketProvider.off("score-update");
     });
-    SocketProvider.on("score-update", (scoreObj: any) => {
+    SocketProvider.on("score-update", (matchJSON: any) => {
       // TODO - This looks better. However, the scoreObj should eventually be coming through as an actual Match object.
-      const sckMatch: SocketMatch = new SocketMatch().fromJSON(scoreObj, new EnergyImpactDetails());
-      this.state.activeMatch.redScore = sckMatch.redScore;
-      this.state.activeMatch.redMinPen = sckMatch.redMinPen;
-      this.state.activeMatch.redMajPen = sckMatch.redMajPen;
-      this.state.activeMatch.blueScore = sckMatch.blueScore;
-      this.state.activeMatch.blueMinPen = sckMatch.blueMinPen;
-      this.state.activeMatch.blueMajPen = sckMatch.blueMajPen;
-      for (let i = 0; i < sckMatch.cardStatuses.length / 2; i++) {
-        this.state.activeMatch.participants[i].cardStatus = sckMatch.cardStatuses[i];
+      const match: Match = new Match().fromJSON(matchJSON);
+      if (typeof matchJSON.details !== "undefined") {
+        const seasonKey: string = match.matchKey.split("-")[0];
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
       }
-      for (let i = sckMatch.cardStatuses.length / 2; i < sckMatch.cardStatuses.length; i++) {
-        const index = (this.state.activeMatch.participants.length / 2) + (i - (sckMatch.cardStatuses.length / 2));
-        this.state.activeMatch.participants[index].cardStatus = sckMatch.cardStatuses[i];
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
+      }
+
+      this.state.activeMatch.redScore = match.redScore;
+      this.state.activeMatch.redMinPen = match.redMinPen;
+      this.state.activeMatch.redMajPen = match.redMajPen;
+      this.state.activeMatch.blueScore = match.blueScore;
+      this.state.activeMatch.blueMinPen = match.blueMinPen;
+      this.state.activeMatch.blueMajPen = match.blueMajPen;
+      for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
+        this.state.activeMatch.participants[i].cardStatus = match.participants[i].cardStatus;
       }
       // Since everything is 'technically' pass-by-reference, updating activeMatch from activeMatch doesn't do anything.
       // Essentially, we are creating a different object with the same properties to properly update the scorecards.
-      const match: Match = new Match().fromJSON(this.state.activeMatch.toJSON());
-      match.matchDetails = sckMatch.toMatchDetails();
-      match.participants = this.state.activeMatch.participants.map(participant => new MatchParticipant().fromJSON(participant.toJSON()));
+      const oldActiveMatch: Match = new Match().fromJSON(this.state.activeMatch.toJSON());
+      oldActiveMatch.matchDetails = match.matchDetails;
+      oldActiveMatch.participants = match.participants;
       for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
         if (typeof this.state.activeMatch.participants[i].team !== "undefined") {
           match.participants[i].team = this.state.activeMatch.participants[i].team;
         }
       }
-      this.props.setActiveMatch(match);
-      this.props.setActiveParticipants(match.participants);
-      this.props.setActiveDetails(match.matchDetails);
+      this.props.setActiveMatch(oldActiveMatch);
+      this.props.setActiveParticipants(oldActiveMatch.participants);
+      this.props.setActiveDetails(oldActiveMatch.matchDetails);
     });
     MatchFlowController.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);

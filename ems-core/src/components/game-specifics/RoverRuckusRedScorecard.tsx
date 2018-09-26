@@ -8,11 +8,10 @@ import MatchParticipant from "../../shared/models/MatchParticipant";
 import MatchDetails from "../../shared/models/MatchDetails";
 import {ISetActiveDetails, ISetActiveMatch} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {setActiveDetails, setActiveMatch} from "../../stores/scoring/actions";
+import {setActiveDetails} from "../../stores/scoring/actions";
 import RoverRuckusTeamStatus from "./RoverRuckusTeamStatus";
 import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
 import {SyntheticEvent} from "react";
-import EnergyImpactMatchDetails from "../../shared/models/EnergyImpactMatchDetails";
 
 interface IProps {
   match?: Match,
@@ -119,7 +118,7 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
 
   private modifyRobotsLanded(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as RoverRuckusMatchDetails).redAutoRobotsLanded = parseInt(props.value, 10);
+      this.props.details.redAutoRobotsLanded = parseInt(props.value, 10);
       this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
@@ -225,7 +224,6 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
       this.props.match.redMinPen = parseInt(props.value, 10);
       this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
-      this.props.setActiveDetails(new EnergyImpactMatchDetails().fromJSON(this.props.details.toJSON()));
       this.forceUpdate();
     }
   }
@@ -250,7 +248,6 @@ export function mapStateToProps({scoringState}: IApplicationState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    setActiveMatch: (match: Match) => dispatch(setActiveMatch(match)),
     setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
   };
 }

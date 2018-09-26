@@ -38,10 +38,11 @@ export default class Match implements IPostableObject {
   }
 
   public static getDetailsFromSeasonKey(seasonKey: number | string): MatchDetails {
-    switch (seasonKey) {
-      case 2018 || "2018":
+    const key: number = parseInt(seasonKey.toString(), 10);
+    switch (key) {
+      case 2018:
         return new EnergyImpactMatchDetails();
-      case 1819 || "1819":
+      case 1819:
         return new RoverRuckusMatchDetails();
       default:
         return new MatchDetails();

@@ -124,6 +124,45 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     return details;
   }
 
+  public getRedScore(minPen: number, majPen: number): number {
+    console.log("Overriding stuff");
+    let score: number = 0;
+    score += this.redAutoRobotsLanded * 30;
+    score += this.redAutoClaims * 15;
+    score += this.redAutoRobotsParked * 10;
+    score += this.redAutoSuccessfulSamples * 25;
+    score += this.redAutoDepotMinerals * 2;
+    console.log("Auto Score: " + score);
+    score += this.redAutoCargoGoldMinerals * 5;
+    score += this.redAutoCargoSilverMinerals * 5;
+    score += this.redTeleDepotMinerals * 2;
+    score += this.redTeleCargoGoldMinerals * 5;
+    score += this.redTeleCargoSilverMinerals * 5;
+    console.log("Tele Score: " + score);
+    score += this.redEndRobotsLatched * 50;
+    score += this.redEndRobotsInCraterPartial * 15;
+    score += this.redEndRobotsInCraterFull * 25;
+    return score;
+  }
+
+  public getBlueScore(minPen: number, majPen: number): number {
+    let score: number = 0;
+    score += this.blueAutoRobotsLanded * 30;
+    score += this.blueAutoClaims * 15;
+    score += this.blueAutoRobotsParked * 10;
+    score += this.blueAutoSuccessfulSamples * 25;
+    score += this.blueAutoDepotMinerals * 2;
+    score += this.blueAutoCargoGoldMinerals * 5;
+    score += this.blueAutoCargoSilverMinerals * 5;
+    score += this.blueTeleDepotMinerals * 2;
+    score += this.blueTeleCargoGoldMinerals * 5;
+    score += this.blueTeleCargoSilverMinerals * 5;
+    score += this.blueEndRobotsLatched * 50;
+    score += this.blueEndRobotsInCraterPartial * 15;
+    score += this.blueEndRobotsInCraterFull * 25;
+    return score;
+  }
+
   get redAutoRobotsLanded(): number {
     return this._redAutoRobotsLanded;
   }

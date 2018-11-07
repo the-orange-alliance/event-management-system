@@ -49,9 +49,7 @@ class AppContainer extends React.Component<IProps, IState> {
           <Divider section={true}/>
           {this.getViewFromActiveItem(activeItem)}
           <ToastContainer
-            position="bottom-right"
             pauseOnHover={true}
-            pauseOnVisibilityChange={true}
             newestOnTop={false}
             closeOnClick={true}
           />

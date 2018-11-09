@@ -28,7 +28,7 @@ class RobotStateSwitcher extends React.Component<IProps> {
     return(
       <div className="state-switcher-container">
         <div className="state-switcher-team-container">
-          {participant.teamKey}
+          Team {participant.teamKey}
         </div>
         <div className="state-switcher-state-container">
           {statesView}

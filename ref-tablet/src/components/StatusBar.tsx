@@ -1,11 +1,10 @@
 import * as React from 'react';
-import Event from "../shared/models/Event";
 import Match from "../shared/models/Match";
 
 interface IProps {
-  event: Event,
   match: Match,
-  mode: string
+  mode: string,
+  connected: boolean
 }
 
 class StatusBar extends React.Component<IProps> {
@@ -14,12 +13,13 @@ class StatusBar extends React.Component<IProps> {
   }
 
   public render() {
-    const {event, match, mode} = this.props;
+    const {connected, match, mode} = this.props;
+
     return (
-      <div className="status-bar-container">
-        <div className="left">{match.matchName} (Field {match.fieldNumber})</div>
+      <div className="status-bar-container black-bg">
+        <div className="left">{match.abbreviatedName} (Field {match.fieldNumber})</div>
         <div className="center">{mode}</div>
-        <div className="right">{event.eventName}</div>
+        <div className="right">{connected ? "CONNECTED" : "NOT CONNECTED"}</div>
       </div>
     );
   }

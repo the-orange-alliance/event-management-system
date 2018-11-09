@@ -3,6 +3,7 @@ import * as React from 'react';
 interface IProps {
   modes: string[],
   selected: number,
+  className?: string,
   onSelect: (index: number) => void
 }
 
@@ -12,7 +13,7 @@ class ModeSwitcher extends React.Component<IProps> {
   }
 
   public render() {
-    const {modes, selected, onSelect} = this.props;
+    const {modes, selected, className, onSelect} = this.props;
 
     const modesView = modes.map((mode, index) => {
       const select = onSelect.bind(this, index);
@@ -28,7 +29,7 @@ class ModeSwitcher extends React.Component<IProps> {
     });
 
     return (
-      <div className="mode-bar-container">
+      <div className={"mode-bar-container " + (className ? className : "")}>
         {modesView}
       </div>
     );

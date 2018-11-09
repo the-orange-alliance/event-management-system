@@ -5,7 +5,8 @@ import BlueAllianceView from "./ftc_1819/BlueAllianceView";
 
 interface IProps {
   event: Event,
-  match: Match
+  match: Match,
+  connected: boolean
 }
 
 class BlueView extends React.Component<IProps> {
@@ -14,13 +15,13 @@ class BlueView extends React.Component<IProps> {
   }
 
   public render() {
-    const {event, match} = this.props;
+    const {event, match, connected} = this.props;
 
     let display;
 
     switch (event.seasonKey) {
       case 1819:
-        display = <BlueAllianceView event={event} match={match} mode={"UNDEFINED"}/>;
+        display = <BlueAllianceView event={event} match={match} mode={"UNDEFINED"} connected={connected}/>;
         break;
       default:
         display = <span>No ref tablet application has been made for {event.seasonKey}</span>;

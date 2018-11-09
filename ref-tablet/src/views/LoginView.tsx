@@ -46,8 +46,8 @@ class LoginView extends React.Component<IProps, IState> {
   }
 
   private authenticate() {
-    if (this.state.username === process.env.REACT_APP_USERNAME &&
-        this.state.password === process.env.REACT_APP_PASSWORD) {
+    if (this.state.username === (process.env.REACT_APP_USERNAME || "admin") &&
+        this.state.password === (process.env.REACT_APP_PASSWORD || "password")) {
       this.props.cookies.set("login", true, {
         maxAge: 86400
       });

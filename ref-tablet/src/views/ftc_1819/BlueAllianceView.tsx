@@ -7,7 +7,8 @@ import ModeSwitcher from "../../components/ModeSwitcher";
 interface IProps {
   event: Event,
   match: Match,
-  mode: string
+  mode: string,
+  connected: boolean
 }
 
 interface IState {
@@ -24,12 +25,12 @@ class BlueAllianceView extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {event, match, mode} = this.props;
+    const {match, mode, connected} = this.props;
     const {currentMode} = this.state;
     return (
-      <div className="alliance-view blue-bg">
-        <StatusBar event={event} match={match} mode={mode}/>
-        <ModeSwitcher modes={["auto", "teleop", "endgame"]} selected={currentMode} onSelect={this.changeModeTab}/>
+      <div className="alliance-view">
+        <StatusBar match={match} mode={mode} connected={connected}/>
+        <ModeSwitcher className={"blue-bg"} modes={["auto", "teleop", "endgame", "cards"]} selected={currentMode} onSelect={this.changeModeTab}/>
       </div>
     );
   }

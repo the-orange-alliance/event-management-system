@@ -116,7 +116,7 @@ class App extends React.Component<IProps, IState> {
       !this.props.cookies.get("login")) {
       return <Redirect to={"/"}/>
     } else {
-      return <RedView event={this.state.event} match={this.state.match}/>;
+      return <RedView event={this.state.event} match={this.state.match} connected={this.state.connected}/>;
     }
   }
 
@@ -125,7 +125,7 @@ class App extends React.Component<IProps, IState> {
       !this.props.cookies.get("login")) {
       return <Redirect to={"/"}/>
     } else {
-      return <BlueView event={this.state.event} match={this.state.match}/>;
+      return <BlueView event={this.state.event} match={this.state.match} connected={this.state.connected}/>;
     }
   }
 

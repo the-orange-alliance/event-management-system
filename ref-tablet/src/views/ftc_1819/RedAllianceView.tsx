@@ -10,7 +10,8 @@ import GenericStateSwitcher from "../../components/GenericStateSwitcher";
 interface IProps {
   event: Event,
   match: Match,
-  mode: string
+  mode: string,
+  connected: boolean
 }
 
 interface IState {
@@ -33,7 +34,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {event, match, mode} = this.props;
+    const {match, mode, connected} = this.props;
     const {currentMode} = this.state;
 
     let modeView;
@@ -53,9 +54,9 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
 
     return (
-      <div className="alliance-view red-bg">
-        <StatusBar event={event} match={match} mode={mode}/>
-        <ModeSwitcher modes={["auto", "teleop", "endgame"]} selected={currentMode} onSelect={this.changeModeTab}/>
+      <div className="alliance-view">
+        <StatusBar match={match} mode={mode} connected={connected}/>
+        <ModeSwitcher className={"red-bg"} modes={["auto", "teleop", "endgame", "cards"]} selected={currentMode} onSelect={this.changeModeTab}/>
         {modeView}
       </div>
     );
@@ -64,8 +65,8 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private renderAutoView(): JSX.Element {
     return (
       <div>
-        <RobotStateSwitcher participant={new MatchParticipant()} states={["Landed", "Nothing"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>
-        <RobotStateSwitcher participant={new MatchParticipant()} states={["Landed", "Nothing"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>
+        <RobotStateSwitcher participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>
+        <RobotStateSwitcher participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>
         <GenericStateSwitcher title={"Alliance Claims"} states={["0", "1", "2"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>
         <GenericStateSwitcher title={"Alliance Sampling"} states={["Successful Sample", "Failed Sample"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>
         <RobotStateSwitcher participant={new MatchParticipant()} states={["Not Parked", "Parked"]} selected={0} onSelect={this.changeRobotOneEndgameState}/>

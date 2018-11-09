@@ -150,11 +150,9 @@
 .mode-bar-container {
   width: 100vw;
   height: 5vh;
-  background-color: orange;
   color: #ffffff;
   font-size: 2vh;
   font-weight: bold;
-  padding: 10px 15px 10px 15px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -165,25 +163,29 @@
   width: 100%;
   max-width: 200px;
   height: 100%;
+  display: -ms-flexbox;
   display: flex;
+  -ms-flex-pack: center;
   justify-content: center;
+  -ms-flex-align: center;
   align-items: center;
   text-align: center;
+  border-bottom: 5px solid #ff8d00;
+  padding-bottom: 5px;
 }
 
 .mode-bar-container > .selected {
-  border-radius: 15px;
-  background-color: #ffffff;
-  color: orange;
+  border-color: #e50000;
 }
 
 .state-switcher-container {
   width: 100%;
   height: 10vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-around;
   align-items: center;
+  padding: 0 10px 0 10px;
 }
 
 .state-switcher-team-container {
@@ -194,11 +196,12 @@
   align-items: center;
   text-align: center;
   font-size: 2vh;
+  color: #000000;
 }
 
 .state-switcher-state-container {
   width: 75%;
-  height: 100%;
+  height: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -206,13 +209,12 @@
 
 .state-switcher-state-container > div {
   width: 100%;
-  height: 75%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
   font-size: 2vh;
-  margin: 5px;
   background-color: lightslategrey;
   border: 4px solid lightslategrey;
 }
@@ -225,6 +227,7 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  background-color: #ffffff;
 }
 
 .header-logo {
@@ -291,11 +294,15 @@
 }
 
 .red-bg {
-  background-color: #f70000;
+  background-color: #ff0000;
 }
 
 .blue-bg {
   background-color: #0702ff;
+}
+
+.black-bg {
+  background-color: #000000;
 }
 
 .center {

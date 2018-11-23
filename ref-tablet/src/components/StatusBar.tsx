@@ -16,7 +16,7 @@ class StatusBar extends React.Component<IProps> {
     const {connected, match, mode} = this.props;
 
     return (
-      <div className="status-bar-container black-bg">
+      <div className="status-bar-container dark-bg">
         <div className="left">{match.abbreviatedName} (Field {match.fieldNumber})</div>
         <div className="center">{mode}</div>
         <div className="right">{connected ? "CONNECTED" : "NOT CONNECTED"}</div>

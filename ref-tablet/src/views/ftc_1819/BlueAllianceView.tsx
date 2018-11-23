@@ -2,7 +2,6 @@ import * as React from 'react';
 import StatusBar from "../../components/StatusBar";
 import Event from "../../shared/models/Event";
 import Match from "../../shared/models/Match";
-import ModeSwitcher from "../../components/ModeSwitcher";
 
 interface IProps {
   event: Event,
@@ -26,11 +25,11 @@ class BlueAllianceView extends React.Component<IProps, IState> {
 
   public render() {
     const {match, mode, connected} = this.props;
-    const {currentMode} = this.state;
+    // const {currentMode} = this.state;
     return (
       <div className="alliance-view">
         <StatusBar match={match} mode={mode} connected={connected}/>
-        <ModeSwitcher className={"blue-bg"} modes={["auto", "teleop", "endgame", "cards"]} selected={currentMode} onSelect={this.changeModeTab}/>
+        {/*<ModeSwitcher className={"blue-bg"} modes={["auto", "teleop", "endgame", "cards"]} selected={currentMode} onSelect={this.changeModeTab}/>*/}
       </div>
     );
   }

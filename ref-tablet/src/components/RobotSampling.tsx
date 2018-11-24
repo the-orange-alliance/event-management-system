@@ -3,24 +3,21 @@ import GOLD_MINERAL from '../resources/ftc_1819/Gold_Mineral.png';
 import SILVER_MINERAL from '../resources/ftc_1819/Silver_Mineral.png';
 
 interface IProps {
+  silverOneStatus: boolean,
+  silverTwoStatus: boolean,
+  goldStatus: boolean
   onSuccess?: () => void
 }
 
 interface IState {
   successful: boolean,
-  silverOneStatus: boolean,
-  silverTwoStatus: boolean,
-  goldStatus: boolean
 }
 
 class RobotSampling extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      successful: false,
-      silverOneStatus: false,
-      silverTwoStatus: false,
-      goldStatus: false
+      successful: false
     };
 
     this.toggleSilverOne = this.toggleSilverOne.bind(this);
@@ -29,7 +26,7 @@ class RobotSampling extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {silverOneStatus, silverTwoStatus, goldStatus} = this.state;
+    const {silverOneStatus, silverTwoStatus, goldStatus} = this.props;
     return (
       <div className="robot-sample-container">
         <div className={"robot-sample-item " + (silverOneStatus ? "selected" : "")} onClick={this.toggleSilverOne}>
@@ -46,21 +43,21 @@ class RobotSampling extends React.Component<IProps, IState> {
   }
 
   private toggleSilverOne() {
-    const newSilverOneStatus = !this.state.silverOneStatus;
-    const successful = newSilverOneStatus && this.state.silverTwoStatus && !this.state.goldStatus;
-    this.setState({silverOneStatus: newSilverOneStatus, successful});
+    const newSilverOneStatus = !this.props.silverOneStatus;
+    const successful = newSilverOneStatus && this.props.silverTwoStatus && !this.props.goldStatus;
+    this.setState({successful});
   }
 
   private toggleSilverTwo() {
-    const newSilverTwoStatus = !this.state.silverTwoStatus;
-    const successful = this.state.silverOneStatus && newSilverTwoStatus && !this.state.goldStatus;
-    this.setState({silverTwoStatus: newSilverTwoStatus, successful});
+    const newSilverTwoStatus = !this.props.silverTwoStatus;
+    const successful = this.props.silverOneStatus && newSilverTwoStatus && !this.props.goldStatus;
+    this.setState({successful});
   }
 
   private toggleGold() {
-    const newGoldStatus = !this.state.goldStatus;
-    const successful = this.state.silverOneStatus && this.state.silverTwoStatus && !newGoldStatus;
-    this.setState({goldStatus: newGoldStatus, successful});
+    const newGoldStatus = !this.props.goldStatus;
+    const successful = this.props.silverOneStatus && this.props.silverTwoStatus && !newGoldStatus;
+    this.setState({successful});
   }
 }
 

@@ -2,27 +2,22 @@ import * as React from 'react';
 import MatchParticipant from "../shared/models/MatchParticipant";
 
 interface IProps {
-  participant: MatchParticipant
+  participant: MatchParticipant,
+  onUpdate?: (status: number) => void
 }
 
-interface IState {
-  selected: number
-}
-
-class RobotCardStatus extends React.Component<IProps, IState> {
+class RobotCardStatus extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
-    this.state = {
-      selected: 0
-    };
   }
 
   public render() {
-    const {selected} = this.state;
+    const {participant} = this.props;
+    const selected: number = participant.cardStatus;
     return (
       <div className="robot-card-container">
         <div className="robot-card-team">
-          Team -1
+          Team {participant.teamKey}
         </div>
         <div className="robot-card-cards">
           <div className={"robot-card-none " + (selected === 0 ? "selected" : "")} onClick={this.updateSelected.bind(this, 0)}>None</div>
@@ -34,7 +29,9 @@ class RobotCardStatus extends React.Component<IProps, IState> {
   }
 
   private updateSelected(index: number) {
-    this.setState({selected: index});
+    if (typeof this.props.onUpdate !== "undefined") {
+      this.props.onUpdate(index);
+    }
   }
 }
 

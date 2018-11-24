@@ -91,45 +91,45 @@ class RedAllianceView extends React.Component<IProps, IState> {
       <div>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneEndgameState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneEndgameState}/>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <RobotClaimToggle participant={new MatchParticipant()}/>
-          </Col>
-          <Col md={6}>
-            <RobotClaimToggle participant={new MatchParticipant()}/>
+            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneEndgameState}/>
           </Col>
         </Row>
         <Row>
           <Col md={6}>
-            <RobotSampling/>
+            <RobotClaimToggle value={false} participant={new MatchParticipant()}/>
           </Col>
           <Col md={6}>
-            <RobotSampling/>
+            <RobotClaimToggle value={false} participant={new MatchParticipant()}/>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={6}>
+            <RobotSampling goldStatus={false} silverOneStatus={false} silverTwoStatus={false}/>
+          </Col>
+          <Col md={6}>
+            <RobotSampling goldStatus={false} silverOneStatus={false} silverTwoStatus={false}/>
           </Col>
         </Row>
         <Row>
           <Col md={4}>
-            <RobotNumberInput image={SILVER_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={0} image={SILVER_MINERAL} min={0} max={50}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput image={GOLD_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={0} image={GOLD_MINERAL} min={0} max={50}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput image={DEPOT_MINERALS} min={0} max={50}/>
+            <RobotNumberInput value={0} image={DEPOT_MINERALS} min={0} max={50}/>
           </Col>
         </Row>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneEndgameState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneEndgameState}/>
           </Col>
         </Row>
       </div>
@@ -141,13 +141,13 @@ class RedAllianceView extends React.Component<IProps, IState> {
       <div>
         <Row>
           <Col md={4}>
-            <RobotNumberInput image={SILVER_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={0} image={SILVER_MINERAL} min={0} max={50}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput image={GOLD_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={0} image={GOLD_MINERAL} min={0} max={50}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput image={DEPOT_MINERALS} min={0} max={50}/>
+            <RobotNumberInput value={0} image={DEPOT_MINERALS} min={0} max={50}/>
           </Col>
         </Row>
       </div>
@@ -157,8 +157,8 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private renderEndView(): JSX.Element {
     return (
       <div>
-        <RobotButtonGroup participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotOneEndgameState}/>
-        <RobotButtonGroup participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotTwoEndgameState}/>
+        <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotOneEndgameState}/>
+        <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotTwoEndgameState}/>
       </div>
     );
   }
@@ -176,10 +176,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={6}>
-            <RobotPenaltyInput label={"Minor Penalties"} min={0} max={255}/>
+            <RobotPenaltyInput value={0} label={"Minor Penalties"} min={0} max={255}/>
           </Col>
           <Col md={6}>
-            <RobotPenaltyInput label={"Major Penalties"} min={0} max={255}/>
+            <RobotPenaltyInput value={0} label={"Major Penalties"} min={0} max={255}/>
           </Col>
         </Row>
       </div>

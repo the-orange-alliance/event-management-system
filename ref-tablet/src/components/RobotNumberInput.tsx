@@ -2,29 +2,23 @@ import * as React from 'react';
 import {Button, Input} from "reactstrap";
 
 interface IProps {
+  value: number,
   image: any
   min: number,
-  max: number
+  max: number,
+  onIncrement?: () => void,
+  onDecrement?: () => void
 }
 
-interface IState {
-  value: number
-}
-
-class RobotNumberInput extends React.Component<IProps, IState> {
+class RobotNumberInput extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
-    this.state = {
-      value: 0
-    };
-
     this.incrementValue = this.incrementValue.bind(this);
     this.decrementValue = this.decrementValue.bind(this);
   }
 
   public render() {
-    const {image} = this.props;
-    const {value} = this.state;
+    const {image, value} = this.props;
     return (
       <div className="robot-number-container">
         <div className="robot-number-left">
@@ -40,14 +34,14 @@ class RobotNumberInput extends React.Component<IProps, IState> {
   }
 
   private incrementValue() {
-    if (this.state.value < this.props.max) {
-      this.setState({value: this.state.value + 1});
+    if (typeof this.props.onIncrement !== "undefined") {
+      this.props.onIncrement();
     }
   }
 
   private decrementValue() {
-    if (this.state.value > this.props.min) {
-      this.setState({value: this.state.value -  1});
+    if (typeof this.props.onDecrement !== "undefined") {
+      this.props.onDecrement();
     }
   }
 }

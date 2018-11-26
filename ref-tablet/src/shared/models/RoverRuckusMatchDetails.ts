@@ -25,7 +25,7 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
   private _blueEndRobotsLatched: number;
   private _blueEndRobotsInCraterPartial: number;
   private _blueEndRobotsInCraterFull: number;
-
+5
   constructor() {
     super();
     this._redAutoRobotsLanded = 0;

@@ -13,6 +13,7 @@ import SocketProvider from "./shared/providers/SocketProvider";
 import {AxiosResponse} from "axios";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
+import RoverRuckusMatchDetails from "./shared/models/RoverRuckusMatchDetails";
 
 interface IProps {
   cookies: Cookies
@@ -67,6 +68,8 @@ class App extends React.Component<IProps, IState> {
         this.setState({event: new Event().fromJSON(response.data.payload[0])});
       }
     });
+    // TODO - Remove after testing.
+    this.state.match.matchDetails = new RoverRuckusMatchDetails();
   }
 
   public render() {

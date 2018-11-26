@@ -6,8 +6,7 @@ interface IProps {
   image: any
   min: number,
   max: number,
-  onIncrement?: () => void,
-  onDecrement?: () => void
+  onChange?: (n: number) => void
 }
 
 class RobotNumberInput extends React.Component<IProps> {
@@ -34,14 +33,14 @@ class RobotNumberInput extends React.Component<IProps> {
   }
 
   private incrementValue() {
-    if (typeof this.props.onIncrement !== "undefined") {
-      this.props.onIncrement();
+    if (typeof this.props.onChange !== "undefined") {
+      this.props.onChange(1);
     }
   }
 
   private decrementValue() {
-    if (typeof this.props.onDecrement !== "undefined") {
-      this.props.onDecrement();
+    if (typeof this.props.onChange !== "undefined") {
+      this.props.onChange(-1);
     }
   }
 }

@@ -14,6 +14,7 @@ import SILVER_MINERAL from '../../resources/ftc_1819/Silver_Mineral.png';
 import DEPOT_MINERALS from '../../resources/ftc_1819/Depot_Minerals.png';
 import RobotCardStatus from "../../components/RobotCardStatus";
 import RobotPenaltyInput from "../../components/RobotPenaltyInput";
+import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
 
 interface IProps {
   event: Event,
@@ -23,9 +24,7 @@ interface IProps {
 }
 
 interface IState {
-  currentMode: number,
-  testRobot1: number,
-  testRobot2: number
+  currentMode: number
 }
 
 class RedAllianceView extends React.Component<IProps, IState> {
@@ -33,12 +32,20 @@ class RedAllianceView extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       currentMode: 0,
-      testRobot1: 0,
-      testRobot2: 1
     };
     this.changeModeTab = this.changeModeTab.bind(this);
+    this.changeRobotOneAutoState = this.changeRobotOneAutoState.bind(this);
+    this.changeRobotTwoAutoState = this.changeRobotTwoAutoState.bind(this);
+    this.changeAutoSilver = this.changeAutoSilver.bind(this);
+    this.changeAutoGold = this.changeAutoGold.bind(this);
+    this.changeAutoDepot = this.changeAutoDepot.bind(this);
+    this.changeTeleSilver = this.changeTeleSilver.bind(this);
+    this.changeTeleGold = this.changeTeleGold.bind(this);
+    this.changeTeleDepot = this.changeTeleDepot.bind(this);
     this.changeRobotOneEndgameState = this.changeRobotOneEndgameState.bind(this);
     this.changeRobotTwoEndgameState = this.changeRobotTwoEndgameState.bind(this);
+    this.changeMinorPenalties = this.changeMinorPenalties.bind(this);
+    this.changeMajorPenalties = this.changeMajorPenalties.bind(this);
   }
 
   public render() {
@@ -87,14 +94,19 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderAutoView(): JSX.Element {
+    const {match} = this.props;
+    const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
+    const silverMinerals = matchDetails.redAutoCargoSilverMinerals;
+    const goldMinerals = matchDetails.redAutoCargoGoldMinerals;
+    const depotMinerals = matchDetails.redAutoDepotMinerals;
     return (
       <div>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneAutoState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoAutoState}/>
           </Col>
         </Row>
         <Row>
@@ -115,13 +127,13 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={4}>
-            <RobotNumberInput value={0} image={SILVER_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={silverMinerals} image={SILVER_MINERAL} min={0} max={50} onChange={this.changeAutoSilver}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput value={0} image={GOLD_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={goldMinerals} image={GOLD_MINERAL} min={0} max={50} onChange={this.changeAutoGold}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput value={0} image={DEPOT_MINERALS} min={0} max={50}/>
+            <RobotNumberInput value={depotMinerals} image={DEPOT_MINERALS} min={0} max={50} onChange={this.changeAutoDepot}/>
           </Col>
         </Row>
         <Row>
@@ -137,17 +149,22 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderTeleView(): JSX.Element {
+    const {match} = this.props;
+    const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
+    const silverMinerals = matchDetails.redTeleCargoSilverMinerals;
+    const goldMinerals = matchDetails.redTeleCargoGoldMinerals;
+    const depotMinerals = matchDetails.redTeleDepotMinerals;
     return (
       <div>
         <Row>
           <Col md={4}>
-            <RobotNumberInput value={0} image={SILVER_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={silverMinerals} image={SILVER_MINERAL} min={0} max={50} onChange={this.changeTeleSilver}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput value={0} image={GOLD_MINERAL} min={0} max={50}/>
+            <RobotNumberInput value={goldMinerals} image={GOLD_MINERAL} min={0} max={50} onChange={this.changeTeleGold}/>
           </Col>
           <Col md={4}>
-            <RobotNumberInput value={0} image={DEPOT_MINERALS} min={0} max={50}/>
+            <RobotNumberInput value={depotMinerals} image={DEPOT_MINERALS} min={0} max={50} onChange={this.changeTeleDepot}/>
           </Col>
         </Row>
       </div>
@@ -164,6 +181,9 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderPenaltyView(): JSX.Element {
+    const {match} = this.props;
+    const minorPenalties = match.redMinPen;
+    const majorPenalties = match.redMajPen;
     return (
       <div>
         <Row>
@@ -176,10 +196,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={6}>
-            <RobotPenaltyInput value={0} label={"Minor Penalties"} min={0} max={255}/>
+            <RobotPenaltyInput value={minorPenalties} label={"Minor Penalties"} min={0} max={255} onChange={this.changeMinorPenalties}/>
           </Col>
           <Col md={6}>
-            <RobotPenaltyInput value={0} label={"Major Penalties"} min={0} max={255}/>
+            <RobotPenaltyInput value={majorPenalties} label={"Major Penalties"} min={0} max={255} onChange={this.changeMajorPenalties}/>
           </Col>
         </Row>
       </div>
@@ -190,12 +210,52 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.setState({currentMode: index});
   }
 
+  private changeRobotOneAutoState(index: number) {
+    console.log(index);
+  }
+
+  private changeRobotTwoAutoState(index: number) {
+    console.log(index);
+  }
+
+  private changeAutoSilver(n: number) {
+    console.log(n);
+  }
+
+  private changeAutoGold(n: number) {
+    console.log(n);
+  }
+
+  private changeAutoDepot(n: number) {
+    console.log(n);
+  }
+
+  private changeTeleSilver(n: number) {
+    console.log(n);
+  }
+
+  private changeTeleGold(n: number) {
+    console.log(n);
+  }
+
+  private changeTeleDepot(n: number) {
+    console.log(n);
+  }
+
   private changeRobotOneEndgameState(index: number) {
-    this.setState({testRobot1: index});
+    console.log('lol');
   }
 
   private changeRobotTwoEndgameState(index: number) {
-    this.setState({testRobot2: index});
+    console.log('lol');
+  }
+
+  private changeMinorPenalties(n: number) {
+    console.log(n);
+  }
+
+  private changeMajorPenalties(n: number) {
+    console.log(n);
   }
 }
 

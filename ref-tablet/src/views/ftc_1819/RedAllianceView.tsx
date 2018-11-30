@@ -15,6 +15,7 @@ import DEPOT_MINERALS from '../../resources/ftc_1819/Depot_Minerals.png';
 import RobotCardStatus from "../../components/RobotCardStatus";
 import RobotPenaltyInput from "../../components/RobotPenaltyInput";
 import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
+import RoverRuckusRefereeData from "../../shared/models/RoverRuckusRefereeData";
 
 interface IProps {
   event: Event,
@@ -24,7 +25,8 @@ interface IProps {
 }
 
 interface IState {
-  currentMode: number
+  currentMode: number,
+  refereeMetadata: RoverRuckusRefereeData
 }
 
 class RedAllianceView extends React.Component<IProps, IState> {
@@ -32,12 +34,15 @@ class RedAllianceView extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       currentMode: 0,
+      refereeMetadata: new RoverRuckusRefereeData()
     };
     this.changeModeTab = this.changeModeTab.bind(this);
     this.changeRobotOnePreState = this.changeRobotOnePreState.bind(this);
     this.changeRobotTwoPreState = this.changeRobotTwoPreState.bind(this);
     this.changeRobotOneAutoState = this.changeRobotOneAutoState.bind(this);
     this.changeRobotTwoAutoState = this.changeRobotTwoAutoState.bind(this);
+    this.changeSampleOne = this.changeSampleOne.bind(this);
+    this.changeSampleTwo = this.changeSampleTwo.bind(this);
     this.changeAutoSilver = this.changeAutoSilver.bind(this);
     this.changeAutoGold = this.changeAutoGold.bind(this);
     this.changeAutoDepot = this.changeAutoDepot.bind(this);
@@ -99,6 +104,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private renderAutoView(): JSX.Element {
     const {match} = this.props;
+    const {refereeMetadata} = this.state;
     const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
     const preOneStatus = matchDetails.redPreRobotOneStatus;
     const preTwoStatus = matchDetails.redPreRobotTwoStatus;
@@ -109,6 +115,12 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const redTwoClaimed = matchDetails.redAutoRobotTwoClaimed;
     const autoOneStatus = matchDetails.redAutoRobotOneStatus;
     const autoTwoStatus = matchDetails.redAutoRobotTwoStatus;
+    const sampleOneSilverOne = refereeMetadata.sampleOneSilverOneStatus;
+    const sampleOneSilverTwo = refereeMetadata.sampleOneSilverTwoStatus;
+    const sampleOneGold = refereeMetadata.sampleOneGoldStatus;
+    const sampleTwoSilverOne = refereeMetadata.sampleTwoSilverOneStatus;
+    const sampleTwoSilverTwo = refereeMetadata.sampleTwoSilverTwoStatus;
+    const sampleTwoGold = refereeMetadata.sampleTwoGoldStatus;
     return (
       <div>
         <Row>
@@ -129,10 +141,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={6}>
-            <RobotSampling goldStatus={false} silverOneStatus={false} silverTwoStatus={false}/>
+            <RobotSampling goldStatus={sampleOneGold} silverOneStatus={sampleOneSilverOne} silverTwoStatus={sampleOneSilverTwo} onChange={this.changeSampleOne}/>
           </Col>
           <Col md={6}>
-            <RobotSampling goldStatus={false} silverOneStatus={false} silverTwoStatus={false}/>
+            <RobotSampling goldStatus={sampleTwoGold} silverOneStatus={sampleTwoSilverOne} silverTwoStatus={sampleTwoSilverTwo} onChange={this.changeSampleTwo}/>
           </Col>
         </Row>
         <Row>
@@ -257,6 +269,52 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private toggleRobotTwoClaim() {
     const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
     details.redAutoRobotTwoClaimed = !details.redAutoRobotTwoClaimed;
+    this.forceUpdate();
+  }
+
+  private changeSampleOne(index: number, successful: boolean) {
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const lastSample: boolean = !this.state.refereeMetadata.sampleOneSilverOneStatus && !this.state.refereeMetadata.sampleOneSilverTwoStatus && this.state.refereeMetadata.sampleOneGoldStatus;
+    if (index === 0) {
+      this.state.refereeMetadata.sampleOneSilverOneStatus = !this.state.refereeMetadata.sampleOneSilverOneStatus;
+    }
+    if (index === 1) {
+      this.state.refereeMetadata.sampleOneSilverTwoStatus = !this.state.refereeMetadata.sampleOneSilverTwoStatus;
+    }
+    if (index === 2) {
+      this.state.refereeMetadata.sampleOneGoldStatus = !this.state.refereeMetadata.sampleOneGoldStatus;
+    }
+    if (typeof details.redAutoSuccessfulSamples === "undefined") {
+      details.redAutoSuccessfulSamples = 0;
+    }
+    if (!lastSample && successful) {
+      details.redAutoSuccessfulSamples += 1;
+    } else if (lastSample && !successful) {
+      details.redAutoSuccessfulSamples -= 1;
+    }
+    this.forceUpdate();
+  }
+
+  private changeSampleTwo(index: number, successful: boolean) {
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const lastSample: boolean = !this.state.refereeMetadata.sampleTwoSilverOneStatus && !this.state.refereeMetadata.sampleTwoSilverTwoStatus && this.state.refereeMetadata.sampleTwoGoldStatus;
+    if (index === 0) {
+      this.state.refereeMetadata.sampleTwoSilverOneStatus = !this.state.refereeMetadata.sampleTwoSilverOneStatus;
+    }
+    if (index === 1) {
+      this.state.refereeMetadata.sampleTwoSilverTwoStatus = !this.state.refereeMetadata.sampleTwoSilverTwoStatus;
+    }
+    if (index === 2) {
+      this.state.refereeMetadata.sampleTwoGoldStatus = !this.state.refereeMetadata.sampleTwoGoldStatus;
+    }
+    if (typeof details.redAutoSuccessfulSamples === "undefined") {
+      details.redAutoSuccessfulSamples = 0;
+    }
+    if (!lastSample && successful) {
+      details.redAutoSuccessfulSamples += 1;
+    } else if (lastSample && !successful) {
+      details.redAutoSuccessfulSamples -= 1;
+    }
     this.forceUpdate();
   }
 

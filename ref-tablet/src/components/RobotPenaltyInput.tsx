@@ -37,13 +37,13 @@ class RobotPenaltyInput extends React.Component<IProps> {
   }
 
   private incrementValue() {
-    if (typeof this.props.onChange !== "undefined") {
+    if (typeof this.props.onChange !== "undefined" && this.props.value < this.props.max) {
       this.props.onChange(1);
     }
   }
 
   private decrementValue() {
-    if (typeof this.props.onChange !== "undefined") {
+    if (typeof this.props.onChange !== "undefined" && this.props.value > this.props.min) {
       this.props.onChange(-1);
     }
   }

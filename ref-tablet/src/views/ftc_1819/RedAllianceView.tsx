@@ -34,11 +34,15 @@ class RedAllianceView extends React.Component<IProps, IState> {
       currentMode: 0,
     };
     this.changeModeTab = this.changeModeTab.bind(this);
+    this.changeRobotOnePreState = this.changeRobotOnePreState.bind(this);
+    this.changeRobotTwoPreState = this.changeRobotTwoPreState.bind(this);
     this.changeRobotOneAutoState = this.changeRobotOneAutoState.bind(this);
     this.changeRobotTwoAutoState = this.changeRobotTwoAutoState.bind(this);
     this.changeAutoSilver = this.changeAutoSilver.bind(this);
     this.changeAutoGold = this.changeAutoGold.bind(this);
     this.changeAutoDepot = this.changeAutoDepot.bind(this);
+    this.toggleRobotOneClaim = this.toggleRobotOneClaim.bind(this);
+    this.toggleRobotTwoClaim = this.toggleRobotTwoClaim.bind(this);
     this.changeTeleSilver = this.changeTeleSilver.bind(this);
     this.changeTeleGold = this.changeTeleGold.bind(this);
     this.changeTeleDepot = this.changeTeleDepot.bind(this);
@@ -96,25 +100,31 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private renderAutoView(): JSX.Element {
     const {match} = this.props;
     const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
-    const silverMinerals = matchDetails.redAutoCargoSilverMinerals;
-    const goldMinerals = matchDetails.redAutoCargoGoldMinerals;
-    const depotMinerals = matchDetails.redAutoDepotMinerals;
+    const preOneStatus = matchDetails.redPreRobotOneStatus;
+    const preTwoStatus = matchDetails.redPreRobotTwoStatus;
+    const silverMinerals = matchDetails.redAutoCargoSilverMinerals || 0;
+    const goldMinerals = matchDetails.redAutoCargoGoldMinerals || 0;
+    const depotMinerals = matchDetails.redAutoDepotMinerals || 0;
+    const redOneClaimed = matchDetails.redAutoRobotOneClaimed;
+    const redTwoClaimed = matchDetails.redAutoRobotTwoClaimed;
+    const autoOneStatus = matchDetails.redAutoRobotOneStatus;
+    const autoTwoStatus = matchDetails.redAutoRobotTwoStatus;
     return (
       <div>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOneAutoState}/>
+            <RobotButtonGroup value={preOneStatus} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOnePreState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoAutoState}/>
+            <RobotButtonGroup value={preTwoStatus} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoPreState}/>
           </Col>
         </Row>
         <Row>
           <Col md={6}>
-            <RobotClaimToggle value={false} participant={new MatchParticipant()}/>
+            <RobotClaimToggle value={redOneClaimed} participant={new MatchParticipant()} onToggle={this.toggleRobotOneClaim}/>
           </Col>
           <Col md={6}>
-            <RobotClaimToggle value={false} participant={new MatchParticipant()}/>
+            <RobotClaimToggle value={redTwoClaimed} participant={new MatchParticipant()} onToggle={this.toggleRobotTwoClaim}/>
           </Col>
         </Row>
         <Row>
@@ -138,10 +148,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={autoOneStatus} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneAutoState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneEndgameState}/>
+            <RobotButtonGroup value={autoTwoStatus} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotTwoAutoState}/>
           </Col>
         </Row>
       </div>
@@ -151,9 +161,9 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private renderTeleView(): JSX.Element {
     const {match} = this.props;
     const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
-    const silverMinerals = matchDetails.redTeleCargoSilverMinerals;
-    const goldMinerals = matchDetails.redTeleCargoGoldMinerals;
-    const depotMinerals = matchDetails.redTeleDepotMinerals;
+    const silverMinerals = matchDetails.redTeleCargoSilverMinerals || 0;
+    const goldMinerals = matchDetails.redTeleCargoGoldMinerals || 0;
+    const depotMinerals = matchDetails.redTeleDepotMinerals || 0;
     return (
       <div>
         <Row>
@@ -172,18 +182,22 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderEndView(): JSX.Element {
+    const {match} = this.props;
+    const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
+    const endOneStatus = matchDetails.redEndRobotOneStatus;
+    const endTwoStatus = matchDetails.redEndRobotTwoStatus;
     return (
       <div>
-        <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotOneEndgameState}/>
-        <RobotButtonGroup value={0} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotTwoEndgameState}/>
+        <RobotButtonGroup value={endOneStatus} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotOneEndgameState}/>
+        <RobotButtonGroup value={endTwoStatus} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotTwoEndgameState}/>
       </div>
     );
   }
 
   private renderPenaltyView(): JSX.Element {
     const {match} = this.props;
-    const minorPenalties = match.redMinPen;
-    const majorPenalties = match.redMajPen;
+    const minorPenalties = match.redMinPen || 0;
+    const majorPenalties = match.redMajPen || 0;
     return (
       <div>
         <Row>
@@ -210,52 +224,122 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.setState({currentMode: index});
   }
 
+  private changeRobotOnePreState(index: number) {
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redPreRobotOneStatus = index;
+    this.forceUpdate();
+  }
+
+  private changeRobotTwoPreState(index: number) {
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redPreRobotTwoStatus = index;
+    this.forceUpdate();
+  }
+
   private changeRobotOneAutoState(index: number) {
-    console.log(index);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redAutoRobotOneStatus = index;
+    this.forceUpdate();
   }
 
   private changeRobotTwoAutoState(index: number) {
-    console.log(index);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redAutoRobotTwoStatus = index;
+    this.forceUpdate();
+  }
+
+  private toggleRobotOneClaim() {
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redAutoRobotOneClaimed = !details.redAutoRobotOneClaimed;
+    this.forceUpdate();
+  }
+
+  private toggleRobotTwoClaim() {
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redAutoRobotTwoClaimed = !details.redAutoRobotTwoClaimed;
+    this.forceUpdate();
   }
 
   private changeAutoSilver(n: number) {
-    console.log(n);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    if (typeof details.redAutoCargoSilverMinerals === "undefined") {
+      details.redAutoCargoSilverMinerals = 0;
+    }
+    details.redAutoCargoSilverMinerals += n;
+    this.forceUpdate();
   }
 
   private changeAutoGold(n: number) {
-    console.log(n);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    if (typeof details.redAutoCargoGoldMinerals === "undefined") {
+      details.redAutoCargoGoldMinerals = 0;
+    }
+    details.redAutoCargoGoldMinerals += n;
+    this.forceUpdate();
   }
 
   private changeAutoDepot(n: number) {
-    console.log(n);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    if (typeof details.redAutoDepotMinerals === "undefined") {
+      details.redAutoDepotMinerals = 0;
+    }
+    details.redAutoDepotMinerals += n;
+    this.forceUpdate();
   }
 
   private changeTeleSilver(n: number) {
-    console.log(n);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    if (typeof details.redTeleCargoSilverMinerals === "undefined") {
+      details.redTeleCargoSilverMinerals = 0;
+    }
+    details.redTeleCargoSilverMinerals += n;
+    this.forceUpdate();
   }
 
   private changeTeleGold(n: number) {
-    console.log(n);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    if (typeof details.redTeleCargoGoldMinerals === "undefined") {
+      details.redTeleCargoGoldMinerals = 0;
+    }
+    details.redTeleCargoGoldMinerals += n;
+    this.forceUpdate();
   }
 
   private changeTeleDepot(n: number) {
-    console.log(n);
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    if (typeof details.redTeleDepotMinerals === "undefined") {
+      details.redTeleDepotMinerals = 0;
+    }
+    details.redTeleDepotMinerals += n;
+    this.forceUpdate();
   }
 
   private changeRobotOneEndgameState(index: number) {
-    console.log('lol');
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redEndRobotOneStatus = index;
+    this.forceUpdate();
   }
 
   private changeRobotTwoEndgameState(index: number) {
-    console.log('lol');
+    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    details.redEndRobotTwoStatus = index;
+    this.forceUpdate();
   }
 
   private changeMinorPenalties(n: number) {
-    console.log(n);
+    this.props.match.redMinPen += n;
+    if (typeof this.props.match.redMinPen === "undefined") {
+      this.props.match.redMinPen = 0;
+    }
+    this.forceUpdate();
   }
 
   private changeMajorPenalties(n: number) {
-    console.log(n);
+    this.props.match.redMajPen += n;
+    if (typeof this.props.match.redMajPen === "undefined") {
+      this.props.match.redMajPen = 0;
+    }
+    this.forceUpdate();
   }
 }
 

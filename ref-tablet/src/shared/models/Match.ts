@@ -144,7 +144,7 @@ export default class Match implements IPostableObject {
           return "TEST";
       }
     } else {
-      return this.matchName.toString().split(" ")[2];
+      return `Qual ${this.matchName.toString().split(" ")[2]}`;
     }
   }
 

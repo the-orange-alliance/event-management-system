@@ -19,7 +19,7 @@ class StatusBar extends React.Component<IProps> {
       <div className="status-bar-container dark-bg">
         <div className="left">{match.abbreviatedName} (Field {match.fieldNumber})</div>
         <div className="center">{mode}</div>
-        <div className="right">{connected ? "CONNECTED" : "NOT CONNECTED"}</div>
+        <div className={"right " + (connected ? "success" : "error")}>{connected ? "CONNECTED" : "NOT CONNECTED"}</div>
       </div>
     );
   }

@@ -11,6 +11,9 @@ export default class ScoringRoom implements IRoom {
   private readonly _name: string;
   private readonly _timer: MatchTimer;
   private _hasCommittedScore: boolean;
+  private _hasPrestarted: boolean;
+  private _currentMatchKey: string;
+  private _currentFieldNumber: number;
 
   constructor(server: Server, matchTimer: MatchTimer) {
     this._server = server;
@@ -18,6 +21,9 @@ export default class ScoringRoom implements IRoom {
     this._name = "scoring";
     this._timer = matchTimer;
     this._hasCommittedScore = false;
+    this._hasPrestarted = false;
+    this._currentMatchKey = "";
+    this._currentFieldNumber = -1;
   }
 
   public addClient(client: Socket) {
@@ -47,15 +53,26 @@ export default class ScoringRoom implements IRoom {
       }, 250);
     }
 
+    // In case tablet or audience display disconnects after prestart, but before match play.
+    if (!this._timer.inProgress() && this._hasPrestarted) {
+      logger.info("Detected that client disconnected after prestart. Sending match info.");
+      client.emit("prestart", this._currentMatchKey, this._currentFieldNumber);
+    }
+
     client.on("request-video", (id: number) => {
       this._server.to("scoring").emit("video-switch", id);
     });
     client.on("prestart", (matchKey: string, fieldNumber: number) => {
       this._server.to("scoring").emit("prestart", matchKey, fieldNumber);
       ScoreManager.reset();
+      this._timer.mode = MatchMode.PRESTART;
+      this._hasPrestarted = true;
+      this._currentMatchKey = matchKey;
+      this._currentFieldNumber = fieldNumber;
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);
+      this._timer.mode = MatchMode.RESET;
       this._hasCommittedScore = true;
     });
     client.on("start", () => {
@@ -63,6 +80,7 @@ export default class ScoringRoom implements IRoom {
         this._timer.once("match-start", (timeLeft: number) => {
           this._server.to("scoring").emit("match-start", timeLeft);
           this._hasCommittedScore = false;
+          this._hasPrestarted = false;
         });
         this._timer.once("match-auto", () => {
           this._server.to("scoring").emit("match-auto");

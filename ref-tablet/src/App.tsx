@@ -13,7 +13,6 @@ import SocketProvider from "./shared/providers/SocketProvider";
 import {AxiosResponse} from "axios";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
-import RoverRuckusMatchDetails from "./shared/models/RoverRuckusMatchDetails";
 
 interface IProps {
   cookies: Cookies
@@ -33,16 +32,15 @@ class App extends React.Component<IProps, IState> {
       match: new Match(),
       connected: false
     };
-    this.renderLoginView = this.renderLoginView.bind(this);
-    this.renderRedView = this.renderRedView.bind(this);
-    this.renderBlueView = this.renderBlueView.bind(this);
-    this.renderHeadRefereeView = this.renderHeadRefereeView.bind(this);
-    this.renderMainView = this.renderMainView.bind(this);
-  }
 
-  public componentDidMount() {
-    EMSProvider.initialize("127.0.0.1");
-    SocketProvider.initialize("127.0.0.1");
+    if (typeof this.props.cookies.get("host") !== "undefined") {
+      SocketProvider.initialize((this.props.cookies.get("host") as string));
+      EMSProvider.initialize((this.props.cookies.get("host") as string));
+    } else {
+      EMSProvider.initialize("127.0.0.1");
+      SocketProvider.initialize("127.0.0.1");
+    }
+
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
       SocketProvider.emit("identify","ref-tablet", "event", "scoring", "referee");
@@ -51,6 +49,30 @@ class App extends React.Component<IProps, IState> {
     SocketProvider.on("disconnect", () => {
       console.log("Disconnected from SocketIO.");
       this.setState({connected: false});
+    });
+    SocketProvider.on("enter-slave", (masterHost: string) => {
+      console.log("Entered slave mode with master address " + masterHost);
+      EMSProvider.initialize(masterHost);
+    });
+
+    this.renderLoginView = this.renderLoginView.bind(this);
+    this.renderRedView = this.renderRedView.bind(this);
+    this.renderBlueView = this.renderBlueView.bind(this);
+    this.renderHeadRefereeView = this.renderHeadRefereeView.bind(this);
+    this.renderMainView = this.renderMainView.bind(this);
+  }
+
+  public componentDidMount() {
+    SocketProvider.on("prestart", (matchKey: string, fieldNumber: number) => {
+      EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
+        if (matchRes.data) {
+          const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
+          EMSProvider.getMatchTeams(matchKey).then((partRes: AxiosResponse) => {
+            match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
+            this.setState({match});
+          });
+        }
+      });
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
       const match: Match = new Match().fromJSON(matchJSON);
@@ -68,8 +90,6 @@ class App extends React.Component<IProps, IState> {
         this.setState({event: new Event().fromJSON(response.data.payload[0])});
       }
     });
-    // TODO - Remove after testing.
-    this.state.match.matchDetails = new RoverRuckusMatchDetails();
   }
 
   public render() {

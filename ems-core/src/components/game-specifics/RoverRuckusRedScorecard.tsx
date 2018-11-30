@@ -58,7 +58,7 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
               <Grid.Row columns="equal" textAlign="center">
                 <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Robots Landed" value={details.redAutoRobotsLanded} onChange={this.modifyRobotsLanded}/></Grid.Column>
                 <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Robots Parked" value={details.redAutoRobotsParked} onChange={this.modifyRobotsParked}/></Grid.Column>
-                <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Alliance Claims" value={details.redAutoClaims} onChange={this.modifyAllianceClaims}/></Grid.Column>
+                {/*<Grid.Column><Form.Input disabled={disabled} fluid={true} label="Alliance Claims" value={details.redAutoClaims} onChange={this.modifyAllianceClaims}/></Grid.Column>*/}
               </Grid.Row>
               <Grid.Row columns="equal" textAlign="center">
                 <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Successful Samples" value={details.redAutoSuccessfulSamples} onChange={this.modifySamples}/></Grid.Column>
@@ -134,8 +134,8 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
 
   private modifyAllianceClaims(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as RoverRuckusMatchDetails).redAutoClaims = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+      // (this.props.details as RoverRuckusMatchDetails).redAutoClaims = parseInt(props.value, 10);
+      // this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }

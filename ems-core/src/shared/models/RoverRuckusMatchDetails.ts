@@ -3,7 +3,6 @@ import MatchDetails from "./MatchDetails";
 export default class RoverRuckusMatchDetails extends MatchDetails implements IPostableObject {
   private _redAutoRobotsLanded: number;
   private _redAutoRobotsParked: number;
-  private _redAutoClaims: number;
   private _redAutoSuccessfulSamples: number;
   private _redAutoDepotMinerals: number;
   private _redAutoCargoGoldMinerals: number;
@@ -16,7 +15,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
   private _redEndRobotsInCraterFull: number;
   private _blueAutoRobotsLanded: number;
   private _blueAutoRobotsParked: number;
-  private _blueAutoClaims: number;
   private _blueAutoSuccessfulSamples: number;
   private _blueAutoDepotMinerals: number;
   private _blueAutoCargoGoldMinerals: number;
@@ -28,11 +26,28 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
   private _blueEndRobotsInCraterPartial: number;
   private _blueEndRobotsInCraterFull: number;
 
+  // Essentially Metadata
+  private _redPreRobotOneStatus: number;
+  private _redPreRobotTwoStatus: number;
+  private _redAutoRobotOneStatus: number;
+  private _redAutoRobotTwoStatus: number;
+  private _redAutoRobotOneClaimed: boolean;
+  private _redAutoRobotTwoClaimed: boolean;
+  private _redEndRobotOneStatus: number;
+  private _redEndRobotTwoStatus: number;
+  private _bluePreRobotOneStatus: number;
+  private _bluePreRobotTwoStatus: number;
+  private _blueAutoRobotOneStatus: number;
+  private _blueAutoRobotTwoStatus: number;
+  private _blueAutoRobotOneClaimed: boolean;
+  private _blueAutoRobotTwoClaimed: boolean;
+  private _blueEndRobotOneStatus: number;
+  private _blueEndRobotTwoStatus: number;
+
   constructor() {
     super();
     this._redAutoRobotsLanded = 0;
     this._redAutoRobotsParked = 0;
-    this._redAutoClaims = 0;
     this._redAutoSuccessfulSamples = 0;
     this._redAutoDepotMinerals = 0;
     this._redAutoCargoGoldMinerals = 0;
@@ -45,7 +60,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     this._redEndRobotsInCraterFull = 0;
     this._blueAutoRobotsLanded = 0;
     this._blueAutoRobotsParked = 0;
-    this._blueAutoClaims = 0;
     this._blueAutoSuccessfulSamples = 0;
     this._blueAutoDepotMinerals = 0;
     this._blueAutoCargoGoldMinerals = 0;
@@ -56,6 +70,24 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     this._blueEndRobotsLatched = 0;
     this._blueEndRobotsInCraterPartial = 0;
     this._blueEndRobotsInCraterFull = 0;
+
+    // Metadata stuff done
+    this._redPreRobotOneStatus = 0;
+    this._redPreRobotTwoStatus = 0;
+    this._redAutoRobotOneStatus = 0;
+    this._redAutoRobotTwoStatus = 0;
+    this._redAutoRobotOneClaimed = false;
+    this._redAutoRobotTwoClaimed = false;
+    this._redEndRobotOneStatus = 0;
+    this._redEndRobotTwoStatus = 0;
+    this._bluePreRobotOneStatus = 0;
+    this._bluePreRobotTwoStatus = 0;
+    this._blueAutoRobotOneStatus = 0;
+    this._blueAutoRobotTwoStatus = 0;
+    this._blueAutoRobotOneClaimed = false;
+    this._blueAutoRobotTwoClaimed = false;
+    this._blueEndRobotOneStatus = 0;
+    this._blueEndRobotTwoStatus = 0;
   }
 
   public toJSON(): object {
@@ -64,7 +96,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
       match_detail_key: this.matchDetailKey,
       red_auto_robots_landed: this.redAutoRobotsLanded,
       red_auto_robots_parked: this.redAutoRobotsParked,
-      red_auto_claims: this.redAutoClaims,
       red_auto_successful_samples: this.redAutoSuccessfulSamples,
       red_auto_depot_minerals: this.redAutoDepotMinerals,
       red_auto_cargo_gold_minerals: this.redAutoCargoGoldMinerals,
@@ -77,7 +108,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
       red_end_robots_in_crater_full: this.redEndRobotsInCraterFull,
       blue_auto_robots_landed: this.blueAutoRobotsLanded,
       blue_auto_robots_parked: this.blueAutoRobotsParked,
-      blue_auto_claims: this.blueAutoClaims,
       blue_auto_successful_samples: this.blueAutoSuccessfulSamples,
       blue_auto_depot_minerals: this.blueAutoDepotMinerals,
       blue_auto_cargo_gold_minerals: this.blueAutoCargoGoldMinerals,
@@ -87,7 +117,23 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
       blue_tele_cargo_silver_minerals: this.blueTeleCargoSilverMinerals,
       blue_end_robots_latched: this.blueEndRobotsLatched,
       blue_end_robots_in_crater_partial: this.blueEndRobotsInCraterPartial,
-      blue_end_robots_in_crater_full: this.blueEndRobotsInCraterFull
+      blue_end_robots_in_crater_full: this.blueEndRobotsInCraterFull,
+      red_pre_robot_one_status: this.redPreRobotOneStatus,
+      red_pre_robot_two_status: this.redPreRobotTwoStatus,
+      red_auto_robot_one_status: this.redAutoRobotOneStatus,
+      red_auto_robot_two_status: this.redAutoRobotTwoStatus,
+      red_auto_robot_one_claimed: this.redAutoRobotOneClaimed ? 1 : 0,
+      red_auto_robot_two_claimed: this.redAutoRobotTwoClaimed ? 1 : 0,
+      red_end_robot_one_status: this.redEndRobotOneStatus,
+      red_end_robot_two_status: this.redEndRobotTwoStatus,
+      blue_pre_robot_one_status: this.bluePreRobotOneStatus,
+      blue_pre_robot_two_status: this.bluePreRobotTwoStatus,
+      blue_auto_robot_one_status: this.blueAutoRobotOneStatus,
+      blue_auto_robot_two_status: this.blueAutoRobotTwoStatus,
+      blue_auto_robot_one_claimed: this.blueAutoRobotOneClaimed ? 1 : 0,
+      blue_auto_robot_two_claimed: this.blueAutoRobotTwoClaimed ? 1 : 0,
+      blue_end_robot_one_status: this.blueEndRobotOneStatus,
+      blue_end_robot_two_status: this.blueEndRobotTwoStatus
     };
   }
 
@@ -97,7 +143,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     details.matchDetailKey = json.match_detail_key;
     details.redAutoRobotsLanded = json.red_auto_robots_landed;
     details.redAutoRobotsParked = json.red_auto_robots_parked;
-    details.redAutoClaims = json.red_auto_claims;
     details.redAutoSuccessfulSamples = json.red_auto_successful_samples;
     details.redAutoDepotMinerals = json.red_auto_depot_minerals;
     details.redAutoCargoGoldMinerals = json.red_auto_cargo_gold_minerals;
@@ -110,7 +155,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     details.redEndRobotsInCraterFull = json.red_end_robots_in_crater_full;
     details.blueAutoRobotsLanded = json.blue_auto_robots_landed;
     details.blueAutoRobotsParked = json.blue_auto_robots_parked;
-    details.blueAutoClaims = json.blue_auto_claims;
     details.blueAutoSuccessfulSamples = json.blue_auto_successful_samples;
     details.blueAutoDepotMinerals = json.blue_auto_depot_minerals;
     details.blueAutoCargoGoldMinerals = json.blue_auto_cargo_gold_minerals;
@@ -121,6 +165,22 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     details.blueEndRobotsLatched = json.blue_end_robots_latched;
     details.blueEndRobotsInCraterPartial = json.blue_end_robots_in_crater_partial;
     details.blueEndRobotsInCraterFull = json.blue_end_robots_in_crater_full;
+    details.redPreRobotOneStatus = json.red_pre_robot_one_status;
+    details.redPreRobotTwoStatus = json.red_pre_robot_two_status;
+    details.redAutoRobotOneStatus = json.red_auto_robot_one_status;
+    details.redAutoRobotTwoStatus = json.red_auto_robot_two_status;
+    details.redAutoRobotOneClaimed = json.red_auto_robot_one_claimed === 1;
+    details.redAutoRobotTwoClaimed = json.red_auto_robot_two_claimed === 1;
+    details.redEndRobotOneStatus = json.red_end_robot_one_status;
+    details.redEndRobotTwoStatus = json.red_end_robot_two_status;
+    details.bluePreRobotOneStatus = json.blue_pre_robot_one_status;
+    details.bluePreRobotTwoStatus = json.blue_pre_robot_two_status;
+    details.blueAutoRobotOneStatus = json.blue_auto_robot_one_status;
+    details.blueAutoRobotTwoStatus = json.blue_auto_robot_two_status;
+    details.blueAutoRobotOneClaimed = json.blue_auto_robot_one_claimed === 1;
+    details.blueAutoRobotTwoClaimed = json.blue_auto_robot_two_claimed === 1;
+    details.blueEndRobotOneStatus = json.blue_end_robot_one_status;
+    details.blueEndRobotTwoStatus = json.blue_end_robot_two_status;
     return details;
   }
 
@@ -128,7 +188,8 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     console.log("Overriding stuff");
     let score: number = 0;
     score += this.redAutoRobotsLanded * 30;
-    score += this.redAutoClaims * 15;
+    score += this.redAutoRobotOneClaimed ? 15 : 0;
+    score += this.redAutoRobotTwoClaimed ? 15 : 0;
     score += this.redAutoRobotsParked * 10;
     score += this.redAutoSuccessfulSamples * 25;
     score += this.redAutoDepotMinerals * 2;
@@ -148,7 +209,8 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
   public getBlueScore(minPen: number, majPen: number): number {
     let score: number = 0;
     score += this.blueAutoRobotsLanded * 30;
-    score += this.blueAutoClaims * 15;
+    score += this.blueAutoRobotOneClaimed ? 15 : 0;
+    score += this.blueAutoRobotTwoClaimed ? 15 : 0;
     score += this.blueAutoRobotsParked * 10;
     score += this.blueAutoSuccessfulSamples * 25;
     score += this.blueAutoDepotMinerals * 2;
@@ -177,14 +239,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
 
   set redAutoRobotsParked(value: number) {
     this._redAutoRobotsParked = value;
-  }
-
-  get redAutoClaims(): number {
-    return this._redAutoClaims;
-  }
-
-  set redAutoClaims(value: number) {
-    this._redAutoClaims = value;
   }
 
   get redAutoSuccessfulSamples(): number {
@@ -283,14 +337,6 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     this._blueAutoRobotsParked = value;
   }
 
-  get blueAutoClaims(): number {
-    return this._blueAutoClaims;
-  }
-
-  set blueAutoClaims(value: number) {
-    this._blueAutoClaims = value;
-  }
-
   get blueAutoSuccessfulSamples(): number {
     return this._blueAutoSuccessfulSamples;
   }
@@ -369,5 +415,133 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
 
   set blueEndRobotsInCraterFull(value: number) {
     this._blueEndRobotsInCraterFull = value;
+  }
+
+  get redPreRobotOneStatus(): number {
+    return this._redPreRobotOneStatus;
+  }
+
+  set redPreRobotOneStatus(value: number) {
+    this._redPreRobotOneStatus = value;
+  }
+
+  get redPreRobotTwoStatus(): number {
+    return this._redPreRobotTwoStatus;
+  }
+
+  set redPreRobotTwoStatus(value: number) {
+    this._redPreRobotTwoStatus = value;
+  }
+
+  get redAutoRobotOneStatus(): number {
+    return this._redAutoRobotOneStatus;
+  }
+
+  set redAutoRobotOneStatus(value: number) {
+    this._redAutoRobotOneStatus = value;
+  }
+
+  get redAutoRobotTwoStatus(): number {
+    return this._redAutoRobotTwoStatus;
+  }
+
+  set redAutoRobotTwoStatus(value: number) {
+    this._redAutoRobotTwoStatus = value;
+  }
+
+  get redAutoRobotOneClaimed(): boolean {
+    return this._redAutoRobotOneClaimed;
+  }
+
+  set redAutoRobotOneClaimed(value: boolean) {
+    this._redAutoRobotOneClaimed = value;
+  }
+
+  get redAutoRobotTwoClaimed(): boolean {
+    return this._redAutoRobotTwoClaimed;
+  }
+
+  set redAutoRobotTwoClaimed(value: boolean) {
+    this._redAutoRobotTwoClaimed = value;
+  }
+
+  get redEndRobotOneStatus(): number {
+    return this._redEndRobotOneStatus;
+  }
+
+  set redEndRobotOneStatus(value: number) {
+    this._redEndRobotOneStatus = value;
+  }
+
+  get redEndRobotTwoStatus(): number {
+    return this._redEndRobotTwoStatus;
+  }
+
+  set redEndRobotTwoStatus(value: number) {
+    this._redEndRobotTwoStatus = value;
+  }
+
+  get bluePreRobotOneStatus(): number {
+    return this._bluePreRobotOneStatus;
+  }
+
+  set bluePreRobotOneStatus(value: number) {
+    this._bluePreRobotOneStatus = value;
+  }
+
+  get bluePreRobotTwoStatus(): number {
+    return this._bluePreRobotTwoStatus;
+  }
+
+  set bluePreRobotTwoStatus(value: number) {
+    this._bluePreRobotTwoStatus = value;
+  }
+
+  get blueAutoRobotOneStatus(): number {
+    return this._blueAutoRobotOneStatus;
+  }
+
+  set blueAutoRobotOneStatus(value: number) {
+    this._blueAutoRobotOneStatus = value;
+  }
+
+  get blueAutoRobotTwoStatus(): number {
+    return this._blueAutoRobotTwoStatus;
+  }
+
+  set blueAutoRobotTwoStatus(value: number) {
+    this._blueAutoRobotTwoStatus = value;
+  }
+
+  get blueAutoRobotOneClaimed(): boolean {
+    return this._blueAutoRobotOneClaimed;
+  }
+
+  set blueAutoRobotOneClaimed(value: boolean) {
+    this._blueAutoRobotOneClaimed = value;
+  }
+
+  get blueAutoRobotTwoClaimed(): boolean {
+    return this._blueAutoRobotTwoClaimed;
+  }
+
+  set blueAutoRobotTwoClaimed(value: boolean) {
+    this._blueAutoRobotTwoClaimed = value;
+  }
+
+  get blueEndRobotOneStatus(): number {
+    return this._blueEndRobotOneStatus;
+  }
+
+  set blueEndRobotOneStatus(value: number) {
+    this._blueEndRobotOneStatus = value;
+  }
+
+  get blueEndRobotTwoStatus(): number {
+    return this._blueEndRobotTwoStatus;
+  }
+
+  set blueEndRobotTwoStatus(value: number) {
+    this._blueEndRobotTwoStatus = value;
   }
 }

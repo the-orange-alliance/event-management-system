@@ -53,6 +53,8 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.changeTeleDepot = this.changeTeleDepot.bind(this);
     this.changeRobotOneEndgameState = this.changeRobotOneEndgameState.bind(this);
     this.changeRobotTwoEndgameState = this.changeRobotTwoEndgameState.bind(this);
+    this.updateRobotOneCard = this.updateRobotOneCard.bind(this);
+    this.updateRobotTwoCard = this.updateRobotTwoCard.bind(this);
     this.changeMinorPenalties = this.changeMinorPenalties.bind(this);
     this.changeMajorPenalties = this.changeMajorPenalties.bind(this);
   }
@@ -121,22 +123,25 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const sampleTwoSilverOne = refereeMetadata.sampleTwoSilverOneStatus;
     const sampleTwoSilverTwo = refereeMetadata.sampleTwoSilverTwoStatus;
     const sampleTwoGold = refereeMetadata.sampleTwoGoldStatus;
+    // Match Participants
+    const participantOne = match.participants.length > 0 ? match.participants[0] : new MatchParticipant();
+    const participantTwo = match.participants.length > 0 ? match.participants[1] : new MatchParticipant();
     return (
       <div>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup value={preOneStatus} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOnePreState}/>
+            <RobotButtonGroup value={preOneStatus} participant={participantOne} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOnePreState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup value={preTwoStatus} participant={new MatchParticipant()} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoPreState}/>
+            <RobotButtonGroup value={preTwoStatus} participant={participantTwo} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoPreState}/>
           </Col>
         </Row>
         <Row>
           <Col md={6}>
-            <RobotClaimToggle value={redOneClaimed} participant={new MatchParticipant()} onToggle={this.toggleRobotOneClaim}/>
+            <RobotClaimToggle value={redOneClaimed} participant={participantOne} onToggle={this.toggleRobotOneClaim}/>
           </Col>
           <Col md={6}>
-            <RobotClaimToggle value={redTwoClaimed} participant={new MatchParticipant()} onToggle={this.toggleRobotTwoClaim}/>
+            <RobotClaimToggle value={redTwoClaimed} participant={participantTwo} onToggle={this.toggleRobotTwoClaim}/>
           </Col>
         </Row>
         <Row>
@@ -160,10 +165,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={6}>
-            <RobotButtonGroup value={autoOneStatus} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneAutoState}/>
+            <RobotButtonGroup value={autoOneStatus} participant={participantOne} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneAutoState}/>
           </Col>
           <Col md={6}>
-            <RobotButtonGroup value={autoTwoStatus} participant={new MatchParticipant()} states={["Not Parked", "Parked"]} onChange={this.changeRobotTwoAutoState}/>
+            <RobotButtonGroup value={autoTwoStatus} participant={participantTwo} states={["Not Parked", "Parked"]} onChange={this.changeRobotTwoAutoState}/>
           </Col>
         </Row>
       </div>
@@ -198,10 +203,13 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
     const endOneStatus = matchDetails.redEndRobotOneStatus;
     const endTwoStatus = matchDetails.redEndRobotTwoStatus;
+    // Match Participants
+    const participantOne = match.participants.length > 0 ? match.participants[0] : new MatchParticipant();
+    const participantTwo = match.participants.length > 0 ? match.participants[1] : new MatchParticipant();
     return (
       <div>
-        <RobotButtonGroup value={endOneStatus} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotOneEndgameState}/>
-        <RobotButtonGroup value={endTwoStatus} participant={new MatchParticipant()} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotTwoEndgameState}/>
+        <RobotButtonGroup value={endOneStatus} participant={participantOne} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotOneEndgameState}/>
+        <RobotButtonGroup value={endTwoStatus} participant={participantTwo} states={["Nothing", "Latched", "Partially Parked", "Fully Parked"]} onChange={this.changeRobotTwoEndgameState}/>
       </div>
     );
   }
@@ -210,14 +218,18 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const {match} = this.props;
     const minorPenalties = match.redMinPen || 0;
     const majorPenalties = match.redMajPen || 0;
+    console.log(minorPenalties)
+    // Match Participants
+    const participantOne = match.participants.length > 0 ? match.participants[0] : new MatchParticipant();
+    const participantTwo = match.participants.length > 0 ? match.participants[1] : new MatchParticipant();
     return (
       <div>
         <Row>
           <Col md={6}>
-            <RobotCardStatus participant={new MatchParticipant()}/>
+            <RobotCardStatus participant={participantOne} onUpdate={this.updateRobotOneCard}/>
           </Col>
           <Col md={6}>
-            <RobotCardStatus participant={new MatchParticipant()}/>
+            <RobotCardStatus participant={participantTwo} onUpdate={this.updateRobotTwoCard}/>
           </Col>
         </Row>
         <Row>
@@ -384,19 +396,30 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.forceUpdate();
   }
 
+  private updateRobotOneCard(cardStatus: number) {
+    this.props.match.participants[0].cardStatus = cardStatus;
+    this.forceUpdate();
+  }
+
+  private updateRobotTwoCard(cardStatus: number) {
+    this.props.match.participants[1].cardStatus = cardStatus;
+    this.forceUpdate();
+  }
+
   private changeMinorPenalties(n: number) {
-    this.props.match.redMinPen += n;
+    console.log(this.props.match.redMinPen);
     if (typeof this.props.match.redMinPen === "undefined") {
       this.props.match.redMinPen = 0;
     }
+    this.props.match.redMinPen += n;
     this.forceUpdate();
   }
 
   private changeMajorPenalties(n: number) {
-    this.props.match.redMajPen += n;
     if (typeof this.props.match.redMajPen === "undefined") {
       this.props.match.redMajPen = 0;
     }
+    this.props.match.redMajPen += n;
     this.forceUpdate();
   }
 }

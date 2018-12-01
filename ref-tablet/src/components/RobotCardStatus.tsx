@@ -13,7 +13,7 @@ class RobotCardStatus extends React.Component<IProps> {
 
   public render() {
     const {participant} = this.props;
-    const selected: number = participant.cardStatus;
+    const selected: number = participant.cardStatus || 0;
     return (
       <div className="robot-card-container">
         <div className="robot-card-team">

@@ -138,10 +138,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col md={6}>
-            <RobotClaimToggle value={redOneClaimed} participant={participantOne} onToggle={this.toggleRobotOneClaim}/>
+            <RobotClaimToggle alliance={"red"} value={redOneClaimed} participant={participantOne} onToggle={this.toggleRobotOneClaim}/>
           </Col>
           <Col md={6}>
-            <RobotClaimToggle value={redTwoClaimed} participant={participantTwo} onToggle={this.toggleRobotTwoClaim}/>
+            <RobotClaimToggle alliance={"red"} value={redTwoClaimed} participant={participantTwo} onToggle={this.toggleRobotTwoClaim}/>
           </Col>
         </Row>
         <Row>
@@ -218,7 +218,6 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const {match} = this.props;
     const minorPenalties = match.redMinPen || 0;
     const majorPenalties = match.redMajPen || 0;
-    console.log(minorPenalties)
     // Match Participants
     const participantOne = match.participants.length > 0 ? match.participants[0] : new MatchParticipant();
     const participantTwo = match.participants.length > 0 ? match.participants[1] : new MatchParticipant();

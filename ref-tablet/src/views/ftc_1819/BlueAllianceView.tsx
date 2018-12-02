@@ -16,6 +16,7 @@ import RobotCardStatus from "../../components/RobotCardStatus";
 import RobotPenaltyInput from "../../components/RobotPenaltyInput";
 import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
 import RoverRuckusRefereeData from "../../shared/models/RoverRuckusRefereeData";
+import SocketProvider from "../../shared/providers/SocketProvider";
 
 interface IProps {
   event: Event,
@@ -25,6 +26,7 @@ interface IProps {
 }
 
 interface IState {
+  activeMatch: Match,
   currentMode: number,
   refereeMetadata: RoverRuckusRefereeData
 }
@@ -33,6 +35,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
+      activeMatch: new Match(),
       currentMode: 0,
       refereeMetadata: new RoverRuckusRefereeData()
     };
@@ -57,6 +60,24 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.updateRobotTwoCard = this.updateRobotTwoCard.bind(this);
     this.changeMinorPenalties = this.changeMinorPenalties.bind(this);
     this.changeMajorPenalties = this.changeMajorPenalties.bind(this);
+  }
+
+  public componentDidMount() {
+    SocketProvider.on("score-update", (matchJSON: any) => {
+      const match: Match = new Match().fromJSON(matchJSON);
+      if (typeof matchJSON.details !== "undefined") {
+        const seasonKey: number = parseInt(match.matchKey.split("-")[0], 10);
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      }
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
+      }
+      this.setState({activeMatch: match});
+    });
+  }
+
+  public componentWillUnmount() {
+    SocketProvider.off("score-update");
   }
 
   public render() {
@@ -106,8 +127,8 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private renderAutoView(): JSX.Element {
     const {match} = this.props;
-    const {refereeMetadata} = this.state;
-    const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
+    const {activeMatch, refereeMetadata} = this.state;
+    const matchDetails = activeMatch.matchDetails as RoverRuckusMatchDetails;
     const preOneStatus = matchDetails.bluePreRobotOneStatus;
     const preTwoStatus = matchDetails.bluePreRobotTwoStatus;
     const silverMinerals = matchDetails.blueAutoCargoSilverMinerals || 0;
@@ -177,8 +198,8 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderTeleView(): JSX.Element {
-    const {match} = this.props;
-    const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
+    const {activeMatch} = this.state;
+    const matchDetails = activeMatch.matchDetails as RoverRuckusMatchDetails;
     const silverMinerals = matchDetails.blueTeleCargoSilverMinerals || 0;
     const goldMinerals = matchDetails.blueTeleCargoGoldMinerals || 0;
     const depotMinerals = matchDetails.blueTeleDepotMinerals || 0;
@@ -201,7 +222,8 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private renderEndView(): JSX.Element {
     const {match} = this.props;
-    const matchDetails = match.matchDetails as RoverRuckusMatchDetails;
+    const {activeMatch} = this.state;
+    const matchDetails = activeMatch.matchDetails as RoverRuckusMatchDetails;
     const endOneStatus = matchDetails.blueEndRobotOneStatus;
     const endTwoStatus = matchDetails.blueEndRobotTwoStatus;
     // Match Participants
@@ -218,8 +240,9 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private renderPenaltyView(): JSX.Element {
     const {match} = this.props;
-    const minorPenalties = match.blueMinPen || 0;
-    const majorPenalties = match.blueMajPen || 0;
+    const {activeMatch} = this.state;
+    const minorPenalties = activeMatch.blueMinPen || 0;
+    const majorPenalties = activeMatch.blueMajPen || 0;
     // Match Participants
     const index = match.participants.length / 2;
     const participantOne = match.participants.length > 0 ? match.participants[index] : new MatchParticipant();
@@ -251,43 +274,43 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeRobotOnePreState(index: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.bluePreRobotOneStatus = index;
     this.forceUpdate();
   }
 
   private changeRobotTwoPreState(index: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.bluePreRobotTwoStatus = index;
     this.forceUpdate();
   }
 
   private changeRobotOneAutoState(index: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotOneStatus = index;
     this.forceUpdate();
   }
 
   private changeRobotTwoAutoState(index: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotTwoStatus = index;
     this.forceUpdate();
   }
 
   private toggleRobotOneClaim() {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotOneClaimed = !details.blueAutoRobotOneClaimed;
     this.forceUpdate();
   }
 
   private toggleRobotTwoClaim() {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotTwoClaimed = !details.blueAutoRobotTwoClaimed;
     this.forceUpdate();
   }
 
   private changeSampleOne(index: number, successful: boolean) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     const lastSample: boolean = !this.state.refereeMetadata.sampleOneSilverOneStatus && !this.state.refereeMetadata.sampleOneSilverTwoStatus && this.state.refereeMetadata.sampleOneGoldStatus;
     if (index === 0) {
       this.state.refereeMetadata.sampleOneSilverOneStatus = !this.state.refereeMetadata.sampleOneSilverOneStatus;
@@ -310,7 +333,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeSampleTwo(index: number, successful: boolean) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     const lastSample: boolean = !this.state.refereeMetadata.sampleTwoSilverOneStatus && !this.state.refereeMetadata.sampleTwoSilverTwoStatus && this.state.refereeMetadata.sampleTwoGoldStatus;
     if (index === 0) {
       this.state.refereeMetadata.sampleTwoSilverOneStatus = !this.state.refereeMetadata.sampleTwoSilverOneStatus;
@@ -333,7 +356,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeAutoSilver(n: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     if (typeof details.blueAutoCargoSilverMinerals === "undefined") {
       details.blueAutoCargoSilverMinerals = 0;
     }
@@ -342,7 +365,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeAutoGold(n: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     if (typeof details.blueAutoCargoGoldMinerals === "undefined") {
       details.blueAutoCargoGoldMinerals = 0;
     }
@@ -351,7 +374,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeAutoDepot(n: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     if (typeof details.blueAutoDepotMinerals === "undefined") {
       details.blueAutoDepotMinerals = 0;
     }
@@ -360,7 +383,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeTeleSilver(n: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     if (typeof details.blueTeleCargoSilverMinerals === "undefined") {
       details.blueTeleCargoSilverMinerals = 0;
     }
@@ -369,7 +392,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeTeleGold(n: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     if (typeof details.blueTeleCargoGoldMinerals === "undefined") {
       details.blueTeleCargoGoldMinerals = 0;
     }
@@ -378,7 +401,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeTeleDepot(n: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     if (typeof details.blueTeleDepotMinerals === "undefined") {
       details.blueTeleDepotMinerals = 0;
     }
@@ -387,13 +410,13 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeRobotOneEndgameState(index: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueEndRobotOneStatus = index;
     this.forceUpdate();
   }
 
   private changeRobotTwoEndgameState(index: number) {
-    const details: RoverRuckusMatchDetails = this.props.match.matchDetails as RoverRuckusMatchDetails;
+    const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueEndRobotTwoStatus = index;
     this.forceUpdate();
   }
@@ -401,29 +424,44 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private updateRobotOneCard(cardStatus: number) {
     const index = this.props.match.participants.length / 2;
     this.props.match.participants[index].cardStatus = cardStatus;
+    if (this.state.activeMatch.participants.length <= 0) {
+      if (this.props.match.participants.length > 0) {
+        this.state.activeMatch.participants = this.props.match.participants;
+      } else {
+        this.state.activeMatch.participants = [new MatchParticipant(), new MatchParticipant(), new MatchParticipant(), new MatchParticipant()];
+      }
+    }
+    this.state.activeMatch.participants[index].cardStatus = cardStatus;
     this.forceUpdate();
   }
 
   private updateRobotTwoCard(cardStatus: number) {
     const index = this.props.match.participants.length / 2;
     this.props.match.participants[index + 1].cardStatus = cardStatus;
+    if (this.state.activeMatch.participants.length <= 0) {
+      if (this.props.match.participants.length > 0) {
+        this.state.activeMatch.participants = this.props.match.participants;
+      } else {
+        this.state.activeMatch.participants = [new MatchParticipant(), new MatchParticipant(), new MatchParticipant(), new MatchParticipant()];
+      }
+    }
+    this.state.activeMatch.participants[index + 1].cardStatus = cardStatus;
     this.forceUpdate();
   }
 
   private changeMinorPenalties(n: number) {
-    console.log(this.props.match.blueMinPen);
-    if (typeof this.props.match.blueMinPen === "undefined") {
-      this.props.match.blueMinPen = 0;
+    if (typeof this.state.activeMatch.blueMinPen === "undefined") {
+      this.state.activeMatch.blueMinPen = 0;
     }
-    this.props.match.blueMinPen += n;
+    this.state.activeMatch.blueMinPen += n;
     this.forceUpdate();
   }
 
   private changeMajorPenalties(n: number) {
-    if (typeof this.props.match.blueMajPen === "undefined") {
-      this.props.match.blueMajPen = 0;
+    if (typeof this.state.activeMatch.blueMajPen === "undefined") {
+      this.state.activeMatch.blueMajPen = 0;
     }
-    this.props.match.blueMajPen += n;
+    this.state.activeMatch.blueMajPen += n;
     this.forceUpdate();
   }
 }

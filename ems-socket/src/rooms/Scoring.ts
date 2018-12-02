@@ -4,6 +4,7 @@ import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import {MatchMode} from "../scoring/MatchMode";
 import ScoreManager from "../scoring/ScoreManager";
+import Match from "../shared/Match";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
@@ -57,6 +58,9 @@ export default class ScoringRoom implements IRoom {
     if (!this._timer.inProgress() && this._hasPrestarted) {
       logger.info("Detected that client disconnected after prestart. Sending match info.");
       client.emit("prestart", this._currentMatchKey, this._currentFieldNumber);
+      setTimeout(() => {
+        client.emit("score-update", ScoreManager.match.toJSON());
+      }, 250);
     }
 
     client.on("request-video", (id: number) => {
@@ -65,10 +69,13 @@ export default class ScoringRoom implements IRoom {
     client.on("prestart", (matchKey: string, fieldNumber: number) => {
       this._server.to("scoring").emit("prestart", matchKey, fieldNumber);
       ScoreManager.reset();
+      ScoreManager.match.matchDetails = Match.getDetailsFromSeasonKey(parseInt(matchKey.split("-")[0], 10));
       this._timer.mode = MatchMode.PRESTART;
       this._hasPrestarted = true;
       this._currentMatchKey = matchKey;
       this._currentFieldNumber = fieldNumber;
+
+      this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);

@@ -74,17 +74,6 @@ class App extends React.Component<IProps, IState> {
         }
       });
     });
-    SocketProvider.on("score-update", (matchJSON: any) => {
-      const match: Match = new Match().fromJSON(matchJSON);
-      if (typeof matchJSON.details !== "undefined") {
-        const seasonKey: number = parseInt(match.matchKey.split("-")[0], 10);
-        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-      }
-      if (typeof matchJSON.participants !== "undefined") {
-        match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
-      }
-      this.setState({match: match});
-    });
     EMSProvider.getEvent().then((response: AxiosResponse) => {
       if (response.data.payload && response.data.payload.length > 0) {
         this.setState({event: new Event().fromJSON(response.data.payload[0])});

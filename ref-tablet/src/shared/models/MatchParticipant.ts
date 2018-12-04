@@ -53,8 +53,12 @@ export default class MatchParticipant implements IPostableObject {
     participant.surrogate = json.surrogated === 1;
     participant.noShow = json.no_show === 1;
     participant.allianceKey = json.alliance_key;
-    participant.team = new Team().fromJSON(json);
-    participant.teamRank = new Ranking().fromJSON(json);
+    try {
+      participant.team = new Team().fromJSON(json);
+      participant.teamRank = new Ranking().fromJSON(json);
+    } catch (e) {
+      console.log();
+    }
     return participant;
   }
 

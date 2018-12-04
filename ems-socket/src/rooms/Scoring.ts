@@ -56,20 +56,30 @@ export default class ScoringRoom implements IRoom {
 
     // In case tablet or audience display disconnects after prestart, but before match play.
     if (!this._timer.inProgress() && this._hasPrestarted) {
-      logger.info("Detected that client disconnected after prestart. Sending match info.");
+      logger.info("Detected that client disconnected after prestart. Sending match info for " + ScoreManager.match.matchKey + ".");
       client.emit("prestart", this._currentMatchKey, this._currentFieldNumber);
       setTimeout(() => {
         client.emit("score-update", ScoreManager.match.toJSON());
       }, 250);
     }
 
+    client.on("score-update", (matchJSON: any) => {
+      if (!this._timer.inProgress()) {
+        if (matchJSON[0] && typeof matchJSON[0].match_key !== "undefined" && matchJSON[0].match_key.length > 0) {
+          ScoreManager.updateMatch(matchJSON[0]);
+          this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
+        } else {
+          logger.warn("Client sent an empty matchKey. Ignoring score update.");
+        }
+      }
+    });
     client.on("request-video", (id: number) => {
       this._server.to("scoring").emit("video-switch", id);
     });
     client.on("prestart", (matchKey: string, fieldNumber: number) => {
       this._server.to("scoring").emit("prestart", matchKey, fieldNumber);
-      ScoreManager.reset();
-      ScoreManager.match.matchDetails = Match.getDetailsFromSeasonKey(parseInt(matchKey.split("-")[0], 10));
+      ScoreManager.reset(matchKey);
+      ScoreManager.createDetails();
       this._timer.mode = MatchMode.PRESTART;
       this._hasPrestarted = true;
       this._currentMatchKey = matchKey;

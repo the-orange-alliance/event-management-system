@@ -92,8 +92,8 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
 
   public toJSON(): object {
     return {
-      match_key: this.matchKey,
-      match_detail_key: this.matchDetailKey,
+      match_key: super.matchKey,
+      match_detail_key: super.matchDetailKey,
       red_auto_robots_landed: this.redAutoRobotsLanded,
       red_auto_robots_parked: this.redAutoRobotsParked,
       red_auto_successful_samples: this.redAutoSuccessfulSamples,

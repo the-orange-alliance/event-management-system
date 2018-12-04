@@ -1,6 +1,6 @@
 export default class MatchDetails implements IPostableObject {
-  private _matchKey: string;
-  private _matchDetailKey: string;
+  public _matchKey: string;
+  public _matchDetailKey: string;
 
   constructor() {
     this._matchKey = "";

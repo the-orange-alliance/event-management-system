@@ -1,5 +1,6 @@
 import Match from "../shared/Match";
 import MatchDetails from "../shared/MatchDetails";
+import MatchParticipant from "../shared/MatchParticipant";
 
 class ScoreManager {
   private static _instance: ScoreManager;
@@ -17,8 +18,26 @@ class ScoreManager {
     this._match = new Match();
   }
 
-  public reset() {
+  public reset(matchKey: string) {
     this._match = new Match();
+    this._match.matchKey = matchKey;
+    this._match.matchDetailKey = matchKey + "D";
+  }
+
+  public createDetails() {
+    const seasonKey: number = parseInt(this._match.matchKey.split("-")[0],  10);
+    this._match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
+    this._match.matchDetails.matchKey = this._match.matchKey;
+    this._match.matchDetails.matchDetailKey = this._match.matchKey + "D";
+  }
+
+  public updateMatch(matchJSON: any) {
+    const seasonKey: number = parseInt(this._match.matchKey.split("-")[0],  10);
+    this._match = new Match().fromJSON(matchJSON);
+    this._match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+    if (typeof matchJSON.participants !== "undefined") {
+      this._match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
+    }
   }
 
   get match(): Match {

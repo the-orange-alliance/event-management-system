@@ -1,8 +1,10 @@
 import * as React from 'react';
 import {Cookies} from 'react-cookie';
+import Event from "../shared/models/Event";
 
 interface IProps {
   cookies: Cookies,
+  event: Event,
   onSuccessfulLogin: () => void
 }
 
@@ -24,11 +26,12 @@ class LoginView extends React.Component<IProps, IState> {
   }
 
   public render() {
+    const {event} = this.props;
     return (
       <div id="app-container">
         <div id="app-top">
           <span id="app-top-name">EMS Scoring Application</span>
-          <span id="app-top-event">Petoskey FTC Qualifier</span>
+          <span id="app-top-event">{event.eventName}</span>
         </div>
         <div id="app-bottom">
           <div>

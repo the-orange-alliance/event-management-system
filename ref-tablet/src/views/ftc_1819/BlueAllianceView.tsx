@@ -76,6 +76,17 @@ class RedAllianceView extends React.Component<IProps, IState> {
     });
   }
 
+  public componentDidUpdate(prevProps: IProps, prevState: IState) {
+    if (prevProps.match.matchKey.length !== this.props.match.matchKey.length) {
+      this.state.activeMatch.matchKey = this.props.match.matchKey;
+      this.state.activeMatch.matchDetails.matchKey = this.props.match.matchKey;
+      this.state.activeMatch.matchDetails.matchDetailKey = this.props.match.matchKey + "D";
+    }
+    if (prevProps.match.participants.length !== this.props.match.participants.length) {
+      this.state.activeMatch.participants = this.props.match.participants;
+    }
+  }
+
   public componentWillUnmount() {
     SocketProvider.off("score-update");
   }
@@ -277,36 +288,42 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.bluePreRobotOneStatus = index;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeRobotTwoPreState(index: number) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.bluePreRobotTwoStatus = index;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeRobotOneAutoState(index: number) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotOneStatus = index;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeRobotTwoAutoState(index: number) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotTwoStatus = index;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private toggleRobotOneClaim() {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotOneClaimed = !details.blueAutoRobotOneClaimed;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private toggleRobotTwoClaim() {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueAutoRobotTwoClaimed = !details.blueAutoRobotTwoClaimed;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeSampleOne(index: number, successful: boolean) {
@@ -330,6 +347,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
       details.blueAutoSuccessfulSamples -= 1;
     }
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeSampleTwo(index: number, successful: boolean) {
@@ -353,6 +371,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
       details.blueAutoSuccessfulSamples -= 1;
     }
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeAutoSilver(n: number) {
@@ -362,6 +381,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     details.blueAutoCargoSilverMinerals += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeAutoGold(n: number) {
@@ -371,6 +391,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     details.blueAutoCargoGoldMinerals += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeAutoDepot(n: number) {
@@ -380,6 +401,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     details.blueAutoDepotMinerals += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeTeleSilver(n: number) {
@@ -389,6 +411,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     details.blueTeleCargoSilverMinerals += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeTeleGold(n: number) {
@@ -398,6 +421,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     details.blueTeleCargoGoldMinerals += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeTeleDepot(n: number) {
@@ -407,18 +431,21 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     details.blueTeleDepotMinerals += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeRobotOneEndgameState(index: number) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueEndRobotOneStatus = index;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeRobotTwoEndgameState(index: number) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
     details.blueEndRobotTwoStatus = index;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private updateRobotOneCard(cardStatus: number) {
@@ -433,6 +460,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.state.activeMatch.participants[index].cardStatus = cardStatus;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private updateRobotTwoCard(cardStatus: number) {
@@ -447,6 +475,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.state.activeMatch.participants[index + 1].cardStatus = cardStatus;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeMinorPenalties(n: number) {
@@ -455,6 +484,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.state.activeMatch.blueMinPen += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
   }
 
   private changeMajorPenalties(n: number) {
@@ -463,6 +493,18 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.state.activeMatch.blueMajPen += n;
     this.forceUpdate();
+    this.sendUpdatedScore();
+  }
+
+  private sendUpdatedScore() {
+    if (this.state.activeMatch.participants.length <= 0) {
+      if (this.props.match.participants.length > 0) {
+        this.state.activeMatch.participants = this.props.match.participants;
+      } else {
+        this.state.activeMatch.participants = [new MatchParticipant(), new MatchParticipant(), new MatchParticipant(), new MatchParticipant()];
+      }
+    }
+    SocketProvider.emit("score-update", this.state.activeMatch.toJSON());
   }
 }
 

@@ -64,7 +64,6 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   public componentDidMount() {
     SocketProvider.on("score-update", (matchJSON: any) => {
-      console.log(matchJSON);
       const match: Match = new Match().fromJSON(matchJSON);
       if (typeof matchJSON.details !== "undefined") {
         const seasonKey: number = parseInt(match.matchKey.split("-")[0], 10);

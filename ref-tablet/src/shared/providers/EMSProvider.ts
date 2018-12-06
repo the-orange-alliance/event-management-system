@@ -61,6 +61,10 @@ class EMSProvider {
     return this.get("api/team");
   }
 
+  public getActiveMatch(id: number): Promise<AxiosResponse> {
+    return this.get("/api/match?active=" + id);
+  }
+
   public getMatch(matchKey: string): Promise<AxiosResponse> {
     return this.get("api/match/" + matchKey);
   }

@@ -77,7 +77,7 @@ export default class MatchTimer extends events.EventEmitter {
   }
 
   private tick() {
-    logger.info(this._modeTimeLeft + "s");
+    // logger.info(this._modeTimeLeft + "s");
     if (this._timeLeft === 0) {
       this.stop();
     }

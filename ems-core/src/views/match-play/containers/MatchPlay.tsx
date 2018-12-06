@@ -200,15 +200,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       SocketProvider.off("score-update");
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
-      // TODO - This looks better. However, the scoreObj should eventually be coming through as an actual Match object.
       const match: Match = new Match().fromJSON(matchJSON);
-      if (typeof matchJSON.details !== "undefined") {
-        const seasonKey: string = match.matchKey.split("-")[0];
-        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-      }
-      if (typeof matchJSON.participants !== "undefined") {
-        match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
-      }
 
       this.state.activeMatch.redScore = match.redScore;
       this.state.activeMatch.redMinPen = match.redMinPen;
@@ -216,22 +208,39 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.state.activeMatch.blueScore = match.blueScore;
       this.state.activeMatch.blueMinPen = match.blueMinPen;
       this.state.activeMatch.blueMajPen = match.blueMajPen;
-      for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
-        this.state.activeMatch.participants[i].cardStatus = match.participants[i].cardStatus;
+
+      if (typeof matchJSON.details !== "undefined") {
+        const seasonKey: string = match.matchKey.split("-")[0];
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
       }
+
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
+
+        for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
+          this.state.activeMatch.participants[i].cardStatus = match.participants[i].cardStatus;
+        }
+
+        for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
+          if (typeof this.state.activeMatch.participants[i].team !== "undefined" && typeof match.participants !== "undefined") {
+            match.participants[i].team = this.state.activeMatch.participants[i].team;
+          }
+        }
+      }
+
       // Since everything is 'technically' pass-by-reference, updating activeMatch from activeMatch doesn't do anything.
       // Essentially, we are creating a different object with the same properties to properly update the scorecards.
       const oldActiveMatch: Match = new Match().fromJSON(this.state.activeMatch.toJSON());
       oldActiveMatch.matchDetails = match.matchDetails;
       oldActiveMatch.participants = match.participants;
-      for (let i = 0; i < this.state.activeMatch.participants.length; i++) {
-        if (typeof this.state.activeMatch.participants[i].team !== "undefined") {
-          match.participants[i].team = this.state.activeMatch.participants[i].team;
-        }
-      }
+
       this.props.setActiveMatch(oldActiveMatch);
-      this.props.setActiveParticipants(oldActiveMatch.participants);
       this.props.setActiveDetails(oldActiveMatch.matchDetails);
+
+      if (typeof oldActiveMatch.participants !== "undefined") {
+        this.props.setActiveParticipants(oldActiveMatch.participants);
+      }
+
     });
     MatchFlowController.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);

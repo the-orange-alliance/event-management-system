@@ -60,9 +60,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.updateRobotTwoCard = this.updateRobotTwoCard.bind(this);
     this.changeMinorPenalties = this.changeMinorPenalties.bind(this);
     this.changeMajorPenalties = this.changeMajorPenalties.bind(this);
-  }
 
-  public componentDidMount() {
     SocketProvider.on("score-update", (matchJSON: any) => {
       const match: Match = new Match().fromJSON(matchJSON);
       if (typeof matchJSON.details !== "undefined") {
@@ -149,12 +147,12 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const redTwoClaimed = matchDetails.blueAutoRobotTwoClaimed;
     const autoOneStatus = matchDetails.blueAutoRobotOneStatus;
     const autoTwoStatus = matchDetails.blueAutoRobotTwoStatus;
-    const sampleOneSilverOne = refereeMetadata.sampleOneSilverOneStatus;
-    const sampleOneSilverTwo = refereeMetadata.sampleOneSilverTwoStatus;
-    const sampleOneGold = refereeMetadata.sampleOneGoldStatus;
-    const sampleTwoSilverOne = refereeMetadata.sampleTwoSilverOneStatus;
-    const sampleTwoSilverTwo = refereeMetadata.sampleTwoSilverTwoStatus;
-    const sampleTwoGold = refereeMetadata.sampleTwoGoldStatus;
+    const sampleOneSilverOne = refereeMetadata.blueSampleOneSilverOneStatus;
+    const sampleOneSilverTwo = refereeMetadata.blueSampleOneSilverTwoStatus;
+    const sampleOneGold = refereeMetadata.blueSampleOneGoldStatus;
+    const sampleTwoSilverOne = refereeMetadata.blueSampleTwoSilverOneStatus;
+    const sampleTwoSilverTwo = refereeMetadata.blueSampleTwoSilverTwoStatus;
+    const sampleTwoGold = refereeMetadata.blueSampleTwoGoldStatus;
     // Match Participants
     const index = match.participants.length / 2;
     const participantOne = match.participants.length > 0 ? match.participants[index] : new MatchParticipant();
@@ -328,15 +326,15 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private changeSampleOne(index: number, successful: boolean) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
-    const lastSample: boolean = !this.state.refereeMetadata.sampleOneSilverOneStatus && !this.state.refereeMetadata.sampleOneSilverTwoStatus && this.state.refereeMetadata.sampleOneGoldStatus;
+    const lastSample: boolean = !this.state.refereeMetadata.blueSampleOneSilverOneStatus && !this.state.refereeMetadata.blueSampleOneSilverTwoStatus && this.state.refereeMetadata.blueSampleOneGoldStatus;
     if (index === 0) {
-      this.state.refereeMetadata.sampleOneSilverOneStatus = !this.state.refereeMetadata.sampleOneSilverOneStatus;
+      this.state.refereeMetadata.blueSampleOneSilverOneStatus = !this.state.refereeMetadata.blueSampleOneSilverOneStatus;
     }
     if (index === 1) {
-      this.state.refereeMetadata.sampleOneSilverTwoStatus = !this.state.refereeMetadata.sampleOneSilverTwoStatus;
+      this.state.refereeMetadata.blueSampleOneSilverTwoStatus = !this.state.refereeMetadata.blueSampleOneSilverTwoStatus;
     }
     if (index === 2) {
-      this.state.refereeMetadata.sampleOneGoldStatus = !this.state.refereeMetadata.sampleOneGoldStatus;
+      this.state.refereeMetadata.blueSampleOneGoldStatus = !this.state.refereeMetadata.blueSampleOneGoldStatus;
     }
     if (typeof details.blueAutoSuccessfulSamples === "undefined") {
       details.blueAutoSuccessfulSamples = 0;
@@ -352,15 +350,15 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private changeSampleTwo(index: number, successful: boolean) {
     const details: RoverRuckusMatchDetails = this.state.activeMatch.matchDetails as RoverRuckusMatchDetails;
-    const lastSample: boolean = !this.state.refereeMetadata.sampleTwoSilverOneStatus && !this.state.refereeMetadata.sampleTwoSilverTwoStatus && this.state.refereeMetadata.sampleTwoGoldStatus;
+    const lastSample: boolean = !this.state.refereeMetadata.blueSampleTwoSilverOneStatus && !this.state.refereeMetadata.blueSampleTwoSilverTwoStatus && this.state.refereeMetadata.blueSampleTwoGoldStatus;
     if (index === 0) {
-      this.state.refereeMetadata.sampleTwoSilverOneStatus = !this.state.refereeMetadata.sampleTwoSilverOneStatus;
+      this.state.refereeMetadata.blueSampleTwoSilverOneStatus = !this.state.refereeMetadata.blueSampleTwoSilverOneStatus;
     }
     if (index === 1) {
-      this.state.refereeMetadata.sampleTwoSilverTwoStatus = !this.state.refereeMetadata.sampleTwoSilverTwoStatus;
+      this.state.refereeMetadata.blueSampleTwoSilverTwoStatus = !this.state.refereeMetadata.blueSampleTwoSilverTwoStatus;
     }
     if (index === 2) {
-      this.state.refereeMetadata.sampleTwoGoldStatus = !this.state.refereeMetadata.sampleTwoGoldStatus;
+      this.state.refereeMetadata.blueSampleTwoGoldStatus = !this.state.refereeMetadata.blueSampleTwoGoldStatus;
     }
     if (typeof details.blueAutoSuccessfulSamples === "undefined") {
       details.blueAutoSuccessfulSamples = 0;

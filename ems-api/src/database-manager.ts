@@ -246,7 +246,7 @@ class DatabaseManager {
       if (eventType === "fgc_2018") {
         query = EnerigyImpactRankingQuery;
       } else if (eventType === "ftc_1819") {
-        query = RoverRuckusRankingQuery;
+        query = GenericRankingQuery;
       } else {
         reject(`There is currently no existing ranking query for ${eventType}.`);
       }
@@ -310,4 +310,4 @@ export default DatabaseManager.getInstance();
 
 // TODO - Find the RoverRuckus Ranking Query.
 export const EnerigyImpactRankingQuery = `SELECT "match".match_key, "match".red_score, "match".blue_score, "match_detail".red_coopertition_bonus, "match_detail".blue_coopertition_bonus, "match_detail".red_robots_parked, "match_detail".blue_robots_parked, GROUP_CONCAT("match_participant".team_key) AS participants, GROUP_CONCAT("match_participant".card_status) AS cards, GROUP_CONCAT("match_participant".disqualified) AS disqualifieds, GROUP_CONCAT("match_participant".surrogate) AS surrogates FROM "match", "match_detail", "match_participant" WHERE "match".match_key = "match_detail".match_key AND "match".match_key = "match_participant".match_key AND "match".tournament_level = "%" GROUP BY "match".match_key ORDER BY "match_participant".match_participant_key;`;
-export const RoverRuckusRankingQuery = `SELECT EVERYTHING`;
+export const GenericRankingQuery = `SELECT "match".match_key, "match".red_score, "match".blue_score, GROUP_CONCAT("match_participant".team_key) AS participants, GROUP_CONCAT("match_participant".card_status) AS cards, GROUP_CONCAT("match_participant".disqualified) AS disqualifieds, GROUP_CONCAT("match_participant".surrogate) AS surrogates FROM "match", "match_detail", "match_participant" WHERE "match".match_key = "match_detail".match_key AND "match".match_key = "match_participant".match_key AND "match".tournament_level = "%" GROUP BY "match".match_key ORDER BY "match_participant".match_participant_key;`;

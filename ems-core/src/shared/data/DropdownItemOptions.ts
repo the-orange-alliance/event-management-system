@@ -80,3 +80,56 @@ export const EventTypeItems = [
     value: "off"
   }
 ];
+
+export const RoverRuckusPreItems = [
+    {
+      text: "Not Present",
+      value: 0
+    },
+    {
+      text: "Not Latched",
+      value: 1
+    },
+    {
+      text: "Latched",
+      value: 2
+    },
+    {
+      text: "Latched",
+      value: 3
+    },
+    {
+      text: "Landed",
+      value: 4
+    }
+];
+
+export const RoverRuckusAutoItems = [
+    {
+      text: "Not Parked",
+      value: 0
+    },
+    {
+      text: "Parked",
+      value: 1
+    }
+];
+
+export const RoverRuckusEndItems = [
+    {
+      text: "Nothing",
+      value: 0
+    },
+    {
+      text: "Latched",
+      value: 1
+    },
+    {
+      text: "Partially Parked",
+      value: 2
+    },
+    {
+      text: "Fully Parked",
+      value: 3
+    }
+];

@@ -58,16 +58,16 @@ gulp.task("post-build", () => {
 	gulp.src(["ems-web/**/*", "!ems-web/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
 	gulp.src(["ems-socket/**/*", "!ems-socket/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));
 	gulp.src(["ems-core/build/**/*"]).pipe(gulp.dest("build/ems/public/desktop"));
-  gulp.src(["ems-core/main/**/*"]).pipe(gulp.dest("build/ems/public/desktop/main"));
-  gulp.src(["ems-core/match-maker/**/*"]).pipe(gulp.dest("build/ems/public/desktop/match-maker"));
-  gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
-  gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
+    gulp.src(["ems-core/main/**/*"]).pipe(gulp.dest("build/ems/public/desktop/main"));
+    gulp.src(["ems-core/match-maker/**/*"]).pipe(gulp.dest("build/ems/public/desktop/match-maker"));
+    gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
+    gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
 	gulp.src(["ecosystem.config.js"]).pipe(gulp.dest("build/ems/server/"));
 
 	gulp.src(["ems-core/.env"]).pipe(gulp.dest("build/ems/public/desktop"));
-  gulp.src(["ems-api/.env"]).pipe(gulp.dest("build/ems/server/ems-api"));
-  gulp.src(["ems-web/.env"]).pipe(gulp.dest("build/ems/server/ems-web"));
-  gulp.src(["ems-sck/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
+    gulp.src(["ems-api/.env"]).pipe(gulp.dest("build/ems/server/ems-api"));
+    gulp.src(["ems-web/.env"]).pipe(gulp.dest("build/ems/server/ems-web"));
+    gulp.src(["ems-sck/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
 	// del.sync(["build/ems/node_modules/**", "build/ems/src/**"]);
 });
 

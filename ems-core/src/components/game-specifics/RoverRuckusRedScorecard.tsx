@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Card, Form, Grid, InputProps} from "semantic-ui-react";
+import {Card, CheckboxProps, DropdownProps, Form, Grid, InputProps} from "semantic-ui-react";
 import {ApplicationActions, IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import Match from "../../shared/models/Match";
@@ -12,6 +12,7 @@ import {setActiveDetails} from "../../stores/scoring/actions";
 import RoverRuckusTeamStatus from "./RoverRuckusTeamStatus";
 import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
 import {SyntheticEvent} from "react";
+import {RoverRuckusAutoItems, RoverRuckusEndItems, RoverRuckusPreItems} from "../../shared/data/DropdownItemOptions";
 
 interface IProps {
   match?: Match,
@@ -25,9 +26,13 @@ interface IProps {
 class RoverRuckusRedScorecard extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
-    this.modifyRobotsLanded = this.modifyRobotsLanded.bind(this);
-    this.modifyRobotsParked = this.modifyRobotsParked.bind(this);
-    this.modifyAllianceClaims = this.modifyAllianceClaims.bind(this);
+
+    this.modifyRobotOnePreStatus = this.modifyRobotOnePreStatus.bind(this);
+    this.modifyRobotOneClaimed = this.modifyRobotOneClaimed.bind(this);
+    this.modifyRobotTwoPreStatus = this.modifyRobotTwoPreStatus.bind(this);
+    this.modifyRobotTwoClaimed = this.modifyRobotTwoClaimed.bind(this);
+    this.modifyRobotOneAutoStatus = this.modifyRobotOneAutoStatus.bind(this);
+    this.modifyRobotTwoAutoStatus = this.modifyRobotTwoAutoStatus.bind(this);
     this.modifySamples = this.modifySamples.bind(this);
     this.modifyAutoDepots = this.modifyAutoDepots.bind(this);
     this.modifyAutoGoldMinerals = this.modifyAutoGoldMinerals.bind(this);
@@ -35,9 +40,8 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
     this.modifyTeleDepots = this.modifyTeleDepots.bind(this);
     this.modifyTeleGoldMinerals = this.modifyTeleGoldMinerals.bind(this);
     this.modifyTeleSilverMinerals = this.modifyTeleSilverMinerals.bind(this);
-    this.modifyRobotsLatched = this.modifyRobotsLatched.bind(this);
-    this.modifyRobotsPartiallyParked = this.modifyRobotsPartiallyParked.bind(this);
-    this.modifyRobotsFullyParked = this.modifyRobotsFullyParked.bind(this);
+    this.modifyRobotOneEndgame = this.modifyRobotOneEndgame.bind(this);
+    this.modifyRobotTwoEndgame = this.modifyRobotTwoEndgame.bind(this);
     this.modifyMinorPenalties = this.modifyMinorPenalties.bind(this);
     this.modifyMajorPenalties = this.modifyMajorPenalties.bind(this);
   }
@@ -56,9 +60,14 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Robots Landed" value={details.redAutoRobotsLanded} onChange={this.modifyRobotsLanded}/></Grid.Column>
-                <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Robots Parked" value={details.redAutoRobotsParked} onChange={this.modifyRobotsParked}/></Grid.Column>
-                {/*<Grid.Column><Form.Input disabled={disabled} fluid={true} label="Alliance Claims" value={details.redAutoClaims} onChange={this.modifyAllianceClaims}/></Grid.Column>*/}
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Pre-Match" value={details.redPreRobotOneStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotOnePreStatus}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 1 Claimed" checked={details.redAutoRobotOneClaimed} onChange={this.modifyRobotOneClaimed}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Pre-Match" value={details.redPreRobotTwoStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotTwoPreStatus}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 2 Claimed" checked={details.redAutoRobotTwoClaimed} onChange={this.modifyRobotTwoClaimed}/></Grid.Column>
+              </Grid.Row>
+              <Grid.Row columns="equal" textAlign="center">
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Auto" value={details.redAutoRobotOneClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotOneAutoStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Auto" value={details.redAutoRobotTwoClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotTwoAutoStatus}/></Grid.Column>
               </Grid.Row>
               <Grid.Row columns="equal" textAlign="center">
                 <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Successful Samples" value={details.redAutoSuccessfulSamples} onChange={this.modifySamples}/></Grid.Column>
@@ -84,9 +93,8 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Robots Latched" value={details.redEndRobotsLatched} onChange={this.modifyRobotsLatched}/></Grid.Column>
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Robots Partially Parked" value={details.redEndRobotsInCraterPartial} onChange={this.modifyRobotsPartiallyParked}/></Grid.Column>
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Robots Fully Parked" value={details.redEndRobotsInCraterFull} onChange={this.modifyRobotsFullyParked}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Endgame" value={details.redEndRobotOneStatus} options={RoverRuckusEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Endgame" value={details.redEndRobotTwoStatus} options={RoverRuckusEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
               </Grid.Row>
             </Grid>
           </Form>
@@ -116,28 +124,40 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
     }
   }
 
-  private modifyRobotsLanded(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      this.props.details.redAutoRobotsLanded = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.forceUpdate();
-    }
+  private modifyRobotOnePreStatus(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as RoverRuckusMatchDetails).redPreRobotOneStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
   }
 
-  private modifyRobotsParked(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as RoverRuckusMatchDetails).redAutoRobotsParked = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.forceUpdate();
-    }
+  private modifyRobotOneClaimed(event: SyntheticEvent, props: CheckboxProps) {
+    (this.props.details as RoverRuckusMatchDetails).redAutoRobotOneClaimed = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
   }
 
-  private modifyAllianceClaims(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      // (this.props.details as RoverRuckusMatchDetails).redAutoClaims = parseInt(props.value, 10);
-      // this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.forceUpdate();
-    }
+  private modifyRobotTwoPreStatus(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as RoverRuckusMatchDetails).redPreRobotTwoStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyRobotTwoClaimed(event: SyntheticEvent, props: CheckboxProps) {
+    (this.props.details as RoverRuckusMatchDetails).redAutoRobotTwoClaimed = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyRobotOneAutoStatus(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as RoverRuckusMatchDetails).redAutoRobotOneStatus = parseInt(props.value + " ", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyRobotTwoAutoStatus(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as RoverRuckusMatchDetails).redAutoRobotTwoStatus = parseInt(props.value + " ", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
   }
 
   private modifySamples(event: SyntheticEvent, props: InputProps) {
@@ -196,28 +216,16 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
     }
   }
 
-  private modifyRobotsLatched(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as RoverRuckusMatchDetails).redEndRobotsLatched = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.forceUpdate();
-    }
+  private modifyRobotOneEndgame(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as RoverRuckusMatchDetails).redEndRobotOneStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
   }
 
-  private modifyRobotsPartiallyParked(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as RoverRuckusMatchDetails).redEndRobotsInCraterPartial = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.forceUpdate();
-    }
-  }
-
-  private modifyRobotsFullyParked(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as RoverRuckusMatchDetails).redEndRobotsInCraterFull = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.forceUpdate();
-    }
+  private modifyRobotTwoEndgame(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as RoverRuckusMatchDetails).redEndRobotTwoStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
   }
 
   private modifyMinorPenalties(event: SyntheticEvent, props: InputProps) {

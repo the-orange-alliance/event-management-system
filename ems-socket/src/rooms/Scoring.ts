@@ -4,7 +4,6 @@ import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import {MatchMode} from "../scoring/MatchMode";
 import ScoreManager from "../scoring/ScoreManager";
-import Match from "../shared/Match";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
@@ -64,7 +63,7 @@ export default class ScoringRoom implements IRoom {
     }
 
     client.on("score-update", (matchJSON: any) => {
-      if (!this._timer.inProgress()) {
+      if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART) {
         if (matchJSON[0] && typeof matchJSON[0].match_key !== "undefined" && matchJSON[0].match_key.length > 0) {
           ScoreManager.updateMatch(matchJSON[0]);
           this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());

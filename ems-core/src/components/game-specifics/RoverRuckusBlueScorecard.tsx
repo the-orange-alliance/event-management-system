@@ -12,7 +12,6 @@ import {setActiveDetails, setActiveMatch} from "../../stores/scoring/actions";
 import RoverRuckusTeamStatus from "./RoverRuckusTeamStatus";
 import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
 import {SyntheticEvent} from "react";
-import EnergyImpactMatchDetails from "../../shared/models/EnergyImpactMatchDetails";
 import {RoverRuckusAutoItems, RoverRuckusEndItems, RoverRuckusPreItems} from "../../shared/data/DropdownItemOptions";
 
 interface IProps {
@@ -60,16 +59,16 @@ class RoverRuckusBlueScorecard extends React.Component<IProps> {
         <Card.Content>
           <Form>
             <Grid className="details">
-                <Grid.Row columns="equal" textAlign="center">
-                    <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Pre-Match" value={details.bluePreRobotOneStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotOnePreStatus}/></Grid.Column>
-                    <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 1 Claimed" checked={details.blueAutoRobotOneClaimed} onChange={this.modifyRobotOneClaimed}/></Grid.Column>
-                    <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Pre-Match" value={details.bluePreRobotTwoStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotTwoPreStatus}/></Grid.Column>
-                    <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 2 Claimed" checked={details.blueAutoRobotTwoClaimed} onChange={this.modifyRobotTwoClaimed}/></Grid.Column>
-                </Grid.Row>
-                <Grid.Row columns="equal" textAlign="center">
-                    <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Auto" value={details.blueAutoRobotOneClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotOneAutoStatus}/></Grid.Column>
-                    <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Auto" value={details.blueAutoRobotTwoClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotTwoAutoStatus}/></Grid.Column>
-                </Grid.Row>
+              <Grid.Row columns="equal" textAlign="center">
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Pre-Auto" value={details.bluePreRobotOneStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotOnePreStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Auto" value={details.blueAutoRobotOneClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotOneAutoStatus}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 1 Claimed" checked={details.blueAutoRobotOneClaimed} onChange={this.modifyRobotOneClaimed}/></Grid.Column>
+              </Grid.Row>
+              <Grid.Row columns="equal" textAlign="center">
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Pre-Auto" value={details.bluePreRobotTwoStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotTwoPreStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Auto" value={details.blueAutoRobotTwoClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotTwoAutoStatus}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 2 Claimed" checked={details.blueAutoRobotTwoClaimed} onChange={this.modifyRobotTwoClaimed}/></Grid.Column>
+              </Grid.Row>
               <Grid.Row columns="equal" textAlign="center">
                 <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Successful Samples" value={details.blueAutoSuccessfulSamples} onChange={this.modifySamples}/></Grid.Column>
                 <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Depot Minerals" value={details.blueAutoDepotMinerals} onChange={this.modifyAutoDepots}/></Grid.Column>
@@ -150,13 +149,13 @@ class RoverRuckusBlueScorecard extends React.Component<IProps> {
   }
 
   private modifyRobotOneAutoStatus(event: SyntheticEvent, props: DropdownProps) {
-    (this.props.details as RoverRuckusMatchDetails).blueAutoRobotOneStatus = parseInt(props.value + " ", 10);
+    (this.props.details as RoverRuckusMatchDetails).blueAutoRobotOneStatus = parseInt(props.value + "", 10);
     this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
     this.forceUpdate();
   }
 
   private modifyRobotTwoAutoStatus(event: SyntheticEvent, props: DropdownProps) {
-    (this.props.details as RoverRuckusMatchDetails).blueAutoRobotTwoStatus = parseInt(props.value + " ", 10);
+    (this.props.details as RoverRuckusMatchDetails).blueAutoRobotTwoStatus = parseInt(props.value + "", 10);
     this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
     this.forceUpdate();
   }
@@ -233,7 +232,7 @@ class RoverRuckusBlueScorecard extends React.Component<IProps> {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
       this.props.match.blueMinPen = parseInt(props.value, 10);
       this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
-      this.props.setActiveDetails(new EnergyImpactMatchDetails().fromJSON(this.props.details.toJSON()));
+      this.props.setActiveDetails(new RoverRuckusMatchDetails().fromJSON(this.props.details.toJSON()));
       this.forceUpdate();
     }
   }
@@ -242,6 +241,7 @@ class RoverRuckusBlueScorecard extends React.Component<IProps> {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
       this.props.match.blueMajPen = parseInt(props.value, 10);
       this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+      this.props.setActiveDetails(new RoverRuckusMatchDetails().fromJSON(this.props.details.toJSON()));
       this.forceUpdate();
     }
   }

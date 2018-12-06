@@ -38,6 +38,8 @@ class ScoreManager {
     if (typeof matchJSON.participants !== "undefined") {
       this._match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
     }
+    this._match.redScore = this._match.matchDetails.getRedScore(this._match.blueMinPen, this._match.blueMajPen);
+    this._match.blueScore = this._match.matchDetails.getBlueScore(this._match.redMinPen, this._match.redMajPen);
   }
 
   get match(): Match {

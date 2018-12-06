@@ -95,12 +95,8 @@ export const RoverRuckusPreItems = [
       value: 2
     },
     {
-      text: "Latched",
-      value: 3
-    },
-    {
       text: "Landed",
-      value: 4
+      value: 3
     }
 ];
 

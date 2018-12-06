@@ -184,6 +184,98 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     return details;
   }
 
+  public getRedScore(blueMinPen: number, blueMajPen: number): number {
+    let redSum: number = 0;
+    redSum += this.redPreRobotOneStatus === 3 ? 30 : 0;
+    redSum += this.redPreRobotTwoStatus === 3 ? 30 : 0;
+    redSum += this.redAutoRobotOneClaimed ? 15: 0;
+    redSum += this.redAutoRobotTwoClaimed ? 15 : 0;
+    redSum += this.redAutoRobotOneStatus === 1 ? 10 : 0;
+    redSum += this.redAutoRobotTwoStatus === 1 ? 10 : 0;
+    redSum += this.redAutoSuccessfulSamples * 25;
+    redSum += this.redAutoCargoSilverMinerals * 5;
+    redSum += this.redAutoCargoGoldMinerals * 5;
+    redSum += this.redAutoDepotMinerals * 2;
+    redSum += this.redTeleCargoSilverMinerals * 5;
+    redSum += this.redTeleCargoGoldMinerals * 5;
+    redSum += this.redTeleDepotMinerals * 2;
+    switch (this.redEndRobotOneStatus) {
+      case 1:
+        redSum += 50;
+        break;
+      case 2:
+        redSum += 15;
+        break;
+      case 3:
+        redSum += 25;
+        break;
+      default:
+        redSum += 0;
+    }
+    switch (this.redEndRobotTwoStatus) {
+      case 1:
+        redSum += 50;
+        break;
+      case 2:
+        redSum += 15;
+        break;
+      case 3:
+        redSum += 25;
+        break;
+      default:
+        redSum += 0;
+    }
+    redSum += blueMinPen * 10;
+    redSum += blueMajPen * 40;
+    return redSum;
+  }
+
+  public getBlueScore(redMinPen: number, redMajPen: number): number {
+    let blueSum: number = 0;
+    blueSum += this.bluePreRobotOneStatus === 4 ? 30 : 0;
+    blueSum += this.bluePreRobotTwoStatus === 4 ? 30 : 0;
+    blueSum += this.blueAutoRobotOneClaimed ? 15: 0;
+    blueSum += this.blueAutoRobotTwoClaimed ? 15 : 0;
+    blueSum += this.blueAutoRobotOneStatus === 1 ? 10 : 0;
+    blueSum += this.blueAutoRobotTwoStatus === 1 ? 10 : 0;
+    blueSum += this.blueAutoSuccessfulSamples * 25;
+    blueSum += this.blueAutoCargoSilverMinerals * 5;
+    blueSum += this.blueAutoCargoGoldMinerals * 5;
+    blueSum += this.blueAutoDepotMinerals * 2;
+    blueSum += this.blueTeleCargoSilverMinerals * 5;
+    blueSum += this.blueTeleCargoGoldMinerals * 5;
+    blueSum += this.blueTeleDepotMinerals * 2;
+    switch (this.blueEndRobotOneStatus) {
+      case 1:
+        blueSum += 50;
+        break;
+      case 2:
+        blueSum += 15;
+        break;
+      case 3:
+        blueSum += 25;
+        break;
+      default:
+        blueSum += 0;
+    }
+    switch (this.blueEndRobotTwoStatus) {
+      case 1:
+        blueSum += 50;
+        break;
+      case 2:
+        blueSum += 15;
+        break;
+      case 3:
+        blueSum += 25;
+        break;
+      default:
+        blueSum += 0;
+    }
+    blueSum += redMinPen * 10;
+    blueSum += redMajPen * 40;
+    return blueSum;
+  }
+
   get redAutoRobotsLanded(): number {
     return this._redAutoRobotsLanded;
   }

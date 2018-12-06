@@ -3,6 +3,7 @@ import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
 import logger from "../logger";
 import EnergyImpactRanker from "../shared/scoring/EnergyImpactRanker";
+import RoverRuckusRanker from "../shared/scoring/RoverRuckusRanker";
 
 const router: Router = Router();
 
@@ -72,6 +73,8 @@ function getRankerByType(eventType: string) {
   switch (eventType) {
     case "fgc_2018":
       return EnergyImpactRanker;
+    case "ftc_1819":
+      return RoverRuckusRanker;
     default:
       return EnergyImpactRanker;
   }

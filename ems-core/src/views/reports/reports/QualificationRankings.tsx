@@ -12,6 +12,8 @@ import {connect} from "react-redux";
 import {EMSEventTypes} from "../../../shared/AppTypes";
 import EnergyImpactRanking from "../../../shared/models/EnergyImpactRanking";
 import EnergyImpactRankTable from "../../../components/game-specifics/EnergyImpactRankTable";
+import RoverRuckusRank from "../../../shared/models/RoverRuckusRank";
+import RoverRuckusRankTable from "../../../components/game-specifics/RoverRuckusRankTable";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -71,6 +73,8 @@ class QualificationRankings extends React.Component<IProps, IState> {
     switch (eventType) {
       case "fgc_2018":
         return new EnergyImpactRanking();
+      case "ftc_1819":
+        return new RoverRuckusRank();
       default:
         return new Ranking();
     }
@@ -80,6 +84,8 @@ class QualificationRankings extends React.Component<IProps, IState> {
     switch (eventType) {
       case "fgc_2018":
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]} identifier={this.props.eventConfig.teamIdentifier}/>;
+      case "ftc_1819":
+        return <RoverRuckusRankTable rankings={this.state.rankings as RoverRuckusRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
       default:
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]}/>;
     }

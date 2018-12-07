@@ -13,7 +13,7 @@
     "socket.io-client": "^2.1.1"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
+    "start": "set PORT=3033 && react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

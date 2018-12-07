@@ -13,6 +13,7 @@ import EnergyImpactMatchDetails from "./shared/models/EnergyImpactMatchDetails";
 import AllianceMember from "./shared/models/AllianceMember";
 
 import MATCH_START from "./displays/fgc_2018/res/sounds/match_start.wav";
+import RoverRuckus from "./displays/ftc_1819/RoverRuckus";
 
 interface IProps {
   cookies: Cookies
@@ -42,8 +43,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.0.37"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.0.37"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.0.117"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.0.117"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
@@ -153,6 +154,9 @@ class App extends React.Component<IProps, IState> {
     switch (event.seasonKey) {
       case 2018:
         display = <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        break;
+      case 1819:
+        display = <RoverRuckus event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       default:
         display = <div id="app-error">REST API CONNECTION LOST</div>;

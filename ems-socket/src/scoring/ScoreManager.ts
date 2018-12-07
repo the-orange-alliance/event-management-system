@@ -1,11 +1,12 @@
 import Match from "../shared/Match";
-import MatchDetails from "../shared/MatchDetails";
 import MatchParticipant from "../shared/MatchParticipant";
+import RoverRuckusRefereeData from "../shared/RoverRuckusRefereeData";
 
 class ScoreManager {
   private static _instance: ScoreManager;
 
   private _match: Match;
+  private _matchMetadata: IPostableObject;
 
   public static getInstance(): ScoreManager {
     if (typeof ScoreManager._instance === "undefined") {
@@ -16,12 +17,14 @@ class ScoreManager {
 
   private constructor() {
     this._match = new Match();
+    this._matchMetadata = new Match();
   }
 
   public reset(matchKey: string) {
     this._match = new Match();
     this._match.matchKey = matchKey;
     this._match.matchDetailKey = matchKey + "D";
+    this._matchMetadata = this.getMetadataFromMatchKey(matchKey);
   }
 
   public createDetails() {
@@ -42,6 +45,20 @@ class ScoreManager {
     this._match.blueScore = this._match.matchDetails.getBlueScore(this._match.redMinPen, this._match.redMajPen);
   }
 
+  public updateMatchMetaData(dataJSON: any) {
+    this._matchMetadata = this.getMetadataFromMatchKey(this._match.matchKey).fromJSON(dataJSON);
+  }
+
+  private getMetadataFromMatchKey(matchKey: string): IPostableObject {
+    const seasonKey: string = matchKey.split("-")[0];
+    switch (seasonKey) {
+      case "1819":
+        return new RoverRuckusRefereeData();
+      default:
+        return new Match();
+    }
+  }
+
   get match(): Match {
     return this._match;
   }
@@ -50,6 +67,13 @@ class ScoreManager {
     this._match = value;
   }
 
+  get matchMetadata(): IPostableObject {
+    return this._matchMetadata;
+  }
+
+  set matchMetadata(value: IPostableObject) {
+    this._matchMetadata = value;
+  }
 }
 
 export default ScoreManager.getInstance();

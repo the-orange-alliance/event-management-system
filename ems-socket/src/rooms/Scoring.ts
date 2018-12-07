@@ -57,7 +57,7 @@ export default class ScoringRoom implements IRoom {
     if (this._timer.inProgress()) {
       logger.info("Sending current match information to newly connected client.");
       setTimeout(() => {
-        client.send("score-update", ScoreManager.match.toJSON());
+        client.emit("score-update", ScoreManager.match.toJSON());
       }, 500);
     }
 
@@ -93,6 +93,7 @@ export default class ScoringRoom implements IRoom {
       this._currentFieldNumber = fieldNumber;
 
       this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
+      this._server.to("referee").emit("data-update", ScoreManager.matchMetadata.toJSON());
     });
     client.on("commit-scores", (matchKey: string) => {
       this._server.to("scoring").emit("commit-scores", matchKey);

@@ -62,7 +62,6 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.changeMajorPenalties = this.changeMajorPenalties.bind(this);
 
     SocketProvider.on("score-update", (matchJSON: any) => {
-      console.log(matchJSON);
       const match: Match = new Match().fromJSON(matchJSON);
       if (typeof matchJSON.details !== "undefined") {
         const seasonKey: number = parseInt(match.matchKey.split("-")[0], 10);
@@ -72,6 +71,11 @@ class RedAllianceView extends React.Component<IProps, IState> {
         match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
       }
       this.setState({activeMatch: match});
+    });
+    SocketProvider.on("data-update", (dataJSON: any) => {
+      console.log("---------- INCOMING ----------");
+      console.log(dataJSON);
+      this.setState({refereeMetadata: new RoverRuckusRefereeData().fromJSON(dataJSON)});
     });
   }
 
@@ -343,6 +347,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.forceUpdate();
     this.sendUpdatedScore();
+    this.sendRefereeData();
   }
 
   private changeSampleTwo(index: number, successful: boolean) {
@@ -367,6 +372,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.forceUpdate();
     this.sendUpdatedScore();
+    this.sendRefereeData();
   }
 
   private changeAutoSilver(n: number) {
@@ -498,6 +504,12 @@ class RedAllianceView extends React.Component<IProps, IState> {
       }
     }
     SocketProvider.emit("score-update", this.state.activeMatch.toJSON());
+  }
+
+  private sendRefereeData() {
+    console.log("---------- OUTGOING ----------");
+    console.log(this.state.refereeMetadata.toJSON());
+    SocketProvider.emit("data-update", this.state.refereeMetadata.toJSON());
   }
 }
 

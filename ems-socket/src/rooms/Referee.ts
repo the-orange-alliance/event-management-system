@@ -3,9 +3,6 @@ import {IRoom} from "./IRoom";
 import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import ScoreManager from "../scoring/ScoreManager";
-import Match from "../shared/Match";
-import MatchDetails from "../shared/MatchDetails";
-import MatchParticipant from "../shared/MatchParticipant";
 
 export default class RefereeRoom implements IRoom {
   private readonly _server: Server;
@@ -38,21 +35,15 @@ export default class RefereeRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
+    if (this._timer.inProgress()) {
+      setTimeout(() => {
+        client.emit("data-update", ScoreManager.matchMetadata.toJSON());
+      }, 500);
+    }
 
-    client.emit("score-update", ScoreManager.match.toJSON());
-
-    client.on("update", (matchJSON: any) => {
-      if (this._timer.inProgress()) {
-        ScoreManager.match = new Match().fromJSON(matchJSON);
-        if (typeof matchJSON.details !== "undefined") {
-          const seasonKey: number = parseInt(ScoreManager.match.matchKey.split("-")[0], 10);
-          ScoreManager.match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-        }
-        if (typeof matchJSON.participants !== "undefined") {
-          ScoreManager.match.participants = matchJSON.participants.map((p: any) => new MatchParticipant().fromJSON(p));
-        }
-        this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
-      }
+    client.on("data-update", (dataJSON: any) => {
+      ScoreManager.updateMatchMetaData(dataJSON[0]);
+      client.emit("data-update", ScoreManager.matchMetadata.toJSON());
     });
   }
 

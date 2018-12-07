@@ -72,6 +72,9 @@ class RedAllianceView extends React.Component<IProps, IState> {
       }
       this.setState({activeMatch: match});
     });
+    SocketProvider.on("data-update", (dataJSON: any) => {
+      this.setState({refereeMetadata: new RoverRuckusRefereeData().fromJSON(dataJSON)});
+    });
   }
 
   public componentDidUpdate(prevProps: IProps, prevState: IState) {
@@ -346,6 +349,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.forceUpdate();
     this.sendUpdatedScore();
+    this.sendRefereeData();
   }
 
   private changeSampleTwo(index: number, successful: boolean) {
@@ -370,6 +374,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     }
     this.forceUpdate();
     this.sendUpdatedScore();
+    this.sendRefereeData();
   }
 
   private changeAutoSilver(n: number) {
@@ -503,6 +508,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
       }
     }
     SocketProvider.emit("score-update", this.state.activeMatch.toJSON());
+  }
+
+  private sendRefereeData() {
+    SocketProvider.emit("data-update", this.state.refereeMetadata.toJSON());
   }
 }
 

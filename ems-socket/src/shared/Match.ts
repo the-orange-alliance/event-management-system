@@ -59,7 +59,6 @@ export default class Match implements IPostableObject {
   }
 
   public toJSON(): object {
-    const seasonKey: number = parseInt(this.matchKey.split("-")[0], 10);
     return {
       match_key: this.matchKey,
       match_detail_key: this.matchDetailKey,

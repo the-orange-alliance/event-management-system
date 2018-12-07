@@ -253,6 +253,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(false);
     SocketProvider.off("score-update");
     MatchFlowController.abortMatch().then(() => {
+      SocketProvider.off("match-end");
       this.props.setMatchState(MatchState.MATCH_ABORTED);
     });
   }

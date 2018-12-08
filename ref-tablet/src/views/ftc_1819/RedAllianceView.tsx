@@ -73,8 +73,6 @@ class RedAllianceView extends React.Component<IProps, IState> {
       this.setState({activeMatch: match});
     });
     SocketProvider.on("data-update", (dataJSON: any) => {
-      console.log("---------- INCOMING ----------");
-      console.log(dataJSON);
       this.setState({refereeMetadata: new RoverRuckusRefereeData().fromJSON(dataJSON)});
     });
   }
@@ -507,8 +505,6 @@ class RedAllianceView extends React.Component<IProps, IState> {
   }
 
   private sendRefereeData() {
-    console.log("---------- OUTGOING ----------");
-    console.log(this.state.refereeMetadata.toJSON());
     SocketProvider.emit("data-update", this.state.refereeMetadata.toJSON());
   }
 }

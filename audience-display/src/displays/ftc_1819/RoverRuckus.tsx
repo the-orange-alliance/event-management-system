@@ -20,7 +20,7 @@ class RoverRuckus extends React.Component<IProps> {
   }
 
   public render() {
-    const {match, videoID} = this.props;
+    const {event, match, videoID} = this.props;
 
     let view;
 
@@ -32,7 +32,7 @@ class RoverRuckus extends React.Component<IProps> {
         view = <MatchPreviewScreen match={match}/>;
         break;
       case 2:
-        view = <MatchPlayScreen match={match}/>;
+        view = <MatchPlayScreen event={event} match={match}/>;
         break;
       case 3:
         view = <MatchResultsScreen match={match}/>;

@@ -136,7 +136,7 @@ export default class Team implements IPostableObject {
   }
 
   set countryCode(value: string) {
-    if (value.length > 2) {
+    if (typeof value !== "undefined" && value.length > 2) {
       value = value.substring(0, 2);
     }
     this._countryCode = value.toLowerCase();

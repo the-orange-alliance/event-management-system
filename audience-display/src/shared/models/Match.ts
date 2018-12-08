@@ -1,6 +1,8 @@
 import * as moment from "moment";
 import MatchParticipant from "./MatchParticipant";
 import AllianceMember from "./AllianceMember";
+import MatchDetails from "./MatchDetails";
+import RoverRuckusMatchDetails from "./RoverRuckusMatchDetails";
 
 export default class Match implements IPostableObject {
   private _matchKey: string;
@@ -35,6 +37,8 @@ export default class Match implements IPostableObject {
     this._scheduledStartTime = moment();
     this._fieldNumber = -1;
     this._active = 0;
+    this._redScore = 0;
+    this._blueScore = 0;
     this._allianceMap = new Map<number, AllianceMember[]>();
   }
 
@@ -80,6 +84,15 @@ export default class Match implements IPostableObject {
     match.active = json.active;
     match.uploaded = json.uploaded === 1;
     return match;
+  }
+
+  public static getDetailsFromSeasonKey(seasonKey: number): MatchDetails {
+    switch (seasonKey) {
+      case 1819:
+        return new RoverRuckusMatchDetails();
+      default:
+        return new MatchDetails();
+    }
   }
 
   get abbreviatedName(): string {

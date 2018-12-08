@@ -14,6 +14,7 @@ export default class ScoringRoom implements IRoom {
   private _hasPrestarted: boolean;
   private _currentMatchKey: string;
   private _currentFieldNumber: number;
+  private _currentVideoID: number;
 
   constructor(server: Server, matchTimer: MatchTimer) {
     this._server = server;
@@ -24,6 +25,7 @@ export default class ScoringRoom implements IRoom {
     this._hasPrestarted = false;
     this._currentMatchKey = "";
     this._currentFieldNumber = -1;
+    this._currentVideoID = -1;
   }
 
   public addClient(client: Socket) {
@@ -44,6 +46,12 @@ export default class ScoringRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
+    // Rebroadcast the current videoID.
+    // TODO - This logic needs to be thought out more...
+    if (this._currentVideoID !== -1) {
+      client.emit("video-switch", this._currentVideoID);
+    }
+
     // In case EMS itself disconnects mid-match.
     if (!this._timer.inProgress() && this._timer.mode === MatchMode.ENDED && !this._hasCommittedScore) {
       logger.info("Detected that client previously disconnected during match. Sending last match results.");
@@ -81,6 +89,7 @@ export default class ScoringRoom implements IRoom {
       }
     });
     client.on("request-video", (id: number) => {
+      this._currentVideoID = id;
       this._server.to("scoring").emit("video-switch", id);
     });
     client.on("prestart", (matchKey: string, fieldNumber: number) => {

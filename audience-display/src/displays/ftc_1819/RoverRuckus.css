@@ -26,3 +26,13 @@
   font-size: 2vw;
   font-weight: bold;
 }
+
+.red-card-bg {
+  border: 1px solid #000000;
+  background-color: #CE2000 !important;
+}
+
+.yellow-card-bg {
+  border: 1px solid #000000;
+  background-color: #ffee0b !important;
+}

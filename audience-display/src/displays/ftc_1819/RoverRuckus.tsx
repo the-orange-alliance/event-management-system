@@ -6,6 +6,7 @@ import Match from "../../shared/models/Match";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchPlayScreen from "./match-play/MatchPlayScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";
+import RankingsScreen from "./rankings/RankingsScreen";
 
 interface IProps {
   event: Event,
@@ -36,6 +37,12 @@ class RoverRuckus extends React.Component<IProps> {
         break;
       case 3:
         view = <MatchResultsScreen match={match}/>;
+        break;
+      case 4:
+        view = <span/>;
+        break;
+      case 6:
+        view = <RankingsScreen event={event}/>;
         break;
       default:
         view = <span/>;

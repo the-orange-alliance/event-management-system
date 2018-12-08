@@ -72,7 +72,7 @@ class RankingsScreen extends React.Component<{}, IState> {
       <tr key={"rankings-bottom"}>
         <td><ReactScroll.Element name="rankings-bottom"/></td>
       </tr>
-    )
+    );
     return (
       <div id="fgc-body">
         <div id="fgc-container-wide">

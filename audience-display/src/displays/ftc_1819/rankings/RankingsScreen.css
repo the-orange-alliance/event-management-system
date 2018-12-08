@@ -1,0 +1,96 @@
+#rr-rank-top {
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 10vh;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#rr-rank-top > div {
+  width: 100%;
+  height: 100%;
+}
+
+#rr-rank-mid {
+  width: 100%;
+  margin-top: 5vh;
+  height: 80vh;
+  padding: 2.5vh 6px 6px 6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.5vw;
+}
+
+#rr-rank-table-container {
+  width: 81vw;
+  height: 95%;
+  overflow: hidden;
+  max-height: 95%;
+}
+
+#rr-rank-table-container > table {
+  width: 100%;
+  height: calc(75vh - 2vw);
+  overflow: hidden;
+  margin: 0;
+  border-spacing: 0;
+}
+
+#rr-rank-table-container > table > thead {
+  display: block;
+  width: 81vw;
+  height: 44px;
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+#rr-rank-table-container > table > tbody {
+  display: block;
+  overflow: hidden;
+  width: 81vw;
+  height: calc(75vh - 2vw - 44px);
+}
+
+#rr-rank-table-container > table > tbody > tr, #rr-rank-table-container > table > thead > tr {
+  text-align: center;
+  height: 40px;
+  width: 81vw;
+  font-family: Roboto, sans-serif;
+  font-weight: bold;
+}
+
+#rr-rank-table-container > table > tbody > tr:nth-child(even) {
+  background-color: #e6e6e6;
+  color: #000000;
+}
+
+#rr-rank-table-container > table > tbody > tr:nth-child(odd) {
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+/* We've got 73vw to work with */
+.rr-rank {
+  width: 13.5vw;
+}
+.rr-team {
+  width: 13.5vw;
+}
+.rr-rp {
+  width: 13.5vw;
+}
+.rr-tbp {
+  width: 13.5vw;
+}
+.rr-high {
+  width: 13.5vw;
+}
+.rr-play {
+  width: 13.5vw;
+}

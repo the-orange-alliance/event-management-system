@@ -155,6 +155,9 @@ export default class ScoringRoom implements IRoom {
         if (typeof timerJSON.auto_time !== "undefined") {
           this._timer.autoTime = timerJSON.auto_time;
         }
+        if (typeof timerJSON.transition_time !== "undefined") {
+          this._timer.transitionTime = timerJSON.transition_time;
+        }
         if (typeof timerJSON.tele_time !== "undefined") {
           this._timer.teleTime = timerJSON.tele_time;
         }

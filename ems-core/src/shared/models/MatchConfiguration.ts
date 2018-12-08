@@ -1,6 +1,7 @@
 export default class MatchConfiguration implements IPostableObject {
   private _delayTime: number;
   private _autoTime: number;
+  private _transitionTime: number;
   private _teleTime: number;
   private _endTime: number;
   private _totalTime: number;
@@ -8,6 +9,7 @@ export default class MatchConfiguration implements IPostableObject {
   constructor() {
     this._delayTime = 0;
     this._autoTime = 30;
+    this._transitionTime = 0;
     this._teleTime = 120;
     this._endTime = 30;
   }
@@ -16,6 +18,7 @@ export default class MatchConfiguration implements IPostableObject {
     return {
       delay_time: this.delayTime,
       auto_time: this.autoTime,
+      transition_time: this.transitionTime,
       tele_time: this.teleTime,
       end_time: this.endTime
     };
@@ -25,6 +28,7 @@ export default class MatchConfiguration implements IPostableObject {
     const matchConfig: MatchConfiguration = new MatchConfiguration();
     matchConfig.delayTime = json.delay_time;
     matchConfig.autoTime = json.auto_time;
+    matchConfig.transitionTime = json.transition_time;
     matchConfig.teleTime = json.tele_time;
     matchConfig.endTime = json.end_time;
     return matchConfig;
@@ -35,7 +39,7 @@ export default class MatchConfiguration implements IPostableObject {
   }
 
   set delayTime(value: number) {
-    this._totalTime = this._delayTime + this._autoTime + this._teleTime;
+    this._totalTime = this._delayTime + this._autoTime + this._transitionTime + this._teleTime;
     this._delayTime = value;
   }
 
@@ -44,8 +48,16 @@ export default class MatchConfiguration implements IPostableObject {
   }
 
   set autoTime(value: number) {
-    this._totalTime = this._delayTime + this._autoTime + this._teleTime;
+    this._totalTime = this._delayTime + this._autoTime + this._transitionTime + this._teleTime;
     this._autoTime = value;
+  }
+
+  get transitionTime(): number {
+    return this._transitionTime;
+  }
+
+  set transitionTime(value: number) {
+    this._transitionTime = value;
   }
 
   get teleTime(): number {
@@ -53,7 +65,7 @@ export default class MatchConfiguration implements IPostableObject {
   }
 
   set teleTime(value: number) {
-    this._totalTime = this._delayTime + this._autoTime + this._teleTime;
+    this._totalTime = this._delayTime + this._autoTime + this._transitionTime + this._teleTime;
     this._teleTime = value;
   }
 

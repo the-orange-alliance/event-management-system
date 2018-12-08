@@ -1,6 +1,5 @@
 import {MatchMode} from "./MatchMode";
-import logger from "../logger";
-import events = require("events");
+import * as events from "events";
 
 export default class MatchTimer extends events.EventEmitter {
   // Time/state variables
@@ -49,7 +48,7 @@ export default class MatchTimer extends events.EventEmitter {
       }
       this._timeLeft = this._totalTime;
       this.emit("match-start", this._timeLeft);
-      logger.info("Starting a match.");
+      console.log("Starting a match.");
       this.tick();
       this._timerID = global.setInterval(() => {
         this.tick();
@@ -63,7 +62,7 @@ export default class MatchTimer extends events.EventEmitter {
       this._timerID = null;
       this._mode = MatchMode.ENDED;
       this.emit("match-end");
-      logger.info("Ended a match");
+      console.log("Ended a match");
     }
   }
 
@@ -73,7 +72,7 @@ export default class MatchTimer extends events.EventEmitter {
       this._timerID = null;
       this._mode = MatchMode.ABORTED;
       this.emit("match-abort");
-      logger.info("Aborted a match");
+      console.log("Aborted a match");
     }
   }
 
@@ -94,23 +93,23 @@ export default class MatchTimer extends events.EventEmitter {
             this._mode = MatchMode.AUTONOMOUS;
             this._modeTimeLeft = this.autoTime;
             this.emit("match-auto");
-            logger.info("Autonomous period started.");
+            console.log("Autonomous period started.");
           } else {
             this._mode = MatchMode.TELEOPERATED;
             this._modeTimeLeft = this.teleTime;
             this.emit("match-tele");
-            logger.info("Teleoperated period started.");
+            console.log("Teleoperated period started.");
           }
           break;
         case MatchMode.AUTONOMOUS:
           if (this.transitionTime > 0) {
             this._mode = MatchMode.TRANSITION;
             this._modeTimeLeft = this.transitionTime;
-            logger.info("Transition period started.");
+            console.log("Transition period started.");
           } else if (this.teleTime > 0) {
             this._mode = MatchMode.TELEOPERATED;
             this._modeTimeLeft = this.teleTime;
-            logger.info("Teleoperated period started.");
+            console.log("Teleoperated period started.");
           } else {
             this.stop();
           }
@@ -119,7 +118,7 @@ export default class MatchTimer extends events.EventEmitter {
           if (this.teleTime > 0) {
             this._mode = MatchMode.TELEOPERATED;
             this._modeTimeLeft = this.teleTime;
-            logger.info("Teleoperated period started.");
+            console.log("Teleoperated period started.");
           } else {
             this.stop();
           }
@@ -127,7 +126,7 @@ export default class MatchTimer extends events.EventEmitter {
     } else {
       if (this.endTime > 0 && this._timeLeft === this.endTime) {
         this.emit("match-endgame");
-        logger.info("Endgame started.")
+        console.log("Endgame started.")
       }
 
       this._modeTimeLeft--;

@@ -43,7 +43,7 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
     const blueAuto = details.getBlueAutoScore();
     const blueTele = details.getBlueTeleScore();
     const blueEnd = details.getBlueEndScore();
-    const bluePen = (match.redMinPen * 10) + (match.blueMajPen * 40);
+    const bluePen = (match.redMinPen * 10) + (match.redMajPen * 40);
 
     const redWin: boolean = match.redScore > match.blueScore;
     const tie: boolean = match.redScore === match.blueScore;
@@ -144,7 +144,7 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
                   <span>{redEnd}</span>
                 </div>
                 <div className="rr-result-alliance-score">
-                  <span>Red Penalty</span>
+                  <span>Blue Penalty</span>
                   <span>{redPen}</span>
                 </div>
               </div>

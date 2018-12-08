@@ -61,6 +61,7 @@
 .rr-result-name {
   width: 70%;
   overflow: hidden;
+  font-size: 1.25vw;
 }
 
 .rr-result-rank {
@@ -71,7 +72,7 @@
   width: 100%;
   height: 20vh;
   padding-left: 4vw;
-  padding-right: 4vw;
+  padding-right: 2vw;
 }
 
 .rr-result-alliance-score {
@@ -81,6 +82,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.rr-result-alliance-score > span:nth-child(2) {
+  width: 15vh;
+  text-align: center;
 }
 
 .rr-result-alliance-scores {

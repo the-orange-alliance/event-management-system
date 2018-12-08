@@ -9,7 +9,6 @@ import EnergyImpact from "./displays/fgc_2018/EnergyImpact";
 import Team from "./shared/models/Team";
 import Match from "./shared/models/Match";
 import MatchParticipant from "./shared/models/MatchParticipant";
-import EnergyImpactMatchDetails from "./shared/models/EnergyImpactMatchDetails";
 import AllianceMember from "./shared/models/AllianceMember";
 
 import MATCH_START from "./displays/fgc_2018/res/sounds/match_start.wav";
@@ -112,7 +111,8 @@ class App extends React.Component<IProps, IState> {
             if (match.tournamentLevel > 0) {
               EMSProvider.getMatchTeamRanks(matchKey).then((teamRes: AxiosResponse) => {
                 if (teamRes.data) {
-                  match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
+                  const seasonKey: number = parseInt(matchKey.split("-")[0], 10);
+                  match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(detailRes.data.payload[0]);
                   match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
                   this.setState({
                     activeMatch: match,
@@ -123,7 +123,8 @@ class App extends React.Component<IProps, IState> {
             } else {
               EMSProvider.getMatchTeams(matchKey).then((teamRes: AxiosResponse) => {
                 if (teamRes.data) {
-                  match.matchDetails = this.getDetailsFromKey(matchKey).fromJSON(detailRes.data.payload[0]);
+                  const seasonKey: number = parseInt(matchKey.split("-")[0], 10);
+                  match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(detailRes.data.payload[0]);
                   match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
                   this.setState({
                     activeMatch: match,
@@ -166,16 +167,6 @@ class App extends React.Component<IProps, IState> {
       return (display);
     } else {
       return (<span/>);
-    }
-  }
-
-  private getDetailsFromKey(matchKey: string): IMatchDetails {
-    const seasonKey = matchKey.split("-")[0];
-    switch (seasonKey) {
-      case "2018":
-        return new EnergyImpactMatchDetails();
-      default:
-        return new EnergyImpactMatchDetails();
     }
   }
 

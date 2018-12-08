@@ -232,8 +232,8 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
 
   public getBlueScore(redMinPen: number, redMajPen: number): number {
     let blueSum: number = 0;
-    blueSum += this.bluePreRobotOneStatus === 4 ? 30 : 0;
-    blueSum += this.bluePreRobotTwoStatus === 4 ? 30 : 0;
+    blueSum += this.bluePreRobotOneStatus === 3 ? 30 : 0;
+    blueSum += this.bluePreRobotTwoStatus === 3 ? 30 : 0;
     blueSum += this.blueAutoRobotOneClaimed ? 15: 0;
     blueSum += this.blueAutoRobotTwoClaimed ? 15 : 0;
     blueSum += this.blueAutoRobotOneStatus === 1 ? 10 : 0;

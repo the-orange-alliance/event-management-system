@@ -38,7 +38,11 @@ export default class Match implements IPostableObject {
     this._fieldNumber = -1;
     this._active = 0;
     this._redScore = 0;
+    this._redMinPen = 0;
+    this._redMajPen = 0;
     this._blueScore = 0;
+    this._blueMinPen = 0;
+    this._blueMajPen = 0;
     this._allianceMap = new Map<number, AllianceMember[]>();
   }
 

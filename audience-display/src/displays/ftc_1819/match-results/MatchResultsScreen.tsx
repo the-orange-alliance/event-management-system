@@ -25,7 +25,83 @@ class MatchResultsScreen extends React.Component<IProps> {
             <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-result-mid" className="rr-border">
-            Eh I'll get here eventually...
+            <div className="rr-result-alliance">
+              <div className="rr-result-alliance-teams">
+                <div className="rr-result-team-container blue-border">
+                  <span className="rr-result-team center-items">3618</span>
+                  <span className="rr-result-name center-left-items">The Petoskey Paladins</span>
+                  <span className="rr-result-rank center-items">#48</span>
+                </div>
+                <div className="rr-result-team-container blue-border">
+                  <span className="rr-result-team center-items">4003</span>
+                  <span className="rr-result-name center-left-items">The TriSonics</span>
+                  <span className="rr-result-rank center-items">#1</span>
+                </div>
+                <div className="rr-result-team-container blue-border">
+                  <span className="rr-result-team center-items">4003</span>
+                  <span className="rr-result-name center-left-items">The TriSonics</span>
+                  <span className="rr-result-rank center-items">#1</span>
+                </div>
+              </div>
+              <div className="rr-result-alliance-breakdown">
+                <div className="rr-result-alliance-score">
+                  <span>Autonomous</span>
+                  <span>0</span>
+                </div>
+                <div className="rr-result-alliance-score">
+                  <span>Mineral</span>
+                  <span>0</span>
+                </div>
+                <div className="rr-result-alliance-score">
+                  <span>End Game</span>
+                  <span>0</span>
+                </div>
+                <div className="rr-result-alliance-score">
+                  <span>Red Penalty</span>
+                  <span>0</span>
+                </div>
+              </div>
+              <div className="rr-result-alliance-scores">
+                <div className="rr-result-text center-items blue-border">Winner!</div>
+                <div className="rr-result-score center-items blue-bg">255</div>
+              </div>
+            </div>
+            <div className="rr-result-alliance">
+              <div className="rr-result-alliance-teams">
+                <div className="rr-result-team-container red-border">
+                  <div className="rr-result-team center-items">3618</div>
+                  <div className="rr-result-name center-left-items">The Petoskey Paladins</div>
+                  <div className="rr-result-rank center-items">#48</div>
+                </div>
+                <div className="rr-result-team-container red-border">
+                  <span className="rr-result-team center-items">4003</span>
+                  <span className="rr-result-name center-left-items">The TriSonics</span>
+                  <span className="rr-result-rank center-items">#1</span>
+                </div>
+              </div>
+              <div className="rr-result-alliance-breakdown">
+                <div className="rr-result-alliance-score">
+                  <span>Autonomous</span>
+                  <span>0</span>
+                </div>
+                <div className="rr-result-alliance-score">
+                  <span>Mineral</span>
+                  <span>0</span>
+                </div>
+                <div className="rr-result-alliance-score">
+                  <span>End Game</span>
+                  <span>0</span>
+                </div>
+                <div className="rr-result-alliance-score">
+                  <span>Red Penalty</span>
+                  <span>0</span>
+                </div>
+              </div>
+              <div className="rr-result-alliance-scores">
+                <div className="rr-result-text center-items red-border">Winner!</div>
+                <div className="rr-result-score center-items red-bg">255</div>
+              </div>
+            </div>
           </div>
           <div id="rr-result-bot" className="rr-border">
             <div className="col-left"><img src={FTC_LOGO} className="fit-h"/></div>

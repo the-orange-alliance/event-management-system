@@ -21,10 +21,93 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
   color: #ffffff;
   font-weight: bold;
   font-size: 1.5vw;
+}
+
+.rr-result-alliance {
+  width: 50%;
+  height: 100%;
+  margin: 2.5vh 1vw 0 2vw;
+}
+
+.rr-result-alliance-teams {
+  width: 100%;
+  height: 15vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.rr-result-team-container {
+  width: 100%;
+  height: 4.5vh;
+  margin-bottom: 0.5vh;
+  padding-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  font-size: 1.5vw;
+}
+
+.rr-result-team {
+  width: 15%;
+}
+
+.rr-result-name {
+  width: 70%;
+  overflow: hidden;
+}
+
+.rr-result-rank {
+  width: 15%;
+}
+
+.rr-result-alliance-breakdown {
+  width: 100%;
+  height: 20vh;
+  padding-left: 4vw;
+  padding-right: 4vw;
+}
+
+.rr-result-alliance-score {
+  width: 100%;
+  height: 5vh;
+  font-size: 1.75vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rr-result-alliance-scores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 7vh;
+  width: 100%;
+  margin-top: 2vh;
+  padding-left: 4vw;
+  padding-right: 2vw;
+}
+
+.rr-result-text {
+  width: 15vw;
+  height: 75%;
+}
+
+.rr-result-score {
+  width: 15vh;
+  text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
+  font-size: 2vw;
+  border: 2px solid #000000;
 }
 
 #rr-result-bot {

@@ -1,0 +1,87 @@
+#rr-pre-top {
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 10vh;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#rr-pre-top > div {
+  width: 100%;
+  height: 100%;
+}
+
+#rr-pre-mid {
+  width: 100%;
+  margin-top: 5vh;
+  height: 60vh;
+  padding: 2.5vh 6px 6px 6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.5vw;
+}
+
+#rr-pre-mid-labels {
+  width: 85%;
+  height: 5vh;
+}
+
+.rr-pre-team {
+  width: 10%;
+  height: 100%;
+  padding-left: 10px;
+}
+
+.rr-pre-name {
+  width: 80%;
+  height: 100%;
+}
+
+.rr-pre-rank {
+  width: 10%;
+  height: 100%;
+}
+
+.rr-pre-mid-alliance {
+  width: 85%;
+  min-height: 25vh;
+}
+
+.rr-pre-mid-alliance > div {
+  height: 6vh;
+  width: 100%;
+  margin-bottom: 1.25vh;
+}
+
+#rr-pre-bot {
+  width: 100%;
+  margin-top: 5vh;
+  height: 15vh;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#rr-pre-bot > div {
+  width: 100%;
+  height: 100%;
+}
+
+.blue-border {
+  background-color: #5C88FF;
+  border: 3px solid #000000;
+  border-radius: 15px;
+}
+
+.red-border {
+  background-color: #CE2000;
+  border: 3px solid #000000;
+  border-radius: 15px;
+}

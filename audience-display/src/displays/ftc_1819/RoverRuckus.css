@@ -2,16 +2,27 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-image: url("./res/rr_bg_1.jpg");
+  background-image: url("./res/rr_bg_2.png");
   -webkit-background-size: cover;
   background-size: cover;
 }
 
 #rr-container {
-  height: 90vh;
-  margin-top: 5vh;
+  height: 100vh;
   width: 90vw;
   margin-left: 5vw;
   display: flex;
   flex-direction: column;
+}
+
+.rr-border {
+  background-color: #335550;
+  border: 3px solid #79BDB2;
+  border-radius: 15px;
+}
+
+.rr-pre-match {
+  color: #ffffff;
+  font-size: 2vw;
+  font-weight: bold;
 }

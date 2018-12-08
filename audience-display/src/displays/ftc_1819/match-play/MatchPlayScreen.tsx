@@ -10,6 +10,9 @@ import MatchParticipant from "../../../shared/models/MatchParticipant";
 import Event from "../../../shared/models/Event";
 import SocketProvider from "../../../shared/providers/SocketProvider";
 import RoverRuckusMatchDetails from "../../../shared/models/RoverRuckusMatchDetails";
+import MatchTimer from "../../../shared/scoring/MatchTimer";
+import MatchConfiguration from "../../../shared/models/MatchConfiguration";
+import {MatchMode} from "../../../shared/scoring/MatchMode";
 
 interface IProps {
   event: Event,
@@ -20,12 +23,20 @@ interface IState {
   activeMatch: Match,
   match: Match,
   teams: Team[],
-  ranks: Ranking[]
+  ranks: Ranking[],
+  timeLeft: number,
+  displayTime: number
 }
 
 class MatchPlayScreen extends React.Component<IProps, IState> {
+  private _timer: MatchTimer;
+  private _timerStyle: string;
+
   constructor(props: IProps) {
     super(props);
+
+    this._timer = new MatchTimer();
+    this._timerStyle = "green-bar";
 
     const match: Match = new Match();
     match.matchDetails = new RoverRuckusMatchDetails();
@@ -34,7 +45,9 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       activeMatch: match,
       match: this.getUpdatedMatchInfo(),
       teams: this.getUpdatedTeamInfo(),
-      ranks: this.getUpdatedRankInfo()
+      ranks: this.getUpdatedRankInfo(),
+      timeLeft: this._timer.timeLeft,
+      displayTime: this._timer.timeLeft
     };
   }
 
@@ -50,10 +63,32 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       }
       this.setState({activeMatch: match});
     });
+    SocketProvider.on("match-start", (timerJSON: any) => {
+      this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
+      this._timer.on("match-endgame", () => {
+        this._timerStyle = "yellow-bar";
+      });
+      this._timer.start();
+      this.updateTimer();
+      const timerID = global.setInterval(() => {
+        this.updateTimer();
+        if (this._timer.timeLeft <= 0) {
+          this._timerStyle = "red-bar";
+          this.updateTimer();
+          global.clearInterval(timerID);
+        }
+      }, 1000);
+    });
+    SocketProvider.on("match-abort", () => {
+      this._timer.abort();
+      this.updateTimer();
+    });
   }
 
   public componentWillUnmount() {
     SocketProvider.off("score-update");
+    SocketProvider.off("match-start");
+    SocketProvider.off("match-abort");
   }
 
   public componentDidUpdate(prevProps: IProps) {
@@ -64,7 +99,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
 
   public render() {
     const {event} = this.props;
-    const {activeMatch, match} = this.state;
+    const {activeMatch, match, timeLeft, displayTime} = this.state;
     const redTeams: MatchParticipant[] = [];
     const blueTeams: MatchParticipant[] = [];
 
@@ -112,6 +147,14 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       );
     });
 
+    const barWidth: number = (((this._timer.matchConfig.totalTime - timeLeft) / this._timer.matchConfig.totalTime) * 100);
+
+    const barStyle = {
+      width: barWidth + "%",
+      borderTopRightRadius: barWidth >= 99 ? 0 : undefined,
+      borderBottomRightRadius: barWidth >= 99 ? 0 : undefined
+    };
+
     return (
       <div>
         <div id="rr-play-container">
@@ -133,8 +176,8 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
               </div>
               <div id="rr-play-mid">
                 <div id="rr-play-mid-timer" className="center-items">
-                  <div id="rr-play-mid-timer-bar"/>
-                  <div id="rr-play-mid-timer-time" className="center-items">150</div>
+                  <div id="rr-play-mid-timer-bar" style={barStyle} className={this._timerStyle}/>
+                  <div id="rr-play-mid-timer-time" className="center-items">{displayTime}</div>
                 </div>
                 <div id="rr-play-mid-scores">
                   <div id="rr-play-mid-blue" className="center-items blue-bg">
@@ -211,6 +254,14 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       }
       return ranks;
     }
+  }
+
+  private updateTimer() {
+    let displayTime: number = this._timer.timeLeft;
+    if (this._timer.mode === MatchMode.AUTONOMOUS || this._timer.mode === MatchMode.TELEOPERATED) {
+      displayTime = this._timer.modeTimeLeft;
+    }
+    this.setState({displayTime, timeLeft: this._timer.timeLeft});
   }
 }
 

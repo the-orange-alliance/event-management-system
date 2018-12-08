@@ -34,7 +34,6 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
     const redTeams: Team[] = [];
     const blueTeams: Team[] = [];
     const details: RoverRuckusMatchDetails = (match.matchDetails as RoverRuckusMatchDetails) || new RoverRuckusMatchDetails();
-    console.log(details, match.matchDetails);
     const redAuto = details.getRedAutoScore();
     const redTele = details.getRedTeleScore();
     const redEnd = details.getRedEndScore();

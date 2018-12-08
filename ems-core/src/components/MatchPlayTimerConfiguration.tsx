@@ -96,7 +96,7 @@ class MatchPlayTimerConfiguration extends React.Component<IProps, IState> {
 
   private updateConfig() {
     this.closeModal();
-    this.props.setMatchConfig(this.state.configCopy);
+    this.props.setMatchConfig(new MatchConfiguration().fromJSON(this.state.configCopy));
     SocketProvider.emit("update-timer", this.state.configCopy.toJSON());
     CONFIG_STORE.set("matchConfig", this.state.configCopy.toJSON()).catch((error: AppError) => {
       DialogManager.showErrorBox(error);

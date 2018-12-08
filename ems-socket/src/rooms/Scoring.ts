@@ -111,10 +111,11 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("start", () => {
       if (!this._timer.inProgress()) {
-        this._timer.once("match-start", (timeLeft: number) => {
-          this._server.to("scoring").emit("match-start", timeLeft);
+        this._timer.once("match-start", () => {
+          this._server.to("scoring").emit("match-start", this._timer.matchConfig.toJSON());
           this._hasCommittedScore = false;
           this._hasPrestarted = false;
+          this._currentVideoID = 2; // Universal MatchPlay screen.
         });
         this._timer.once("match-auto", () => {
           this._server.to("scoring").emit("match-auto");
@@ -149,21 +150,30 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("update-timer", (timerJSON: any) => {
       if (!this._timer.inProgress()) {
-        if (typeof timerJSON.delay_time !== "undefined") {
-          this._timer.delayTime = timerJSON.delay_time;
+        if (typeof timerJSON[0].delay_time !== "undefined") {
+          this._timer.matchConfig.delayTime = timerJSON[0].delay_time;
         }
-        if (typeof timerJSON.auto_time !== "undefined") {
-          this._timer.autoTime = timerJSON.auto_time;
+        if (typeof timerJSON[0].auto_time !== "undefined") {
+          this._timer.matchConfig.autoTime = timerJSON[0].auto_time;
         }
-        if (typeof timerJSON.transition_time !== "undefined") {
-          this._timer.transitionTime = timerJSON.transition_time;
+        if (typeof timerJSON[0].transition_time !== "undefined") {
+          this._timer.matchConfig.transitionTime = timerJSON[0].transition_time;
         }
-        if (typeof timerJSON.tele_time !== "undefined") {
-          this._timer.teleTime = timerJSON.tele_time;
+        if (typeof timerJSON[0].tele_time !== "undefined") {
+          this._timer.matchConfig.teleTime = timerJSON[0].tele_time;
         }
-        if (typeof timerJSON.end_time !== "undefined") {
-          this._timer.endTime = timerJSON.end_time;
+        if (typeof timerJSON[0].end_time !== "undefined") {
+          this._timer.matchConfig.endTime = timerJSON[0].end_time;
         }
+        const config = this._timer.matchConfig;
+        logger.warn("-------- TIMER CONFIGURATION UPDATED --------");
+        logger.warn(`DELAY     : ${config.delayTime}`);
+        logger.warn(`AUTONOMOUS: ${config.autoTime}`);
+        logger.warn(`TRANSITION: ${config.transitionTime}`);
+        logger.warn(`TELEOP    : ${config.teleTime}`);
+        logger.warn(`ENDGAME   : ${config.endTime}`);
+        logger.warn(`TOTAL TIME: ${config.totalTime}`);
+        logger.warn("-------- TIMER CONFIGURATION UPDATED --------")
       }
     });
   }

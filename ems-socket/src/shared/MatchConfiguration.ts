@@ -12,6 +12,7 @@ export default class MatchConfiguration implements IPostableObject {
     this._transitionTime = 0;
     this._teleTime = 120;
     this._endTime = 30;
+    this._totalTime = this._delayTime + this._autoTime + this._transitionTime + this._teleTime;
   }
 
   public toJSON(): object {
@@ -26,11 +27,11 @@ export default class MatchConfiguration implements IPostableObject {
 
   public fromJSON(json: any): MatchConfiguration {
     const matchConfig: MatchConfiguration = new MatchConfiguration();
-    matchConfig.delayTime = json.delay_time || 0;
-    matchConfig.autoTime = json.auto_time || 0;
-    matchConfig.transitionTime = json.transition_time || 0;
-    matchConfig.teleTime = json.tele_time || 0;
-    matchConfig.endTime = json.end_time || 0;
+    matchConfig.delayTime = json.delay_time;
+    matchConfig.autoTime = json.auto_time;
+    matchConfig.transitionTime = json.transition_time;
+    matchConfig.teleTime = json.tele_time;
+    matchConfig.endTime = json.end_time;
     return matchConfig;
   }
 

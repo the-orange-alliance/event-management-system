@@ -152,7 +152,11 @@ class EventPostingController {
           }
         }
         EMSProvider.postMatchScheduleParticipants(participants).then(() => {
-          resolve();
+          EMSProvider.resetCardStatuses().then(() => {
+            resolve();
+          }).catch((cardError: HttpError) => {
+            reject(cardError);
+          });
         }).catch((participantError: HttpError) => {
           reject(participantError);
         });

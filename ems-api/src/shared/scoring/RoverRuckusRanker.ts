@@ -44,14 +44,15 @@ class RoverRuckusRanker implements IMatchRanker {
 
           const rp = redTeam && redWin ? 2 : tie ? 1 : !redTeam && !redWin ? 2 : 0;
           const points = redTeam ? match.red_score : match.blue_score;
-          const tbPoints = redWin ? match.blue_score : match.red_score;
           ranking.rankingPoints += rp;
           ranking.totalPoints += points;
-          ranking.tiebreakerPoints += tbPoints;
 
           if (ranking.highScore < points) {
             ranking.highScore = points;
           }
+        }
+        if (!isSurrogate && match.red_score !== null && match.blue_score !== null) {
+          ranking.tiebreakerPoints += redWin ? match.blue_score : match.red_score;
         }
         if (match.red_score !== null && match.blue_score !== null) {
           ranking.played++;

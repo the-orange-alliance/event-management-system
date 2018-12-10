@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS "team" (
     state_prov VARCHAR(255),
     country VARCHAR(255),
     country_code VARCHAR(2),
-    rookie_year INT
+    rookie_year INT,
+    card_status INT
 );
 
 CREATE TABLE IF NOT EXISTS "alliance" (

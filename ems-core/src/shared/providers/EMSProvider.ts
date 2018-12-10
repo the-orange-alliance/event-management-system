@@ -242,6 +242,10 @@ class EMSProvider {
     return this.put("api/match/" + participants[0].matchKey + "/participants", participants);
   }
 
+  public resetCardStatuses(): Promise<AxiosResponse> {
+    return this.get("api/team/cards/reset");
+  }
+
 }
 
 export default EMSProvider.getInstance();

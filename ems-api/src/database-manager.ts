@@ -173,6 +173,26 @@ class DatabaseManager {
     });
   }
 
+  public updateAll(table: string, records: any): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      let columns = "";
+      for (let field in records) {
+        if (records.hasOwnProperty(field)) {
+          columns += field + "=\"" + records[field] + "\",";
+        }
+      }
+      columns = columns.substring(0, columns.length - 1);
+      const query = "UPDATE \"" + table + "\" SET " + columns + ";";
+      this._db.all(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  };
+
   public selectAllFromJoin(tableOne: string, tableTwo: string, joinColumn: string): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
       const query = `SELECT * FROM "${tableOne}", "${tableTwo}" WHERE "${tableOne}".${joinColumn}="${tableTwo}".${joinColumn};"`;

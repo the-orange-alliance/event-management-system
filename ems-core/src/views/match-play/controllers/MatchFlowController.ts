@@ -384,6 +384,11 @@ class MatchFlowController {
         participant.cardStatus = 0;
       }
     }
+
+    if (match.tournamentLevel >= 10) {
+      this.assignTeamCards(match.participants);
+    }
+
     const promises: Array<Promise<any>> = [];
     promises.push(EMSProvider.putMatchResult(match));
     promises.push(EMSProvider.putMatchDetails(match.matchDetails));
@@ -403,6 +408,26 @@ class MatchFlowController {
         return 1;
     }
   }
+
+  private assignTeamCards(participants: MatchParticipant[]) {
+    for (let i = 0; i < participants.length / 2; i++) {
+      if (participants[i].cardStatus > 0) {
+        for (let j = 0; j < participants.length / 2; j++) {
+          participants[j].cardStatus = participants[i].cardStatus;
+        }
+        break;
+      }
+    }
+    for (let i = participants.length / 2; i < participants.length; i++) {
+      if (participants[i].cardStatus > 0) {
+        for (let j = participants.length / 2; j < participants.length; j++) {
+          participants[j].cardStatus = participants[i].cardStatus;
+        }
+        break;
+      }
+    }
+  }
+
 }
 
 export default MatchFlowController.getInstance();

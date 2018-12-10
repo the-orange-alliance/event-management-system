@@ -141,6 +141,9 @@ router.put("/:match_key/participants", (req: Request, res: Response, next: NextF
   const promises: Promise<any>[] = [];
   for (const record of req.body.records) {
     promises.push(DatabaseManager.updateWhere("match_participant", record, "match_participant_key=\"" + record.match_participant_key + "\""));
+    if (typeof record.card_status !== "undefined" && !isNaN(record.card_status) && record.card_status > 0) {
+      promises.push(DatabaseManager.updateWhere("team", {card_status: record.card_status}, `team_key=${record.team_key}`));
+    }
   }
   Promise.all(promises).then((values: any[]) => {
     res.send({payload: values});

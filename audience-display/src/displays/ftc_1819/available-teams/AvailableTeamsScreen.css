@@ -1,0 +1,33 @@
+#rr-at-top {
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 10vh;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#rr-at-top > div {
+  width: 100%;
+  height: 100%;
+}
+
+#rr-at-mid {
+  width: 100%;
+  margin-top: 5vh;
+  height: 80vh;
+  padding: 2.5vh 6px 6px 6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.5vw;
+}
+
+#rr-at-mid > table {
+  width: 100%;
+  height: 100%;
+}

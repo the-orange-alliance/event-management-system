@@ -36,6 +36,19 @@ class VideoSwitch extends React.Component {
             </Card.Content>
           </Card>
         </Card.Group>
+        <Card.Group itemsPerRow={2}>
+          <Card fluid={true} color={getTheme().secondary}>
+            <Card.Content className="card-header"><h3>Playoffs</h3></Card.Content>
+            <Card.Content>
+              <Grid columns="equal">
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 7)}>Available Teams</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.switchVideo.bind(this, 8)}>Playoff Bracket</Button></Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Card.Content>
+          </Card>
+        </Card.Group>
       </Tab.Pane>
     );
   }

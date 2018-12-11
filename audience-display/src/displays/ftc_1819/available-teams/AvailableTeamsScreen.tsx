@@ -55,10 +55,8 @@ class AvailableTeamsScreen extends React.Component<IProps, IState> {
     let columns: any[] = [];
     for (let i = 0; i < rankingsView.length; i++) {
       columns.push(rankingsView[i]);
-      console.log("ADDING COLUMN");
-      if (i % 6 === 5) {
+      if (i % 8 === 7) {
         // New row
-        console.log("ADDING ROW");
         rows.push(<tr>{columns}</tr>);
         columns = [];
       }

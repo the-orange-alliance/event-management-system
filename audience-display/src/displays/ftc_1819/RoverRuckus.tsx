@@ -8,6 +8,7 @@ import MatchPlayScreen from "./match-play/MatchPlayScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";
 import RankingsScreen from "./rankings/RankingsScreen";
 import AvailableTeamsScreen from "./available-teams/AvailableTeamsScreen";
+import AllianceBracketScreen from "./alliance-bracket/AllianceBracketScreen";
 
 interface IProps {
   event: Event,
@@ -47,6 +48,9 @@ class RoverRuckus extends React.Component<IProps> {
         break;
       case 7:
         view = <AvailableTeamsScreen event={event}/>;
+        break;
+      case 8:
+        view = <AllianceBracketScreen event={event}/>;
         break;
       default:
         view = <span/>;

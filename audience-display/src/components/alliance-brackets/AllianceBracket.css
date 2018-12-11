@@ -1,0 +1,38 @@
+#bracket-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.bracket-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: row;
+  height: 10vh;
+}
+
+.bracket-box {
+  width: 18vw;
+  height: 9vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 1.75vw;
+  border: 2px solid #000000;
+}
+
+.bracket-box-alliance {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 5px;
+}

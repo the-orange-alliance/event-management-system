@@ -4,28 +4,30 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
 }
 
-.bracket-row {
-  width: 100%;
+.bracket-col {
+  position: relative;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  flex-direction: row;
-  height: 10vh;
+  flex-direction: column;
+  height: 100%;
+  width: 20vw;
 }
 
 .bracket-box {
-  width: 18vw;
+  width: 19vw;
   height: 9vh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   font-weight: bold;
-  font-size: 1.75vw;
+  font-size: 1.7vw;
   border: 2px solid #000000;
+  z-index: 1;
 }
 
 .bracket-box-alliance {
@@ -35,4 +37,111 @@
   justify-content: flex-start;
   align-items: center;
   padding: 5px;
+}
+
+.bracket-box-winner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9ae3b;
+  border: 2px solid #000000;
+  width: 13.5vw;
+  height: 6vh;
+  z-index: 1;
+}
+
+.bracket-pipe {
+  position: absolute;
+  background-color: #C8CDC8;
+  z-index: 0;
+}
+
+.semi-pipe-1-top-x {
+  top: 11.5%;
+  right: -4vw;
+  height: 1vw;
+  width: 5vw;
+}
+
+.semi-pipe-1-top-y {
+  top: 11.5%;
+  left: 4vw;
+  height: 7.5%;
+  width: 1vw;
+}
+
+.semi-pipe-1-bot-y {
+  top: 30.5%;
+  left: 4vw;
+  height: 8%;
+  width: 1vw;
+}
+
+.semi-pipe-1-bot-x {
+  top: 36.5%;
+  right: -5vw;
+  height: 1vw;
+  width: 6vw;
+}
+
+.semi-pipe-2-top-x {
+  top: 61.25%;
+  right: -5vw;
+  height: 1vw;
+  width: 6vw;
+}
+
+.semi-pipe-2-top-y {
+  top: 61.5%;
+  left: 4vw;
+  height: 7.5%;
+  width: 1vw;
+}
+
+.semi-pipe-2-bot-y {
+  top: 80%;
+  left: 4vw;
+  height: 8%;
+  width: 1vw;
+}
+
+.semi-pipe-2-bot-x {
+  top: 86%;
+  right: -5vw;
+  height: 1vw;
+  width: 6vw;
+}
+
+.final-pipe-top-x {
+  right: -5vw;
+  width: 10vw;
+  height: 1vw;
+  top: 23.5%;
+}
+
+.final-pipe-bot-x {
+  right: -5vw;
+  width: 9vw;
+  height: 1vw;
+  top: 73.5%;
+}
+
+.final-pipe-top-y {
+  left: 4vw;
+  width: 1vw;
+  height: 16vh;
+  top: 25%;
+}
+
+.final-pipe-bot-y {
+  left: 4vw;
+  width: 1vw;
+  height: 15vh;
+  top: 55%;
+}
+
+.winner-pipe {
+  width: 5vw;
+  height: 1vw;
+  left: -1vw;
 }

@@ -4,7 +4,7 @@ import Event from "../../../shared/models/Event";
 
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
-import FourAllianceBracket from "../../../components/alliance-brackets/4AllianceBracket";
+import EightAllianceBracket from "../../../components/alliance-brackets/8AllianceBracket";
 
 interface IProps {
   event: Event
@@ -26,7 +26,7 @@ class AllianceBracketScreen extends React.Component<IProps> {
             <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-at-mid" className="rr-border">
-            <FourAllianceBracket/>
+            <EightAllianceBracket/>
           </div>
         </div>
       </div>

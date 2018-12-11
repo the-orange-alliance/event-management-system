@@ -14,6 +14,22 @@ import MatchTimer from "../../../shared/scoring/MatchTimer";
 import MatchConfiguration from "../../../shared/models/MatchConfiguration";
 import {MatchMode} from "../../../shared/scoring/MatchMode";
 
+import MATCH_START from "../res/sounds/match_start.wav";
+import MATCH_AUTO from "../res/sounds/match_auto_end_warning.wav";
+import MATCH_TELE from "../res/sounds/match_tele_start.wav";
+import MATCH_PRE_TELE from "../res/sounds/match_tele_pre_start.wav";
+import MATCH_ENDGAME from "../res/sounds/match_end_start.wav";
+import MATCH_END from "../res/sounds/match_end.wav";
+import MATCH_ABORT from "../res/sounds/match_estop.wav";
+
+const START_AUDIO = initAudio(MATCH_START);
+const END_AUTO = initAudio(MATCH_AUTO);
+const TELE_AUDIO = initAudio(MATCH_TELE);
+const TELE_PRE_AUDIO = initAudio(MATCH_PRE_TELE);
+const ENDGAME_AUDIO = initAudio(MATCH_ENDGAME);
+const END_AUDIO = initAudio(MATCH_END);
+const ABORT_AUDIO = initAudio(MATCH_ABORT);
+
 interface IProps {
   event: Event,
   match: Match
@@ -64,15 +80,33 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       this.setState({activeMatch: match});
     });
     SocketProvider.on("match-start", (timerJSON: any) => {
+      START_AUDIO.play();
       this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
+      this._timer.on("match-transition", () => {
+        END_AUTO.play();
+      });
+      this._timer.on("match-tele", () => {
+        console.log("should be playing sound...");
+        TELE_AUDIO.play();
+      });
       this._timer.on("match-endgame", () => {
+        ENDGAME_AUDIO.play();
         this._timerStyle = "yellow-bar";
+      });
+      this._timer.on("match-end", () => {
+        this._timer.removeAllListeners("match-transition");
+        this._timer.removeAllListeners("match-tele");
+        this._timer.removeAllListeners("match-endgame");
+        this._timer.removeAllListeners("match-abort");
       });
       this._timer.start();
       this.updateTimer();
       const timerID = global.setInterval(() => {
         this.updateTimer();
         if (this._timer.timeLeft <= 0) {
+          if (this._timer.mode !== MatchMode.ABORTED) {
+            END_AUDIO.play();
+          }
           this._timerStyle = "red-bar";
           this.updateTimer();
           global.clearInterval(timerID);
@@ -80,8 +114,13 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       }, 1000);
     });
     SocketProvider.on("match-abort", () => {
+      ABORT_AUDIO.play();
       this._timer.abort();
       this.updateTimer();
+      this._timer.removeAllListeners("match-transition");
+      this._timer.removeAllListeners("match-tele");
+      this._timer.removeAllListeners("match-endgame");
+      this._timer.removeAllListeners("match-end");
     });
   }
 
@@ -258,11 +297,21 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
 
   private updateTimer() {
     let displayTime: number = this._timer.timeLeft;
-    if (this._timer.mode === MatchMode.AUTONOMOUS || this._timer.mode === MatchMode.TELEOPERATED) {
+    if (this._timer.mode === MatchMode.AUTONOMOUS || this._timer.mode === MatchMode.TELEOPERATED || this._timer.mode === MatchMode.TRANSITION) {
       displayTime = this._timer.modeTimeLeft;
+    }
+    if (this._timer.mode === MatchMode.TRANSITION && this._timer.modeTimeLeft === 3) {
+      TELE_PRE_AUDIO.play();
     }
     this.setState({displayTime, timeLeft: this._timer.timeLeft});
   }
 }
+
+function initAudio(url: any): any {
+  const audio = new Audio(url);
+  audio.volume = 0.5;
+  return audio;
+}
+
 
 export default MatchPlayScreen;

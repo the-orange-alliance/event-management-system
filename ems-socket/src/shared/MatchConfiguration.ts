@@ -84,6 +84,10 @@ export default class MatchConfiguration implements IPostableObject {
 }
 
 export const FTC_CONFIG = new MatchConfiguration();
+FTC_CONFIG.autoTime = 30;
+FTC_CONFIG.transitionTime = 8;
+FTC_CONFIG.teleTime = 120;
+FTC_CONFIG.endTime = 30;
 
 export const FGC_CONFIG = new MatchConfiguration();
 FGC_CONFIG.delayTime = 0;

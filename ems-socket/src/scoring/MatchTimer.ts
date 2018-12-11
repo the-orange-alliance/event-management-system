@@ -41,7 +41,6 @@ export default class MatchTimer extends events.EventEmitter {
       this._timeLeft = this.matchConfig.totalTime;
       this.emit("match-start", this._timeLeft);
       logger.info("Starting a match.");
-      this.tick();
       this._timerID = global.setInterval(() => {
         this.tick();
       }, 1000);
@@ -79,6 +78,9 @@ export default class MatchTimer extends events.EventEmitter {
     if (this._timeLeft === 0) {
       this.stop();
     }
+
+    this._modeTimeLeft--;
+    this._timeLeft--;
 
     if (this._modeTimeLeft === 0) {
       switch (this._mode) {
@@ -118,13 +120,10 @@ export default class MatchTimer extends events.EventEmitter {
           }
       }
     } else {
-      if (this.matchConfig.endTime > 0 && (this._timeLeft - 1) === this.matchConfig.endTime) {
+      if (this.matchConfig.endTime > 0 && this._timeLeft === this.matchConfig.endTime) {
         this.emit("match-endgame");
         logger.info("Endgame started.")
       }
-
-      this._modeTimeLeft--;
-      this._timeLeft--;
     }
   }
 

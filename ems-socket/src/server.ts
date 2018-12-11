@@ -9,6 +9,7 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
+import {FTC_CONFIG} from "./shared/MatchConfiguration";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -32,6 +33,7 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 app.use(cors());
 
 const timer = new MatchTimer();
+timer.matchConfig = FTC_CONFIG;
 const clients: Map<string, string> = new Map<string, string>();
 const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);

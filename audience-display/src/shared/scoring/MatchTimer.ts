@@ -40,7 +40,6 @@ export default class MatchTimer extends events.EventEmitter {
       this._timeLeft = this.matchConfig.totalTime;
       this.emit("match-start", this._timeLeft);
       console.log("Starting a match.");
-      this.tick();
       this._timerID = global.setInterval(() => {
         this.tick();
       }, 1000);
@@ -79,6 +78,9 @@ export default class MatchTimer extends events.EventEmitter {
       this.stop();
     }
 
+    this._modeTimeLeft--;
+    this._timeLeft--;
+
     if (this._modeTimeLeft === 0) {
       switch (this._mode) {
         case MatchMode.PRESTART:
@@ -98,10 +100,12 @@ export default class MatchTimer extends events.EventEmitter {
           if (this.matchConfig.transitionTime > 0) {
             this._mode = MatchMode.TRANSITION;
             this._modeTimeLeft = this.matchConfig.transitionTime;
+            this.emit("match-transition");
             console.log("Transition period started.");
           } else if (this.matchConfig.teleTime > 0) {
             this._mode = MatchMode.TELEOPERATED;
             this._modeTimeLeft = this.matchConfig.teleTime;
+            this.emit("match-tele");
             console.log("Teleoperated period started.");
           } else {
             this.stop();
@@ -111,19 +115,17 @@ export default class MatchTimer extends events.EventEmitter {
           if (this.matchConfig.teleTime > 0) {
             this._mode = MatchMode.TELEOPERATED;
             this._modeTimeLeft = this.matchConfig.teleTime;
+            this.emit("match-tele");
             console.log("Teleoperated period started.");
           } else {
             this.stop();
           }
       }
     } else {
-      if (this.matchConfig.endTime > 0 && (this._timeLeft - 1) === this.matchConfig.endTime) {
+      if (this.matchConfig.endTime > 0 && this._timeLeft === this.matchConfig.endTime) {
         this.emit("match-endgame");
         console.log("Endgame started.")
       }
-
-      this._modeTimeLeft--;
-      this._timeLeft--;
     }
   }
 

@@ -5,7 +5,7 @@ import {
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
-  SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID,
+  SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {IConfigState} from "./models";
@@ -15,6 +15,7 @@ import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
 import MatchConfiguration from "../../shared/models/MatchConfiguration";
 import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
+import TOAConfig from "../../shared/models/TOAConfig";
 
 export const initialState: IConfigState = {
   slaveModeEnabled: false,
@@ -27,7 +28,8 @@ export const initialState: IConfigState = {
   practiceSchedule: new Schedule("Practice"),
   qualificationSchedule: new Schedule("Qualification"),
   finalsSchedule: new Schedule("Finals"),
-  eliminationsSchedule: new EliminationsSchedule()
+  eliminationsSchedule: new EliminationsSchedule(),
+  toaConfig: new TOAConfig()
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {
@@ -54,6 +56,8 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, masterHost: action.payload.masterHost};
     case SET_SLAVE_ID:
       return {...state, slaveInstanceID: action.payload.slaveID};
+    case SET_TOA_CONFIG:
+      return {...state, toaConfig: action.payload.toaConfig};
     default:
       return state;
   }

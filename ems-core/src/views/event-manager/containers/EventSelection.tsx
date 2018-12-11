@@ -30,11 +30,13 @@ import {CONFIG_STORE} from "../../../shared/AppStore";
 import EventPostingController from "../controllers/EventPostingController";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
+import TOAConfig from "../../../shared/models/TOAConfig";
 
 interface IProps {
   onComplete: () => void,
   eventConfig?: EventConfiguration,
   event?: Event,
+  toaConfig?: TOAConfig,
   selectConfigPreset?: (preset: EventConfiguration) => ISetEventConfiguration
   setEvent?: (event: Event) => ISetEvent,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
@@ -48,6 +50,8 @@ interface IState {
 class EventSelection extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    this.setTOAEventKey = this.setTOAEventKey.bind(this);
+    this.setTOAKey = this.setTOAKey.bind(this);
     this.setPostQualConfig = this.setPostQualConfig.bind(this);
     this.setTeamsPerAlliance = this.setTeamsPerAlliance.bind(this);
     this.setPostQualTeamsPerAlliance = this.setPostQualTeamsPerAlliance.bind(this);
@@ -84,6 +88,21 @@ class EventSelection extends React.Component<IProps, IState> {
         <EventSelectionSetupCard title={"5. Event Creation"} content={this.renderEventCreation()}/>
       </div>
     );
+  }
+
+  /* TOA Configuration Methods */
+  private setTOAEventKey(event: SyntheticEvent, props: InputProps) {
+    if (typeof props.value === "string") {
+      this.props.toaConfig.eventKey = props.value;
+      this.forceUpdate();
+    }
+  }
+
+  private setTOAKey(event: SyntheticEvent, props: InputProps) {
+    if (typeof props.value === "string") {
+      this.props.toaConfig.apiKey = props.value;
+      this.forceUpdate();
+    }
   }
 
   /* Event Configuration Methods */
@@ -277,33 +296,41 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private renderDownloadAndVerification(): JSX.Element {
+    const {eventConfig, toaConfig} = this.props;
+    const downloadDisabled: boolean = !eventConfig.requiresTOA || toaConfig.eventKey.length <= 0 || toaConfig.apiKey.length <= 0;
     return (
       <Form>
         <Grid>
           <Grid.Row columns={16}>
             <Grid.Column width={8}>Would you like to live upload match results to The Orange Alliance?</Grid.Column>
-            <Grid.Column width={2}><Radio label="Yes" checked={this.props.eventConfig.requiresTOA} onClick={this.setConfigRequiresTOA.bind(this, true)}/></Grid.Column>
-            <Grid.Column width={2}><Radio label="No" checked={!this.props.eventConfig.requiresTOA} onClick={this.setConfigRequiresTOA.bind(this, false)}/></Grid.Column>
+            <Grid.Column width={2}><Radio label="Yes" checked={eventConfig.requiresTOA} onClick={this.setConfigRequiresTOA.bind(this, true)}/></Grid.Column>
+            <Grid.Column width={2}><Radio label="No" checked={!eventConfig.requiresTOA} onClick={this.setConfigRequiresTOA.bind(this, false)}/></Grid.Column>
           </Grid.Row>
           {
-            this.props.eventConfig.requiresTOA &&
+            eventConfig.requiresTOA &&
             <Grid.Row columns="equal">
               <Grid.Column>
                 <Form.Group widths="equal">
                   <Form.Input
-                    label="TOA API Key"
-                    placeholder="Encrypted API Key"
-                  />
-                  <Form.Input
                     label="TOA Event Code"
                     placeholder="####-###-####"
+                    value={toaConfig.eventKey}
+                    onChange={this.setTOAEventKey}
+                    error={toaConfig.eventKey.length <= 0}
+                  />
+                  <Form.Input
+                    label="TOA API Key"
+                    placeholder="Encrypted API Key"
+                    value={toaConfig.apiKey}
+                    onChange={this.setTOAKey}
+                    error={toaConfig.apiKey.length <= 0}
                   />
                 </Form.Group>
               </Grid.Column>
             </Grid.Row>
           }
           <Grid.Row columns={16}>
-            <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={!this.props.eventConfig.requiresTOA}>Download Event Data</Button></Grid.Column>
+            <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={downloadDisabled}>Download Event Data</Button></Grid.Column>
           </Grid.Row>
         </Grid>
       </Form>
@@ -392,7 +419,8 @@ class EventSelection extends React.Component<IProps, IState> {
 export function mapStateToProps({configState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
-    event: configState.event
+    event: configState.event,
+    toaConfig: configState.toaConfig
   };
 }
 

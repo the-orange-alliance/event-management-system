@@ -30,3 +30,6 @@ export type SET_MASTER_HOST = typeof SET_MASTER_HOST;
 
 export const SET_SLAVE_ID = "SET_SLAVE_ID";
 export type SET_SLAVE_ID = typeof SET_SLAVE_ID;
+
+export const SET_TOA_CONFIG = "SET_TOA_CONFIG";
+export type SET_TOA_CONFIG = typeof SET_TOA_CONFIG;

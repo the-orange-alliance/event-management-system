@@ -5,7 +5,7 @@ import {
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
   SET_NETWORK_HOST,
   SET_PRACTICE_SCHEDULE,
-  SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID,
+  SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import EventConfiguration from "../../shared/models/EventConfiguration";
@@ -13,6 +13,7 @@ import Event from "../../shared/models/Event";
 import Schedule from "../../shared/models/Schedule";
 import MatchConfiguration from "../../shared/models/MatchConfiguration";
 import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
+import TOAConfig from "../../shared/models/TOAConfig";
 
 export interface IToggleSlaveMode extends Action {
   type: TOGGLE_SLAVE_MODE,
@@ -91,6 +92,13 @@ export interface ISetSlaveID extends Action {
   }
 }
 
+export interface ISetTOAConfig extends Action {
+  type: SET_TOA_CONFIG,
+  payload: {
+    toaConfig: TOAConfig
+  }
+}
+
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
   ISetPracticeSchedule | ISetQualificationSchedule | ISetFinalsSchedule| ISetEliminationsSchedule |
-  ISetMatchConfig | ISetMasterHost | ISetSlaveID;
+  ISetMatchConfig | ISetMasterHost | ISetSlaveID | ISetTOAConfig;

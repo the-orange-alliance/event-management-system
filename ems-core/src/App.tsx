@@ -23,6 +23,7 @@ import MatchParticipant from "./shared/models/MatchParticipant";
 import SocketProvider from "./shared/providers/SocketProvider";
 import AllianceMember from "./shared/models/AllianceMember";
 import MatchConfiguration from "./shared/models/MatchConfiguration";
+import WebProvider from "./shared/providers/WebProvider";
 
 interface IProps {
   slaveModeEnabled: boolean,
@@ -46,7 +47,7 @@ class App extends React.Component<IProps> {
 
   public componentDidMount() {
     this.initializeSocket(this.props.networkHost);
-
+    WebProvider.initialize(this.props.networkHost);
     if (this.props.slaveModeEnabled) {
       document.title = "Event Management System (Slave to " + this.props.masterHost + ")";
       EMSProvider.initialize(this.props.masterHost);

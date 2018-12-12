@@ -65,7 +65,7 @@ export const EventTypeItems = [
   },
   {
     text: "Region Championship",
-    value: "region_cmp"
+      value: "region_cmp"
   },
   {
     text: "Super Regional",

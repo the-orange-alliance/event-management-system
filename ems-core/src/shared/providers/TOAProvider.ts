@@ -24,7 +24,7 @@ class TOAProvider {
    * and the network of EMS may change, the provider must be manually initialized at runtime.
    */
   public initialize(toaConfig: TOAConfig): void {
-    this._host = "http://theorangealliance.org/";
+    this._host = "https://theorangealliance.org/";
     this._toaConfig = toaConfig;
     this._config = {
       baseURL: this._host,
@@ -32,7 +32,7 @@ class TOAProvider {
       headers: {
         "Content-Type": "application/json",
         "X-Application-Origin": "EMS-" + this._toaConfig.eventKey,
-        "X-API-Key": this._toaConfig.apiKey
+        "X-TOA-Key": this._toaConfig.apiKey
       }
     };
     this._axios = Axios.create(this._config);
@@ -56,6 +56,14 @@ class TOAProvider {
 
   public ping(): Promise<AxiosResponse> {
     return this.get("ping");
+  }
+
+  public getEvent(eventKey: string): Promise<AxiosResponse> {
+    return this.get("api/event/" + eventKey);
+  }
+
+  public getTeams(eventKey: string): Promise<AxiosResponse> {
+    return this.get("api/event/" + eventKey + "/team");
   }
 
 }

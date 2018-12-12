@@ -63,6 +63,10 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.masterHost = configStore.masterHost;
     }
 
+    if (typeof configStore.toaConfig !== "undefined") {
+      configState.toaConfig = configState.toaConfig.fromJSON(configStore.toaConfig);
+    }
+
     const applicationStore = createStore(reducers, {
       configState: configState,
       internalState: internalState

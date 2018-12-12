@@ -1,4 +1,4 @@
-export default class TOAConfig {
+export default class TOAConfig implements IPostableObject {
   private _eventKey: string;
   private _apiKey: string;
   private _enabled:  boolean;
@@ -7,6 +7,23 @@ export default class TOAConfig {
     this._eventKey = "";
     this._apiKey = "";
     this._enabled = false;
+  }
+
+  public toJSON(): object {
+    return {
+      event_key: this.eventKey,
+      api_key: this.apiKey
+    };
+  }
+
+  public fromJSON(json: any): TOAConfig {
+    const config: TOAConfig = new TOAConfig();
+    config.eventKey = json.event_key || "";
+    config.apiKey = json.api_key || "";
+    if (config.eventKey.length > 0 && config.apiKey.length > 0) {
+      config.enabled = true;
+    }
+    return config;
   }
 
   get eventKey(): string {

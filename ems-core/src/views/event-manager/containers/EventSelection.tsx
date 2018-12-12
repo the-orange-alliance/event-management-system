@@ -31,6 +31,11 @@ import EventPostingController from "../controllers/EventPostingController";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
 import TOAConfig from "../../../shared/models/TOAConfig";
+import TOAProvider from "../../../shared/providers/TOAProvider";
+import {AxiosResponse} from "axios";
+import DialogManager from "../../../shared/managers/DialogManager";
+import TOAEvent from "../../../shared/models/toa/TOAEvent";
+import EMSEventAdapter from "../../../shared/adapters/EMSEventAdapter";
 
 interface IProps {
   onComplete: () => void,
@@ -44,7 +49,8 @@ interface IProps {
 
 interface IState {
   eventValidator: EventCreationValidator,
-  creatingEvent: boolean
+  creatingEvent: boolean,
+  downloadingData: boolean
 }
 
 class EventSelection extends React.Component<IProps, IState> {
@@ -67,10 +73,12 @@ class EventSelection extends React.Component<IProps, IState> {
     this.setEventCountry = this.setEventCountry.bind(this);
     this.setEventFields = this.setEventFields.bind(this);
     this.createEvent = this.createEvent.bind(this);
+    this.downloadTOAData = this.downloadTOAData.bind(this);
 
     this.state = {
       eventValidator: new EventCreationValidator(this.props.eventConfig, this.props.event),
-      creatingEvent: false
+      creatingEvent: false,
+      downloadingData: false
     };
   }
 
@@ -88,6 +96,29 @@ class EventSelection extends React.Component<IProps, IState> {
         <EventSelectionSetupCard title={"5. Event Creation"} content={this.renderEventCreation()}/>
       </div>
     );
+  }
+
+  /* TOA Download Methods */
+  private downloadTOAData() {
+    this.setState({downloadingData: true});
+    TOAProvider.initialize(this.props.toaConfig);
+    TOAProvider.getEvent(this.props.toaConfig.eventKey).then((res: AxiosResponse) => {
+      if (res.data && res.data[0]) {
+        const event: TOAEvent = new TOAEvent().fromJSON(res.data[0]);
+        this.props.setEvent(new EMSEventAdapter(event).get());
+        this.props.toaConfig.enabled = true;
+        this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+        this.forceUpdate();
+      } else {
+        DialogManager.showInfoBox("TheOrangeAlliance", "No event was found for event_key " + this.props.toaConfig.eventKey);
+      }
+      this.setState({downloadingData: false});
+    }).catch((error: HttpError) => {
+      this.props.toaConfig.enabled = false;
+      console.log(error);
+      this.setState({downloadingData: false});
+      DialogManager.showErrorBox(error);
+    });
   }
 
   /* TOA Configuration Methods */
@@ -262,7 +293,8 @@ class EventSelection extends React.Component<IProps, IState> {
   private createEvent(): void {
     this.setState({creatingEvent: true});
     this.props.setNavigationDisabled(true);
-    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON()}).catch((err) => console.log(err));
+    const toaConfig = this.props.toaConfig.enabled ? this.props.toaConfig.toJSON() : undefined;
+    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), toaConfig: toaConfig}).catch((err) => console.log(err));
     EventPostingController.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
       this.setState({creatingEvent: false});
       this.props.setNavigationDisabled(false);
@@ -297,6 +329,7 @@ class EventSelection extends React.Component<IProps, IState> {
 
   private renderDownloadAndVerification(): JSX.Element {
     const {eventConfig, toaConfig} = this.props;
+    const {downloadingData} = this.state;
     const downloadDisabled: boolean = !eventConfig.requiresTOA || toaConfig.eventKey.length <= 0 || toaConfig.apiKey.length <= 0;
     return (
       <Form>
@@ -330,7 +363,7 @@ class EventSelection extends React.Component<IProps, IState> {
             </Grid.Row>
           }
           <Grid.Row columns={16}>
-            <Grid.Column width={4}><Button fluid={true} color={getTheme().primary} disabled={downloadDisabled}>Download Event Data</Button></Grid.Column>
+            <Grid.Column width={4}><Button fluid={true} loading={downloadingData} color={getTheme().primary} disabled={downloadDisabled || downloadingData} onClick={this.downloadTOAData}>Download Event Data</Button></Grid.Column>
           </Grid.Row>
         </Grid>
       </Form>

@@ -63,7 +63,7 @@ class TOAProvider {
   }
 
   public getTeams(eventKey: string): Promise<AxiosResponse> {
-    return this.get("api/event/" + eventKey + "/team");
+    return this.get("api/event/" + eventKey + "/teams");
   }
 
 }

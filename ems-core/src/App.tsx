@@ -24,11 +24,14 @@ import SocketProvider from "./shared/providers/SocketProvider";
 import AllianceMember from "./shared/models/AllianceMember";
 import MatchConfiguration from "./shared/models/MatchConfiguration";
 import WebProvider from "./shared/providers/WebProvider";
+import TOAConfig from "./shared/models/TOAConfig";
+import TOAProvider from "./shared/providers/TOAProvider";
 
 interface IProps {
   slaveModeEnabled: boolean,
   masterHost: string,
   networkHost: string,
+  toaConfig: TOAConfig,
   matchTimerConfig: MatchConfiguration,
   setCompletedStep?: (step: number) => IIncrementCompletedStep,
   setTeamList?: (teams: Team[]) => IUpdateTeamList,
@@ -46,6 +49,10 @@ class App extends React.Component<IProps> {
   }
 
   public componentDidMount() {
+    if (this.props.toaConfig.enabled) {
+      TOAProvider.initialize(this.props.toaConfig);
+    }
+
     this.initializeSocket(this.props.networkHost);
     WebProvider.initialize(this.props.networkHost);
     if (this.props.slaveModeEnabled) {
@@ -203,7 +210,8 @@ export function mapStateToProps(state: IApplicationState) {
     slaveModeEnabled: state.configState.slaveModeEnabled,
     masterHost: state.configState.masterHost,
     networkHost: state.configState.networkHost,
-    matchTimerConfig: state.configState.matchConfig
+    matchTimerConfig: state.configState.matchConfig,
+    toaConfig: state.configState.toaConfig
   };
 }
 

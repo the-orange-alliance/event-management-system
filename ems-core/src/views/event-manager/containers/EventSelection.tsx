@@ -110,7 +110,7 @@ class EventSelection extends React.Component<IProps, IState> {
         this.state.eventValidator.update(this.props.eventConfig, this.props.event);
         this.forceUpdate();
       } else {
-        DialogManager.showInfoBox("TheOrangeAlliance", "No event was found for event_key " + this.props.toaConfig.eventKey);
+        DialogManager.showInfoBox("TheOrangeAlliance", `The Orange Alliance does not contain any event info for "${this.props.toaConfig.eventKey}". Are you sure your event information is posted online?`);
       }
       this.setState({downloadingData: false});
     }).catch((error: HttpError) => {
@@ -293,7 +293,7 @@ class EventSelection extends React.Component<IProps, IState> {
   private createEvent(): void {
     this.setState({creatingEvent: true});
     this.props.setNavigationDisabled(true);
-    const toaConfig = this.props.toaConfig.enabled ? this.props.toaConfig.toJSON() : undefined;
+    const toaConfig = (this.props.toaConfig.enabled && this.props.eventConfig.requiresTOA) ? this.props.toaConfig.toJSON() : undefined;
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), toaConfig: toaConfig}).catch((err) => console.log(err));
     EventPostingController.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
       this.setState({creatingEvent: false});

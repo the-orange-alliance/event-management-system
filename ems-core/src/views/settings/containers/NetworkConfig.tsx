@@ -19,6 +19,7 @@ import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
 import DialogManager from "../../../shared/managers/DialogManager";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import SocketProvider from "../../../shared/providers/SocketProvider";
+import WebProvider from "../../../shared/providers/WebProvider";
 
 interface IProps {
   processingAction?: boolean,
@@ -143,6 +144,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
     ProcessManager.startEcosystem(this.state.updateIP).then(() => {
       ProcessManager.listEcosystem().then((procList: Process[]) => {
         EMSProvider.initialize(this.state.updateIP);
+        WebProvider.initialize(this.state.updateIP);
         SocketProvider.initialize(this.state.updateIP);
         this.props.updateProcessList(procList);
         this.props.setNetworkHost(this.state.updateIP); // TODO - Update EMSProvider, WebProvider, SocketProvider

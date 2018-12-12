@@ -15,12 +15,18 @@ import EventConfiguration from "../../../shared/models/EventConfiguration";
 import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
 import Event from "../../../shared/models/Event";
+import TOAConfig from "../../../shared/models/TOAConfig";
+import TOAProvider from "../../../shared/providers/TOAProvider";
+import {AxiosResponse} from "axios";
+import TOATeam from "../../../shared/models/toa/TOATeam";
+import EMSTeamAdapter from "../../../shared/adapters/EMSTeamAdapter";
 
 interface IProps {
   onComplete: () => void,
   teams?: Team[],
   eventConfig?: EventConfiguration,
   event: Event,
+  toaConfig?: TOAConfig
   addTeam?: (team: Team) => IAddTeam,
   alterTeam?: (index: number, team: Team) => IAlterTeam,
   removeTeam?: (index: number) => IRemoveTeam
@@ -57,13 +63,15 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     this.createNewTeam = this.createNewTeam.bind(this);
     this.removeTeam = this.removeTeam.bind(this);
     this.importTeamsByCSV = this.importTeamsByCSV.bind(this);
+    this.importByTOA = this.importByTOA.bind(this);
     this.createTeamList = this.createTeamList.bind(this);
   }
 
   public render() {
+    const {teams, toaConfig} = this.props;
     const {removeMode, confirmModalOpen, teamModalOpen, activeTeam, loadingTeams} = this.state;
 
-    const teamsView = this.props.teams.map((team, index) => {
+    const teamsView = teams.map((team, index) => {
       return (
         <Table.Row key={team.teamKey} onClick={this.modifyTeam.bind(this, team, index)}>
           <Table.Cell>{team.teamKey}</Table.Cell>
@@ -101,6 +109,10 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
           <div>
             <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams || !this.canCreateTeamList()} onClick={this.createTeamList}>Save &amp; Publish</Button>
             <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importTeamsByCSV}>Import By CSV</Button>
+            {
+              toaConfig.enabled &&
+              <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importByTOA}>Import From TOA</Button>
+            }
           </div>
           <div>
             <Button color={getTheme().secondary} loading={loadingTeams} disabled={loadingTeams} onClick={this.createNewTeam}>Add Team</Button>
@@ -174,6 +186,42 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     });
   }
 
+  private importByTOA() {
+    this.setState({loadingTeams: true});
+    this.props.setNavigationDisabled(true);
+    TOAProvider.getTeams(this.props.event.eventKey).then((res: AxiosResponse) => {
+      const teams: Team[] = [];
+      const failedImports: number[] = [];
+      if (res.data && res.data.length > 0) {
+        for (const teamJSON of res.data) {
+          if (typeof teamJSON.team !== "undefined") {
+            const team: Team = new EMSTeamAdapter(new TOATeam().fromJSON(teamJSON.team)).get();
+            team.participantKey = teamJSON.event_participant_key;
+            const validator: TeamValidator = new TeamValidator(team);
+            validator.update(team);
+            if (validator.isValid) {
+              teams.push(team);
+            } else {
+              failedImports.push(teamJSON.team_key);
+            }
+          } else {
+            failedImports.push(teamJSON.team_key);
+          }
+        }
+      }
+      this.setState({loadingTeams: false});
+      this.props.setNavigationDisabled(false);
+      this.props.setTeamList(teams);
+      setTimeout(() => {
+        DialogManager.showInfoBox("Team Import Result", "Imported " + teams.length + " of original " + res.data.length + ". The following teams were not imported due to parsing errors: " + failedImports.toString());
+      }, 250);
+    }).catch((error: HttpError) => {
+      this.setState({loadingTeams: false});
+      this.props.setNavigationDisabled(false);
+      DialogManager.showErrorBox(error);
+    });
+  }
+
   private canCreateTeamList(): boolean {
     if (this.props.eventConfig.postQualConfig === "elims") {
       const maxTeamsPerAlliance = Math.max(this.props.eventConfig.teamsPerAlliance, this.props.eventConfig.postQualTeamsPerAlliance);
@@ -227,7 +275,8 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
   return {
     teams: internalState.teamList,
     eventConfig: configState.eventConfiguration,
-    event: configState.event
+    event: configState.event,
+    toaConfig: configState.toaConfig
   };
 }
 

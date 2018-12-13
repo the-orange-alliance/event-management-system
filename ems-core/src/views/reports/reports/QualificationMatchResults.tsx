@@ -57,8 +57,8 @@ class QualificationMatchResults extends React.Component<IProps, IState> {
         <Table.Row key={match.matchKey}>
           <Table.Cell>{match.matchName}</Table.Cell>
           <Table.Cell>{match.fieldNumber}</Table.Cell>
-          <Table.Cell>{(typeof match.redScore !== "undefined" && match.redScore !== null && match.redScore.toString() !== "null") ? match.redScore : "NOT PLAYED"}</Table.Cell>
-          <Table.Cell>{(typeof match.blueScore !== "undefined" && match.blueScore !== null && match.blueScore.toString() !== "null") ? match.blueScore : "NOT PLAYED"}</Table.Cell>
+          <Table.Cell>{(typeof match.redScore !== "undefined" && match.redScore >= 0 && match.redScore.toString() !== "null") ? match.redScore : "NOT PLAYED"}</Table.Cell>
+          <Table.Cell>{(typeof match.blueScore !== "undefined" && match.blueScore >= 0 && match.blueScore.toString() !== "null") ? match.blueScore : "NOT PLAYED"}</Table.Cell>
           <Table.Cell>{match.redMinPen ? match.redMinPen : 0}</Table.Cell>
           <Table.Cell>{match.blueMinPen ? match.blueMinPen : 0}</Table.Cell>
         </Table.Row>

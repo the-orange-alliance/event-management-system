@@ -8,20 +8,23 @@ import Team from "../../../shared/models/Team";
 import EMSProvider from "../../../shared/providers/EMSProvider";
 import RoverRuckusRank from "../../../shared/models/RoverRuckusRank";
 import {AxiosResponse} from "axios";
+import SocketProvider from "../../../shared/providers/SocketProvider";
 
 interface IProps {
   event: Event
 }
 
 interface IState {
-  rankings: RoverRuckusRank[]
+  rankings: RoverRuckusRank[],
+  teamsList: number[]
 }
 
 class AvailableTeamsScreen extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      rankings: []
+      rankings: [],
+      teamsList: []
     };
   }
 
@@ -39,15 +42,22 @@ class AvailableTeamsScreen extends React.Component<IProps, IState> {
     }).catch((error: any) => {
       console.error(error);
     });
+    SocketProvider.on("alliance-update", (teamsList: number[]) => {
+      this.setState({teamsList});
+    });
+  }
+
+  public componentWillUnmount() {
+    SocketProvider.off("alliance-update");
   }
 
   public render() {
     const {event} = this.props;
-    const {rankings} = this.state;
+    const {rankings, teamsList} = this.state;
 
     const rankingsView = rankings.map((ranking: RoverRuckusRank) => {
       return (
-        <td key={ranking.rankKey}>{ranking.rank} - {ranking.teamKey}</td>
+        <td key={ranking.rankKey} className={teamsList.indexOf(ranking.teamKey) > -1 ? "selected" : ""}>{ranking.rank} - {ranking.teamKey}</td>
       );
     });
 
@@ -57,13 +67,13 @@ class AvailableTeamsScreen extends React.Component<IProps, IState> {
       columns.push(rankingsView[i]);
       if (i % 8 === 7) {
         // New row
-        rows.push(<tr>{columns}</tr>);
+        rows.push(<tr key={i}>{columns}</tr>);
         columns = [];
       }
     }
 
     if (columns.length > 0) {
-      rows.push(<tr>{columns}</tr>);
+      rows.push(<tr key={rows.length + 1}>{columns}</tr>);
     }
 
     return (

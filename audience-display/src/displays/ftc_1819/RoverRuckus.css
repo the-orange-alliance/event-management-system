@@ -23,8 +23,9 @@
 
 .rr-pre-match {
   color: #ffffff;
-  font-size: 2.5vw;
+  font-size: 2.25vw;
   font-weight: bold;
+  text-align: center;
 }
 
 .red-card-bg {

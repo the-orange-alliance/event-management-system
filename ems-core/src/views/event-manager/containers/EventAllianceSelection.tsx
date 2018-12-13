@@ -17,6 +17,7 @@ import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/
 import {Dispatch} from "redux";
 import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
 import EventPostingController from "../controllers/EventPostingController";
+import SocketProvider from "../../../shared/providers/SocketProvider";
 
 interface IProps {
   onComplete: () => void,
@@ -164,8 +165,8 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
               <Button color={getTheme().primary} disabled={navigationDisabled} onClick={this.autoRemoveTeam}>Undo Action</Button>
             </div>
             <div>
-              <Button color={getTheme().secondary} disabled={navigationDisabled}>Show Available Teams</Button>
-              <Button color={getTheme().secondary} disabled={navigationDisabled}>Show Current Alliances</Button>
+              <Button color={getTheme().secondary} disabled={navigationDisabled} onClick={this.switchVideo.bind(this, 7)}>Show Available Teams</Button>
+              <Button color={getTheme().secondary} disabled={navigationDisabled} onClick={this.switchVideo.bind(this, 8)}>Show Current Alliances</Button>
             </div>
           </div>
         </Card.Content>
@@ -175,6 +176,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
 
   private changeTeam(index: number, event: SyntheticEvent, props: DropdownProps) {
     this.state.inputValues[index] = props.value as number;
+    this.sendAllianceUpdate();
     this.forceUpdate();
   }
 
@@ -183,6 +185,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       if (this.state.inputValues[i] <= 0) {
         this.state.inputValues[i] = teamKey;
         this.state.autoAddStack.push(i);
+        this.sendAllianceUpdate();
         this.forceUpdate();
         break;
       }
@@ -193,6 +196,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
     if (this.state.autoAddStack.length > 0) {
       const index = this.state.autoAddStack.pop();
       this.state.inputValues[index] = 0;
+      this.sendAllianceUpdate();
       this.forceUpdate();
     }
   }
@@ -223,7 +227,15 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
     }).catch((error: HttpError) => {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);
-    })
+    });
+  }
+
+  private switchVideo(id: number) {
+    SocketProvider.send("request-video", id);
+  }
+
+  private sendAllianceUpdate() {
+    SocketProvider.send("alliance-update", this.state.inputValues);
   }
 }
 

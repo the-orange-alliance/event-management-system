@@ -12,6 +12,7 @@ export default class EventRoom implements IRoom {
 
   private isSlaveEnabled: boolean;
   private masterAddress: string;
+  private teamsList: number[];
 
   constructor(server: Server) {
     this._server = server;
@@ -19,6 +20,7 @@ export default class EventRoom implements IRoom {
     this._name = "event";
     this.isSlaveEnabled = false;
     this.masterAddress = "";
+    this.teamsList = [];
   }
 
   public addClient(client: Socket) {
@@ -42,7 +44,11 @@ export default class EventRoom implements IRoom {
     if (this.isSlaveEnabled) {
       this._server.to(this._name).emit("enter-slave", this.masterAddress);
     }
-
+    if (this.teamsList.length > 0) {
+      setTimeout(() => {
+        client.emit("alliance-update", this.teamsList);
+      }, 250);
+    }
     client.on("request-config", () => {
       const fileName = path.resolve(getAppDataPath("") + "/ems-core/config.json");
       fs.readFile(fileName, ((err, data) => {
@@ -64,6 +70,10 @@ export default class EventRoom implements IRoom {
     });
     client.on("test-audience-success", () => {
       this._server.to(this._name).emit("test-audience-success");
+    });
+    client.on("alliance-update", (teamsList: number[]) => {
+      this.teamsList = teamsList;
+      this._server.to(this.name).emit("alliance-update", teamsList);
     });
   }
 

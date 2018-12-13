@@ -1,4 +1,4 @@
-export default class MatchDetails implements IPostableObject {
+export default class TOAMatchDetails implements IPostableObject {
   private _matchDetailKey: string;
   private _matchKey: string;
   private _redMinPen: number;
@@ -15,7 +15,7 @@ export default class MatchDetails implements IPostableObject {
     this._blueMajPen = 0;
   }
 
-  toJSON(): object {
+  public toJSON(): object {
     return {
       match_detail_key: this.matchDetailKey,
       match_key: this.matchKey,
@@ -26,8 +26,8 @@ export default class MatchDetails implements IPostableObject {
     };
   }
 
-  fromJSON(json: any): MatchDetails {
-    const details: MatchDetails = new MatchDetails();
+  public fromJSON(json: any): TOAMatchDetails {
+    const details: TOAMatchDetails = new TOAMatchDetails();
     details.matchDetailKey = json.match_detail_key;
     details.matchKey = json.match_key;
     details.redMinPen = json.red_min_pen;

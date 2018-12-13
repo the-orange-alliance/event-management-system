@@ -25,7 +25,39 @@ export default class MatchDetails implements IPostableObject {
     return 0;
   }
 
+  public getRedAutoScore(): number {
+    return 0;
+  }
+
+  public getRedTeleScore(): number {
+    return 0;
+  }
+
+  public getRedEndScore(): number {
+    return 0;
+  }
+
+  public getRedPenalty(minPen: number, majPen: number): number {
+    return 0;
+  }
+
   public getBlueScore(minPen: number, majPen: number): number {
+    return 0;
+  }
+
+  public getBlueAutoScore(): number {
+    return 0;
+  }
+
+  public getBlueTeleScore(): number {
+    return 0;
+  }
+
+  public getBlueEndScore(): number {
+    return 0;
+  }
+
+  public getBluePenalty(minPen: number, majPen: number): number {
     return 0;
   }
 

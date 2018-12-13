@@ -17,12 +17,17 @@ import {disableNavigation, setPracticeMatches} from "../../../stores/internal/ac
 import EventPostingController from "../controllers/EventPostingController";
 import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
+import Event from"../../../shared/models/Event";
 import Match from "../../../shared/models/Match";
+import TOAConfig from "../../../shared/models/TOAConfig";
+import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
 
 interface IProps {
   onComplete: () => void,
   navigationDisabled?: boolean,
+  event?: Event,
   eventConfig?: EventConfiguration,
+  toaConfig?: TOAConfig,
   teamList?: Team[],
   schedule?: Schedule,
   practiceMatches?: Match[],
@@ -97,6 +102,13 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
+    if (this.props.toaConfig.enabled) {
+      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.practiceMatches).then(() => {
+        console.log(`${this.props.practiceMatches.length} matches have been posted to TOA.`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
+    }
     EventPostingController.createMatchSchedule(0, this.props.practiceMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
@@ -112,7 +124,9 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
   return {
     navigationDisabled: internalState.navigationDisabled,
     teamList: internalState.teamList,
+    event: configState.event,
     eventConfig: configState.eventConfiguration,
+    toaConfig: configState.toaConfig,
     schedule: configState.practiceSchedule,
     practiceMatches: internalState.practiceMatches
   };

@@ -1,4 +1,4 @@
-export default class MatchParticipant implements IPostableObject {
+export default class TOAMatchParticipant implements IPostableObject {
   private _matchParticipantKey: string;
   private _matchKey: string;
   private _teamKey: string;
@@ -15,7 +15,7 @@ export default class MatchParticipant implements IPostableObject {
     this._refStatus = 0;
   }
 
-  toJSON(): object {
+  public toJSON(): object {
     return {
       match_participant_key: this.matchParticipantKey,
       match_key: this.matchKey,
@@ -26,8 +26,8 @@ export default class MatchParticipant implements IPostableObject {
     };
   }
 
-  fromJSON(json: any): MatchParticipant {
-    const participant: MatchParticipant = new MatchParticipant();
+  public fromJSON(json: any): TOAMatchParticipant {
+    const participant: TOAMatchParticipant = new TOAMatchParticipant();
     participant.matchParticipantKey = json.match_participant_key;
     participant.matchKey = json.match_key;
     participant.teamKey = json.team_key;

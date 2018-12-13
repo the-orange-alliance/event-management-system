@@ -1,4 +1,4 @@
-export default class Match implements IPostableObject {
+export default class TOAMatch implements IPostableObject {
   private _matchKey: string;
   private _eventKey: string;
   private _tournamentLevel: number;
@@ -6,9 +6,6 @@ export default class Match implements IPostableObject {
   private _matchName: string;
   private _playNumber: number;
   private _fieldNumber: number;
-  private _prestartTime: string;
-  private _prestartCount: number;
-  private _cycleTime: string;
   private _redScore: number;
   private _blueScore: number;
   private _redPenalty: number;
@@ -29,9 +26,6 @@ export default class Match implements IPostableObject {
     this._matchName = '';
     this._playNumber = 0;
     this._fieldNumber = 0;
-    this._prestartTime = '';
-    this._prestartCount = 0;
-    this._cycleTime = '';
     this._redScore = 0;
     this._blueScore = 0;
     this._redPenalty = 0;
@@ -45,7 +39,7 @@ export default class Match implements IPostableObject {
     this._videoURL = '';
   }
 
-  toJSON(): object {
+  public toJSON(): object {
     return {
       match_key: this.matchKey,
       event_key: this.eventKey,
@@ -54,9 +48,6 @@ export default class Match implements IPostableObject {
       match_name: this.matchName,
       play_number: this.playNumber,
       field_number: this.fieldNumber,
-      prestart_time: this.prestartTime,
-      prestart_count: this.prestartCount,
-      cycle_time: this.cycleTime,
       red_score: this.redScore,
       blue_score: this.blueScore,
       red_penalty: this.redPenalty,
@@ -71,8 +62,8 @@ export default class Match implements IPostableObject {
     };
   }
 
-  fromJSON(json: any): Match {
-    const match: Match = new Match();
+  public fromJSON(json: any): TOAMatch {
+    const match: TOAMatch = new TOAMatch();
     match.matchKey = json.match_key;
     match.eventKey = json.event_key;
     match.tournamentLevel = json.tournament_level;
@@ -80,9 +71,6 @@ export default class Match implements IPostableObject {
     match.matchName = json.match_name;
     match.playNumber = json.play_number;
     match.fieldNumber = json.field_number;
-    match.prestartTime = json.prestart_time;
-    match.prestartCount = json.prestart_count;
-    match.cycleTime = json.cycle_time;
     match.redScore = json.red_score;
     match.blueScore = json.blue_score;
     match.redPenalty = json.red_penalty;
@@ -177,30 +165,6 @@ export default class Match implements IPostableObject {
 
   set fieldNumber(value: number) {
     this._fieldNumber = value;
-  }
-
-  get prestartTime(): string {
-    return this._prestartTime;
-  }
-
-  set prestartTime(value: string) {
-    this._prestartTime = value;
-  }
-
-  get prestartCount(): number {
-    return this._prestartCount;
-  }
-
-  set prestartCount(value: number) {
-    this._prestartCount = value;
-  }
-
-  get cycleTime(): string {
-    return this._cycleTime;
-  }
-
-  set cycleTime(value: string) {
-    this._cycleTime = value;
   }
 
   get redScore(): number {

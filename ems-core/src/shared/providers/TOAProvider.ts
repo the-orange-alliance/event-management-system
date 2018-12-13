@@ -2,6 +2,9 @@ import {default as Axios, AxiosInstance, AxiosRequestConfig, AxiosError, AxiosRe
 import HttpError from "../models/HttpError";
 import TOAConfig from "../models/TOAConfig";
 import TOAEventParticipant from "../models/toa/TOAEventParticipant";
+import TOAMatch from "../models/toa/TOAMatch";
+import TOAMatchDetails from "../models/toa/TOAMatchDetails";
+import TOAMatchParticipant from "../models/toa/TOAMatchParticipant";
 
 class TOAProvider {
   private static _instance: TOAProvider;
@@ -120,6 +123,18 @@ class TOAProvider {
 
   public postEventParticipants(eventKey: string, participants: TOAEventParticipant[]): Promise<AxiosResponse> {
     return this.post("api/event/" + eventKey + "/teams", participants);
+  }
+
+  public postMatches(eventKey: string, matches: TOAMatch[]): Promise<AxiosResponse> {
+    return this.post("api/event/" + eventKey + "/matches", matches);
+  }
+
+  public postMatchDetails(eventKey: string, matches: TOAMatchDetails[]): Promise<AxiosResponse> {
+    return this.post("api/event/" + eventKey + "/matches/details", matches);
+  }
+
+  public postMatchParticipants(eventKey: string, participants: TOAMatchParticipant[]): Promise<AxiosResponse> {
+    return this.post("api/event/" + eventKey + "/matches/participants", participants);
   }
 
 }

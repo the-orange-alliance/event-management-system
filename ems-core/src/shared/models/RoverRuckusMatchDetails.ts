@@ -184,6 +184,64 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     return details;
   }
 
+  public getRedAutoScore(): number {
+    let redSum: number = 0;
+    redSum += this.redPreRobotOneStatus === 3 ? 30 : 0;
+    redSum += this.redPreRobotTwoStatus === 3 ? 30 : 0;
+    redSum += this.redAutoRobotOneClaimed ? 15: 0;
+    redSum += this.redAutoRobotTwoClaimed ? 15 : 0;
+    redSum += this.redAutoRobotOneStatus === 1 ? 10 : 0;
+    redSum += this.redAutoRobotTwoStatus === 1 ? 10 : 0;
+    redSum += this.redAutoSuccessfulSamples * 25;
+    redSum += this.redAutoCargoSilverMinerals * 5;
+    redSum += this.redAutoCargoGoldMinerals * 5;
+    redSum += this.redAutoDepotMinerals * 2;
+    return redSum;
+  }
+
+  public getRedTeleScore(): number {
+    let redSum: number = 0;
+    redSum += this.redTeleCargoSilverMinerals * 5;
+    redSum += this.redTeleCargoGoldMinerals * 5;
+    redSum += this.redTeleDepotMinerals * 2;
+    return redSum;
+  }
+
+  public getRedEndScore(): number {
+    let redSum: number = 0;
+    switch (this.redEndRobotOneStatus) {
+      case 1:
+        redSum += 50;
+        break;
+      case 2:
+        redSum += 15;
+        break;
+      case 3:
+        redSum += 25;
+        break;
+      default:
+        redSum += 0;
+    }
+    switch (this.redEndRobotTwoStatus) {
+      case 1:
+        redSum += 50;
+        break;
+      case 2:
+        redSum += 15;
+        break;
+      case 3:
+        redSum += 25;
+        break;
+      default:
+        redSum += 0;
+    }
+    return redSum;
+  }
+
+  public getRedPenalty(minPen: number, majPen: number): number {
+    return minPen * 10 + majPen * 40;
+  }
+
   public getRedScore(blueMinPen: number, blueMajPen: number): number {
     let redSum: number = 0;
     redSum += this.redPreRobotOneStatus === 3 ? 30 : 0;
@@ -228,6 +286,64 @@ export default class RoverRuckusMatchDetails extends MatchDetails implements IPo
     redSum += blueMinPen * 10;
     redSum += blueMajPen * 40;
     return redSum;
+  }
+
+  public getBlueAutoScore(): number {
+    let blueSum: number = 0;
+    blueSum += this.bluePreRobotOneStatus === 3 ? 30 : 0;
+    blueSum += this.bluePreRobotTwoStatus === 3 ? 30 : 0;
+    blueSum += this.blueAutoRobotOneClaimed ? 15: 0;
+    blueSum += this.blueAutoRobotTwoClaimed ? 15 : 0;
+    blueSum += this.blueAutoRobotOneStatus === 1 ? 10 : 0;
+    blueSum += this.blueAutoRobotTwoStatus === 1 ? 10 : 0;
+    blueSum += this.blueAutoSuccessfulSamples * 25;
+    blueSum += this.blueAutoCargoSilverMinerals * 5;
+    blueSum += this.blueAutoCargoGoldMinerals * 5;
+    blueSum += this.blueAutoDepotMinerals * 2;
+    return blueSum;
+  }
+
+  public getBlueTeleScore(): number {
+    let blueSum: number = 0;
+    blueSum += this.blueTeleCargoSilverMinerals * 5;
+    blueSum += this.blueTeleCargoGoldMinerals * 5;
+    blueSum += this.blueTeleDepotMinerals * 2;
+    return blueSum;
+  }
+
+  public getBlueEndScore(): number {
+    let blueSum: number = 0;
+    switch (this.blueEndRobotOneStatus) {
+      case 1:
+        blueSum += 50;
+        break;
+      case 2:
+        blueSum += 15;
+        break;
+      case 3:
+        blueSum += 25;
+        break;
+      default:
+        blueSum += 0;
+    }
+    switch (this.blueEndRobotTwoStatus) {
+      case 1:
+        blueSum += 50;
+        break;
+      case 2:
+        blueSum += 15;
+        break;
+      case 3:
+        blueSum += 25;
+        break;
+      default:
+        blueSum += 0;
+    }
+    return blueSum;
+  }
+
+  public getBluePenalty(minPen: number, majPen: number): number {
+    return minPen * 10 + majPen * 40;
   }
 
   public getBlueScore(redMinPen: number, redMajPen: number): number {

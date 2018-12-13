@@ -38,6 +38,12 @@ class MatchMakerManager {
           for (const participantJSON of matchJSON.participants) {
             participants.push(new MatchParticipant().fromJSON(participantJSON));
           }
+          match.redScore = -1;
+          match.blueScore = -1;
+          match.redMinPen = 0;
+          match.redMajPen = 0;
+          match.blueMinPen = 0;
+          match.blueMajPen = 0;
           match.participants = participants;
           matches.push(match);
         }

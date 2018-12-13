@@ -84,7 +84,7 @@ class TOAProvider {
       } else {
         records.push(body.toJSON());
       }
-      this._axios.post(url, {records: records}).then((response: AxiosResponse) => {
+      this._axios.post(url, records).then((response: AxiosResponse) => {
         resolve(response);
       }).catch((error) => {
         if (error.response) {
@@ -114,7 +114,11 @@ class TOAProvider {
     return this.delete("api/event/" + eventKey + "/teams");
   }
 
-  public postEventParticipants(eventKey: string, participants: TOAEventParticipant): Promise<AxiosResponse> {
+  public deleteAllMatchData(eventKey: string): Promise<AxiosResponse> {
+    return this.delete("api/event/" + eventKey + "/matches/all");
+  }
+
+  public postEventParticipants(eventKey: string, participants: TOAEventParticipant[]): Promise<AxiosResponse> {
     return this.post("api/event/" + eventKey + "/teams", participants);
   }
 

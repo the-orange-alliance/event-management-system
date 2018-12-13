@@ -20,6 +20,7 @@ import TOAProvider from "../../../shared/providers/TOAProvider";
 import {AxiosResponse} from "axios";
 import TOATeam from "../../../shared/models/toa/TOATeam";
 import EMSTeamAdapter from "../../../shared/adapters/EMSTeamAdapter";
+import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
 
 interface IProps {
   onComplete: () => void,
@@ -129,6 +130,13 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     const updatedTeams: Team[] = this.props.teams;
     for (let i = 0; i < this.props.teams.length; i++) {
       updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + (i + 1);
+    }
+    if (this.props.toaConfig.enabled) {
+      TOAUploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
+        console.log(`${updatedTeams.length} teams have been posted to TOA`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
     }
     EventPostingController.createTeamList(updatedTeams).then(() => {
       setTimeout(() => {

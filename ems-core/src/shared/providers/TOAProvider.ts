@@ -5,6 +5,7 @@ import TOAEventParticipant from "../models/toa/TOAEventParticipant";
 import TOAMatch from "../models/toa/TOAMatch";
 import TOAMatchDetails from "../models/toa/TOAMatchDetails";
 import TOAMatchParticipant from "../models/toa/TOAMatchParticipant";
+import TOARanking from "../models/toa/TOARanking";
 
 class TOAProvider {
   private static _instance: TOAProvider;
@@ -101,6 +102,30 @@ class TOAProvider {
     });
   }
 
+  public put(url: string, body: IPostableObject | IPostableObject[]): Promise<AxiosResponse> {
+    return new Promise((resolve, reject) => {
+      const records: object[] = [];
+      if (body instanceof Array) {
+        for (const record of body) {
+          records.push(record.toJSON());
+        }
+      } else {
+        records.push(body.toJSON());
+      }
+      this._axios.put(url, records).then((response: AxiosResponse) => {
+        resolve(response);
+      }).catch((error) => {
+        if (error.response) {
+          reject(new HttpError(error.response.data._code, error.response.data._message, this._host + url));
+        } else if (error.request) {
+          reject(new HttpError(404, "ERR_CONNECTION_REFUSED", this._host + url));
+        } else {
+          reject(new HttpError(404, error.message, this._host + url));
+        }
+      });
+    });
+  }
+
   public ping(): Promise<AxiosResponse> {
     return this.get("ping");
   }
@@ -121,6 +146,10 @@ class TOAProvider {
     return this.delete("api/event/" + eventKey + "/matches/all?level=" + tournamentLevel);
   }
 
+  public deleteRankings(eventKey: string): Promise<AxiosResponse> {
+    return this.delete("api/event/" + eventKey + "/rankings");
+  }
+
   public postEventParticipants(eventKey: string, participants: TOAEventParticipant[]): Promise<AxiosResponse> {
     return this.post("api/event/" + eventKey + "/teams", participants);
   }
@@ -135,6 +164,22 @@ class TOAProvider {
 
   public postMatchParticipants(eventKey: string, participants: TOAMatchParticipant[]): Promise<AxiosResponse> {
     return this.post("api/event/" + eventKey + "/matches/participants", participants);
+  }
+
+  public postRankings(eventKey: string, rankings: TOARanking[]): Promise<AxiosResponse> {
+    return this.post("api/event/" + eventKey + "/rankings", rankings);
+  }
+
+  public putMatchResults(eventKey: string, match: TOAMatch): Promise<AxiosResponse> {
+    return this.put("api/event/" + eventKey + "/matches/" + match.matchKey, match);
+  }
+
+  public putMatchDetails(eventKey: string, matchDetails: TOAMatchDetails): Promise<AxiosResponse> {
+    return this.put("api/event/" + eventKey + "/matches/" + matchDetails.matchKey + "/details", matchDetails)
+  }
+
+  public putMatchParticipants(eventKey: string, participants: TOAMatchParticipant[]): Promise<AxiosResponse> {
+    return this.put("api/event/" + eventKey + "/matches/" + participants[0].matchKey + "/participants", participants);
   }
 
 }

@@ -1,6 +1,7 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Button, Card, Divider, DropdownProps, Form, Grid, Tab} from "semantic-ui-react";
+import Event from "../../../shared/models/Event";
 import Match from "../../../shared/models/Match";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
@@ -27,11 +28,15 @@ import {disableNavigation, setEliminationsMatches} from "../../../stores/interna
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 import MatchParticipant from "../../../shared/models/MatchParticipant";
 import MatchDetails from "../../../shared/models/MatchDetails";
+import TOAConfig from "../../../shared/models/TOAConfig";
+import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
 
 interface IProps {
   activeMatch?: Match,
   activeDetails?: MatchDetails,
-  activeParticipants?: MatchParticipant[]
+  activeParticipants?: MatchParticipant[],
+  event?: Event,
+  toaConfig?: TOAConfig,
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
   matchState?: MatchState,
@@ -263,6 +268,13 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.setState({committingScores: true});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
+    if (this.props.toaConfig.enabled) {
+      TOAUploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
+        console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
+    }
     MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
@@ -343,6 +355,8 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     activeMatch: scoringState.activeMatch,
     activeDetails: scoringState.activeDetails,
     activeParticipants: scoringState.activeParticipants,
+    event: configState.event,
+    toaConfig: configState.toaConfig,
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,
     matchState: scoringState.matchState,

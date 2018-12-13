@@ -39,7 +39,7 @@ class RoverRuckusRanker implements IMatchRanker {
         const cardStatus: number = JSON.parse("[" + match.cards + "]")[i];
         const isDisqualified: boolean = JSON.parse("[" + match.disqualifieds + "]")[i] === 1;
         const ranking = rankingsMap.get(parseInt(participants[i])) as RoverRuckusRank;
-        if (!isSurrogate && cardStatus <= 1 && !isDisqualified && match.red_score !== null && match.blue_score !== null) {
+        if (!isSurrogate && cardStatus <= 1 && !isDisqualified && match.red_score >= 0 && match.blue_score >= 0) {
           const redTeam = i < (participants.length / 2);
 
           const rp = redTeam && redWin ? 2 : tie ? 1 : !redTeam && !redWin ? 2 : 0;
@@ -51,10 +51,10 @@ class RoverRuckusRanker implements IMatchRanker {
             ranking.highScore = points;
           }
         }
-        if (!isSurrogate && match.red_score !== null && match.blue_score !== null) {
+        if (!isSurrogate && match.red_score >= 0 && match.blue_score >= 0) {
           ranking.tiebreakerPoints += redWin ? match.blue_score : match.red_score;
         }
-        if (match.red_score !== null && match.blue_score !== null) {
+        if (match.red_score >= 0 && match.blue_score >= 0) {
           ranking.played++;
         }
       }

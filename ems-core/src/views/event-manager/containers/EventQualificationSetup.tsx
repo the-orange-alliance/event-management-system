@@ -19,11 +19,14 @@ import HttpError from "../../../shared/models/HttpError";
 import DialogManager from "../../../shared/managers/DialogManager";
 import Match from "../../../shared/models/Match";
 import Event from "../../../shared/models/Event";
+import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
+import TOAConfig from "../../../shared/models/TOAConfig";
 
 interface IProps {
   onComplete: () => void,
   navigationDisabled?: boolean,
   event: Event,
+  toaConfig?: TOAConfig,
   eventConfig?: EventConfiguration,
   teamList?: Team[],
   schedule?: Schedule,
@@ -99,6 +102,13 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
+    if (this.props.toaConfig.enabled) {
+      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.qualificationMatches).then(() => {
+        console.log(`${this.props.qualificationMatches.length} matches have been posted to TOA.`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
+    }
     EventPostingController.createMatchSchedule(1, this.props.qualificationMatches).then(() => {
       EventPostingController.createRanks(this.props.teamList, this.props.event.eventKey).then(() => {
         this.props.setNavigationDisabled(false);
@@ -120,6 +130,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     navigationDisabled: internalState.navigationDisabled,
     teamList: internalState.teamList,
     eventConfig: configState.eventConfiguration,
+    toaConfig: configState.toaConfig,
     event: configState.event,
     schedule: configState.qualificationSchedule,
     qualificationMatches: internalState.qualificationMatches

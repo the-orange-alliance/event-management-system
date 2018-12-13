@@ -117,8 +117,8 @@ class TOAProvider {
     return this.delete("api/event/" + eventKey + "/teams");
   }
 
-  public deleteAllMatchData(eventKey: string): Promise<AxiosResponse> {
-    return this.delete("api/event/" + eventKey + "/matches/all");
+  public deleteMatchData(eventKey: string, tournamentLevel: string): Promise<AxiosResponse> {
+    return this.delete("api/event/" + eventKey + "/matches/all?level=" + tournamentLevel);
   }
 
   public postEventParticipants(eventKey: string, participants: TOAEventParticipant[]): Promise<AxiosResponse> {

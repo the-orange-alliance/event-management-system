@@ -15,12 +15,17 @@ import {disableNavigation, setEliminationsMatches} from "../../../stores/interna
 import EliminationsSchedule from "../../../shared/models/EliminationsSchedule";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
+import Event from "../../../shared/models/Event";
 import Match from "../../../shared/models/Match";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
+import TOAConfig from "../../../shared/models/TOAConfig";
+import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
 
 interface IProps {
   onComplete: () => void,
+  event?: Event,
   eventConfig?: EventConfiguration,
+  toaConfig?: TOAConfig,
   navigationDisabled?: boolean,
   schedule?: EliminationsSchedule,
   elimsMatches?: Match[],
@@ -86,6 +91,13 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
+    if (this.props.toaConfig.enabled) {
+      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.elimsMatches).then(() => {
+        console.log(`${this.props.elimsMatches.length} matches have been posted to TOA.`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
+    }
     EventPostingController.createElimsSchedule(this.props.elimsMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
@@ -100,7 +112,9 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
     navigationDisabled: internalState.navigationDisabled,
+    event: configState.event,
     eventConfig: configState.eventConfiguration,
+    toaConfig: configState.toaConfig,
     schedule: configState.eliminationsSchedule,
     elimsMatches: internalState.eliminationsMatches
   };

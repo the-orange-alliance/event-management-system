@@ -43,11 +43,10 @@ class TOAUploadManager {
 
   public postMatchSchedule(eventKey: string, matches: Match[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      TOAProvider.deleteAllMatchData(eventKey).then(() => {
+      TOAProvider.deleteMatchData(eventKey, getPartialFromLevel(matches[0].tournamentLevel)).then(() => {
         setTimeout(() => {
           const toaMatches: TOAMatch[] = matches.map((m: Match) => {
             const details: MatchDetails = Match.getDetailsFromSeasonKey(parseInt(m.matchKey.split("-")[0], 10));
-            console.log(details);
             return new TOAMatchAdapter(m, details).get();
           });
           const toaDetails: TOAMatchDetails[] = matches.map((m: Match) => {
@@ -61,7 +60,6 @@ class TOAUploadManager {
             }
           }
           const promises: Array<Promise<any>> = [];
-          // console.log(toaMatches, toaDetails);
           promises.push(TOAProvider.postMatches(eventKey, toaMatches));
           promises.push(TOAProvider.postMatchDetails(eventKey, toaDetails));
           promises.push(TOAProvider.postMatchParticipants(eventKey, toaParticipants));
@@ -77,6 +75,18 @@ class TOAUploadManager {
     });
   }
 
+}
+
+function getPartialFromLevel(tournamentLevel: number): string {
+  if (tournamentLevel === 0) {
+    return "P";
+  } else if (tournamentLevel === 1) {
+    return "Q";
+  } else if (tournamentLevel >= 10) {
+    return "E";
+  } else {
+    return "";
+  }
 }
 
 export default TOAUploadManager.getInstance();

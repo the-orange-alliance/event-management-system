@@ -5,6 +5,7 @@ import EventConfiguration from "../../shared/models/EventConfiguration";
 import {ApplicationActions, IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import {PostQualConfig, TournamentLevels} from "../../shared/AppTypes";
+import Event from "../../shared/models/Event";
 import Match from "../../shared/models/Match";
 import {getTheme} from "../../shared/AppTheme";
 import {SyntheticEvent} from "react";
@@ -19,8 +20,12 @@ import DialogManager from "../../shared/managers/DialogManager";
 import {IDisableNavigation, ISetEliminationsMatches} from "../../stores/internal/types";
 import {disableNavigation, setEliminationsMatches} from "../../stores/internal/actions";
 import ConfirmActionModal from "../../components/ConfirmActionModal";
+import TOAConfig from "../../shared/models/TOAConfig";
+import TOAUploadManager from "../../shared/managers/TOAUploadManager";
 
 interface IProps {
+  event?: Event,
+  toaConfig?: TOAConfig,
   eventConfig?: EventConfiguration,
   practiceMatches?: Match[],
   qualificationMatches?: Match[],
@@ -162,6 +167,13 @@ class MatchReviewView extends React.Component<IProps, IState> {
     this.setState({updatingScores: true, confirmModalOpen: false});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
+    if (this.props.toaConfig.enabled) {
+      TOAUploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
+        console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
+    }
     MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({updatingScores: false});
@@ -183,6 +195,8 @@ class MatchReviewView extends React.Component<IProps, IState> {
 
 export function mapStateToProps({configState, internalState, scoringState}: IApplicationState) {
   return {
+    event: configState.event,
+    toaConfig: configState.toaConfig,
     eventConfig: configState.eventConfiguration,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,

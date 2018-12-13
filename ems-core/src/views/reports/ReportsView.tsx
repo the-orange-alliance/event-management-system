@@ -17,6 +17,8 @@ import QualificationRankings from "./reports/QualificationRankings";
 import DialogManager from "../../shared/managers/DialogManager";
 import OtherCompetingTeams from "./reports/OtherCompetingTeams";
 import QualificationMatchResults from "./reports/QualificationMatchResults";
+import QualificationAnnouncers from "./reports/QualificationAnnouncers";
+import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -55,6 +57,8 @@ class ReportsView extends React.Component<IProps, IState> {
     this.generateQualificationRankings = this.generateQualificationRankings.bind(this);
     this.generateCompetingTeams = this.generateCompetingTeams.bind(this);
     this.generateQualificationMatchResults = this.generateQualificationMatchResults.bind(this);
+    this.generateQualificationAnnouncers = this.generateQualificationAnnouncers.bind(this);
+    this.generateEliminationsAnnouncers = this.generateEliminationsAnnouncers.bind(this);
   }
 
   public render() {
@@ -102,7 +106,7 @@ class ReportsView extends React.Component<IProps, IState> {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationMatchResults}>Match Results Report</Button></Grid.Column>
-                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationAnnouncers}>Announcers Report</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -139,7 +143,7 @@ class ReportsView extends React.Component<IProps, IState> {
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
-                  <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Announcers Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateEliminationsAnnouncers}>Announcers Report</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -224,7 +228,7 @@ class ReportsView extends React.Component<IProps, IState> {
 
   private generateReportHTML(htmlStr: string): string {
     const templateHTML = "<html lang=\"en\"><head><meta charSet=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" /><link rel=\"stylesheet\" href=\"./semantic.min.css\" /><title>Generated Report</title><style>%STYLE%</style></head><body>%BODY%</body></html>";
-    return templateHTML.replace("%STYLE%", "@media print {.new-page { page-break-after: always; }}").replace("%BODY%", htmlStr);
+    return templateHTML.replace("%STYLE%", ".blue-bg {background-color: #0069ff !important;}.red-bg {background-color: #ff2733 !important;}@media print {.new-page { page-break-after: always; }}").replace("%BODY%", htmlStr);
   }
 
   private updateHTML(htmlStr: string) {
@@ -242,6 +246,10 @@ class ReportsView extends React.Component<IProps, IState> {
 
   private generateQualificationSchedule() {
     this.generateReport(<QualificationSchedule onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generateQualificationAnnouncers() {
+    this.generateReport(<QualificationAnnouncers onHTMLUpdate={this.updateHTML}/>)
   }
 
   private generatePostQualSchedule() {
@@ -272,11 +280,15 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generateCompetingTeams() {
-    this.generateReport(<OtherCompetingTeams onHTMLUpdate={this.updateHTML}/>)
+    this.generateReport(<OtherCompetingTeams onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationMatchResults() {
-    this.generateReport(<QualificationMatchResults onHTMLUpdate={this.updateHTML}/>)
+    this.generateReport(<QualificationMatchResults onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generateEliminationsAnnouncers() {
+    this.generateReport(<EliminationsAnnouncers onHTMLUpdate={this.updateHTML}/>);
   }
 }
 

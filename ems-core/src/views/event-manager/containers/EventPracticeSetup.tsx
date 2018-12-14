@@ -100,9 +100,9 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
     this.setState({activeIndex: 3});
   }
 
-  private onPublishSchedule() {
+  private onPublishSchedule(postOnline?: boolean) {
     this.props.setNavigationDisabled(true);
-    if (this.props.toaConfig.enabled) {
+    if (postOnline && this.props.toaConfig.enabled) {
       TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.practiceMatches).then(() => {
         console.log(`${this.props.practiceMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {

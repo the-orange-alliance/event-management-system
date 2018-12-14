@@ -58,7 +58,6 @@ class DialogManager {
         reject(new AppError(1202, "BACKUP_ERROR", error));
       });
       const name: string = moment().format("M-DD-YYYY-HH.mm");
-      console.log(name);
       ipcRenderer.send("create-backup", location, name);
     });
   }

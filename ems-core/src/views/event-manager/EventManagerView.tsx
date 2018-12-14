@@ -13,6 +13,8 @@ import EventQualificationSetup from "./containers/EventQualificationSetup";
 import EventFinalsSetup from "./containers/EventFinalsSetup";
 import EventAllianceSelection from "./containers/EventAllianceSelection";
 import EventEliminationsSetup from "./containers/EventEliminationsSetup";
+import EventAwardsSetup from "./containers/EventAwardsSetup";
+import EventDataUpload from "./containers/EventDataUpload";
 
 interface IProps {
   completedStep?: number,
@@ -147,6 +149,10 @@ class EventManagerView extends React.Component<IProps, IState> {
           <EventFinalsSetup onComplete={this.completeStep.bind(this, 6)}/>
           :
           <EventEliminationsSetup onComplete={this.completeStep.bind(this, 6)}/>;
+      case 7:
+        return <EventAwardsSetup onComplete={this.completeStep.bind(this, 7)}/>;
+      case 8:
+        return <EventDataUpload/>;
       default:
         return <span>View not found.</span>;
     }

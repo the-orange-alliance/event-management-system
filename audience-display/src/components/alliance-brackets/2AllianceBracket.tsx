@@ -1,8 +1,14 @@
 import * as React from 'react';
 import "./AllianceBracket.css";
+import Match from "../../shared/models/Match";
+import MatchParticipant from "../../shared/models/MatchParticipant";
 
-class TwoAllianceBracket extends React.Component {
-  constructor(props: any) {
+interface IProps {
+  allianceMatches: Map<number, Match[]>
+}
+
+class TwoAllianceBracket extends React.Component<IProps> {
+  constructor(props: IProps) {
     super(props);
   }
 
@@ -12,10 +18,10 @@ class TwoAllianceBracket extends React.Component {
         <div className="bracket-col">
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              {this.renderAlliance(40, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              {this.renderAlliance(40, false)}
             </div>
           </div>
         </div>
@@ -27,6 +33,33 @@ class TwoAllianceBracket extends React.Component {
         </div>
       </div>
     );
+  }
+
+  private renderAlliance(tournamentLevel: number, redAlliance: boolean): any {
+    if (typeof this.props.allianceMatches.get(tournamentLevel) !== "undefined") {
+      const matches: Match[] = this.props.allianceMatches.get(tournamentLevel) as Match[];
+      if (matches.length > 0) {
+        const allianceMembers: MatchParticipant[] = [];
+        for (const participant of matches[0].participants) {
+          if (redAlliance && participant.station < 20) {
+            allianceMembers.push(participant);
+          }
+          if (!redAlliance && participant.station >= 20) {
+            allianceMembers.push(participant);
+          }
+        }
+        const view = allianceMembers.map((p: MatchParticipant) => {
+          return (
+            <span key={p.matchParticipantKey}>{p.teamKey}&nbsp;&nbsp;</span>
+          );
+        });
+        return view;
+      } else {
+        return <span/>;
+      }
+    } else {
+      return <span/>;
+    }
   }
 }
 

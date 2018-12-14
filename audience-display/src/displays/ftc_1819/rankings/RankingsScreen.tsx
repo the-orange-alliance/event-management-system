@@ -114,7 +114,21 @@ class RankingsScreen extends React.Component<IProps, IState> {
     setTimeout(() => {
       this.scrollBottomThenTop().then(() => {
         this._timerID = global.setInterval(() => {
-          this.scrollBottomThenTop();
+          this.scrollBottomThenTop().then(() => {
+            EMSProvider.getRankingTeams().then((response: AxiosResponse) => {
+              if (response.data && response.data.payload && response.data.payload.length > 0) {
+                const rankings: RoverRuckusRank[] = [];
+                for (const rankJSON of response.data.payload) {
+                  const ranking: RoverRuckusRank = new RoverRuckusRank().fromJSON(rankJSON);
+                  ranking.team = new Team().fromJSON(rankJSON);
+                  rankings.push(ranking);
+                }
+                this.setState({rankings: rankings});
+              }
+            }).catch((error: any) => {
+              console.error(error);
+            });
+          });
         }, 52000);
       });
     }, 10000);

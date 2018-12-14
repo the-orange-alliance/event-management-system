@@ -86,7 +86,7 @@ export default class ScoringRoom implements IRoom {
       }, 500);
     });
     client.on("score-update", (matchJSON: any) => {
-      if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART) {
+      if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART || !this._hasCommittedScore) {
         if (matchJSON[0] && typeof matchJSON[0].match_key !== "undefined" && matchJSON[0].match_key.length > 0) {
           ScoreManager.updateMatch(matchJSON[0]);
           this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());

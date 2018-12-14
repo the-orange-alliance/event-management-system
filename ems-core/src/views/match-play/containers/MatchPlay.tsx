@@ -148,7 +148,7 @@ class MatchPlay extends React.Component<IProps, IState> {
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[1]} color="blue" onClick={this.setAudienceDisplay}>Set Audience Display</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[2]} color="purple" onClick={this.startMatch}>Start Match</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[3]} color="red" onClick={this.abortMatch}>Abort Match</Button></Grid.Column>
-            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4] || !connected} loading={committingScores} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
+            <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4]} loading={committingScores} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
           </Grid.Row>
         </Grid>
         <Divider/>

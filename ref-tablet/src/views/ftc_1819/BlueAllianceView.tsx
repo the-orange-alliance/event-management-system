@@ -163,10 +163,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
     return (
       <div>
         <Row>
-          <Col sm={6}>
+          <Col sm={12}>
             <RobotButtonGroup value={preOneStatus} participant={participantOne} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOnePreState}/>
           </Col>
-          <Col sm={6}>
+          <Col sm={12}>
             <RobotButtonGroup value={preTwoStatus} participant={participantTwo} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoPreState}/>
           </Col>
         </Row>
@@ -218,13 +218,13 @@ class RedAllianceView extends React.Component<IProps, IState> {
     return (
       <div>
         <Row>
-          <Col md={4}>
+          <Col sm={4}>
             <RobotNumberInput value={silverMinerals} image={SILVER_MINERAL} min={0} max={50} onChange={this.changeTeleSilver}/>
           </Col>
-          <Col md={4}>
+          <Col sm={4}>
             <RobotNumberInput value={goldMinerals} image={GOLD_MINERAL} min={0} max={50} onChange={this.changeTeleGold}/>
           </Col>
-          <Col md={4}>
+          <Col sm={4}>
             <RobotNumberInput value={depotMinerals} image={DEPOT_MINERALS} min={0} max={50} onChange={this.changeTeleDepot}/>
           </Col>
         </Row>
@@ -262,18 +262,18 @@ class RedAllianceView extends React.Component<IProps, IState> {
     return (
       <div>
         <Row>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotCardStatus participant={participantOne} onUpdate={this.updateRobotOneCard}/>
           </Col>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotCardStatus participant={participantTwo} onUpdate={this.updateRobotTwoCard}/>
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotPenaltyInput value={minorPenalties} label={"Minor Penalties"} min={0} max={255} onChange={this.changeMinorPenalties}/>
           </Col>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotPenaltyInput value={majorPenalties} label={"Major Penalties"} min={0} max={255} onChange={this.changeMajorPenalties}/>
           </Col>
         </Row>

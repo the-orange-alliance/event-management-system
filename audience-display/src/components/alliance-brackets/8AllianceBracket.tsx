@@ -1,8 +1,14 @@
 import * as React from 'react';
 import "./AllianceBracket.css";
+import Match from "../../shared/models/Match";
+import MatchParticipant from "../../shared/models/MatchParticipant";
 
-class EightAllianceBracket extends React.Component {
-  constructor(props: any) {
+interface IProps {
+  allianceMatches: Map<number, Match[]>
+}
+
+class EightAllianceBracket extends React.Component<IProps> {
+  constructor(props: IProps) {
     super(props);
   }
 
@@ -16,34 +22,34 @@ class EightAllianceBracket extends React.Component {
           <div className="bracket-pipe semi-pipe-2-bot-x"/>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              1.&nbsp;{this.renderAlliance(20, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              8.&nbsp;{this.renderAlliance(20, false)}
             </div>
           </div>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              4.&nbsp;{this.renderAlliance(21, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              5.&nbsp;{this.renderAlliance(21, false)}
             </div>
           </div>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              2.&nbsp;{this.renderAlliance(22, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              7.&nbsp;{this.renderAlliance(22, false)}
             </div>
           </div>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              3.&nbsp;{this.renderAlliance(23, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              6.&nbsp;{this.renderAlliance(23, false)}
             </div>
           </div>
         </div>
@@ -54,18 +60,18 @@ class EightAllianceBracket extends React.Component {
           <div className="bracket-pipe semi-pipe-2-bot-y"/>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              {this.renderAlliance(30, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              {this.renderAlliance(30, false)}
             </div>
           </div>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              {this.renderAlliance(31, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              {this.renderAlliance(31, false)}
             </div>
           </div>
           <div className="bracket-pipe final-pipe-top-x"/>
@@ -76,10 +82,10 @@ class EightAllianceBracket extends React.Component {
           <div className="bracket-pipe final-pipe-bot-y"/>
           <div className="bracket-box">
             <div className="bracket-box-alliance red-bg">
-              1. 3618, 4003, 67
+              {this.renderAlliance(40, true)}
             </div>
             <div className="bracket-box-alliance blue-bg">
-              8. 4381, 4237, 254
+              {this.renderAlliance(40, false)}
             </div>
           </div>
         </div>
@@ -91,6 +97,33 @@ class EightAllianceBracket extends React.Component {
         </div>
       </div>
     );
+  }
+
+  private renderAlliance(tournamentLevel: number, redAlliance: boolean): any {
+    if (typeof this.props.allianceMatches.get(tournamentLevel) !== "undefined") {
+      const matches: Match[] = this.props.allianceMatches.get(tournamentLevel) as Match[];
+      if (matches.length > 0) {
+        const allianceMembers: MatchParticipant[] = [];
+        for (const participant of matches[0].participants) {
+          if (redAlliance && participant.station < 20) {
+            allianceMembers.push(participant);
+          }
+          if (!redAlliance && participant.station >= 20) {
+            allianceMembers.push(participant);
+          }
+        }
+        const view = allianceMembers.map((p: MatchParticipant) => {
+          return (
+            <span key={p.matchParticipantKey}>{p.teamKey}&nbsp;&nbsp;</span>
+          );
+        });
+        return view;
+      } else {
+        return <span/>;
+      }
+    } else {
+      return <span/>;
+    }
   }
 }
 

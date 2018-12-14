@@ -88,6 +88,10 @@ class EMSProvider {
   public getAlliances(): Promise<AxiosResponse> {
     return this.get("api/alliance");
   }
+
+  public getMatches(tournamentLevel: number | string): Promise<AxiosResponse> {
+    return this.get("api/match?level=" + tournamentLevel);
+  }
 }
 
 export default EMSProvider.getInstance();

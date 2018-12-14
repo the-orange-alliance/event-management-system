@@ -21,6 +21,9 @@ export default class RoverRuckusRank extends Ranking {
     rank.rank = json.rank;
     rank.rankChange = json.rank_change;
     rank.played = json.played;
+    rank.wins = json.wins;
+    rank.losses = json.losses;
+    rank.ties = json.ties;
     rank.rankingPoints = json.ranking_points;
     rank.tiebreakerPoints = json.tiebreaker_points;
     rank.totalPoints = json.total_points;
@@ -35,6 +38,9 @@ export default class RoverRuckusRank extends Ranking {
       rank: this.rank,
       rank_change: this.rankChange,
       played: this.played,
+      wins: this.wins,
+      losses: this.losses,
+      ties: this.ties,
       ranking_points: this.rankingPoints,
       tiebreaker_points: this.tiebreakerPoints,
       total_points: this.totalPoints,

@@ -5,30 +5,62 @@ import Event from "../../../shared/models/Event";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 import EightAllianceBracket from "../../../components/alliance-brackets/8AllianceBracket";
-import AllianceMember from "../../../shared/models/AllianceMember";
+import EMSProvider from "../../../shared/providers/EMSProvider";
+import {AxiosResponse} from "axios";
+import MatchParticipant from "../../../shared/models/MatchParticipant";
+import Match from "../../../shared/models/Match";
 
 interface IProps {
   event: Event
 }
 
 interface IState {
-  alliances: Map<number, AllianceMember[]>
+  tournamentLevelMatches: Map<number, Match[]>
 }
 
 class AllianceBracketScreen extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      alliances: new Map<number, AllianceMember[]>()
+      tournamentLevelMatches: new Map<number, Match[]>()
     };
   }
 
   public componentDidMount() {
-    this.setState({alliances: this.getAllianceMap()});
+    EMSProvider.getMatches("elims").then((elimsMatchesResposne: AxiosResponse) => {
+      if (elimsMatchesResposne.data && elimsMatchesResposne.data.payload && elimsMatchesResposne.data.payload.length > 0) {
+        const elimsMatches: Match[] = [];
+        for (const matchJSON of elimsMatchesResposne.data.payload) {
+          const match: Match = new Match().fromJSON(matchJSON);
+          const participants: MatchParticipant[] = [];
+          for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
+            const participant: MatchParticipant = new MatchParticipant();
+            participant.allianceKey = matchJSON.alliance_keys.split(",")[i];
+            participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
+            participant.matchKey = match.matchKey;
+            participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
+            participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
+            participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
+            participants.push(participant);
+          }
+          match.participants = participants;
+          elimsMatches.push(match);
+        }
+        const map: Map<number, Match[]> = new Map<number, Match[]>();
+        for (const match of elimsMatches) {
+          if (typeof map.get(match.tournamentLevel) === "undefined") {
+            map.set(match.tournamentLevel, []);
+          }
+          (map.get(match.tournamentLevel) as Match[]).push(match);
+        }
+        this.setState({tournamentLevelMatches: map});
+      }
+    });
   }
 
   public render() {
     const {event} = this.props;
+    const {tournamentLevelMatches} = this.state;
     return (
       <div id="rr-body">
         <div id="rr-container">
@@ -38,15 +70,11 @@ class AllianceBracketScreen extends React.Component<IProps, IState> {
             <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-at-mid" className="rr-border">
-            <EightAllianceBracket/>
+            <EightAllianceBracket allianceMatches={tournamentLevelMatches}/>
           </div>
         </div>
       </div>
     );
-  }
-
-  private getAllianceMap(): Map<number, AllianceMember[]> {
-    return new Map<number, AllianceMember[]>();
   }
 }
 

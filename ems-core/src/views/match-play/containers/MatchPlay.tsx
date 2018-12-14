@@ -40,6 +40,7 @@ interface IProps {
   activeParticipants?: MatchParticipant[],
   event?: Event,
   toaConfig?: TOAConfig,
+  backupDir?: string,
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
   matchState?: MatchState,
@@ -291,9 +292,16 @@ class MatchPlay extends React.Component<IProps, IState> {
           if (this.props.elimsMatches.length < matches.length) {
             this.props.setEliminationsMatches(matches);
           }
+          if (this.props.backupDir.length > 0) {
+            DialogManager.createBackup(this.props.backupDir);
+          }
         }).catch((error: HttpError) => {
           console.error(error);
         });
+      } else {
+        if (this.props.backupDir.length > 0) {
+          DialogManager.createBackup(this.props.backupDir);
+        }
       }
     }).catch((error: HttpError) => {
       this.setState({committingScores: false});
@@ -364,6 +372,7 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     activeParticipants: scoringState.activeParticipants,
     event: configState.event,
     toaConfig: configState.toaConfig,
+    backupDir: configState.backupDir,
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,
     matchState: scoringState.matchState,

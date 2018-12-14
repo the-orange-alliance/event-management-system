@@ -30,8 +30,11 @@ import MatchParticipant from "../../../shared/models/MatchParticipant";
 import MatchDetails from "../../../shared/models/MatchDetails";
 import TOAConfig from "../../../shared/models/TOAConfig";
 import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
+import MatchTimer from "../../../shared/scoring/MatchTimer";
 
 interface IProps {
+  mode: string,
+  timer: MatchTimer,
   activeMatch?: Match,
   activeDetails?: MatchDetails,
   activeParticipants?: MatchParticipant[],
@@ -88,7 +91,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   public render() {
     const {selectedLevel, committingScores} = this.state;
-    const {eventConfig, matchState, connected, matchDuration} = this.props;
+    const {eventConfig, matchState, connected, matchDuration, mode} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
     const availableLevels = this.getAvailableTournamentLevels(eventConfig.postQualConfig).map(tournamentLevel => {
@@ -126,7 +129,7 @@ class MatchPlay extends React.Component<IProps, IState> {
         <Grid columns="equal">
           <Grid.Row>
             <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
-            <Grid.Column textAlign="center"><b>{disMin}:{disSec} </b></Grid.Column>
+            <Grid.Column textAlign="center"><b>{disMin}:{disSec} </b>({mode})</Grid.Column>
             <Grid.Column textAlign="right"><b>Connection Status: </b><span className={connected ? "success-text" : "error-text"}>{connected ? "OKAY" : "NO CONNECTION"}</span></Grid.Column>
           </Grid.Row>
         </Grid>
@@ -199,6 +202,10 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private startMatch() {
+    SocketProvider.once("match-start", (timerJSON: any) => {
+      this.props.timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
+      this.props.timer.start();
+    });
     SocketProvider.once("match-end", () => {
       console.log(this.props.activeMatch.matchKey);
       this.props.setMatchState(MatchState.MATCH_COMPLETE);

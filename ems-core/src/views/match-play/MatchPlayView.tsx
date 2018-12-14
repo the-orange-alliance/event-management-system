@@ -12,7 +12,6 @@ import {Dispatch} from "redux";
 import {setMatchDuration} from "../../stores/scoring/actions";
 import MatchTimer from "../../shared/scoring/MatchTimer";
 import {MatchMode} from "../../shared/scoring/MatchMode";
-import MatchConfiguration from "../../shared/models/MatchConfiguration";
 
 interface IProps {
   matchDuration?: moment.Duration,
@@ -20,7 +19,8 @@ interface IProps {
 }
 
 interface IState {
-  activeIndex: number
+  activeIndex: number,
+  mode: string
 }
 
 class MatchPlayView extends React.Component<IProps, IState> {
@@ -29,16 +29,36 @@ class MatchPlayView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeIndex: 0
+      activeIndex: 0,
+      mode: "???"
     };
     this._timer = new MatchTimer();
     this.onTabChange = this.onTabChange.bind(this);
   }
 
   public componentDidMount() {
-    SocketProvider.on("match-start", (timerJSON: any) => {
-      this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
-      this._timer.start();
+    this._timer.on("match-start", () => {
+      console.log('MATCH START');
+      this.setState({mode: "AUTO"});
+      this._timer.on("match-transition", () => this.setState({mode: "TRANSITION"}));
+      this._timer.on("match-tele", () => this.setState({mode: "TELE"}));
+      this._timer.on("match-endgame", () => this.setState({mode: "ENDGAME"}));
+      SocketProvider.on("match-end", () => {
+        this.setState({mode: "MATCH END"});
+        this._timer.removeAllListeners("match-transition");
+        this._timer.removeAllListeners("match-tele");
+        this._timer.removeAllListeners("match-endgame");
+        this._timer.removeAllListeners("match-abort");
+        this._timer.stop();
+      });
+      SocketProvider.on("match-abort", () => {
+        this._timer.removeAllListeners("match-transition");
+        this._timer.removeAllListeners("match-tele");
+        this._timer.removeAllListeners("match-endgame");
+        this._timer.removeAllListeners("match-end");
+        this.setState({mode: "ABORTED"});
+        this._timer.abort();
+      });
       this.updateTimer();
       const timerID = global.setInterval(() => {
         this.updateTimer();
@@ -46,28 +66,22 @@ class MatchPlayView extends React.Component<IProps, IState> {
           this.updateTimer();
           global.clearInterval(timerID);
         }
-      }, 1000);
-    });
-    SocketProvider.on("match-end", () => {
-      this._timer.stop();
-    });
-    SocketProvider.on("match-abort", () => {
-      this._timer.abort();
+      }, 500);
     });
   }
 
   public componentWillUnmount() {
-    SocketProvider.off("match-start");
     SocketProvider.off("match-end");
     SocketProvider.off("match-abort");
     this._timer.stop();
   }
 
   public render() {
+    const {mode} = this.state;
     return (
       <div className="view">
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={ [
-          { menuItem: "Match Play", render: () => <MatchPlay/>},
+          { menuItem: "Match Play", render: () => <MatchPlay mode={mode} timer={this._timer}/>},
           { menuItem: "Video Switch", render: () => <VideoSwitch/>},
         ]}/>
       </div>

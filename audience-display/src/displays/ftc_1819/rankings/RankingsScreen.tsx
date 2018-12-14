@@ -5,7 +5,7 @@ import EMSProvider from "../../../shared/providers/EMSProvider";
 import Team from "../../../shared/models/Team";
 import {AxiosResponse} from "axios";
 import RoverRuckusRank from "../../../shared/models/RoverRuckusRank";
-
+import * as ReactScroll from "react-scroll";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 
@@ -19,9 +19,11 @@ interface IState {
 }
 
 class RankingsScreen extends React.Component<IProps, IState> {
+  private _timerID: any;
+
   constructor(props: IProps) {
     super(props);
-
+    this._timerID = null;
     this.state = {
       rankings: [],
       loading: true
@@ -38,6 +40,7 @@ class RankingsScreen extends React.Component<IProps, IState> {
           rankings.push(ranking);
         }
         this.setState({rankings: rankings, loading: false});
+        this.loop();
       } else {
         this.setState({loading: false});
       }
@@ -45,6 +48,12 @@ class RankingsScreen extends React.Component<IProps, IState> {
       console.error(error);
       this.setState({loading: false});
     });
+  }
+
+  public componentWillUnmount() {
+    if (this._timerID !== null) {
+      global.clearInterval(this._timerID);
+    }
   }
 
   public render() {
@@ -63,7 +72,11 @@ class RankingsScreen extends React.Component<IProps, IState> {
         </tr>
       );
     });
-
+    rankingsView.push(
+      <tr key={"rankings-bottom"} style={{height: 0}}>
+        <td><ReactScroll.Element name="rankings-bottom"/></td>
+      </tr>
+    );
     return !loading ? (
       <div id="rr-body">
         <div id="rr-container">
@@ -74,6 +87,7 @@ class RankingsScreen extends React.Component<IProps, IState> {
           </div>
           <div id="rr-rank-mid" className="rr-border">
             <div id="rr-rank-table-container">
+              <ReactScroll.Element name="rankings-top"/>
               <table>
                 <thead>
                   <tr>
@@ -85,7 +99,7 @@ class RankingsScreen extends React.Component<IProps, IState> {
                     <th className="rr-play">Matches Played</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="rr-rank-scrollview">
                   {rankingsView}
                 </tbody>
               </table>
@@ -94,6 +108,54 @@ class RankingsScreen extends React.Component<IProps, IState> {
         </div>
       </div>
     ) : <span/>;
+  }
+
+  private loop() {
+    setTimeout(() => {
+      this.scrollBottomThenTop().then(() => {
+        this._timerID = global.setInterval(() => {
+          this.scrollBottomThenTop();
+        }, 52000);
+      });
+    }, 10000);
+  }
+
+  private scrollBottomThenTop(): Promise<any> {
+    return new Promise<any>((funcResolve, funcReject) => {
+      const scrollToBottom = new Promise((resolve, reject) => {
+        ReactScroll.Events.scrollEvent.register("end", () => {
+          ReactScroll.Events.scrollEvent.remove("end");
+          resolve();
+        });
+        this.scrollToBottom(48000);
+      });
+      scrollToBottom.then(() => {
+        this.scrollToTop(4000);
+        setTimeout(() => {
+          funcResolve();
+        });
+      });
+    });
+  }
+
+  private scrollToBottom(duration: number): void {
+    ReactScroll.scroller.scrollTo("rankings-bottom", {
+      duration: duration,
+      delay: 0,
+      smooth: "linear",
+      containerId: "rr-rank-scrollview",
+      ignoreCancelEvents: true
+    });
+  }
+
+  private scrollToTop(duration: number): void {
+    ReactScroll.animateScroll.scrollToTop({
+      duration: duration,
+      delay: 0,
+      smooth: true,
+      containerId: "rr-rank-scrollview",
+      ignoreCancelEvents: true
+    });
   }
 }
 

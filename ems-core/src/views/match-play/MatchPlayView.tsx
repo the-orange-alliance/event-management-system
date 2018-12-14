@@ -10,6 +10,9 @@ import SocketProvider from "../../shared/providers/SocketProvider";
 import {ISetMatchDuration} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setMatchDuration} from "../../stores/scoring/actions";
+import MatchTimer from "../../shared/scoring/MatchTimer";
+import {MatchMode} from "../../shared/scoring/MatchMode";
+import MatchConfiguration from "../../shared/models/MatchConfiguration";
 
 interface IProps {
   matchDuration?: moment.Duration,
@@ -17,30 +20,39 @@ interface IProps {
 }
 
 interface IState {
-  activeIndex: number,
-  timerID: any
+  activeIndex: number
 }
 
 class MatchPlayView extends React.Component<IProps, IState> {
+  private _timer: MatchTimer;
+
   constructor(props: IProps) {
     super(props);
     this.state = {
-      activeIndex: 0,
-      timerID: null
+      activeIndex: 0
     };
+    this._timer = new MatchTimer();
     this.onTabChange = this.onTabChange.bind(this);
   }
 
   public componentDidMount() {
-    SocketProvider.on("match-start", (time: number) => {
-      this.props.setMatchDuration(moment.duration(time, "seconds"));
-      this.startTimer();
+    SocketProvider.on("match-start", (timerJSON: any) => {
+      this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
+      this._timer.start();
+      this.updateTimer();
+      const timerID = global.setInterval(() => {
+        this.updateTimer();
+        if (this._timer.timeLeft <= 0) {
+          this.updateTimer();
+          global.clearInterval(timerID);
+        }
+      }, 1000);
     });
     SocketProvider.on("match-end", () => {
-      this.stopTimer();
+      this._timer.stop();
     });
     SocketProvider.on("match-abort", () => {
-      this.stopTimer();
+      this._timer.abort();
     });
   }
 
@@ -48,7 +60,7 @@ class MatchPlayView extends React.Component<IProps, IState> {
     SocketProvider.off("match-start");
     SocketProvider.off("match-end");
     SocketProvider.off("match-abort");
-    this.stopTimer();
+    this._timer.stop();
   }
 
   public render() {
@@ -62,23 +74,19 @@ class MatchPlayView extends React.Component<IProps, IState> {
     );
   }
 
+  private updateTimer() {
+    let displayTime: number = this._timer.timeLeft;
+    if (this._timer.mode === MatchMode.TRANSITION) {
+      displayTime = this._timer.modeTimeLeft;
+    }
+    if (this._timer.mode === MatchMode.AUTONOMOUS && this._timer.matchConfig.transitionTime > 0) {
+      displayTime = this._timer.timeLeft - this._timer.matchConfig.transitionTime;
+    }
+    this.props.setMatchDuration(moment.duration(displayTime, "seconds"));
+  }
+
   private onTabChange(event: SyntheticEvent, props: TabProps) {
     this.setState({activeIndex: parseInt(props.activeIndex as string, 10)});
-  }
-
-  private startTimer() {
-    const timerID = global.setInterval(() => {
-      const newDuration = moment.duration(this.props.matchDuration.subtract(1, "s"));
-      this.props.setMatchDuration(newDuration);
-    }, 1000);
-    this.setState({timerID: timerID});
-  }
-
-  private stopTimer() {
-    if (this.state.timerID !== null) {
-      global.clearInterval(this.state.timerID);
-      this.setState({timerID: null});
-    }
   }
 }
 

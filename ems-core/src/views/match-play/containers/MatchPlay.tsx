@@ -126,7 +126,7 @@ class MatchPlay extends React.Component<IProps, IState> {
         <Grid columns="equal">
           <Grid.Row>
             <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
-            <Grid.Column textAlign="center"><b>{disMin}:{disSec} </b>(TELEOP)</Grid.Column>
+            <Grid.Column textAlign="center"><b>{disMin}:{disSec} </b></Grid.Column>
             <Grid.Column textAlign="right"><b>Connection Status: </b><span className={connected ? "success-text" : "error-text"}>{connected ? "OKAY" : "NO CONNECTION"}</span></Grid.Column>
           </Grid.Row>
         </Grid>

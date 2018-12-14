@@ -15,6 +15,7 @@ export default class ScoringRoom implements IRoom {
   private _currentMatchKey: string;
   private _currentFieldNumber: number;
   private _currentVideoID: number;
+  private _mode: string;
 
   constructor(server: Server, matchTimer: MatchTimer) {
     this._server = server;
@@ -26,6 +27,7 @@ export default class ScoringRoom implements IRoom {
     this._currentMatchKey = "";
     this._currentFieldNumber = -1;
     this._currentVideoID = -1;
+    this._mode = "UNDEFINED";
   }
 
   public addClient(client: Socket) {
@@ -78,6 +80,11 @@ export default class ScoringRoom implements IRoom {
       }, 500);
     }
 
+    client.on("get-mode", () => {
+      setTimeout(() => {
+        client.emit("mode-update", this._mode);
+      }, 500);
+    });
     client.on("score-update", (matchJSON: any) => {
       if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART) {
         if (matchJSON[0] && typeof matchJSON[0].match_key !== "undefined" && matchJSON[0].match_key.length > 0) {
@@ -100,7 +107,7 @@ export default class ScoringRoom implements IRoom {
       this._hasPrestarted = true;
       this._currentMatchKey = matchKey;
       this._currentFieldNumber = fieldNumber;
-
+      this._mode = "PRESTART";
       this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
       this._server.to("referee").emit("data-update", ScoreManager.matchMetadata.toJSON());
     });
@@ -116,15 +123,18 @@ export default class ScoringRoom implements IRoom {
           this._hasCommittedScore = false;
           this._hasPrestarted = false;
           this._currentVideoID = 2; // Universal MatchPlay screen.
+          this._mode = "AUTONOMOUS";
         });
         this._timer.once("match-auto", () => {
           this._server.to("scoring").emit("match-auto");
         });
         this._timer.once("match-tele", () => {
           this._server.to("scoring").emit("match-tele");
+          this._mode = "TELEOP";
         });
         this._timer.once("match-endgame", () => {
           this._server.to("scoring").emit("match-endgame");
+          this._mode = "ENDGAME";
         });
         this._timer.once("match-end", () => {
           this._server.to("scoring").emit("match-end");
@@ -132,6 +142,7 @@ export default class ScoringRoom implements IRoom {
           this._timer.removeAllListeners("match-auto");
           this._timer.removeAllListeners("match-tele");
           this._timer.removeAllListeners("match-endgame");
+          this._mode = "MATCH END";
         });
         this._timer.once("match-abort", () => {
           this._server.to("scoring").emit("match-abort");
@@ -139,6 +150,7 @@ export default class ScoringRoom implements IRoom {
           this._timer.removeAllListeners("match-auto");
           this._timer.removeAllListeners("match-tele");
           this._timer.removeAllListeners("match-endgame");
+          this._mode = "MATCH ABORTED";
         });
         this._timer.start();
       }

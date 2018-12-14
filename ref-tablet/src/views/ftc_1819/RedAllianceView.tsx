@@ -143,9 +143,9 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const matchDetails = activeMatch.matchDetails as RoverRuckusMatchDetails;
     const preOneStatus = matchDetails.redPreRobotOneStatus;
     const preTwoStatus = matchDetails.redPreRobotTwoStatus;
-    const silverMinerals = matchDetails.redAutoCargoSilverMinerals || 0;
-    const goldMinerals = matchDetails.redAutoCargoGoldMinerals || 0;
-    const depotMinerals = matchDetails.redAutoDepotMinerals || 0;
+    const silverMinerals = matchDetails.redTeleCargoSilverMinerals || 0;
+    const goldMinerals = matchDetails.redTeleCargoGoldMinerals || 0;
+    const depotMinerals = matchDetails.redTeleDepotMinerals || 0;
     const redOneClaimed = matchDetails.redAutoRobotOneClaimed;
     const redTwoClaimed = matchDetails.redAutoRobotTwoClaimed;
     const autoOneStatus = matchDetails.redAutoRobotOneStatus;
@@ -162,45 +162,45 @@ class RedAllianceView extends React.Component<IProps, IState> {
     return (
       <div>
         <Row>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotButtonGroup value={preOneStatus} participant={participantOne} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotOnePreState}/>
           </Col>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotButtonGroup value={preTwoStatus} participant={participantTwo} states={["Not Present", "Not Latched", "Latched", "Landed"]} onChange={this.changeRobotTwoPreState}/>
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotClaimToggle alliance={"red"} value={redOneClaimed} participant={participantOne} onToggle={this.toggleRobotOneClaim}/>
           </Col>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotClaimToggle alliance={"red"} value={redTwoClaimed} participant={participantTwo} onToggle={this.toggleRobotTwoClaim}/>
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotSampling goldStatus={sampleOneGold} silverOneStatus={sampleOneSilverOne} silverTwoStatus={sampleOneSilverTwo} onChange={this.changeSampleOne}/>
           </Col>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotSampling goldStatus={sampleTwoGold} silverOneStatus={sampleTwoSilverOne} silverTwoStatus={sampleTwoSilverTwo} onChange={this.changeSampleTwo}/>
           </Col>
         </Row>
         <Row>
-          <Col md={4}>
-            <RobotNumberInput value={silverMinerals} image={SILVER_MINERAL} min={0} max={50} onChange={this.changeAutoSilver}/>
+          <Col sm={4}>
+            <RobotNumberInput value={silverMinerals} image={SILVER_MINERAL} min={0} max={50} onChange={this.changeTeleSilver}/>
           </Col>
-          <Col md={4}>
-            <RobotNumberInput value={goldMinerals} image={GOLD_MINERAL} min={0} max={50} onChange={this.changeAutoGold}/>
+          <Col sm={4}>
+            <RobotNumberInput value={goldMinerals} image={GOLD_MINERAL} min={0} max={50} onChange={this.changeTeleGold}/>
           </Col>
-          <Col md={4}>
-            <RobotNumberInput value={depotMinerals} image={DEPOT_MINERALS} min={0} max={50} onChange={this.changeAutoDepot}/>
+          <Col sm={4}>
+            <RobotNumberInput value={depotMinerals} image={DEPOT_MINERALS} min={0} max={50} onChange={this.changeTeleDepot}/>
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotButtonGroup value={autoOneStatus} participant={participantOne} states={["Not Parked", "Parked"]} onChange={this.changeRobotOneAutoState}/>
           </Col>
-          <Col md={6}>
+          <Col sm={6}>
             <RobotButtonGroup value={autoTwoStatus} participant={participantTwo} states={["Not Parked", "Parked"]} onChange={this.changeRobotTwoAutoState}/>
           </Col>
         </Row>

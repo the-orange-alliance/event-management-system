@@ -18,7 +18,7 @@ class AppStore {
     this._name = name;
   }
 
-  public set(key: string, data: object): Promise<object> {
+  public set(key: string, data: object | string): Promise<object> {
     return new Promise<object>((resolve, reject) => {
       ipcRenderer.once("store-set-success", (event: any, storeState: object) => {
         resolve(storeState);

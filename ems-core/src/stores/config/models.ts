@@ -17,5 +17,6 @@ export interface IConfigState {
   qualificationSchedule: Schedule
   finalsSchedule: Schedule
   eliminationsSchedule: EliminationsSchedule,
-  toaConfig: TOAConfig
+  toaConfig: TOAConfig,
+  backupDir: string
 }

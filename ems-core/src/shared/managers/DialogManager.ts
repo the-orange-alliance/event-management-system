@@ -1,6 +1,7 @@
 import {FileFilter} from "electron";
 import AppError from "../models/AppError";
 import HttpError from "../models/HttpError";
+import * as moment from "moment";
 
 interface IOpenDialogProps {
   title?: string,
@@ -45,6 +46,20 @@ class DialogManager {
         reject(new AppError(1201, "DIALOG_OPEN", error));
       });
       ipcRenderer.send("open-dialog", props);
+    });
+  }
+
+  public createBackup(location: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      ipcRenderer.once("create-backup-success", () => {
+        resolve();
+      });
+      ipcRenderer.once("create-backup-error", (event: any, error: any) => {
+        reject(new AppError(1202, "BACKUP_ERROR", error));
+      });
+      const name: string = moment().format("M-DD-YYYY-HH.mm");
+      console.log(name);
+      ipcRenderer.send("create-backup", location, name);
     });
   }
 

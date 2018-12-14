@@ -1,5 +1,6 @@
 import {ActionCreator} from "redux";
 import {
+  SET_BACKUP_DIR,
   SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
@@ -9,6 +10,7 @@ import {
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {
+  ISetBackupDir,
   ISetEliminationsSchedule,
   ISetEvent,
   ISetEventConfiguration, ISetFinalsSchedule, ISetMasterHost, ISetMatchConfig,
@@ -105,5 +107,12 @@ export const setTOAConfig: ActionCreator<ISetTOAConfig> = (toaConfig: TOAConfig)
   type: SET_TOA_CONFIG,
   payload: {
     toaConfig: toaConfig
+  }
+});
+
+export const setBackupDir: ActionCreator<ISetBackupDir> = (backupDir: string) => ({
+  type: SET_BACKUP_DIR,
+  payload: {
+    backupDir: backupDir
   }
 });

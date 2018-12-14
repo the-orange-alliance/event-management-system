@@ -1,5 +1,6 @@
 import {Action} from "redux";
 import {
+  SET_BACKUP_DIR,
   SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
@@ -99,6 +100,13 @@ export interface ISetTOAConfig extends Action {
   }
 }
 
+export interface ISetBackupDir extends Action {
+  type: SET_BACKUP_DIR,
+  payload: {
+    backupDir: string
+  }
+}
+
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
   ISetPracticeSchedule | ISetQualificationSchedule | ISetFinalsSchedule| ISetEliminationsSchedule |
-  ISetMatchConfig | ISetMasterHost | ISetSlaveID | ISetTOAConfig;
+  ISetMatchConfig | ISetMasterHost | ISetSlaveID | ISetTOAConfig | ISetBackupDir;

@@ -67,6 +67,10 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.toaConfig = configState.toaConfig.fromJSON(configStore.toaConfig);
     }
 
+    if (typeof configStore.backupDir !== "undefined") {
+      configState.backupDir = configStore.backupDir;
+    }
+
     const applicationStore = createStore(reducers, {
       configState: configState,
       internalState: internalState

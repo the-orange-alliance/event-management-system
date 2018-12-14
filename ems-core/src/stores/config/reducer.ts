@@ -1,5 +1,6 @@
 import {Reducer} from "redux";
 import {
+  SET_BACKUP_DIR,
   SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
@@ -29,7 +30,8 @@ export const initialState: IConfigState = {
   qualificationSchedule: new Schedule("Qualification"),
   finalsSchedule: new Schedule("Finals"),
   eliminationsSchedule: new EliminationsSchedule(),
-  toaConfig: new TOAConfig()
+  toaConfig: new TOAConfig(),
+  backupDir: "",
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {
@@ -58,6 +60,8 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, slaveInstanceID: action.payload.slaveID};
     case SET_TOA_CONFIG:
       return {...state, toaConfig: action.payload.toaConfig};
+    case SET_BACKUP_DIR:
+      return {...state, backupDir: action.payload.backupDir};
     default:
       return state;
   }

@@ -51,3 +51,25 @@ ipcMain.on("store-set", (event, options) => {
     }
   });
 });
+
+ipcMain.on("create-backup", (event, location, name) => {
+  if (typeof location !== "undefined" && location.length > 0) {
+    try {
+      const dbFile = path.join(appDataPath, "production.db");
+      const destFile = path.join(location,  name + "_production.db");
+      fs.copyFile(dbFile, destFile, (error) => {
+        if (error) {
+          logger.error(error);
+          event.sender.send("create-backup-error", error);
+        } else {
+          event.sender.send("create-backup-success");
+        }
+      });
+    } catch (e) {
+      logger.error(e);
+      event.sender.send("create-backup-error", "Error while attempting to create a backup.");
+    }
+  } else {
+    event.sender.send("create-backup-error", "Backup location is not correctly set.");
+  }
+});

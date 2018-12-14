@@ -4,7 +4,7 @@ import {getTheme} from "../../../shared/AppTheme";
 import ExplanationIcon from "../../../components/ExplanationIcon";
 import {IDisableNavigation, IIncrementCompletedStep} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
-import {ApplicationActions} from "../../../stores";
+import {ApplicationActions, IApplicationState} from "../../../stores";
 import {disableNavigation, incrementCompletedStep} from "../../../stores/internal/actions";
 import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
 import EMSProvider from "../../../shared/providers/EMSProvider";
@@ -13,10 +13,14 @@ import {connect} from "react-redux";
 import DialogManager from "../../../shared/managers/DialogManager";
 import {CONFIG_STORE} from "../../../shared/AppStore";
 import AppError from "../../../shared/models/AppError";
+import {ISetBackupDir} from "../../../stores/config/types";
+import {setBackupDir} from "../../../stores/config/actions";
 
 interface IProps {
+  backupDir?: string
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
-  setCompletedStep?: (step: number) => IIncrementCompletedStep
+  setCompletedStep?: (step: number) => IIncrementCompletedStep,
+  setBackupDir?: (backupDir: string) => ISetBackupDir
 }
 
 interface IState {
@@ -27,15 +31,19 @@ class DataSyncConfig extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      modalOpen: false
+      modalOpen: false,
     };
     this.purgeLocal = this.purgeLocal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.openModal = this.openModal.bind(this);
+    this.chooseBackupDir = this.chooseBackupDir.bind(this);
+    this.forceBackup = this.forceBackup.bind(this);
   }
 
   public render() {
+    const {backupDir} = this.props;
     const {modalOpen} = this.state;
+    const canBackup: boolean = backupDir.length > 0;
     return (
       <Tab.Pane className="tab-subview">
         <RestrictedAccessModal open={modalOpen} onClose={this.closeModal} onSuccess={this.purgeLocal}/>
@@ -48,12 +56,12 @@ class DataSyncConfig extends React.Component<IProps, IState> {
               <Form>
                 <Grid>
                   <Grid.Row columns={16}>
-                    <Grid.Column width={10}><Form.Input fluid={true} label={<ExplanationIcon title={"Local Data Backup Path"} content={"EMS will periodically backup configuration and database files to this path."}/>}/></Grid.Column>
-                    <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} color={getTheme().primary}>Choose Directory</Form.Button></Grid.Column>
+                    <Grid.Column width={10}><Form.Input fluid={true} value={backupDir} label={<ExplanationIcon title={"Local Data Backup Path"} content={"EMS will periodically backup configuration and database files to this path."}/>}/></Grid.Column>
+                    <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} color={getTheme().primary} onClick={this.chooseBackupDir}>Choose Directory</Form.Button></Grid.Column>
                   </Grid.Row>
                   <Grid.Row columns={16}>
                     <Grid.Column width={10}><Form.Button fluid={true} color="red" onClick={this.openModal}>Purge Local</Form.Button></Grid.Column>
-                    <Grid.Column width={6}><Form.Button fluid={true} color="orange">Force Backup</Form.Button></Grid.Column>
+                    <Grid.Column width={6}><Form.Button fluid={true} disabled={!canBackup} color="orange" onClick={this.forceBackup}>Force Backup</Form.Button></Grid.Column>
                   </Grid.Row>
                 </Grid>
               </Form>
@@ -83,6 +91,21 @@ class DataSyncConfig extends React.Component<IProps, IState> {
     )
   }
 
+  private chooseBackupDir() {
+    DialogManager.showOpenDialog({title: "EMS Backup Directory", directories: true}).then((data: string[]) => {
+      if (data.length > 0) {
+        this.props.setBackupDir(data[0]);
+        CONFIG_STORE.set("backupDir", data[0]).then(() => {
+          console.log("Set backup directory. Now backing up.");
+        }).catch((error: AppError) => {
+          DialogManager.showErrorBox(error);
+        });
+      }
+    }).catch((error: AppError) => {
+      DialogManager.showErrorBox(error);
+    });
+  }
+
   private purgeLocal() { // TODO - Flush out the redux state as well.
     this.props.setNavigationDisabled(true);
     EMSProvider.deleteEvent().then(() => {
@@ -99,6 +122,15 @@ class DataSyncConfig extends React.Component<IProps, IState> {
     });
   }
 
+  private forceBackup() {
+    console.log("forcing backup");
+    DialogManager.createBackup(this.props.backupDir).then(() => {
+      console.log("Successfully created backup");
+    }).catch((error: AppError) => {
+      DialogManager.showErrorBox(error);
+    });
+  }
+
   public openModal() {
     this.setState({modalOpen: true});
   }
@@ -108,11 +140,18 @@ class DataSyncConfig extends React.Component<IProps, IState> {
   }
 }
 
-export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+export function mapStateToProps({configState}: IApplicationState) {
   return {
-    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
-    setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step))
+    backupDir: configState.backupDir
   };
 }
 
-export default connect(null, mapDispatchToProps)(DataSyncConfig);
+export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+  return {
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
+    setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step)),
+    setBackupDir: (backupDir: string) => dispatch(setBackupDir(backupDir))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DataSyncConfig);

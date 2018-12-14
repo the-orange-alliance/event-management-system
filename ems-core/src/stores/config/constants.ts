@@ -33,3 +33,6 @@ export type SET_SLAVE_ID = typeof SET_SLAVE_ID;
 
 export const SET_TOA_CONFIG = "SET_TOA_CONFIG";
 export type SET_TOA_CONFIG = typeof SET_TOA_CONFIG;
+
+export const SET_BACKUP_DIR = "SET_BACKUP_DIR";
+export type SET_BACKUP_DIR = typeof SET_BACKUP_DIR;

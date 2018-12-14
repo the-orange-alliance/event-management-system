@@ -9,12 +9,14 @@ import MatchResultsScreen from "./match-results/MatchResultsScreen";
 import RankingsScreen from "./rankings/RankingsScreen";
 import AvailableTeamsScreen from "./available-teams/AvailableTeamsScreen";
 import AllianceBracketScreen from "./alliance-bracket/AllianceBracketScreen";
+import MatchTimerScreen from "./match-timer/MatchTimerScreen";
 
 interface IProps {
   event: Event,
   teams: Team[],
   videoID: number,
-  match: Match
+  match: Match,
+  displayMode: string
 }
 
 class RoverRuckus extends React.Component<IProps> {
@@ -23,7 +25,7 @@ class RoverRuckus extends React.Component<IProps> {
   }
 
   public render() {
-    const {event, match, videoID} = this.props;
+    const {displayMode, event, match, videoID} = this.props;
 
     let view;
 
@@ -43,6 +45,9 @@ class RoverRuckus extends React.Component<IProps> {
       case 4:
         view = <span/>;
         break;
+      case 5:
+        view = <MatchTimerScreen match={match}/>;
+        break;
       case 6:
         view = <RankingsScreen event={event}/>;
         break;
@@ -54,6 +59,12 @@ class RoverRuckus extends React.Component<IProps> {
         break;
       default:
         view = <span/>;
+    }
+
+    if (displayMode.indexOf("pit") > -1) {
+      view = <RankingsScreen event={event}/>;
+    } else if (displayMode.indexOf("field") > -1 && videoID === 2) {
+      view = <MatchTimerScreen match={match}/>; // TODO - Make Match Timer!
     }
 
     return (view);

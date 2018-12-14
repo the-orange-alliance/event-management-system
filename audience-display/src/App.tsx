@@ -13,6 +13,7 @@ import AllianceMember from "./shared/models/AllianceMember";
 
 import MATCH_START from "./displays/fgc_2018/res/sounds/match_start.wav";
 import RoverRuckus from "./displays/ftc_1819/RoverRuckus";
+import {Route, RouteComponentProps} from "react-router";
 
 interface IProps {
   cookies: Cookies
@@ -24,7 +25,7 @@ interface IState {
   teams: Team[],
   loading: boolean,
   videoID: number,
-  activeMatch: Match
+  activeMatch: Match,
 }
 
 class App extends React.Component<IProps, IState> {
@@ -36,7 +37,7 @@ class App extends React.Component<IProps, IState> {
       teams: [],
       loading: true,
       videoID: 0,
-      activeMatch: new Match()
+      activeMatch: new Match(),
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
@@ -137,6 +138,8 @@ class App extends React.Component<IProps, IState> {
         }).catch((detailsRes: any) => console.error(detailsRes));
       }).catch((matchRes: any) => console.error(matchRes));
     });
+
+    this.renderAudienceDisplay = this.renderAudienceDisplay.bind(this);
   }
 
   /**
@@ -149,15 +152,18 @@ class App extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {event, teams, loading, videoID, activeMatch} = this.state;
+    return <Route path="/" render={this.renderAudienceDisplay}/>
+  }
 
+  private renderAudienceDisplay(props: RouteComponentProps<any>) {
+    const {event, teams, loading, videoID, activeMatch} = this.state;
     let display: JSX.Element;
     switch (event.seasonKey) {
       case 2018:
         display = <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       case 1819:
-        display = <RoverRuckus event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        display = <RoverRuckus displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       default:
         display = <div id="app-error">REST API CONNECTION LOST</div>;

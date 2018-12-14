@@ -28,7 +28,7 @@
 }
 
 #rr-rank-table-container {
-  width: 81vw;
+  width: 77vw;
   height: 95%;
   overflow: hidden;
   max-height: 95%;
@@ -44,7 +44,7 @@
 
 #rr-rank-table-container > table > thead {
   display: block;
-  width: 81vw;
+  width: 77vw;
   height: 44px;
   background-color: #000000;
   color: #FFFFFF;
@@ -53,14 +53,14 @@
 #rr-rank-table-container > table > tbody {
   display: block;
   overflow: hidden;
-  width: 81vw;
+  width: 77vw;
   height: calc(75vh - 2vw - 44px);
 }
 
 #rr-rank-table-container > table > tbody > tr, #rr-rank-table-container > table > thead > tr {
   text-align: center;
   height: 40px;
-  width: 81vw;
+  width: 77vw;
   font-family: Roboto, sans-serif;
   font-weight: bold;
 }
@@ -82,20 +82,23 @@
 
 /* We've got 73vw to work with */
 .rr-rank {
-  width: 13.5vw;
+  width: 11vw;
+}
+.rr-record {
+  width: 11vw;
 }
 .rr-team {
-  width: 13.5vw;
+  width: 11vw;
 }
 .rr-rp {
-  width: 13.5vw;
+  width: 11vw;
 }
 .rr-tbp {
-  width: 13.5vw;
+  width: 11vw;
 }
 .rr-high {
-  width: 13.5vw;
+  width: 11vw;
 }
 .rr-play {
-  width: 13.5vw;
+  width: 11vw;
 }

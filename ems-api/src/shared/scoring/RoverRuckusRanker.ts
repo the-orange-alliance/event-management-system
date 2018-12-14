@@ -50,6 +50,16 @@ class RoverRuckusRanker implements IMatchRanker {
           if (ranking.highScore < points) {
             ranking.highScore = points;
           }
+
+          if (redTeam && redWin) {
+            ranking.wins++;
+          } else if (!redTeam && !redWin) {
+            ranking.wins++;
+          } else if (match.red_score === match.blue_score) {
+            ranking.ties++;
+          } else {
+            ranking.losses++;
+          }
         }
         if (!isSurrogate && match.red_score >= 0 && match.blue_score >= 0) {
           ranking.tiebreakerPoints += redWin ? match.blue_score : match.red_score;

@@ -5,14 +5,26 @@ import Event from "../../../shared/models/Event";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 import EightAllianceBracket from "../../../components/alliance-brackets/8AllianceBracket";
+import AllianceMember from "../../../shared/models/AllianceMember";
 
 interface IProps {
   event: Event
 }
 
-class AllianceBracketScreen extends React.Component<IProps> {
+interface IState {
+  alliances: Map<number, AllianceMember[]>
+}
+
+class AllianceBracketScreen extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    this.state = {
+      alliances: new Map<number, AllianceMember[]>()
+    };
+  }
+
+  public componentDidMount() {
+    this.setState({alliances: this.getAllianceMap()});
   }
 
   public render() {
@@ -31,6 +43,10 @@ class AllianceBracketScreen extends React.Component<IProps> {
         </div>
       </div>
     );
+  }
+
+  private getAllianceMap(): Map<number, AllianceMember[]> {
+    return new Map<number, AllianceMember[]>();
   }
 }
 

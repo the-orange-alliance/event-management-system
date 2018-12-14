@@ -29,6 +29,9 @@ export default class TOARankingAdapter {
     ranking.rank = this._ranking.rank;
     ranking.rankChange = this._ranking.rankChange || 0;
     ranking.played = this._ranking.played;
+    ranking.wins = this._ranking.wins;
+    ranking.losses = this._ranking.losses;
+    ranking.ties = this._ranking.ties;
     this.assignData(ranking);
     return ranking;
   }
@@ -41,9 +44,6 @@ export default class TOARankingAdapter {
       ranking.qualifyingPoints = 0;
       ranking.tieBreakerPoints = this._ranking.tiebreakerPoints;
       // Actually have no idea what to do for these values.
-      ranking.wins = -1;
-      ranking.losses = -1;
-      ranking.ties = -1;
     }
   }
 }

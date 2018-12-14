@@ -64,6 +64,7 @@ class RankingsScreen extends React.Component<IProps, IState> {
       return (
         <tr key={ranking.rankKey}>
           <td className="rr-rank">{ranking.rank}</td>
+          <td className="rr-record">{ranking.wins}-{ranking.losses}-{ranking.ties}</td>
           <td className="rr-team">{ranking.teamKey}</td>
           <td className="rr-rp">{ranking.rankingPoints}</td>
           <td className="rr-tbp">{ranking.tiebreakerPoints}</td>
@@ -92,9 +93,10 @@ class RankingsScreen extends React.Component<IProps, IState> {
                 <thead>
                   <tr>
                     <th className="rr-rank">Rank</th>
+                    <th className="rr-record">W-L-T</th>
                     <th className="rr-team">Team #</th>
                     <th className="rr-rp">Ranking Points</th>
-                    <th className="rr-tbp">Tiebreaker Points</th>
+                    <th className="rr-tbp">TBP</th>
                     <th className="rr-high">Highest Score</th>
                     <th className="rr-play">Matches Played</th>
                   </tr>

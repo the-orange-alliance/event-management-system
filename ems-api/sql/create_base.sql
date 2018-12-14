@@ -44,6 +44,9 @@ CREATE TABLE IF NOT EXISTS "ranking" (
     rank INT NOT NULL,
     rank_change INT,
     played INT,
+    wins INT,
+    losses INT,
+    ties INT,
     FOREIGN KEY (team_key) REFERENCES "team"(team_key)
 );
 

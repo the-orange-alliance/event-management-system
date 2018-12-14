@@ -3,6 +3,9 @@ export default class RoverRuckusRank implements IPostableObject {
   private _teamKey: number;
   private _rank: number;
   private _rankChange: number;
+  private _wins: number;
+  private _losses: number;
+  private _ties: number;
   private _rankingPoints: number;
   private _tiebreakerPoints: number;
   private _totalPoints: number;
@@ -14,6 +17,9 @@ export default class RoverRuckusRank implements IPostableObject {
     this._teamKey = 0;
     this._rank = 0;
     this._rankChange = 0;
+    this._wins = 0;
+    this._losses = 0;
+    this._ties = 0;
     this._rankingPoints = 0;
     this._tiebreakerPoints = 0;
     this._totalPoints = 0;
@@ -31,6 +37,9 @@ export default class RoverRuckusRank implements IPostableObject {
     rank.teamKey = json.team_key;
     rank.rank = json.rank;
     rank.rankChange = json.rank_change;
+    rank.wins = json.wins;
+    rank.losses = json.losses;
+    rank.ties = json.ties;
     rank.played = json.played;
     rank.rankingPoints = json.ranking_points;
     rank.tiebreakerPoints = json.tiebreaker_points;
@@ -45,6 +54,9 @@ export default class RoverRuckusRank implements IPostableObject {
       team_key: this.teamKey,
       rank: this.rank,
       rank_change: this.rankChange,
+      wins: this.wins,
+      losses: this.losses,
+      ties: this.ties,
       played: this.played,
       ranking_points: this.rankingPoints,
       tiebreaker_points: this.tiebreakerPoints,
@@ -195,5 +207,29 @@ export default class RoverRuckusRank implements IPostableObject {
    */
   public set played(value: number) {
     this._played = value;
+  }
+
+  get wins(): number {
+    return this._wins;
+  }
+
+  set wins(value: number) {
+    this._wins = value;
+  }
+
+  get losses(): number {
+    return this._losses;
+  }
+
+  set losses(value: number) {
+    this._losses = value;
+  }
+
+  get ties(): number {
+    return this._ties;
+  }
+
+  set ties(value: number) {
+    this._ties = value;
   }
 }

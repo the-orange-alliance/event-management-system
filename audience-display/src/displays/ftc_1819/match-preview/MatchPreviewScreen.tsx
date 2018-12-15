@@ -50,21 +50,23 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
     }
 
     const redTeamsView = redTeams.map((team: Team, index: number) => {
+      const rank = match.tournamentLevel >= 10 ? match.participants[index].getAllianceRankFromKey() : ranks[index].rank;
       return (
         <div key={team.teamKey} className="center-items red-border">
           <div className="rr-pre-team center-left-items">{team.teamKey}</div>
           <div className="rr-pre-name center-left-items">{team.teamNameShort}</div>
-          <div className="rr-pre-rank center-items">#{ranks[index].rank}</div>
+          <div className="rr-pre-rank center-items">#{rank}</div>
         </div>
       );
     });
 
     const blueTeamsView = blueTeams.map((team: Team, index: number) => {
+      const rank = match.tournamentLevel >= 10 ? match.participants[index + teams.length / 2].getAllianceRankFromKey() : ranks[index + teams.length / 2].rank;
       return (
         <div key={team.teamKey} className="center-items blue-border">
           <div className="rr-pre-team center-left-items">{team.teamKey}</div>
           <div className="rr-pre-name center-left-items">{team.teamNameShort}</div>
-          <div className="rr-pre-rank center-items">#{ranks[index + teams.length / 2].rank}</div>
+          <div className="rr-pre-rank center-items">#{rank}</div>
         </div>
       );
     });

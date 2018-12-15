@@ -70,21 +70,23 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
     }
 
     const redTeamsView = redTeams.map((team: Team, index: number) => {
+      const rank = match.tournamentLevel >= 10 ? match.participants[index].getAllianceRankFromKey() : ranks[index].rank;
       return (
         <div key={team.teamKey} className="rr-result-team-container red-border">
           <div className="rr-result-team center-items">{team.teamKey}</div>
           <div className="rr-result-name center-left-items">{team.teamNameShort}</div>
-          <div className="rr-result-rank center-items">#{ranks[index].rank}</div>
+          <div className="rr-result-rank center-items">#{rank}</div>
         </div>
       );
     });
 
     const blueTeamsView = blueTeams.map((team: Team, index: number) => {
+      const rank = match.tournamentLevel >= 10 ? match.participants[index + teams.length / 2].getAllianceRankFromKey() : ranks[index + teams.length / 2].rank;
       return (
         <div key={team.teamKey} className="rr-result-team-container blue-border">
           <span className="rr-result-team center-items">{team.teamKey}</span>
           <span className="rr-result-name center-left-items">{team.teamNameShort}</span>
-          <span className="rr-result-rank center-items">#{ranks[index + teams.length / 2].rank}</span>
+          <span className="rr-result-rank center-items">#{rank}</span>
         </div>
       );
     });

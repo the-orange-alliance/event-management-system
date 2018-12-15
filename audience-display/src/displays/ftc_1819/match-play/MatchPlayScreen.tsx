@@ -211,7 +211,10 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
             <div id="rr-play-base">
               <div id="rr-play-blue">
                 {blueTeamsView}
-                {/*<div className="rr-alliance-box center-items blue-bg"><span>EDI</span></div>*/}
+                {
+                  match.tournamentLevel >= 10 &&
+                  <div className="rr-alliance-box center-items blue-bg"><span>{blueTeams[0].getAllianceRankFromKey()}</span></div>
+                }
               </div>
               <div id="rr-play-mid">
                 <div id="rr-play-mid-timer" className="center-items">
@@ -229,7 +232,10 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
               </div>
               <div id="rr-play-red">
                 {redTeamsView}
-                {/*<div className="rr-alliance-box center-items red-bg"><span>FRA</span></div>*/}
+                {
+                  match.tournamentLevel >= 10 &&
+                  <div className="rr-alliance-box center-items red-bg"><span>{redTeams[0].getAllianceRankFromKey()}</span></div>
+                }
               </div>
             </div>
           </div>

@@ -11,6 +11,10 @@ export const PostQualItems = [
 
 export const AllianceCaptainItems = [
   {
+    text: "2 (Finals)",
+    value: 2
+  },
+  {
     text: "4 (Semifinals)",
     value: 4
   },

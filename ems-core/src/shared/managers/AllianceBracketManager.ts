@@ -118,6 +118,13 @@ class AllianceBracketManager {
         match.tournamentLevel = 40;
         match.fieldNumber = 1;
         results.push(match);
+        if (options.allianceCaptains === 2) {
+          match.participants = this.getFinalsTeams(i + 1, alliances);
+          for (let k = 0; k < match.participants.length; k++) {
+            match.participants[k].matchKey = match.matchKey;
+            match.participants[k].matchParticipantKey = match.matchKey + "-T" + (k + 1);
+          }
+        }
       }
       resolve(results);
     });
@@ -201,6 +208,10 @@ class AllianceBracketManager {
         break;
     }
     return this.getParticipantsFromAlliance(redAlliance, blueAlliance);
+  }
+
+  private getFinalsTeams(series: number, alliances: Map<number, AllianceMember[]>): MatchParticipant[] {
+    return this.getParticipantsFromAlliance(alliances.get(1), alliances.get(2));
   }
 
   private getParticipantsFromAlliance(redAlliance: AllianceMember[], blueAlliance: AllianceMember[]): MatchParticipant[] {

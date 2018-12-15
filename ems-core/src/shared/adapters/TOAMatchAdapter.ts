@@ -25,8 +25,8 @@ export default class TOAMatchAdapter {
     match.fieldNumber = this._match.fieldNumber;
     match.redScore = this._match.redScore;
     match.blueScore = this._match.blueScore;
-    match.redPenalty = this._matchDetails.getRedPenalty(this._match.blueMinPen, this._match.blueMajPen);
-    match.bluePenalty = this._matchDetails.getBluePenalty(this._match.redMinPen, this._match.redMajPen);
+    match.redPenalty = this._matchDetails.getRedPenalty(this._match.blueMinPen || 0, this._match.blueMajPen || 0);
+    match.bluePenalty = this._matchDetails.getBluePenalty(this._match.redMinPen || 0, this._match.redMajPen || 0);
     match.redAutoScore = this._matchDetails.getRedAutoScore();
     match.blueAutoScore = this._matchDetails.getBlueAutoScore();
     match.redTeleScore = this._matchDetails.getRedTeleScore();

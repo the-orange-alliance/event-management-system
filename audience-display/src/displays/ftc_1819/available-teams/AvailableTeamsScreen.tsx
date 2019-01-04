@@ -1,14 +1,9 @@
 import * as React from 'react';
 import "./AvailableTeamsScreen.css";
-import Event from "../../../shared/models/Event";
-
+import {EMSProvider, Event, RoverRuckusRank, SocketProvider, Team} from "@the-orange-alliance/lib-ems";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
-import Team from "../../../shared/models/Team";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import RoverRuckusRank from "../../../shared/models/RoverRuckusRank";
 import {AxiosResponse} from "axios";
-import SocketProvider from "../../../shared/providers/SocketProvider";
 
 interface IProps {
   event: Event

@@ -1,15 +1,9 @@
 import * as React from 'react';
 import "./MatchResultsScreen.css";
-import Match from "../../../shared/models/Match";
-
+import {Match, MatchParticipant, Ranking, RoverRuckusMatchDetails, Team} from "@the-orange-alliance/lib-ems";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 import FTC_LOGO from "../res/FTC_logo_transparent.png";
-import Team from "../../../shared/models/Team";
-import Ranking from "../../../shared/models/Ranking";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import RoverRuckusMatchDetails from "../../../shared/models/RoverRuckusMatchDetails";
-
 interface IProps {
   match: Match
 }

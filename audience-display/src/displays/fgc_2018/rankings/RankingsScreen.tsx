@@ -1,8 +1,6 @@
 import * as React from "react";
-import EMSProvider from "../../../shared/providers/EMSProvider";
+import {EMSProvider, EnergyImpactRanking, Team} from "@the-orange-alliance/lib-ems";
 import {AxiosResponse} from "axios";
-import EnergyImpactRanking from "../../../shared/models/EnergyImpactRanking";
-import Team from "../../../shared/models/Team";
 import * as ReactScroll from "react-scroll";
 
 import "./RankingsScreen.css";

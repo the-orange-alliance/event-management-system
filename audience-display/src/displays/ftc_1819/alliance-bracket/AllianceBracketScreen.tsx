@@ -1,14 +1,10 @@
 import * as React from 'react';
 import "./AllianceBracketScreen.css";
-import Event from "../../../shared/models/Event";
-
+import {Event, EMSProvider, Match, MatchParticipant} from "@the-orange-alliance/lib-ems";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 import EightAllianceBracket from "../../../components/alliance-brackets/8AllianceBracket";
-import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import Match from "../../../shared/models/Match";
 
 interface IProps {
   event: Event

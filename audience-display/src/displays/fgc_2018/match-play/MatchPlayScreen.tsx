@@ -1,6 +1,7 @@
 import * as React from "react";
 import ScoringComponent from "./ScoringComponent";
 import * as moment from "moment";
+import {Match, MatchParticipant, SocketProvider, Team} from "@the-orange-alliance/lib-ems";
 
 import "./MatchPlayScreen.css";
 import FGC_LOGO from "../res/Global_Logo.png";
@@ -24,11 +25,6 @@ import RED_TURBINE_STARTED from "../res/Red_Wind_Core_Icon.png";
 import RED_TURBINE_COMPLETE from "../res/Red_Wind_Complete_Icon.png";
 import TeamCardStatus from "./TeamCardStatus";
 import SolarCapsule from "./ScoringCapsule";
-import Match from "../../../shared/models/Match";
-import Team from "../../../shared/models/Team";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import SocketProvider from "../../../shared/providers/SocketProvider";
-import BasicMatch from "../../../shared/models/BasicMatch";
 
 import MATCH_START from "../res/sounds/match_start.wav";
 import MATCH_ENDGAME from "../res/sounds/match_end_start.wav";
@@ -49,6 +45,7 @@ interface IState {
   teams: Team[],
   time: moment.Duration,
   timerID: any,
+  // @ts-ignore
   matchData: BasicMatch,
   panels: any
 }
@@ -61,6 +58,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       teams: this.getUpdatedTeamInfo(),
       time: moment.duration(0, "seconds"),
       timerID: null,
+      // @ts-ignore
       matchData: new BasicMatch(),
       panels: {
         red: 0,
@@ -88,6 +86,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       this.stopTimer();
     });
     SocketProvider.on("score-update", (scoreObj: any) => {
+      // @ts-ignore
       this.setState({matchData: new BasicMatch().fromJSON(scoreObj)});
     });
     SocketProvider.on("onSolar", (solarObj: any) => {

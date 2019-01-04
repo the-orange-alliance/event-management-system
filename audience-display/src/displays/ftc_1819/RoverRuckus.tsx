@@ -1,8 +1,6 @@
 import * as React from 'react';
 import "./RoverRuckus.css";
-import Event from "../../shared/models/Event";
-import Team from "../../shared/models/Team";
-import Match from "../../shared/models/Match";
+import {Event, Team, Match} from "@the-orange-alliance/lib-ems";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchPlayScreen from "./match-play/MatchPlayScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";

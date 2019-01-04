@@ -1,7 +1,6 @@
 import * as React from 'react';
 import "./AllianceBracket.css";
-import Match from "../../shared/models/Match";
-import MatchParticipant from "../../shared/models/MatchParticipant";
+import {Match, MatchParticipant} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   allianceMatches: Map<number, Match[]>

@@ -1,18 +1,10 @@
 import * as React from 'react';
 import "./MatchPlayScreen.css";
-import Match from "../../../shared/models/Match";
-
+import {
+  Event, Match, MatchMode, MatchConfiguration, MatchParticipant, MatchTimer, RoverRuckusMatchDetails, SocketProvider, Ranking, Team
+} from "@the-orange-alliance/lib-ems";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
-import Team from "../../../shared/models/Team";
-import Ranking from "../../../shared/models/Ranking";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import Event from "../../../shared/models/Event";
-import SocketProvider from "../../../shared/providers/SocketProvider";
-import RoverRuckusMatchDetails from "../../../shared/models/RoverRuckusMatchDetails";
-import MatchTimer from "../../../shared/scoring/MatchTimer";
-import MatchConfiguration from "../../../shared/models/MatchConfiguration";
-import {MatchMode} from "../../../shared/scoring/MatchMode";
 
 import MATCH_START from "../res/sounds/match_start.wav";
 import MATCH_AUTO from "../res/sounds/match_auto_end_warning.wav";

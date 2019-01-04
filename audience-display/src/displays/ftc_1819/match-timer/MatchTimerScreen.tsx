@@ -1,18 +1,13 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import "./MatchTimerScreen.css";
-import Match from "../../../shared/models/Match";
+import {
+  Match, MatchMode, MatchConfiguration, MatchParticipant, MatchTimer, RoverRuckusMatchDetails, SocketProvider, Team
+} from "@the-orange-alliance/lib-ems";
 
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 import FTC_LOGO from "../res/FTC_logo_transparent.png";
-import Team from "../../../shared/models/Team";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import MatchTimer from "../../../shared/scoring/MatchTimer";
-import RoverRuckusMatchDetails from "../../../shared/models/RoverRuckusMatchDetails";
-import SocketProvider from "../../../shared/providers/SocketProvider";
-import MatchConfiguration from "../../../shared/models/MatchConfiguration";
-import {MatchMode} from "../../../shared/scoring/MatchMode";
 
 interface IProps {
   match: Match

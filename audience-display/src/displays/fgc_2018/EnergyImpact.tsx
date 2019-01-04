@@ -1,5 +1,5 @@
 import * as React from "react";
-import Event from "../../shared/models/Event";
+import {Event, Match, Team} from "@the-orange-alliance/lib-ems";
 import SponsorScreen from "./sponsor/SponsorScreen";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchResultsScreen from "./match-results/MatchResultsScreen";
@@ -7,8 +7,6 @@ import MatchPlayScreen from "./match-play/MatchPlayScreen";
 import RankingsScreen from "./rankings/RankingsScreen";
 
 import "./EnergyImpact.css";
-import Team from "../../shared/models/Team";
-import Match from "../../shared/models/Match";
 
 interface IProps {
   event: Event,

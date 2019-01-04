@@ -1,15 +1,10 @@
 import * as React from "react";
-
+import {EnergyImpactMatchDetails, Match, MatchParticipant, Ranking, Team} from "@the-orange-alliance/lib-ems";
 import "./MatchResultsScreen.css";
 import RED_WIN from "../res/Red_Win_Top.png";
 import RED_LOSE from "../res/Red_Lose_Top.png";
 import BLUE_WIN from "../res/Blue_Win_Top.png";
 import BLUE_LOSE from "../res/Blue_Lose_Top.png";
-import Match from "../../../shared/models/Match";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import Team from "../../../shared/models/Team";
-import EnergyImpactMatchDetails from "../../../shared/models/EnergyImpactMatchDetails";
-import Ranking from "../../../shared/models/Ranking";
 
 import SOLAR_ICON from "../res/Grey_Solar_Icon.png";
 import WIND_ICON from "../res/Black_Wind_Icon.png";

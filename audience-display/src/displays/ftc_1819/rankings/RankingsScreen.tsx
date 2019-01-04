@@ -1,10 +1,7 @@
 import * as React from 'react';
 import './RankingsScreen.css';
-import Event from "../../../shared/models/Event";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import Team from "../../../shared/models/Team";
+import {Event, EMSProvider, Team, RoverRuckusRank} from "@the-orange-alliance/lib-ems";
 import {AxiosResponse} from "axios";
-import RoverRuckusRank from "../../../shared/models/RoverRuckusRank";
 import * as ReactScroll from "react-scroll";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";

@@ -1,15 +1,11 @@
 import * as React from 'react';
 import './App.css';
-import SocketProvider from "./shared/providers/SocketProvider";
+import {
+  AllianceMember, Event, EMSProvider, SocketProvider, Team, Match, MatchParticipant
+} from "@the-orange-alliance/lib-ems";
 import {Cookies, withCookies} from "react-cookie";
-import Event from "./shared/models/Event";
-import EMSProvider from "./shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
 import EnergyImpact from "./displays/fgc_2018/EnergyImpact";
-import Team from "./shared/models/Team";
-import Match from "./shared/models/Match";
-import MatchParticipant from "./shared/models/MatchParticipant";
-import AllianceMember from "./shared/models/AllianceMember";
 
 import MATCH_START from "./displays/fgc_2018/res/sounds/match_start.wav";
 import RoverRuckus from "./displays/ftc_1819/RoverRuckus";
@@ -158,7 +154,7 @@ class App extends React.Component<IProps, IState> {
   private renderAudienceDisplay(props: RouteComponentProps<any>) {
     const {event, teams, loading, videoID, activeMatch} = this.state;
     let display: JSX.Element;
-    switch (event.seasonKey) {
+    switch (event.season.seasonKey) {
       case 2018:
         display = <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
@@ -179,7 +175,7 @@ class App extends React.Component<IProps, IState> {
   private initState() {
     EMSProvider.getEvent().then((response: AxiosResponse) => {
       if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
-        EMSProvider.getAllTeams().then((teamsResponse: AxiosResponse) => {
+        EMSProvider.getTeams().then((teamsResponse: AxiosResponse) => {
           if (teamsResponse.data.payload && teamsResponse.data.payload.length > 0) {
             this.setState({
               event: new Event().fromJSON(response.data.payload[0]),

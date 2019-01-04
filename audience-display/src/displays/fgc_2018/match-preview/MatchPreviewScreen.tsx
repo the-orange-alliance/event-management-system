@@ -1,13 +1,9 @@
 import * as React from "react";
-
+import {Match, MatchParticipant, Ranking, Team} from "@the-orange-alliance/lib-ems";
 import "./MatchPreviewScreen.css";
 import FGC_LOGO from "../res/Before_Screen_Logo.png";
 import RED_FLAG from "../res/Red_Team_Tag.png";
 import BLUE_FLAG from "../res/Blue_Team_Tag.png";
-import Match from "../../../shared/models/Match";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import Team from "../../../shared/models/Team";
-import Ranking from "../../../shared/models/Ranking";
 
 interface IProps {
   match: Match,

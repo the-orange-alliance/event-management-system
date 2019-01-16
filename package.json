@@ -28,6 +28,7 @@
     "dist": "electron-builder"
   },
   "dependencies": {
+    "@the-orange-alliance/lib-ems": "^0.1.5",
     "concurrently": "^3.6.0",
     "npm": "^6.5.0",
     "pm2": "^3.0.0",

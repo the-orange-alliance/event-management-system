@@ -1,20 +1,18 @@
 import * as React from "react";
 import {Button, Card, Divider, Form, Grid, Tab} from "semantic-ui-react";
-import {getTheme} from "../../../shared/AppTheme";
+import {getTheme} from "../../../AppTheme";
 import ExplanationIcon from "../../../components/ExplanationIcon";
 import {IDisableNavigation, IIncrementCompletedStep} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {disableNavigation, incrementCompletedStep} from "../../../stores/internal/actions";
 import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import HttpError from "../../../shared/models/HttpError";
 import {connect} from "react-redux";
-import DialogManager from "../../../shared/managers/DialogManager";
-import {CONFIG_STORE} from "../../../shared/AppStore";
-import AppError from "../../../shared/models/AppError";
+import DialogManager from "../../../managers/DialogManager";
+import {CONFIG_STORE} from "../../../AppStore";
 import {ISetBackupDir} from "../../../stores/config/types";
 import {setBackupDir} from "../../../stores/config/actions";
+import {AppError, EMSProvider, HttpError} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   backupDir?: string

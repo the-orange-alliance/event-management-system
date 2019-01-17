@@ -1,8 +1,8 @@
 import * as React from "react";
 import {Dimmer, Divider, Grid, Loader} from "semantic-ui-react";
-import Event from "../../../shared/models/Event";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
+import {Event} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   event?: Event,

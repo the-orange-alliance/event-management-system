@@ -1,25 +1,21 @@
 import * as React from "react";
 import {Button, Card, Dimmer, Divider, Form, Grid, InputProps, Loader, Tab} from "semantic-ui-react";
-import Process from "../../../shared/models/Process";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import ProcessDescriptor from "../../../components/ProcessDescriptor";
-import {getTheme} from "../../../shared/AppTheme";
+import {getTheme} from "../../../AppTheme";
 import ExplanationIcon from "../../../components/ExplanationIcon";
 import ProcessActor from "../../../components/ProcessActor";
 import {IDisableNavigation, ISetProcessActionsDisabled, IUpdateProcessList} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setProcessActionsDisabled, updateProcessList} from "../../../stores/internal/actions";
-import ProcessManager from "../../../shared/managers/ProcessManager";
+import ProcessManager from "../../../managers/ProcessManager";
 import {SyntheticEvent} from "react";
 import {ISetNetworkHost} from "../../../stores/config/types";
 import {setNetworkHost} from "../../../stores/config/actions";
-import AppError from "../../../shared/models/AppError";
 import RestrictedAccessModal from "../../../components/RestrictedAccessModal";
-import DialogManager from "../../../shared/managers/DialogManager";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import SocketProvider from "../../../shared/providers/SocketProvider";
-import WebProvider from "../../../shared/providers/WebProvider";
+import DialogManager from "../../../managers/DialogManager";
+import {AppError, EMSProvider, Process, SocketProvider, WebProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   processingAction?: boolean,

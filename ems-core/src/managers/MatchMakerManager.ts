@@ -1,8 +1,4 @@
-import AppError from "../models/AppError";
-import Team from "../models/Team";
-import {TournamentLevels} from "../AppTypes";
-import Match from "../models/Match";
-import MatchParticipant from "../models/MatchParticipant";
+import {AppError, Match, MatchParticipant, Team, TournamentType} from "@the-orange-alliance/lib-ems";
 
 const ipcRenderer = (window as any).require("electron").ipcRenderer;
 
@@ -13,7 +9,7 @@ interface IMatchMakerOptions {
   teamsPerAlliance: number,
   fields: number,
   eventKey: string,
-  type: TournamentLevels
+  type: TournamentType
 }
 
 class MatchMakerManager {

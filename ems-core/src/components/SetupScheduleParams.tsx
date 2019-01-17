@@ -1,19 +1,16 @@
 import * as React from "react";
 import {Button, Card, Dimmer, Divider, Form, Grid, Loader, Input, InputProps, Tab} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 import ExplanationIcon from "./ExplanationIcon";
-import Schedule from "../shared/models/Schedule";
 import {SyntheticEvent} from "react";
 import DatePicker from "react-datepicker";
 import {Moment} from "moment";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
-import {CONFIG_STORE} from "../shared/AppStore";
-import DialogManager from "../shared/managers/DialogManager";
+import {CONFIG_STORE} from "../AppStore";
+import DialogManager from "../managers/DialogManager";
 import ConfirmActionModal from "./ConfirmActionModal";
-import Event from "../shared/models/Event";
-import ScheduleItem from "../shared/models/ScheduleItem";
-import Team from "../shared/models/Team";
+import {Event, Schedule, ScheduleItem, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: (scheduleItems: ScheduleItem[]) => void

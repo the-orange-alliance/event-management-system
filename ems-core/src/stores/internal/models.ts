@@ -1,7 +1,4 @@
-import Process from "../../shared/models/Process";
-import Team from "../../shared/models/Team";
-import Match from "../../shared/models/Match";
-import AllianceMember from "../../shared/models/AllianceMember";
+import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
 export interface IInternalState {
   processingActionsDisabled: boolean,

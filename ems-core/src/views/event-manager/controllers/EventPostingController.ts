@@ -1,14 +1,7 @@
-import Event from "../../../shared/models/Event";
-import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import {EMSEventTypes, TournamentLevels} from "../../../shared/AppTypes";
-import HttpError from "../../../shared/models/HttpError";
-import Team from "../../../shared/models/Team";
-import ScheduleItem from "../../../shared/models/ScheduleItem";
-import Match from "../../../shared/models/Match";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import Ranking from "../../../shared/models/Ranking";
-import AllianceMember from "../../../shared/models/AllianceMember";
+import {AllianceMember, EMSProvider, Event, EventType, HttpError, Match, MatchParticipant, Team, Ranking,
+  ScheduleItem, TournamentType
+} from "@the-orange-alliance/lib-ems";
 
 class EventPostingController {
   private static _instance: EventPostingController;
@@ -22,7 +15,7 @@ class EventPostingController {
 
   private constructor() {}
 
-  public createEventDatabase(eventType: EMSEventTypes, event: Event): Promise<any> {
+  public createEventDatabase(eventType: EventType, event: Event): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       try {
         EMSProvider.getEvent().then((response: AxiosResponse) => {
@@ -80,7 +73,7 @@ class EventPostingController {
     });
   }
 
-  public createSchedule(type: TournamentLevels, scheduleItems: ScheduleItem[]): Promise<any> {
+  public createSchedule(type: TournamentType, scheduleItems: ScheduleItem[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.deleteScheduleItems(type).then(() => {
         EMSProvider.postScheduleItems(scheduleItems).then(() => {

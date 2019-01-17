@@ -1,8 +1,7 @@
 import * as React from "react";
-import {getTheme} from "../../shared/AppTheme";
+import {getTheme} from "../../AppTheme";
 import {Table} from "semantic-ui-react";
-import {TeamIdentifier} from "../../shared/AppTypes";
-import RoverRuckusRank from "../../shared/models/RoverRuckusRank";
+import {RoverRuckusRank, TeamIdentifier} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   rankings: RoverRuckusRank[],

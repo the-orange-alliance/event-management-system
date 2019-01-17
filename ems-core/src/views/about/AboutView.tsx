@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Card, Grid} from "semantic-ui-react";
-import {getTheme} from "../../shared/AppTheme";
+import {getTheme} from "../../AppTheme";
 
 class AboutView extends React.Component {
   public render() {

@@ -1,13 +1,12 @@
 import * as React from "react";
 import {Button, Grid} from "semantic-ui-react";
-import Process from "../shared/models/Process";
 import {IDisableNavigation, ISetProcessActionsDisabled, IUpdateProcessList} from "../stores/internal/types";
 import {ApplicationActions, IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Dispatch} from "redux";
 import {disableNavigation, setProcessActionsDisabled, updateProcessList} from "../stores/internal/actions";
-import ProcessManager from "../shared/managers/ProcessManager";
-import AppError from "../shared/models/AppError";
+import ProcessManager from "../managers/ProcessManager";
+import {AppError, Process} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   process: Process,

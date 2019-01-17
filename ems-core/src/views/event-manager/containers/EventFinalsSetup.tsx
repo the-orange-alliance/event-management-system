@@ -3,23 +3,17 @@ import {Tab, TabProps} from "semantic-ui-react";
 import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import SetupRankingsOverview from "../../../components/SetupRankingsOverview";
-import Event from "../../../shared/models/Event";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
-import Team from "../../../shared/models/Team";
-import Schedule from "../../../shared/models/Schedule";
 import SetupScheduleParams from "../../../components/SetupScheduleParams";
-import ScheduleItem from "../../../shared/models/ScheduleItem";
 import EventPostingController from "../controllers/EventPostingController";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
+import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, ISetFinalsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setFinalsMatches} from "../../../stores/internal/actions";
 import {connect} from "react-redux";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupRunMatchMaker from "../../../components/SetupRunMatchMaker";
-import Match from "../../../shared/models/Match";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
+import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,

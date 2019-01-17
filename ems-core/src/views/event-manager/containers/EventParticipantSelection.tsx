@@ -1,7 +1,6 @@
 import * as React from "react";
 import {Button, Table} from "semantic-ui-react";
-import {getTheme} from "../../../shared/AppTheme";
-import Team from "../../../shared/models/Team";
+import {getTheme} from "../../../AppTheme";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
 import TeamEditModal from "../../../components/TeamEditModal";
 import {ApplicationActions, IApplicationState} from "../../../stores";
@@ -9,18 +8,12 @@ import {Dispatch} from "redux";
 import {IAddTeam, IAlterTeam, IDisableNavigation, IRemoveTeam, IUpdateTeamList} from "../../../stores/internal/types";
 import {addTeam, alterTeam, disableNavigation, removeTeam, updateTeamList} from "../../../stores/internal/actions";
 import {connect} from "react-redux";
-import DialogManager from "../../../shared/managers/DialogManager";
+import DialogManager from "../../../managers/DialogManager";
 import TeamValidator from "../controllers/TeamValidator";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
 import EventPostingController from "../controllers/EventPostingController";
-import HttpError from "../../../shared/models/HttpError";
-import Event from "../../../shared/models/Event";
-import TOAConfig from "../../../shared/models/TOAConfig";
-import TOAProvider from "../../../shared/providers/TOAProvider";
 import {AxiosResponse} from "axios";
-import TOATeam from "../../../shared/models/toa/TOATeam";
-import EMSTeamAdapter from "../../../shared/adapters/EMSTeamAdapter";
-import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
+import TOAUploadManager from "../../../managers/TOAUploadManager";
+import {EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAConfig, TOAProvider, TOATeam} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -197,24 +190,17 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   private importByTOA() {
     this.setState({loadingTeams: true});
     this.props.setNavigationDisabled(true);
-    TOAProvider.getTeams(this.props.event.eventKey).then((res: AxiosResponse) => {
-      const teams: Team[] = [];
+    TOAProvider.getTeams(this.props.event.eventKey).then((toaTeams: TOATeam[]) => {
       const failedImports: number[] = [];
-      if (res.data && res.data.length > 0) {
-        for (const teamJSON of res.data) {
-          if (typeof teamJSON.team !== "undefined") {
-            const team: Team = new EMSTeamAdapter(new TOATeam().fromJSON(teamJSON.team)).get();
-            team.participantKey = teamJSON.event_participant_key;
-            const validator: TeamValidator = new TeamValidator(team);
-            validator.update(team);
-            if (validator.isValid) {
-              teams.push(team);
-            } else {
-              failedImports.push(teamJSON.team_key);
-            }
-          } else {
-            failedImports.push(teamJSON.team_key);
-          }
+      for (const toaTeam of toaTeams) {
+        const team: Team = new EMSTeamAdapter(new TOATeam().fromJSON(toaTeam.toJSON())).get();
+        team.participantKey = teamJSON.event_participant_key;
+        const validator: TeamValidator = new TeamValidator(team);
+        validator.update(team);
+        if (validator.isValid) {
+          teams.push(team);
+        } else {
+          failedImports.push(teamJSON.team_key);
         }
       }
       this.setState({loadingTeams: false});
@@ -231,7 +217,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   }
 
   private canCreateTeamList(): boolean {
-    if (this.props.eventConfig.postQualConfig === "elims") {
+    if (this.props.eventConfig.playoffsConfig === "elims") {
       const maxTeamsPerAlliance = Math.max(this.props.eventConfig.teamsPerAlliance, this.props.eventConfig.postQualTeamsPerAlliance);
       return this.props.teams.length >= (maxTeamsPerAlliance * this.props.eventConfig.allianceCaptains);
     } else {

@@ -1,18 +1,16 @@
 import * as React from "react";
 import {Button, Form, Grid, InputProps} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
-import MatchConfiguration from "../shared/models/MatchConfiguration";
+import {getTheme} from "../AppTheme";
 import {ISetMatchConfig} from "../stores/config/types";
 import {SyntheticEvent} from "react";
-import {CONFIG_STORE} from "../shared/AppStore";
-import AppError from "../shared/models/AppError";
-import DialogManager from "../shared/managers/DialogManager";
+import {CONFIG_STORE} from "../AppStore";
+import DialogManager from "../managers/DialogManager";
 import {ApplicationActions, IApplicationState} from "../stores";
 import {Dispatch} from "redux";
 import {setMatchConfig} from "../stores/config/actions";
 import {connect} from "react-redux";
 import RestrictedAccessModal from "./RestrictedAccessModal";
-import SocketProvider from "../shared/providers/SocketProvider";
+import {AppError, MatchConfiguration, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   matchConfig?: MatchConfiguration,

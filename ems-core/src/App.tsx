@@ -15,17 +15,10 @@ import {
   setQualificationMatches, setSocketConnected,
   updateTeamList
 } from "./stores/internal/actions";
-import EMSProvider from "./shared/providers/EMSProvider";
-import Team from "./shared/models/Team";
+
+import {EMSProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration, Team, Match,
+AllianceMember, MatchParticipant} from "@the-orange-alliance/lib-ems";
 import {AxiosResponse} from "axios";
-import Match from "./shared/models/Match";
-import MatchParticipant from "./shared/models/MatchParticipant";
-import SocketProvider from "./shared/providers/SocketProvider";
-import AllianceMember from "./shared/models/AllianceMember";
-import MatchConfiguration from "./shared/models/MatchConfiguration";
-import WebProvider from "./shared/providers/WebProvider";
-import TOAConfig from "./shared/models/TOAConfig";
-import TOAProvider from "./shared/providers/TOAProvider";
 
 interface IProps {
   slaveModeEnabled: boolean,

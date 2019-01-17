@@ -7,8 +7,9 @@ import {
   SET_MATCH_DURATION,
   SET_MATCH_STATE, UPDATE_PARTICIPANT_STATUS
 } from "./constants";
-import {MatchState} from "../../shared/models/MatchState";
+
 import * as moment from "moment";
+import {MatchState} from "@the-orange-alliance/lib-ems";
 
 // Since redux only allows shallow copying, our participants/details must be flattened.
 export const initialState: IScoringState = {

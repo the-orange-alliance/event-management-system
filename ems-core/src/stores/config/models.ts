@@ -1,9 +1,4 @@
-import EventConfiguration from "../../shared/models/EventConfiguration";
-import Event from "../../shared/models/Event";
-import Schedule from "../../shared/models/Schedule";
-import MatchConfiguration from "../../shared/models/MatchConfiguration";
-import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
-import TOAConfig from "../../shared/models/TOAConfig";
+import {EventConfiguration, MatchConfiguration, Schedule, EliminationsSchedule, TOAConfig, Event} from "@the-orange-alliance/lib-ems";
 
 export interface IConfigState {
   slaveModeEnabled: boolean,

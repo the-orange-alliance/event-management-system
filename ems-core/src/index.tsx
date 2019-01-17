@@ -6,15 +6,14 @@ import './index.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import {reducers} from "./stores";
 import {createStore} from "redux";
-import {CONFIG_STORE} from "./shared/AppStore";
-import AppError from "./shared/models/AppError";
+import {CONFIG_STORE} from "./AppStore";
 import {IConfigState} from "./stores/config/models";
 import * as Config from "./stores/config/reducer";
 import * as Internal from "./stores/internal/reducer";
-import Process from "./shared/models/Process";
-import ProcessManager from "./shared/managers/ProcessManager";
 import {IInternalState} from "./stores/internal/models";
-import DialogManager from "./shared/managers/DialogManager";
+import ProcessManager from "./managers/ProcessManager";
+import DialogManager from "./managers/DialogManager";
+import {AppError, Process} from "@the-orange-alliance/lib-ems";
 
 const {ipcRenderer} = (window as any).require("electron");
 

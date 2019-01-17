@@ -1,5 +1,5 @@
 import * as React from "react";
-import {getTheme} from "../../../shared/AppTheme";
+import {getTheme} from "../../../AppTheme";
 import {Button, Card} from "semantic-ui-react";
 
 interface IProps {

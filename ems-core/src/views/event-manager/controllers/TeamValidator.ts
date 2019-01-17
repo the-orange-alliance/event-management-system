@@ -1,4 +1,4 @@
-import Team from "../../../shared/models/Team";
+import {Team} from "@the-orange-alliance/lib-ems";
 
 class TeamValidator {
   private _team: Team;

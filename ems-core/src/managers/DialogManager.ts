@@ -1,6 +1,5 @@
 import {FileFilter} from "electron";
-import AppError from "../models/AppError";
-import HttpError from "../models/HttpError";
+import {AppError, HttpError} from "@the-orange-alliance/lib-ems";
 import * as moment from "moment";
 
 interface IOpenDialogProps {

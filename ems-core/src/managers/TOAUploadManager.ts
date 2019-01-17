@@ -1,22 +1,8 @@
-import Team from "../models/Team";
-import TOAProvider from "../providers/TOAProvider";
-import HttpError from "../models/HttpError";
-import TOAEventParticipant from "../models/toa/TOAEventParticipant";
-import TOAEventParticipantAdapter from "../adapters/TOAEventParticipantAdapter";
-import Match from "../models/Match";
-import TOAMatch from "../models/toa/TOAMatch";
-import TOAMatchAdapter from "../adapters/TOAMatchAdapter";
-import MatchDetails from "../models/MatchDetails";
-import TOAMatchDetails from "../models/toa/TOAMatchDetails";
-import TOAMatchDetailsAdapter from "../adapters/TOAMatchDetailsAdapter";
-import TOAMatchParticipant from "../models/toa/TOAMatchParticipant";
-import TOAMatchParticipantAdapter from "../adapters/TOAMatchParticipantAdapter";
-import MatchParticipant from "../models/MatchParticipant";
-import EMSProvider from "../providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import Ranking from "../models/Ranking";
-import TOARanking from "../models/toa/TOARanking";
-import TOARankingAdapter from "../adapters/TOARankingAdapter";
+import {EMSProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team,
+  TOAEventParticipant, TOAEventParticipantAdapter, TOAMatch, TOAMatchAdapter, TOAMatchDetails, TOAMatchDetailsAdapter,
+  TOAMatchParticipant, TOAMatchParticipantAdapter, TOAProvider, TOARanking, TOARankingAdapter
+} from "@the-orange-alliance/lib-ems";
 
 class TOAUploadManager {
   private static _instance: TOAUploadManager;

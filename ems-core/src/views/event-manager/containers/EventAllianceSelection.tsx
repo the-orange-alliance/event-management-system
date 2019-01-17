@@ -1,23 +1,16 @@
 import * as React from "react";
 import {Button, Card, Divider, DropdownItemProps, DropdownProps, Form, Grid, Table} from "semantic-ui-react";
-import {getTheme} from "../../../shared/AppTheme";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
+import {getTheme} from "../../../AppTheme";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import Ranking from "../../../shared/models/Ranking";
-import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
-import Team from "../../../shared/models/Team";
+import DialogManager from "../../../managers/DialogManager";
 import {SyntheticEvent} from "react";
-import AllianceMember from "../../../shared/models/AllianceMember";
-import Event from "../../../shared/models/Event";
 import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
 import EventPostingController from "../controllers/EventPostingController";
-import SocketProvider from "../../../shared/providers/SocketProvider";
+import {AllianceMember, EMSProvider, Event, EventConfiguration, HttpError, Ranking, SocketProvider, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -161,7 +154,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
           <Divider/>
           <div className="step-table-buttons">
             <div>
-              <Button color={getTheme().primary} loading={navigationDisabled} disabled={!canGenerate || navigationDisabled} onClick={this.generateAlliances}>Save & Publish</Button>
+              <Button color={getTheme().primary} loading={navigationDisabled} disabled={!canGenerate || navigationDisabled} onClick={this.generateAlliances}>Save &amp; Publish</Button>
               <Button color={getTheme().primary} disabled={navigationDisabled} onClick={this.autoRemoveTeam}>Undo Action</Button>
             </div>
             <div>

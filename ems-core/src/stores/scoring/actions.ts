@@ -5,17 +5,14 @@ import {
   ISetMatchDuration,
   ISetMatchState, IUpdateParticipantStatus,
 } from "./types";
-import Match from "../../shared/models/Match";
 import {
   SET_ACTIVE_DETAILS,
   SET_ACTIVE_MATCH, SET_ACTIVE_PARTICIPANTS,
   SET_MATCH_DURATION,
   SET_MATCH_STATE, UPDATE_PARTICIPANT_STATUS
 } from "./constants";
-import {MatchState} from "../../shared/models/MatchState";
 import * as moment from "moment";
-import MatchParticipant from "../../shared/models/MatchParticipant";
-import MatchDetails from "../../shared/models/MatchDetails";
+import {Match, MatchState, MatchParticipant, MatchDetails} from "@the-orange-alliance/lib-ems";
 
 export const setActiveMatch: ActionCreator<ISetActiveMatch> = (activeMatch: Match) => ({
   type: SET_ACTIVE_MATCH,

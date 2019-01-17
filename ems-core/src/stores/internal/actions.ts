@@ -29,10 +29,7 @@ import {
   ISetSocketConnected,
   ISetFinalsMatches, ISetEliminationsMatches, ISetAllianceMembers
 } from "./types";
-import Process from "../../shared/models/Process";
-import Team from "../../shared/models/Team";
-import Match from "../../shared/models/Match";
-import AllianceMember from "../../shared/models/AllianceMember";
+import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
 export const updateProcessList: ActionCreator<IUpdateProcessList> = (processList: Process[]) => ({
   type: UPDATE_PROCESS_LIST,

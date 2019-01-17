@@ -9,12 +9,7 @@ import {
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
   TOGGLE_SLAVE_MODE
 } from "./constants";
-import EventConfiguration from "../../shared/models/EventConfiguration";
-import Event from "../../shared/models/Event";
-import Schedule from "../../shared/models/Schedule";
-import MatchConfiguration from "../../shared/models/MatchConfiguration";
-import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
-import TOAConfig from "../../shared/models/TOAConfig";
+import {EventConfiguration, MatchConfiguration, Schedule, EliminationsSchedule, TOAConfig} from "@the-orange-alliance/lib-ems";
 
 export interface IToggleSlaveMode extends Action {
   type: TOGGLE_SLAVE_MODE,

@@ -1,20 +1,17 @@
 import * as React from "react";
 import {Button, Card, Checkbox, CheckboxProps, Divider, Table} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
-import {TournamentLevels} from "../shared/AppTypes";
-import EventConfiguration from "../shared/models/EventConfiguration";
+import {getTheme} from "../AppTheme";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
-import Match from "../shared/models/Match";
 import {IDisableNavigation} from "../stores/internal/types";
 import ConfirmActionModal from "./ConfirmActionModal";
-import TOAConfig from "../shared/models/TOAConfig";
 import {SyntheticEvent} from "react";
+import {EventConfiguration, Match, TOAConfig, TournamentType} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: (postOnline: boolean) => void,
   toaConfig?: TOAConfig,
-  type: TournamentLevels,
+  type: TournamentType,
   matchList: Match[],
   eventConfig?: EventConfiguration,
   navigationDisabled?: boolean,

@@ -2,7 +2,7 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {ToastContainer} from "react-toastify";
 import {Container, Divider, Header, Menu, MenuItemProps} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 import {IApplicationState} from "../stores";
 import EventManagerView from "../views/event-manager/EventManagerView";
 import SettingsView from "../views/settings/SettingsView";

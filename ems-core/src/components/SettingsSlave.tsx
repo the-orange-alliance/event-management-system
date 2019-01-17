@@ -1,25 +1,20 @@
 import * as React from "react";
 import {Button, Card, Grid, Input, InputProps, Message} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 import ExplanationIcon from "./ExplanationIcon";
-import Event from "../shared/models/Event";
-import EventConfiguration from "../shared/models/EventConfiguration";
 import {ApplicationActions, IApplicationState} from "../stores";
 import {Dispatch} from "redux";
 import {connect} from "react-redux";
 import {SyntheticEvent} from "react";
-import EMSProvider from "../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import HttpError from "../shared/models/HttpError";
-import DialogManager from "../shared/managers/DialogManager";
+import DialogManager from "../managers/DialogManager";
 import * as socket from "socket.io-client";
 import {ISetEvent, ISetEventConfiguration, IToggleSlaveMode} from "../stores/config/types";
 import {enableSlaveMode, setEvent, setEventConfiguration} from "../stores/config/actions";
-import {CONFIG_STORE} from "../shared/AppStore";
-import AppError from "../shared/models/AppError";
+import {CONFIG_STORE} from "../AppStore";
 import {IIncrementCompletedStep} from "../stores/internal/types";
 import {incrementCompletedStep} from "../stores/internal/actions";
-import SocketProvider from "../shared/providers/SocketProvider";
+import {AppError, EMSProvider, Event, EventConfiguration, HttpError, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   event?: Event,

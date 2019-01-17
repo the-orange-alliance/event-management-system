@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Card} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 
 interface IProps {
   title: string,

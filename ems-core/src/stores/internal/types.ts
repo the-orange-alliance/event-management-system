@@ -15,10 +15,7 @@ import {
   SET_ELIMINATIONS_MATCHES,
   SET_ALLIANCE_MEMBERS
 } from "./constants";
-import Process from "../../shared/models/Process";
-import Team from "../../shared/models/Team";
-import Match from "../../shared/models/Match";
-import AllianceMember from "../../shared/models/AllianceMember";
+import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
 export interface IUpdateProcessList extends Action {
   type: UPDATE_PROCESS_LIST,

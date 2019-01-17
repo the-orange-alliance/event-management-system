@@ -2,17 +2,12 @@ import * as React from "react";
 import {Card, CheckboxProps, DropdownProps, Form, Grid, InputProps} from "semantic-ui-react";
 import {ApplicationActions, IApplicationState} from "../../stores";
 import {connect} from "react-redux";
-import Match from "../../shared/models/Match";
-import {MatchState} from "../../shared/models/MatchState";
-import MatchParticipant from "../../shared/models/MatchParticipant";
-import MatchDetails from "../../shared/models/MatchDetails";
 import {ISetActiveDetails, ISetActiveMatch} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setActiveDetails} from "../../stores/scoring/actions";
 import RoverRuckusTeamStatus from "./RoverRuckusTeamStatus";
-import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
 import {SyntheticEvent} from "react";
-import {RoverRuckusAutoItems, RoverRuckusEndItems, RoverRuckusPreItems} from "../../shared/data/DropdownItemOptions";
+import {DropdownData, Match, MatchDetails, MatchParticipant, MatchState, RoverRuckusMatchDetails} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   match?: Match,
@@ -60,13 +55,13 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Pre-Auto" value={details.redPreRobotOneStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotOnePreStatus}/></Grid.Column>
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Auto" value={details.redAutoRobotOneClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotOneAutoStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Pre-Auto" value={details.redPreRobotOneStatus} options={DropdownData.RoverRuckusPreItems} onChange={this.modifyRobotOnePreStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Auto" value={details.redAutoRobotOneClaimed} options={DropdownData.RoverRuckusAutoItems} onChange={this.modifyRobotOneAutoStatus}/></Grid.Column>
                 <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 1 Claimed" checked={details.redAutoRobotOneClaimed} onChange={this.modifyRobotOneClaimed}/></Grid.Column>
               </Grid.Row>
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Pre-Auto" value={details.redPreRobotTwoStatus} options={RoverRuckusPreItems} onChange={this.modifyRobotTwoPreStatus}/></Grid.Column>
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Auto" value={details.redAutoRobotTwoClaimed} options={RoverRuckusAutoItems} onChange={this.modifyRobotTwoAutoStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Pre-Auto" value={details.redPreRobotTwoStatus} options={DropdownData.RoverRuckusPreItems} onChange={this.modifyRobotTwoPreStatus}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Auto" value={details.redAutoRobotTwoClaimed} options={DropdownData.RoverRuckusAutoItems} onChange={this.modifyRobotTwoAutoStatus}/></Grid.Column>
                 <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Robot 2 Claimed" checked={details.redAutoRobotTwoClaimed} onChange={this.modifyRobotTwoClaimed}/></Grid.Column>
               </Grid.Row>
               <Grid.Row columns="equal" textAlign="center">
@@ -93,8 +88,8 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Endgame" value={details.redEndRobotOneStatus} options={RoverRuckusEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Endgame" value={details.redEndRobotTwoStatus} options={RoverRuckusEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Endgame" value={details.redEndRobotOneStatus} options={DropdownData.RoverRuckusEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Endgame" value={details.redEndRobotTwoStatus} options={DropdownData.RoverRuckusEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
               </Grid.Row>
             </Grid>
           </Form>

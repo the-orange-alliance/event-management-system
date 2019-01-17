@@ -11,17 +11,12 @@ import {
 } from "./constants";
 import {IConfigState} from "./models";
 import {ConfigActions} from "./types";
-import * as EventConfig from "../../shared/models/EventConfiguration";
-import Event from "../../shared/models/Event";
-import Schedule from "../../shared/models/Schedule";
-import MatchConfiguration from "../../shared/models/MatchConfiguration";
-import EliminationsSchedule from "../../shared/models/EliminationsSchedule";
-import TOAConfig from "../../shared/models/TOAConfig";
+import {MatchConfiguration, Schedule, EliminationsSchedule, TOAConfig, EventConfiguration, Event} from "@the-orange-alliance/lib-ems";
 
 export const initialState: IConfigState = {
   slaveModeEnabled: false,
   slaveInstanceID: 1,
-  eventConfiguration: EventConfig.DEFAULT_RESET,
+  eventConfiguration: new EventConfiguration(),
   matchConfig: new MatchConfiguration(),
   event: new Event(),
   networkHost: undefined,

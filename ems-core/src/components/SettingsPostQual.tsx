@@ -1,22 +1,19 @@
 import * as React from "react";
 import {Button, Card, Dropdown, DropdownProps, Grid} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
-import EventConfiguration from "../shared/models/EventConfiguration";
+import {getTheme} from "../AppTheme";
 import {ApplicationActions, IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Dispatch} from "redux";
 import {ISetEventConfiguration} from "../stores/config/types";
 import {setEventConfiguration} from "../stores/config/actions";
-import {AllianceCaptainItems, EliminationsFormatItems, PostQualItems} from "../shared/data/DropdownItemOptions";
 import {SyntheticEvent} from "react";
 import {EliminationsFormats, PostQualConfig} from "../shared/AppTypes";
-import Team from "../shared/models/Team";
 import ConfirmActionModal from "./ConfirmActionModal";
-import {CONFIG_STORE} from "../shared/AppStore";
-import AppError from "../shared/models/AppError";
-import DialogManager from "../shared/managers/DialogManager";
+import {CONFIG_STORE} from "../AppStore";
+import DialogManager from "../managers/DialogManager";
 import {IIncrementCompletedStep} from "../stores/internal/types";
 import {incrementCompletedStep} from "../stores/internal/actions";
+import {AppError, EventConfiguration, Team, DropdownData} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -69,28 +66,28 @@ class SettingsPostQual extends React.Component<IProps, IState> {
                 <Dropdown
                   fluid={true}
                   selection={true}
-                  value={this.state.configCopy.postQualConfig}
-                  options={PostQualItems}
+                  value={this.state.configCopy.playoffsConfig}
+                  options={DropdownData.PostQualItems}
                   onChange={this.setPostQualConfig}
                 />
               </Grid.Column>
             </Grid.Row>
             {
-              this.state.configCopy.postQualConfig === "elims" &&
+              this.state.configCopy.playoffsConfig === "elims" &&
               <Grid.Row>
                 <Grid.Column><span>Alliance Captains</span></Grid.Column>
-                <Grid.Column><Dropdown fluid={true} selection={true} value={this.state.configCopy.allianceCaptains} options={AllianceCaptainItems} onChange={this.setAllianceCaptainConfig}/></Grid.Column>
+                <Grid.Column><Dropdown fluid={true} selection={true} value={this.state.configCopy.allianceCaptains} options={DropdownData.AllianceCaptainItems} onChange={this.setAllianceCaptainConfig}/></Grid.Column>
               </Grid.Row>
             }
             {
-              this.state.configCopy.postQualConfig === "elims" &&
+              this.state.configCopy.playoffsConfig === "elims" &&
               <Grid.Row>
                 <Grid.Column><span>Eliminations Format</span></Grid.Column>
-                <Grid.Column><Dropdown fluid={true} selection={true} value={this.state.configCopy.elimsFormat} options={EliminationsFormatItems} onChange={this.setElimsFormatConfig}/></Grid.Column>
+                <Grid.Column><Dropdown fluid={true} selection={true} value={this.state.configCopy.elimsFormat} options={DropdownData.EliminationsFormatItems} onChange={this.setElimsFormatConfig}/></Grid.Column>
               </Grid.Row>
             }
             {
-              this.state.configCopy.postQualConfig === "finals" &&
+              this.state.configCopy.playoffsConfig === "finals" &&
               <Grid.Row>
                 <Grid.Column><span>Ranking Cutoff</span></Grid.Column>
                 <Grid.Column><Dropdown fluid={true} selection={true} value={this.state.configCopy.rankingCutoff} options={rankingsOptions} onChange={this.setRankingCutoffConfig}/></Grid.Column>
@@ -115,7 +112,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
 
   private setPostQualConfig(event: SyntheticEvent, props: DropdownProps) {
     if (typeof props.value === "string") {
-      this.state.configCopy.postQualConfig = props.value as PostQualConfig;
+      this.state.configCopy.playoffsConfig = props.value as PostQualConfig;
       this.forceUpdate();
     }
   }
@@ -146,9 +143,9 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     this.closeConfirmModal();
     this.props.setEventConfig(this.state.configCopy);
     CONFIG_STORE.set("eventConfig", this.state.configCopy.toJSON()).then((data: any) => {
-      if (this.state.configCopy.postQualConfig === "finals" && this.props.completedStep === 4) {
+      if (this.state.configCopy.playoffsConfig === "finals" && this.props.completedStep === 4) {
         this.props.setCompletedStep(5);
-      } else if (this.state.configCopy.postQualConfig === "elims" && this.props.completedStep !== 4) {
+      } else if (this.state.configCopy.playoffsConfig === "elims" && this.props.completedStep !== 4) {
         this.props.setCompletedStep(4);
       }
     }).catch((error: AppError) => {

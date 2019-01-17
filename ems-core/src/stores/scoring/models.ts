@@ -1,8 +1,5 @@
-import Match from "../../shared/models/Match";
-import {MatchState} from "../../shared/models/MatchState";
+import {Match, MatchState, MatchParticipant, MatchDetails} from "@the-orange-alliance/lib-ems";
 import * as moment from "moment";
-import MatchParticipant from "../../shared/models/MatchParticipant";
-import MatchDetails from "../../shared/models/MatchDetails";
 
 export interface IScoringState {
   activeMatch: Match,

@@ -1,25 +1,19 @@
 import * as React from "react";
 import {Tab, TabProps} from "semantic-ui-react";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
 import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import SetupElimsScheduleParams from "../../../components/SetupElimsScheduleParams";
-import ScheduleItem from "../../../shared/models/ScheduleItem";
 import EventPostingController from "../controllers/EventPostingController";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
+import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
-import EliminationsSchedule from "../../../shared/models/EliminationsSchedule";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
-import Event from "../../../shared/models/Event";
-import Match from "../../../shared/models/Match";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
-import TOAConfig from "../../../shared/models/TOAConfig";
-import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
+import TOAUploadManager from "../../../managers/TOAUploadManager";
+import {EliminationsSchedule, Event, EventConfiguration, HttpError, Match, ScheduleItem, TOAConfig} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,

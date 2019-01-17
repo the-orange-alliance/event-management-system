@@ -1,12 +1,9 @@
-import AllianceMember from "../models/AllianceMember";
-import {EliminationsFormats} from "../AppTypes";
-import Match from "../models/Match";
-import MatchParticipant from "../models/MatchParticipant";
+import {AllianceMember, EliminationFormat, Match, MatchParticipant} from "@the-orange-alliance/lib-ems";
 
 interface IBracketOptions {
   allianceCaptains: number,
   allianceMembers: AllianceMember[],
-  format: EliminationsFormats,
+  format: EliminationFormat,
   eventKey: string,
   fields: number
 }
@@ -246,7 +243,7 @@ class AllianceBracketManager {
     return alliances;
   }
 
-  private getMatchesFromFormat(format: EliminationsFormats): number {
+  private getMatchesFromFormat(format: EliminationFormat): number {
     switch (format) {
       case "bo1":
         return 1;

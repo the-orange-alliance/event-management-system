@@ -1,5 +1,4 @@
-import Process from "../models/Process";
-import AppError from "../models/AppError";
+import {AppError, Process} from "@the-orange-alliance/lib-ems";
 
 const ipcRenderer = (window as any).require("electron").ipcRenderer;
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Grid} from "semantic-ui-react";
-import Process from "../shared/models/Process";
+import {Process} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   process: Process

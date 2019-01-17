@@ -1,8 +1,7 @@
 import * as React from "react";
 import {Button, Card, Dropdown, DropdownProps, Grid} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 import {TeamIdentifierItems} from "../shared/data/DropdownItemOptions";
-import EventConfiguration from "../shared/models/EventConfiguration";
 import {ISetEventConfiguration} from "../stores/config/types";
 import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../stores";
@@ -10,11 +9,10 @@ import {Dispatch} from "redux";
 import {setEventConfiguration} from "../stores/config/actions";
 import {connect} from "react-redux";
 import {TeamIdentifier} from "../shared/AppTypes";
-import Event from "../shared/models/Event";
 import ConfirmActionModal from "./ConfirmActionModal";
-import {CONFIG_STORE} from "../shared/AppStore";
-import AppError from "../shared/models/AppError";
-import DialogManager from "../shared/managers/DialogManager";
+import {CONFIG_STORE} from "../AppStore";
+import DialogManager from "../managers/DialogManager";
+import {AppError, Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   event?: Event,
@@ -81,7 +79,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
               </Grid.Column>
             </Grid.Row>
             <Grid.Row width={16} centered={true}>
-              <Grid.Column width={6}><Button fluid={true} color={getTheme().primary} onClick={this.openConfirmModal}>Save & Update</Button></Grid.Column>
+              <Grid.Column width={6}><Button fluid={true} color={getTheme().primary} onClick={this.openConfirmModal}>Save &amps; Update</Button></Grid.Column>
             </Grid.Row>
           </Grid>
         </Card.Content>

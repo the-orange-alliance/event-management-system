@@ -1,15 +1,12 @@
 import * as React from "react";
 import {Card, Table} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
-import ScheduleItem from "../shared/models/ScheduleItem";
-import {TournamentLevels} from "../shared/AppTypes";
-import EMSProvider from "../shared/providers/EMSProvider";
-import HttpError from "../shared/models/HttpError";
-import DialogManager from "../shared/managers/DialogManager";
+import {getTheme} from "../AppTheme";
+import DialogManager from "../managers/DialogManager";
 import {AxiosResponse} from "axios";
+import {EMSProvider, HttpError, ScheduleItem, TournamentType} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
-  type: TournamentLevels
+  type: TournamentType
 }
 
 interface IState {

@@ -1,22 +1,16 @@
 import * as React from "react";
 import {Button, Card, Form, InputProps, Tab} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 import {ApplicationActions, IApplicationState} from "../stores";
-import AppError from "../shared/models/AppError";
-import DialogManager from "../shared/managers/DialogManager";
+import DialogManager from "../managers/DialogManager";
 import {connect} from "react-redux";
-import Event from "../shared/models/Event";
 import {IDisableNavigation} from "../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation} from "../stores/internal/actions";
-import Match from "../shared/models/Match";
-import ScheduleItem from "../shared/models/ScheduleItem";
-import EMSProvider from "../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import EliminationsSchedule from "../shared/models/EliminationsSchedule";
-import AllianceMember from "../shared/models/AllianceMember";
 import {SyntheticEvent} from "react";
-import AllianceBracketManager from "../shared/managers/AllianceBracketManager";
+import AllianceBracketManager from "../managers/AllianceBracketManager";
+import {AllianceMember, AppError, EliminationsSchedule, EMSProvider, Event, Match, ScheduleItem} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: (matches: Match[]) => void,

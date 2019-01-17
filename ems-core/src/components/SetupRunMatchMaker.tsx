@@ -1,22 +1,16 @@
 import * as React from "react";
 import {Button, Card, Form, RadioProps, Tab} from "semantic-ui-react";
-import {getTheme} from "../shared/AppTheme";
+import {getTheme} from "../AppTheme";
 import {SyntheticEvent} from "react";
-import Schedule from "../shared/models/Schedule";
-import MatchMakerManager from "../shared/managers/MatchMakerManager";
-import Team from "../shared/models/Team";
+import MatchMakerManager from "../managers/MatchMakerManager";
 import {ApplicationActions, IApplicationState} from "../stores";
-import AppError from "../shared/models/AppError";
-import DialogManager from "../shared/managers/DialogManager";
+import DialogManager from "../managers/DialogManager";
 import {connect} from "react-redux";
-import Event from "../shared/models/Event";
 import {IDisableNavigation} from "../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation} from "../stores/internal/actions";
-import Match from "../shared/models/Match";
-import ScheduleItem from "../shared/models/ScheduleItem";
-import EMSProvider from "../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
+import {AppError, EMSProvider, Event, Match, Schedule, ScheduleItem, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   teams: Team[],

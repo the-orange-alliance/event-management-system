@@ -1,12 +1,9 @@
 import * as React from "react";
 import ReportTemplate from "./ReportTemplate";
-import Team from "../../../shared/models/Team";
-import Match from "../../../shared/models/Match";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Table} from "semantic-ui-react";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
+import {EventConfiguration, Match, MatchParticipant, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   teamList?: Team[],

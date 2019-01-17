@@ -1,13 +1,7 @@
-import {MatchState} from "../../../shared/models/MatchState";
-import Match from "../../../shared/models/Match";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import HttpError from "../../../shared/models/HttpError";
-import SocketProvider from "../../../shared/providers/SocketProvider";
-import {AllianceColors, EliminationsFormats} from "../../../shared/AppTypes";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import Team from "../../../shared/models/Team";
 import {AxiosResponse} from "axios";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
+import {AllianceColor, EliminationFormat, EMSProvider, EventConfiguration, HttpError, Match, MatchParticipant,
+  MatchState, SocketProvider, Team
+} from "@the-orange-alliance/lib-ems";
 
 const PRESTART_ID = 0;
 const AUDIENCE_ID = 1;
@@ -43,7 +37,7 @@ class MatchFlowController {
         for (const participant of match.participants) {
           participant.cardStatus = 0;
         }
-        SocketProvider.sendTwo("prestart", match.matchKey, match.fieldNumber);
+        SocketProvider.emit("prestart", match.matchKey, match.fieldNumber);
         resolve();
       }).catch((error: HttpError) => {
         reject(error);
@@ -193,7 +187,7 @@ class MatchFlowController {
     return states;
   }
 
-  public checkForAdvancements(tournamentLevel: number, format: EliminationsFormats): Promise<Match[]> {
+  public checkForAdvancements(tournamentLevel: number, format: EliminationFormat): Promise<Match[]> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getMatches(tournamentLevel).then((response: AxiosResponse) => {
         if (response.data && response.data.payload && response.data.payload.length > 0) {
@@ -302,7 +296,7 @@ class MatchFlowController {
     }
   }
 
-  private makeAndPostParticipants(advancementLevel: number, alliance: MatchParticipant[], allianceColor: AllianceColors): Promise<any> {
+  private makeAndPostParticipants(advancementLevel: number, alliance: MatchParticipant[], allianceColor: AllianceColor): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getMatchResults(advancementLevel).then((response: AxiosResponse) => {
         if (response.data && response.data.payload && response.data.payload.length > 0) {
@@ -396,7 +390,7 @@ class MatchFlowController {
     return Promise.all(promises);
   }
 
-  private getWinsFromFormat(format: EliminationsFormats): number {
+  private getWinsFromFormat(format: EliminationFormat): number {
     switch (format) {
       case "bo1":
         return 1;

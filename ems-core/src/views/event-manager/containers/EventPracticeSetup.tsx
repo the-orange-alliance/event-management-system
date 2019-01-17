@@ -7,20 +7,13 @@ import SetupScheduleParams from "../../../components/SetupScheduleParams";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupRunMatchMaker from "../../../components/SetupRunMatchMaker";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
-import Schedule from "../../../shared/models/Schedule";
-import Team from "../../../shared/models/Team";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
-import ScheduleItem from "../../../shared/models/ScheduleItem";
 import {IDisableNavigation, ISetPracticeMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setPracticeMatches} from "../../../stores/internal/actions";
 import EventPostingController from "../controllers/EventPostingController";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
-import Event from"../../../shared/models/Event";
-import Match from "../../../shared/models/Match";
-import TOAConfig from "../../../shared/models/TOAConfig";
-import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
+import DialogManager from "../../../managers/DialogManager";
+import TOAUploadManager from "../../../managers/TOAUploadManager";
+import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,

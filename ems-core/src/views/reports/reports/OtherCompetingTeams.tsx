@@ -1,12 +1,9 @@
 import * as React from "react";
-import Team from "../../../shared/models/Team";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
 import ReportTemplate from "./ReportTemplate";
-import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
+import DialogManager from "../../../managers/DialogManager";
 import {Table} from "semantic-ui-react";
+import {EMSProvider, EventConfiguration, HttpError, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   eventConfig?: EventConfiguration,

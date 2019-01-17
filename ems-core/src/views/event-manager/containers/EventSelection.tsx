@@ -6,36 +6,23 @@ import fgc_2018 from "../../../resources/FGC_ei.png";
 import ftc_1718 from "../../../resources/FTC_rr.png";
 import ftc_1819 from "../../../resources/FTC_roverruckus.png";
 import ftc_logo from "../../../resources/FTC_logo.png";
-import EventConfiguration, {
-  DEFAULT_RESET,
-  FGC_EI_PRESET, FTC_RELIC_PRESET,
-  FTC_ROVER_PRESET
-} from "../../../shared/models/EventConfiguration";
-import Event from "../../../shared/models/Event";
 import {ISetEvent, ISetEventConfiguration} from "../../../stores/config/types";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Dispatch} from "redux";
 import {setEvent, setEventConfiguration} from "../../../stores/config/actions";
-import {getTheme} from "../../../shared/AppTheme";
+import {getTheme} from "../../../AppTheme";
 import ExplanationIcon from "../../../components/ExplanationIcon";
-import {getFromEMSEventType, getFromSeasonKey, SeasonItems} from "../../../shared/data/Seasons";
-import {getFromRegionKey, RegionItems} from "../../../shared/data/Regions";
 import {SyntheticEvent} from "react";
-import {AllianceCaptainItems, PostQualItems, EventTypeItems} from "../../../shared/data/DropdownItemOptions";
-import {PostQualConfig} from "../../../shared/AppTypes";
 import EventCreationValidator from "../controllers/EventCreationValidator";
-import HttpError from "../../../shared/models/HttpError";
-import {CONFIG_STORE} from "../../../shared/AppStore";
+import {CONFIG_STORE} from "../../../AppStore";
 import EventPostingController from "../controllers/EventPostingController";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
-import TOAConfig from "../../../shared/models/TOAConfig";
-import TOAProvider from "../../../shared/providers/TOAProvider";
-import {AxiosResponse} from "axios";
-import DialogManager from "../../../shared/managers/DialogManager";
-import TOAEvent from "../../../shared/models/toa/TOAEvent";
-import EMSEventAdapter from "../../../shared/adapters/EMSEventAdapter";
+import DialogManager from "../../../managers/DialogManager";
+import {DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, PlayoffsType, RegionData, SeasonData,
+  TOAConfig, TOAEvent, TOAProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_EI_PRESET, FTC_ROVER_PRESET
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -102,10 +89,9 @@ class EventSelection extends React.Component<IProps, IState> {
   private downloadTOAData() {
     this.setState({downloadingData: true});
     TOAProvider.initialize(this.props.toaConfig);
-    TOAProvider.getEvent(this.props.toaConfig.eventKey).then((res: AxiosResponse) => {
-      if (res.data && res.data[0]) {
-        const event: TOAEvent = new TOAEvent().fromJSON(res.data[0]);
-        this.props.setEvent(new EMSEventAdapter(event).get());
+    TOAProvider.getEvent(this.props.toaConfig.eventKey).then((toaEvent: TOAEvent) => {
+      if (toaEvent && toaEvent.eventKey && toaEvent.eventKey.length > 0) {
+        this.props.setEvent(new EMSEventAdapter(toaEvent).get());
         this.props.toaConfig.enabled = true;
         this.state.eventValidator.update(this.props.eventConfig, this.props.event);
         this.forceUpdate();
@@ -138,9 +124,9 @@ class EventSelection extends React.Component<IProps, IState> {
 
   /* Event Configuration Methods */
   private setConfigurationPreset(preset: EventConfiguration) {
-    const seasonKey = getFromEMSEventType(preset.eventType).value;
+    const seasonKey = SeasonData.getFromEventType(preset.eventType).value;
     this.props.selectConfigPreset(preset);
-    this.props.event.season = getFromSeasonKey(seasonKey);
+    this.props.event.season = SeasonData.getFromSeasonKey(seasonKey);
     this.state.eventValidator.update(this.props.eventConfig, this.props.event);
     this.forceUpdate();
   }
@@ -182,7 +168,7 @@ class EventSelection extends React.Component<IProps, IState> {
 
   private setPostQualConfig(event: SyntheticEvent, props: DropdownProps) {
     if (typeof props.value === "string") {
-      this.props.eventConfig.postQualConfig = props.value as PostQualConfig;
+      this.props.eventConfig.playoffsConfig = props.value as PlayoffsType;
       this.props.selectConfigPreset(this.props.eventConfig);
       this.state.eventValidator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
@@ -202,7 +188,7 @@ class EventSelection extends React.Component<IProps, IState> {
   /* Event Information Methods */
   private setEventRegion(event: SyntheticEvent, props: DropdownProps) {
     if (typeof props.value === "string") {
-      this.props.event.region = getFromRegionKey(props.value);
+      this.props.event.region = RegionData.getFromRegionKey(props.value);
       this.props.setEvent(this.props.event);
       this.state.eventValidator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
@@ -372,24 +358,24 @@ class EventSelection extends React.Component<IProps, IState> {
 
   private renderBasicEventInformation(): JSX.Element {
     const {eventValidator} = this.state;
-    const selectedRegion = typeof this.props.event.region === "undefined" ? RegionItems[0].value : this.props.event.region.regionKey;
-    const selectedEventType = typeof this.props.event.eventType === "undefined" ? EventTypeItems[0].value : this.props.event.eventType;
+    const selectedRegion = typeof this.props.event.region === "undefined" ? RegionData.RegionItems[0].value : this.props.event.region.regionKey;
+    const selectedEventType = typeof this.props.event.eventType === "undefined" ? DropdownData.EventTypeItems[0].value : this.props.event.eventType;
     const event = this.props.event;
     return (
       <Form>
         <Grid>
           <Grid.Row columns={16}>
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={SeasonItems} disabled={true} value={getFromEMSEventType(this.props.eventConfig.eventType).value} label="Season"/></Grid.Column>
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={RegionItems} value={selectedRegion} onChange={this.setEventRegion} error={typeof event.region === "undefined"} label="Region"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={SeasonData.SeasonItems} disabled={true} value={SeasonData.getFromEventType(this.props.eventConfig.eventType).value} label="Season"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={RegionData.RegionItems} value={selectedRegion} onChange={this.setEventRegion} error={typeof event.region === "undefined"} label="Region"/></Grid.Column>
             {
               this.props.eventConfig.requiresTOA &&
-               <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={[]} error={!eventValidator.isValidEventKey()} label="Event"/></Grid.Column> // TODO - Implement automatic event importing
+               <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={[]} error={!eventValidator.isValidEventKey()} label="Event"/></Grid.Column>
             }
             {
               !this.props.eventConfig.requiresTOA &&
               <Grid.Column width={4}><Form.Input fluid={true} value={event.eventCode} onChange={this.setEventCode} error={!eventValidator.isValidEventKey()} label={<ExplanationIcon title={"Event Code"} content={"An event's code is a 3-4 letter combination that is used to represent the event. For example, Great Lakes Bay Region event could be coded into GLBR."}/>}/></Grid.Column>
             }
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={EventTypeItems} value={selectedEventType} onChange={this.setEventType} error={typeof event.eventType === "undefined"} label="Event Type"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.EventTypeItems} value={selectedEventType} onChange={this.setEventType} error={typeof event.eventType === "undefined"} label="Event Type"/></Grid.Column>
           </Grid.Row>
           <Grid.Row columns={16}>
             <Grid.Column width={8}><Form.Input fluid={true} value={event.eventName} onChange={this.setEventName} error={!eventValidator.isValidEventName()} label="Event Name"/></Grid.Column>
@@ -412,18 +398,18 @@ class EventSelection extends React.Component<IProps, IState> {
 
   private renderPostQualInformation(): JSX.Element {
     const {eventValidator} = this.state;
-    const postQualLabel = this.props.eventConfig.postQualConfig === "elims" ? "Eliminations" : "Finals";
+    const postQualLabel = this.props.eventConfig.playoffsConfig === "elims" ? "Eliminations" : "Finals";
     return (
       <Form>
         <Grid>
           <Grid.Row columns={16}>
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={PostQualItems} value={this.props.eventConfig.postQualConfig} onChange={this.setPostQualConfig} label="Post-Qualification Type"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.PostQualItems} value={this.props.eventConfig.playoffsConfig} onChange={this.setPostQualConfig} label="Post-Qualification Type"/></Grid.Column>
             {
-              this.props.eventConfig.postQualConfig === "elims" &&
-              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={AllianceCaptainItems} value={this.props.eventConfig.allianceCaptains} onChange={this.setAllianceCaptainConfig} error={!eventValidator.isValidAllianceCaptains()} label="Alliance Captains"/></Grid.Column>
+              this.props.eventConfig.playoffsConfig === "elims" &&
+              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.AllianceCaptainItems} value={this.props.eventConfig.allianceCaptains} onChange={this.setAllianceCaptainConfig} error={!eventValidator.isValidAllianceCaptains()} label="Alliance Captains"/></Grid.Column>
             }
             {
-              this.props.eventConfig.postQualConfig === "finals" &&
+              this.props.eventConfig.playoffsConfig === "finals" &&
               <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.rankingCutoff} onChange={this.setRankingCutoff} label={<ExplanationIcon title={"Ranking Cutoff"} content={"This configuration may be changed after the event is created in the 'Settings' tab."}/>}/></Grid.Column>
             }
             <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.postQualTeamsPerAlliance} onChange={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>

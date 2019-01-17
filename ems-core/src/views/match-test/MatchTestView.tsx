@@ -1,15 +1,10 @@
 import * as React from "react";
 import {Button, Card, Grid} from "semantic-ui-react";
-import {getTheme} from "../../shared/AppTheme";
+import {getTheme} from "../../AppTheme";
 import {IApplicationState} from "../../stores";
-import SocketProvider from "../../shared/providers/SocketProvider";
-import EMSProvider from "../../shared/providers/EMSProvider";
 import {connect} from "react-redux";
-import DialogManager from "../../shared/managers/DialogManager";
-import HttpError from "../../shared/models/HttpError";
-import TOAProvider from "../../shared/providers/TOAProvider";
-import TOAConfig from "../../shared/models/TOAConfig";
-import WebProvider from "../../shared/providers/WebProvider";
+import DialogManager from "../../managers/DialogManager";
+import {EMSProvider, HttpError, SocketProvider, TOAConfig, TOAProvider, WebProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   slaveModeEnabled?: boolean,

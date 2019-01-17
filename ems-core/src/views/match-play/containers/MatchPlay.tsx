@@ -1,15 +1,9 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Button, Card, Divider, DropdownProps, Form, Grid, Tab} from "semantic-ui-react";
-import Event from "../../../shared/models/Event";
-import Match from "../../../shared/models/Match";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
-import {PostQualConfig, TournamentLevels} from "../../../shared/AppTypes";
-import MatchConfiguration from "../../../shared/models/MatchConfiguration";
 import MatchPlayTimerConfiguration from "../../../components/MatchPlayTimerConfiguration";
-import {MatchState} from "../../../shared/models/MatchState";
 import {
   ISetActiveDetails,
   ISetActiveMatch,
@@ -20,17 +14,14 @@ import {Dispatch} from "redux";
 import {setActiveDetails, setActiveMatch, setActiveParticipants, setMatchState} from "../../../stores/scoring/actions";
 import MatchFlowController from "../controllers/MatchFlowController";
 import * as moment from "moment";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
-import SocketProvider from "../../../shared/providers/SocketProvider";
+import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
 import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
-import MatchParticipant from "../../../shared/models/MatchParticipant";
-import MatchDetails from "../../../shared/models/MatchDetails";
-import TOAConfig from "../../../shared/models/TOAConfig";
-import TOAUploadManager from "../../../shared/managers/TOAUploadManager";
-import MatchTimer from "../../../shared/scoring/MatchTimer";
+import TOAUploadManager from "../../../managers/TOAUploadManager";
+import {Event, EventConfiguration, HttpError, Match, MatchDetails, MatchConfiguration, MatchParticipant,
+  MatchState, MatchTimer, PlayoffsType, SocketProvider, TOAConfig, TournamentType
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   mode: string,
@@ -59,7 +50,7 @@ interface IProps {
 }
 
 interface IState {
-  selectedLevel: TournamentLevels
+  selectedLevel: TournamentType
   configModalOpen: boolean,
   activeMatch: Match,
   committingScores: boolean
@@ -95,7 +86,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     const {eventConfig, matchState, connected, matchDuration, mode} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
-    const availableLevels = this.getAvailableTournamentLevels(eventConfig.postQualConfig).map(tournamentLevel => {
+    const availableLevels = this.getAvailableTournamentLevels(eventConfig.playoffsConfig).map(tournamentLevel => {
       return {
         text: tournamentLevel,
         value: tournamentLevel
@@ -309,11 +300,11 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
   }
 
-  private getAvailableTournamentLevels(postQualConfig: PostQualConfig): TournamentLevels[] {
+  private getAvailableTournamentLevels(postQualConfig: PlayoffsType): TournamentType[] {
     return ["Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Finals"];
   }
 
-  private getMatchesByTournamentLevel(tournamentLevel: TournamentLevels): Match[] { // TODO - Only show fields that EMS controls
+  private getMatchesByTournamentLevel(tournamentLevel: TournamentType): Match[] { // TODO - Only show fields that EMS controls
     switch (tournamentLevel) {
       case "Practice":
         return this.props.practiceMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
@@ -329,15 +320,15 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private changeSelectedLevel(event: SyntheticEvent, props: DropdownProps) {
-    const matches = this.getMatchesByTournamentLevel((props.value as TournamentLevels));
+    const matches = this.getMatchesByTournamentLevel((props.value as TournamentType));
     if (matches.length > 0) {
       this.props.setActiveMatch(matches[0]);
       this.setState({
-        selectedLevel: (props.value as TournamentLevels),
+        selectedLevel: (props.value as TournamentType),
       });
     } else {
       this.setState({
-        selectedLevel: (props.value as TournamentLevels)
+        selectedLevel: (props.value as TournamentType)
       });
     }
   }

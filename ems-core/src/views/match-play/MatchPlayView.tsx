@@ -10,8 +10,7 @@ import SocketProvider from "../../shared/providers/SocketProvider";
 import {ISetMatchDuration} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setMatchDuration} from "../../stores/scoring/actions";
-import MatchTimer from "../../shared/scoring/MatchTimer";
-import {MatchMode} from "../../shared/scoring/MatchMode";
+import {MatchMode, MatchTimer} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   matchDuration?: moment.Duration,

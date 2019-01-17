@@ -1,19 +1,14 @@
 import * as React from "react";
-import Team from "../../../shared/models/Team";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
 import ReportTemplate from "./ReportTemplate";
-import EMSProvider from "../../../shared/providers/EMSProvider";
 import {AxiosResponse} from "axios";
-import HttpError from "../../../shared/models/HttpError";
-import DialogManager from "../../../shared/managers/DialogManager";
-import Ranking from "../../../shared/models/Ranking";
+import DialogManager from "../../../managers/DialogManager";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import {EMSEventTypes} from "../../../shared/AppTypes";
-import EnergyImpactRanking from "../../../shared/models/EnergyImpactRanking";
 import EnergyImpactRankTable from "../../../components/game-specifics/EnergyImpactRankTable";
-import RoverRuckusRank from "../../../shared/models/RoverRuckusRank";
 import RoverRuckusRankTable from "../../../components/game-specifics/RoverRuckusRankTable";
+import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking,
+  RoverRuckusRank, Team
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -69,7 +64,7 @@ class QualificationRankings extends React.Component<IProps, IState> {
     );
   }
 
-  private getByEventType(eventType: EMSEventTypes): Ranking {
+  private getByEventType(eventType: EventType): Ranking {
     switch (eventType) {
       case "fgc_2018":
         return new EnergyImpactRanking();
@@ -80,7 +75,7 @@ class QualificationRankings extends React.Component<IProps, IState> {
     }
   }
 
-  private getRankingTable(eventType: EMSEventTypes) {
+  private getRankingTable(eventType: EventType) {
     switch (eventType) {
       case "fgc_2018":
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]} identifier={this.props.eventConfig.teamIdentifier}/>;

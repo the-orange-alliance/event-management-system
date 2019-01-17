@@ -3,8 +3,7 @@ import {Button, Card, Grid, Tab, TabProps} from "semantic-ui-react";
 import {SyntheticEvent} from "react";
 import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
-import {getTheme} from "../../shared/AppTheme";
-import EventConfiguration from "../../shared/models/EventConfiguration";
+import {getTheme} from "../../AppTheme";
 import PracticeSchedule from "./reports/PracticeSchedule";
 import QualificationSchedule from "./reports/QualificationSchedule";
 import EliminationsSchedule from "./reports/EliminationsSchedule";
@@ -14,11 +13,12 @@ import QualificationScheduleByTeam from "./reports/QualificationScheduleByTeam";
 import EliminationsScheduleByTeam from "./reports/EliminationsScheduleByTeam";
 import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
 import QualificationRankings from "./reports/QualificationRankings";
-import DialogManager from "../../shared/managers/DialogManager";
+import DialogManager from "../../managers/DialogManager";
 import OtherCompetingTeams from "./reports/OtherCompetingTeams";
 import QualificationMatchResults from "./reports/QualificationMatchResults";
 import QualificationAnnouncers from "./reports/QualificationAnnouncers";
 import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
+import {EventConfiguration} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -115,11 +115,11 @@ class ReportsView extends React.Component<IProps, IState> {
             <Card.Content textAlign="center" className="card-header">
               <Card.Header>
                 {
-                  eventConfig.postQualConfig === "elims" &&
+                  eventConfig.playoffsConfig === "elims" &&
                   <h4>Eliminations Matches</h4>
                 }
                 {
-                  eventConfig.postQualConfig === "finals" &&
+                  eventConfig.playoffsConfig === "finals" &&
                   <h4>Finals Matches</h4>
                 }
               </Card.Header>
@@ -133,11 +133,11 @@ class ReportsView extends React.Component<IProps, IState> {
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
                   {
-                    eventConfig.postQualConfig === "elims" &&
+                    eventConfig.playoffsConfig === "elims" &&
                     <Grid.Column><Button fluid={true} color={getTheme().primary}>Bracket Report</Button></Grid.Column>
                   }
                   {
-                    eventConfig.postQualConfig === "finals" &&
+                    eventConfig.playoffsConfig === "finals" &&
                     <Grid.Column><Button fluid={true} color={getTheme().primary}>Rankings Report</Button></Grid.Column>
                   }
                 </Grid.Row>
@@ -157,11 +157,11 @@ class ReportsView extends React.Component<IProps, IState> {
                 <Grid.Row>
                   <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Qualification Cards Report</Button></Grid.Column>
                   {
-                    eventConfig.postQualConfig === "elims" &&
+                    eventConfig.playoffsConfig === "elims" &&
                     <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Eliminations Cards Report</Button></Grid.Column>
                   }
                   {
-                    eventConfig.postQualConfig === "finals" &&
+                    eventConfig.playoffsConfig === "finals" &&
                     <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Finals Cards Report</Button></Grid.Column>
                   }
                 </Grid.Row>
@@ -253,7 +253,7 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generatePostQualSchedule() {
-    if (this.props.eventConfig.postQualConfig === "elims") {
+    if (this.props.eventConfig.playoffsConfig === "elims") {
       this.generateReport(<EliminationsSchedule onHTMLUpdate={this.updateHTML}/>);
     } else {
       this.generateReport(<FinalsSchedule onHTMLUpdate={this.updateHTML}/>);
@@ -269,7 +269,7 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generatePostQualScheduleByTeam() {
-    if (this.props.eventConfig.postQualConfig === "elims") {
+    if (this.props.eventConfig.playoffsConfig === "elims") {
       this.generateReport(<EliminationsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
     } else {
       this.generateReport(<FinalsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);

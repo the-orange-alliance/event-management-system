@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Button, Card, Grid, Tab} from "semantic-ui-react";
-import {getTheme} from "../../../shared/AppTheme";
-import SocketProvider from "../../../shared/providers/SocketProvider";
+import {getTheme} from "../../../AppTheme";
+import {SocketProvider} from "@the-orange-alliance/lib-ems";
 
 class VideoSwitch extends React.Component {
   public render() {

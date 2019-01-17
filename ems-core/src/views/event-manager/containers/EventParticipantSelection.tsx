@@ -11,9 +11,8 @@ import {connect} from "react-redux";
 import DialogManager from "../../../managers/DialogManager";
 import TeamValidator from "../controllers/TeamValidator";
 import EventPostingController from "../controllers/EventPostingController";
-import {AxiosResponse} from "axios";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
-import {EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAConfig, TOAProvider, TOATeam} from "@the-orange-alliance/lib-ems";
+import {EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -190,24 +189,29 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   private importByTOA() {
     this.setState({loadingTeams: true});
     this.props.setNavigationDisabled(true);
-    TOAProvider.getTeams(this.props.event.eventKey).then((toaTeams: TOATeam[]) => {
+    TOAProvider.getTeams(this.props.event.eventKey).then((toaParticipants: TOAEventParticipant[]) => {
+      const teams: Team[] = [];
       const failedImports: number[] = [];
-      for (const toaTeam of toaTeams) {
-        const team: Team = new EMSTeamAdapter(new TOATeam().fromJSON(toaTeam.toJSON())).get();
-        team.participantKey = teamJSON.event_participant_key;
-        const validator: TeamValidator = new TeamValidator(team);
-        validator.update(team);
-        if (validator.isValid) {
-          teams.push(team);
+      for (const toaParticipant of toaParticipants) {
+        if (typeof toaParticipant.team !== "undefined") {
+          const team: Team = new EMSTeamAdapter(toaParticipant.team).get();
+          team.participantKey = toaParticipant.eventParticipantKey;
+          const validator: TeamValidator = new TeamValidator(team);
+          validator.update(team);
+          if (validator.isValid) {
+            teams.push(team);
+          } else {
+            failedImports.push(team.teamKey);
+          }
         } else {
-          failedImports.push(teamJSON.team_key);
+          failedImports.push(toaParticipant.teamKey);
         }
       }
       this.setState({loadingTeams: false});
       this.props.setNavigationDisabled(false);
       this.props.setTeamList(teams);
       setTimeout(() => {
-        DialogManager.showInfoBox("Team Import Result", "Imported " + teams.length + " of original " + res.data.length + ". The following teams were not imported due to parsing errors: " + failedImports.toString());
+        DialogManager.showInfoBox("Team Import Result", "Imported " + teams.length + " of original " + toaParticipants.length + ". The following teams were not imported due to parsing errors: " + failedImports.toString());
       }, 250);
     }).catch((error: HttpError) => {
       this.setState({loadingTeams: false});

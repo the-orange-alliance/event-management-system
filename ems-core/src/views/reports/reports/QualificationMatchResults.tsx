@@ -1,16 +1,12 @@
 import * as React from "react";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
 import ReportTemplate from "./ReportTemplate";
-import Ranking from "../../../shared/models/Ranking";
 import {Table} from "semantic-ui-react";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import Match from "../../../shared/models/Match";
 import {AxiosResponse} from "axios";
-import EMSProvider from "../../../shared/providers/EMSProvider";
-import DialogManager from "../../../shared/managers/DialogManager";
-import HttpError from "../../../shared/models/HttpError";
+import DialogManager from "../../../managers/DialogManager";
 import * as moment from "moment";
+import {EMSProvider, EventConfiguration, HttpError, Match, Ranking} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   eventConfig?: EventConfiguration,

@@ -1,5 +1,4 @@
-import Event from "../../../shared/models/Event";
-import EventConfiguration from "../../../shared/models/EventConfiguration";
+import {Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
 
 class EventCreationValidator {
   private _event: Event;
@@ -79,7 +78,7 @@ class EventCreationValidator {
 
   public isValidAllianceCaptains(): boolean {
     const captains = this._eventConfig.allianceCaptains;
-    if (this._eventConfig.postQualConfig === "finals") {
+    if (this._eventConfig.playoffsConfig === "finals") {
       return true;
     }
     return typeof captains === "number" && this.isSafe(captains.toString());

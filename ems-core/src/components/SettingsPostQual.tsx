@@ -7,13 +7,12 @@ import {Dispatch} from "redux";
 import {ISetEventConfiguration} from "../stores/config/types";
 import {setEventConfiguration} from "../stores/config/actions";
 import {SyntheticEvent} from "react";
-import {EliminationsFormats, PostQualConfig} from "../shared/AppTypes";
 import ConfirmActionModal from "./ConfirmActionModal";
 import {CONFIG_STORE} from "../AppStore";
 import DialogManager from "../managers/DialogManager";
 import {IIncrementCompletedStep} from "../stores/internal/types";
 import {incrementCompletedStep} from "../stores/internal/actions";
-import {AppError, EventConfiguration, Team, DropdownData} from "@the-orange-alliance/lib-ems";
+import {AppError, EliminationFormat, EventConfiguration, Team, DropdownData, PlayoffsType} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -112,7 +111,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
 
   private setPostQualConfig(event: SyntheticEvent, props: DropdownProps) {
     if (typeof props.value === "string") {
-      this.state.configCopy.playoffsConfig = props.value as PostQualConfig;
+      this.state.configCopy.playoffsConfig = props.value as PlayoffsType;
       this.forceUpdate();
     }
   }
@@ -127,7 +126,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
 
   private setElimsFormatConfig(event: SyntheticEvent, props: DropdownProps) {
     const value: string = props.value.toString();
-    this.state.configCopy.elimsFormat = value as EliminationsFormats;
+    this.state.configCopy.elimsFormat = value as EliminationFormat;
     this.forceUpdate();
   }
 

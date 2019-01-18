@@ -1,18 +1,16 @@
 import * as React from "react";
 import {Button, Card, Dropdown, DropdownProps, Grid} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
-import {TeamIdentifierItems} from "../shared/data/DropdownItemOptions";
 import {ISetEventConfiguration} from "../stores/config/types";
 import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../stores";
 import {Dispatch} from "redux";
 import {setEventConfiguration} from "../stores/config/actions";
 import {connect} from "react-redux";
-import {TeamIdentifier} from "../shared/AppTypes";
 import ConfirmActionModal from "./ConfirmActionModal";
 import {CONFIG_STORE} from "../AppStore";
 import DialogManager from "../managers/DialogManager";
-import {AppError, Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
+import {AppError, DropdownData, Event, EventConfiguration, TeamIdentifier} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   event?: Event,
@@ -73,7 +71,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
                   fluid={true}
                   selection={true}
                   value={this.state.configCopy.teamIdentifier}
-                  options={TeamIdentifierItems}
+                  options={DropdownData.TeamIdentifierItems}
                   onChange={this.setTeamIdentifier}
                 />
               </Grid.Column>

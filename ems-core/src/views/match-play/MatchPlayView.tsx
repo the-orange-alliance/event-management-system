@@ -6,11 +6,10 @@ import {connect} from "react-redux";
 import MatchPlay from "./containers/MatchPlay";
 import VideoSwitch from "./containers/VideoSwitch";
 import * as moment from "moment";
-import SocketProvider from "../../shared/providers/SocketProvider";
 import {ISetMatchDuration} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setMatchDuration} from "../../stores/scoring/actions";
-import {MatchMode, MatchTimer} from "@the-orange-alliance/lib-ems";
+import {MatchMode, MatchTimer, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   matchDuration?: moment.Duration,

@@ -2,8 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
 import logger from "../logger";
-import EnergyImpactRanker from "../shared/scoring/EnergyImpactRanker";
-import RoverRuckusRanker from "../shared/scoring/RoverRuckusRanker";
+import {EnergyImpactRanker, IMatchRanker, IPostableObject, RoverRuckusRanker} from "@the-orange-alliance/lib-ems";
 
 const router: Router = Router();
 
@@ -33,7 +32,7 @@ router.get("/calculate/:tournament_level", (req: Request, res: Response, next: N
     DatabaseManager.getMatchResultsForRankings(req.query.type, req.params.tournament_level).then((rows: any[]) => {
       logger.info(`Re-calculating rankings for ${req.query.type}.`);
       const ranker: IMatchRanker = getRankerByType(req.query.type);
-      const rankJSON: any = ranker.execute(rows).map(rank => rank.toJSON());
+      const rankJSON: any = ranker.execute(rows).map((rank: IPostableObject) => rank.toJSON());
       if (rankJSON.length > 0){
         const promises: Array<Promise<any>> = [];
         for (const ranking of rankJSON) {

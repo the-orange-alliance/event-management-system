@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Match from "../shared/models/Match";
+import {Match} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   match: Match,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Cookies} from 'react-cookie';
-import Event from "../shared/models/Event";
+import {Event} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   cookies: Cookies,

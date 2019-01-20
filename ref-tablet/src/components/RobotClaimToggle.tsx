@@ -1,11 +1,10 @@
 import * as React from 'react';
-import MatchParticipant from "../shared/models/MatchParticipant";
-import {AllianceColors} from "../shared/AppTypes";
+import {AllianceColor, MatchParticipant} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   value: boolean,
   participant: MatchParticipant,
-  alliance?: AllianceColors
+  alliance?: AllianceColor
   onToggle?: () => void
 }
 
@@ -20,7 +19,7 @@ class RobotClaimToggle extends React.Component<IProps> {
     return (
       <div className="robot-claim-container">
         <div className="robot-claim-flag">
-          <div className={"robot-claim-team " + (value ? "selected " : " ") + (alliance ? (alliance + "-bg") : "")} onClick={this.onSelect}>{participant.teamKey}</div>
+          <div className={"robot-claim-team " + (value ? "selected " : " ") + (alliance ? (alliance.toString().toLowerCase() + "-bg") : "")} onClick={this.onSelect}>{participant.teamKey}</div>
           <span className="robot-claim-top"/>
           <span className="robot-claim-middle"/>
           <span className="robot-claim-base-top"/>

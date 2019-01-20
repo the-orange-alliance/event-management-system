@@ -1,7 +1,7 @@
 import {MatchMode} from "./MatchMode";
 import * as events from "events";
-import MatchConfiguration from "../shared/MatchConfiguration";
 import logger from "../logger";
+import {MatchConfiguration} from "@the-orange-alliance/lib-ems";
 
 export default class MatchTimer extends events.EventEmitter {
   // Time/state variables

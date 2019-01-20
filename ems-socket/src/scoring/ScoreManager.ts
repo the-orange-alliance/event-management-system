@@ -1,6 +1,4 @@
-import Match from "../shared/Match";
-import MatchParticipant from "../shared/MatchParticipant";
-import RoverRuckusRefereeData from "../shared/RoverRuckusRefereeData";
+import {IPostableObject, Match, MatchParticipant, RoverRuckusRefereeData} from "@the-orange-alliance/lib-ems";
 
 class ScoreManager {
   private static _instance: ScoreManager;

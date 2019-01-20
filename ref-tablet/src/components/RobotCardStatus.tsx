@@ -1,5 +1,5 @@
 import * as React from 'react';
-import MatchParticipant from "../shared/models/MatchParticipant";
+import {MatchParticipant} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   participant: MatchParticipant,

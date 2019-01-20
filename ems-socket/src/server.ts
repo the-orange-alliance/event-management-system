@@ -9,7 +9,7 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
-import {FTC_CONFIG} from "./shared/MatchConfiguration";
+import {FTC_CONFIG} from "@the-orange-alliance/lib-ems";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of

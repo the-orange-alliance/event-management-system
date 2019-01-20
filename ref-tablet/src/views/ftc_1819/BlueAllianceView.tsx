@@ -1,9 +1,6 @@
 import * as React from 'react';
 import StatusBar from "../../components/StatusBar";
-import Event from "../../shared/models/Event";
-import Match from "../../shared/models/Match";
 import RobotButtonGroup from "../../components/RobotButtonGroup";
-import MatchParticipant from "../../shared/models/MatchParticipant";
 import {Col, Nav, NavItem, NavLink, Row} from "reactstrap";
 import RobotClaimToggle from "../../components/RobotClaimToggle";
 import RobotSampling from "../../components/RobotSampling";
@@ -14,9 +11,8 @@ import SILVER_MINERAL from '../../resources/ftc_1819/Silver_Mineral.png';
 import DEPOT_MINERALS from '../../resources/ftc_1819/Depot_Minerals.png';
 import RobotCardStatus from "../../components/RobotCardStatus";
 import RobotPenaltyInput from "../../components/RobotPenaltyInput";
-import RoverRuckusMatchDetails from "../../shared/models/RoverRuckusMatchDetails";
-import RoverRuckusRefereeData from "../../shared/models/RoverRuckusRefereeData";
-import SocketProvider from "../../shared/providers/SocketProvider";
+
+import {Event, Match, MatchParticipant, RoverRuckusMatchDetails, RoverRuckusRefereeData, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   event: Event,
@@ -172,10 +168,10 @@ class RedAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotClaimToggle alliance={"blue"} value={redOneClaimed} participant={participantOne} onToggle={this.toggleRobotOneClaim}/>
+            <RobotClaimToggle alliance={"Blue"} value={redOneClaimed} participant={participantOne} onToggle={this.toggleRobotOneClaim}/>
           </Col>
           <Col sm={6}>
-            <RobotClaimToggle alliance={"blue"} value={redTwoClaimed} participant={participantTwo} onToggle={this.toggleRobotTwoClaim}/>
+            <RobotClaimToggle alliance={"Blue"} value={redTwoClaimed} participant={participantTwo} onToggle={this.toggleRobotTwoClaim}/>
           </Col>
         </Row>
         <Row>

@@ -1,8 +1,6 @@
 import * as React from 'react';
-import Event from "../shared/models/Event";
-import Match from "../shared/models/Match";
 import BlueAllianceView from "./ftc_1819/BlueAllianceView";
-import SocketProvider from "../shared/providers/SocketProvider";
+import {Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   event: Event,
@@ -59,12 +57,12 @@ class BlueView extends React.Component<IProps, IState> {
     const {mode} = this.state;
     let display;
 
-    switch (event.seasonKey) {
+    switch (event.season.seasonKey) {
       case 1819:
         display = <BlueAllianceView event={event} match={match} mode={mode} connected={connected}/>;
         break;
       default:
-        display = <span>No ref tablet application has been made for {event.seasonKey}</span>;
+        display = <span>No ref tablet application has been made for {event.season.seasonKey}</span>;
     }
 
     return (display);

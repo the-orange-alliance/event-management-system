@@ -1,18 +1,14 @@
 import * as React from 'react';
 import {Cookies, withCookies} from 'react-cookie';
 import './App.css';
-import Event from "./shared/models/Event";
 import {Redirect, Route, RouteComponentProps} from "react-router";
 import LoginView from "./views/LoginView";
 import MainView from "./views/MainView";
 import RedView from "./views/RedView";
 import BlueView from "./views/BlueView";
 import HeadRefereeView from "./views/HeadRefereeView";
-import EMSProvider from "./shared/providers/EMSProvider";
-import SocketProvider from "./shared/providers/SocketProvider";
 import {AxiosResponse} from "axios";
-import Match from "./shared/models/Match";
-import MatchParticipant from "./shared/models/MatchParticipant";
+import {EMSProvider, Event, Match, MatchParticipant, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   cookies: Cookies

@@ -76,7 +76,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
     });
 
     // The microservices aren't 100% ready when the application loads, so we give it some time here.
-    const time = process.env.NODE_ENV === "production" ? 4000 : 0;
+    const time = process.env.NODE_ENV === "production" ? 4000 : 1000;
     setTimeout(() => {
       console.log("Preloaded application state.");
       ipcRenderer.send("preload-finish");

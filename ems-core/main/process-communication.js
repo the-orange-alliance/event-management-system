@@ -45,6 +45,9 @@ ipcMain.on("list-ecosystem", (event) => {
 
 ipcMain.on("start-ecosystem", (event, host) => {
   localIPv4().then((localHost) => {
+    if (localHost === "Default") {
+      localHost = "127.0.0.1";
+    }
     if (typeof host === "undefined" || host === null) {
       host = localHost;
       logger.info(`Starting services with a default ${host} address.`);
@@ -82,6 +85,9 @@ ipcMain.on("start-ecosystem", (event, host) => {
 
 ipcMain.on("start-process", (event, procName, host) => {
   localIPv4().then((localHost) => {
+    if (localHost === "Default") {
+      localHost = "127.0.0.1";
+    }
     if (typeof host === "undefined" || host === null) {
       host = localHost;
       logger.info(`Starting services with a default ${host} address.`);

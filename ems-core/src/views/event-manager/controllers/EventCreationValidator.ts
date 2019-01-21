@@ -63,7 +63,7 @@ class EventCreationValidator {
 
   public isValidFieldCount(): boolean {
     const fields = this._event.fieldCount;
-    return typeof fields === "number" && this.isSafe(fields.toString()) && fields > 0;
+    return typeof fields === "number" && this.isSafe(fields.toString()) && fields > 0 && fields < 10;
   }
 
   public isValidTPA(): boolean {
@@ -81,7 +81,7 @@ class EventCreationValidator {
     if (this._eventConfig.playoffsConfig === "finals") {
       return true;
     }
-    return typeof captains === "number" && this.isSafe(captains.toString());
+    return typeof captains === "number" && this.isSafe(captains.toString()) && captains > 0 && captains < 64;
   }
 
   private checkIfValid(): void {

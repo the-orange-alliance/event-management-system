@@ -20,9 +20,10 @@ import EventPostingController from "../controllers/EventPostingController";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
 import DialogManager from "../../../managers/DialogManager";
-import {DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, PlayoffsType, RegionData, SeasonData,
+import {DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, PlayoffsType, Region, RegionData, SeasonData,
   TOAConfig, TOAEvent, TOAProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_EI_PRESET, FTC_ROVER_PRESET
 } from "@the-orange-alliance/lib-ems";
+import NumericInput from "../../../components/NumericInput";
 
 interface IProps {
   onComplete: () => void,
@@ -35,12 +36,13 @@ interface IProps {
 }
 
 interface IState {
-  eventValidator: EventCreationValidator,
   creatingEvent: boolean,
   downloadingData: boolean
 }
 
 class EventSelection extends React.Component<IProps, IState> {
+  private _validator: EventCreationValidator;
+
   constructor(props: IProps) {
     super(props);
     this.setTOAEventKey = this.setTOAEventKey.bind(this);
@@ -63,10 +65,11 @@ class EventSelection extends React.Component<IProps, IState> {
     this.downloadTOAData = this.downloadTOAData.bind(this);
 
     this.state = {
-      eventValidator: new EventCreationValidator(this.props.eventConfig, this.props.event),
       creatingEvent: false,
       downloadingData: false
     };
+
+    this._validator = new EventCreationValidator(this.props.eventConfig, this.props.event);
   }
 
   public componentDidMount() {
@@ -93,7 +96,7 @@ class EventSelection extends React.Component<IProps, IState> {
       if (toaEvent && toaEvent.eventKey && toaEvent.eventKey.length > 0) {
         this.props.setEvent(new EMSEventAdapter(toaEvent).get());
         this.props.toaConfig.enabled = true;
-        this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+        this._validator.update(this.props.eventConfig, this.props.event);
         this.forceUpdate();
       } else {
         DialogManager.showInfoBox("TheOrangeAlliance", `The Orange Alliance does not contain any event info for "${this.props.toaConfig.eventKey}". Are you sure your event information is posted online?`);
@@ -127,7 +130,7 @@ class EventSelection extends React.Component<IProps, IState> {
     const seasonKey = SeasonData.getFromEventType(preset.eventType).value;
     this.props.selectConfigPreset(preset);
     this.props.event.season = SeasonData.getFromSeasonKey(seasonKey);
-    this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+    this._validator.update(this.props.eventConfig, this.props.event);
     this.forceUpdate();
   }
 
@@ -137,31 +140,25 @@ class EventSelection extends React.Component<IProps, IState> {
     this.forceUpdate();
   }
 
-  private setTeamsPerAlliance(event: SyntheticEvent, props: InputProps) {
-    const value: string = props.value.toString();
-    if (!isNaN(parseInt(value, 10))) {
-      this.props.eventConfig.teamsPerAlliance = parseInt(value, 10);
-      this.props.selectConfigPreset(this.props.eventConfig);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
-      this.forceUpdate();
-    }
+  private setTeamsPerAlliance(newValue: number) {
+    this.props.eventConfig.teamsPerAlliance = newValue;
+    this.props.selectConfigPreset(this.props.eventConfig);
+    this._validator.update(this.props.eventConfig, this.props.event);
+    this.forceUpdate();
   }
 
-  private setPostQualTeamsPerAlliance(event: SyntheticEvent, props: InputProps) {
-    const value: string = props.value.toString();
-    if (!isNaN(parseInt(value, 10))) {
-      this.props.eventConfig.postQualTeamsPerAlliance = parseInt(value, 10);
-      this.props.selectConfigPreset(this.props.eventConfig);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
-      this.forceUpdate();
-    }
+  private setPostQualTeamsPerAlliance(newValue: number) {
+    this.props.eventConfig.postQualTeamsPerAlliance = newValue;
+    this.props.selectConfigPreset(this.props.eventConfig);
+    this._validator.update(this.props.eventConfig, this.props.event);
+    this.forceUpdate();
   }
 
   private setRankingCutoff(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(parseInt(props.value, 10))) {
       this.props.eventConfig.rankingCutoff = parseInt(props.value, 10);
       this.props.selectConfigPreset(this.props.eventConfig);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -170,7 +167,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.eventConfig.playoffsConfig = props.value as PlayoffsType;
       this.props.selectConfigPreset(this.props.eventConfig);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -180,7 +177,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (!isNaN(parseInt(value, 10))) {
       this.props.eventConfig.allianceCaptains = parseInt(value, 10);
       this.props.selectConfigPreset(this.props.eventConfig);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -190,7 +187,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.region = RegionData.getFromRegionKey(props.value);
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -199,7 +196,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.eventType = props.value;
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -208,7 +205,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.eventCode = props.value.toString().toUpperCase();
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -217,7 +214,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.eventName = props.value;
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -226,7 +223,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.venue = props.value;
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -235,7 +232,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.city = props.value;
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -244,7 +241,7 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.stateProv = props.value;
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
@@ -253,27 +250,27 @@ class EventSelection extends React.Component<IProps, IState> {
     if (typeof props.value === "string") {
       this.props.event.country = props.value;
       this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
+      this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
     }
   }
 
-  private setEventFields(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(parseInt(props.value, 10))) {
-      this.props.event.fieldCount = parseInt(props.value, 10);
-      const fieldControl: number[] = [];
+  private setEventFields(newValue: number) {
+    this.props.event.fieldCount = newValue;
+    const fieldControl: number[] = [];
+    if (this._validator.isValidFieldCount()) {
       for (let i = 0; i < this.props.event.fieldCount; i++) {
         fieldControl.push(i + 1);
       }
-      this.props.eventConfig.fieldsControlled = fieldControl;
-      this.props.setEvent(this.props.event);
-      this.state.eventValidator.update(this.props.eventConfig, this.props.event);
-      this.forceUpdate();
     }
+    this.props.eventConfig.fieldsControlled = fieldControl;
+    this.props.setEvent(this.props.event);
+    this._validator.update(this.props.eventConfig, this.props.event);
+    this.forceUpdate();
   }
 
   private canCreateEvent(): boolean {
-    return this.state.eventValidator.isValid;
+    return this._validator.isValid;
   }
 
   private createEvent(): void {
@@ -357,16 +354,18 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private renderBasicEventInformation(): JSX.Element {
-    const {eventValidator} = this.state;
-    const selectedRegion = typeof this.props.event.region === "undefined" ? RegionData.RegionItems[0].value : this.props.event.region.regionKey;
-    const selectedEventType = typeof this.props.event.eventType === "undefined" ? DropdownData.EventTypeItems[0].value : this.props.event.eventType;
-    const event = this.props.event;
+    const eventValidator = this._validator;
+    const selectedRegion = typeof this.props.event.region === "undefined" ? new Region("", "").regionKey : this.props.event.region.regionKey;
+    const selectedEventType = this.props.event.eventType;
+    const {event, eventConfig} = this.props;
+    const isValidRegion = typeof event.region === "undefined" ? false : event.region.regionKey.length > 0;
+    const isValidEventType = typeof event.eventType === "undefined" ? false : event.eventType.length > 0;
     return (
       <Form>
         <Grid>
           <Grid.Row columns={16}>
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={SeasonData.SeasonItems} disabled={true} value={SeasonData.getFromEventType(this.props.eventConfig.eventType).value} label="Season"/></Grid.Column>
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={RegionData.RegionItems} value={selectedRegion} onChange={this.setEventRegion} error={typeof event.region === "undefined"} label="Region"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={RegionData.RegionItems} value={selectedRegion} onChange={this.setEventRegion} error={!isValidRegion} label="Region"/></Grid.Column>
             {
               this.props.eventConfig.requiresTOA &&
                <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={[]} error={!eventValidator.isValidEventKey()} label="Event"/></Grid.Column>
@@ -375,7 +374,7 @@ class EventSelection extends React.Component<IProps, IState> {
               !this.props.eventConfig.requiresTOA &&
               <Grid.Column width={4}><Form.Input fluid={true} value={event.eventCode} onChange={this.setEventCode} error={!eventValidator.isValidEventKey()} label={<ExplanationIcon title={"Event Code"} content={"An event's code is a 3-4 letter combination that is used to represent the event. For example, Great Lakes Bay Region event could be coded into GLBR."}/>}/></Grid.Column>
             }
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.EventTypeItems} value={selectedEventType} onChange={this.setEventType} error={typeof event.eventType === "undefined"} label="Event Type"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.EventTypeItems} value={selectedEventType} onChange={this.setEventType} error={!isValidEventType} label="Event Type"/></Grid.Column>
           </Grid.Row>
           <Grid.Row columns={16}>
             <Grid.Column width={8}><Form.Input fluid={true} value={event.eventName} onChange={this.setEventName} error={!eventValidator.isValidEventName()} label="Event Name"/></Grid.Column>
@@ -388,8 +387,8 @@ class EventSelection extends React.Component<IProps, IState> {
             <Grid.Column width={4}><Form.Input fluid={true} value={event.website} error={!eventValidator.isValidWebsite()} label="Website (Optional)"/></Grid.Column>
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column width={4}><Form.Input fluid={true} value={event.fieldCount} onChange={this.setEventFields} error={!eventValidator.isValidFieldCount()} label={<ExplanationIcon title={"Field Count"} content={"Number of competition fields at the event. Usually between 1-4."}/>}/></Grid.Column>
-            <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.teamsPerAlliance} onChange={this.setTeamsPerAlliance} error={!eventValidator.isValidTPA()} label="Teams Per Alliance"/></Grid.Column>
+            <Grid.Column width={4}><NumericInput value={event.fieldCount} onUpdate={this.setEventFields} error={!eventValidator.isValidFieldCount()} label={<ExplanationIcon title={"Field Count"} content={"Number of competition fields at the event. Usually between 1-4."}/>}/></Grid.Column>
+            <Grid.Column width={4}><NumericInput value={eventConfig.teamsPerAlliance} onUpdate={this.setTeamsPerAlliance} error={!eventValidator.isValidTPA()} label={"Teams Per Alliance"}/></Grid.Column>
           </Grid.Row>
         </Grid>
       </Form>
@@ -397,22 +396,25 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private renderPostQualInformation(): JSX.Element {
-    const {eventValidator} = this.state;
-    const postQualLabel = this.props.eventConfig.playoffsConfig === "elims" ? "Eliminations" : "Finals";
+    const {eventConfig} = this.props;
+    const eventValidator = this._validator;
+    const postQualLabel = eventConfig.playoffsConfig === "elims" ? "Eliminations" : "Finals";
+    const isValidPlayoffConfig = typeof eventConfig.playoffsConfig === "undefined" ? false : eventConfig.playoffsConfig.length > 0;
     return (
       <Form>
         <Grid>
           <Grid.Row columns={16}>
-            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.PostQualItems} value={this.props.eventConfig.playoffsConfig} onChange={this.setPostQualConfig} label="Post-Qualification Type"/></Grid.Column>
+            <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.PostQualItems} value={eventConfig.playoffsConfig} error={!isValidPlayoffConfig} onChange={this.setPostQualConfig} label="Post-Qualification Type"/></Grid.Column>
             {
-              this.props.eventConfig.playoffsConfig === "elims" &&
-              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.AllianceCaptainItems} value={this.props.eventConfig.allianceCaptains} onChange={this.setAllianceCaptainConfig} error={!eventValidator.isValidAllianceCaptains()} label="Alliance Captains"/></Grid.Column>
+              eventConfig.playoffsConfig === "elims" &&
+              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.AllianceCaptainItems} value={eventConfig.allianceCaptains} onChange={this.setAllianceCaptainConfig} error={!eventValidator.isValidAllianceCaptains()} label="Alliance Captains"/></Grid.Column>
             }
             {
-              this.props.eventConfig.playoffsConfig === "finals" &&
-              <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.rankingCutoff} onChange={this.setRankingCutoff} label={<ExplanationIcon title={"Ranking Cutoff"} content={"This configuration may be changed after the event is created in the 'Settings' tab."}/>}/></Grid.Column>
+              eventConfig.playoffsConfig === "finals" &&
+              <Grid.Column width={4}><Form.Input fluid={true} value={eventConfig.rankingCutoff} onChange={this.setRankingCutoff} label={<ExplanationIcon title={"Ranking Cutoff"} content={"This configuration may be changed after the event is created in the 'Settings' tab."}/>}/></Grid.Column>
             }
-            <Grid.Column width={4}><Form.Input fluid={true} value={this.props.eventConfig.postQualTeamsPerAlliance} onChange={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>
+            {/*<Grid.Column width={4}><Form.Input fluid={true} value={eventConfig.postQualTeamsPerAlliance} onChange={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>*/}
+            <Grid.Column width={4}><NumericInput value={eventConfig.postQualTeamsPerAlliance} onUpdate={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>
           </Grid.Row>
         </Grid>
       </Form>

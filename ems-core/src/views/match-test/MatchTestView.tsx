@@ -17,10 +17,15 @@ interface IState {
   webTested: boolean,
   toaTested: boolean,
   audTested: boolean,
+  apiTesting: boolean,
+  sckTesting: boolean,
+  webTesting: boolean,
+  toaTesting: boolean,
+  audTesting: boolean,
   apiConnected: boolean,
   sckConnected: boolean,
   webConnected: boolean,
-  toaConnected: boolean
+  toaConnected: boolean,
   audConnected: boolean
 }
 
@@ -33,6 +38,11 @@ class MatchTestView extends React.Component<IProps, IState> {
       webTested: false,
       toaTested: false,
       audTested: false,
+      apiTesting: false,
+      sckTesting: false,
+      webTesting: false,
+      toaTesting: false,
+      audTesting: false,
       apiConnected: false,
       sckConnected: false,
       webConnected: false,
@@ -62,7 +72,9 @@ class MatchTestView extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {apiTested, sckTested, audTested, webTested, toaTested, apiConnected, sckConnected, webConnected, audConnected, toaConnected} = this.state;
+    const {apiTested, sckTested, audTested, webTested, toaTested, apiTesting, sckTesting, webTesting, toaTesting,
+      audTesting, apiConnected, sckConnected, webConnected, audConnected, toaConnected
+    } = this.state;
     const {slaveModeEnabled} = this.props;
     return (
       <div className="view">
@@ -83,20 +95,40 @@ class MatchTestView extends React.Component<IProps, IState> {
               </Grid.Row>
               <Grid.Row textAlign="center">
                 <Grid.Column width={3}/>
-                <Grid.Column width={2} className={apiConnected ? "success-text" : "error-text"}>{apiTested ? (apiConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}</Grid.Column>
-                <Grid.Column width={2} className={sckConnected ? "success-text" : "error-text"}>{sckTested ? (sckConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}</Grid.Column>
-                <Grid.Column width={2} className={webConnected ? "success-text" : "error-text"}>{webTested ? (webConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}</Grid.Column>
-                <Grid.Column width={2} className={toaConnected ? "success-text" : "error-text"}>{toaTested ? (toaConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}</Grid.Column>
-                <Grid.Column width={2} className={audConnected ? "success-text" : "error-text"}>{audTested ? (audConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}</Grid.Column>
+                <Grid.Column width={2} className={apiConnected ? "success-text" : "error-text"}>
+                  {apiTesting ? "TESTING..." :  apiTested ? (apiConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
+                </Grid.Column>
+                <Grid.Column width={2} className={sckConnected ? "success-text" : "error-text"}>
+                  {sckTesting ? "TESTING..." :  sckTested ? (sckConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
+                </Grid.Column>
+                <Grid.Column width={2} className={webConnected ? "success-text" : "error-text"}>
+                  {webTesting ? "TESTING..." :  webTested ? (webConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
+                </Grid.Column>
+                <Grid.Column width={2} className={toaConnected ? "success-text" : "error-text"}>
+                  {toaTesting ? "TESTING..." :  toaTested ? (toaConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
+                </Grid.Column>
+                <Grid.Column width={2} className={audConnected ? "success-text" : "error-text"}>
+                  {audTesting ? "TESTING..." :  audTested ? (audConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
+                </Grid.Column>
                 <Grid.Column width={3}/>
               </Grid.Row>
               <Grid.Row textAlign="center">
                 <Grid.Column width={3}/>
-                <Grid.Column width={2}><Button fluid={true} color={getTheme().primary} onClick={this.testAPI}>Test</Button></Grid.Column>
-                <Grid.Column width={2}><Button fluid={true} color={getTheme().primary} onClick={this.testSocketIO}>Test</Button></Grid.Column>
-                <Grid.Column width={2}><Button fluid={true} color={getTheme().primary} onClick={this.testWeb}>Test</Button></Grid.Column>
-                <Grid.Column width={2}><Button fluid={true} color={getTheme().primary} onClick={this.testTOA}>Test</Button></Grid.Column>
-                <Grid.Column width={2}><Button fluid={true} color={getTheme().primary} onClick={this.testAudience}>Test</Button></Grid.Column>
+                <Grid.Column width={2}>
+                  <Button fluid={true} disabled={apiTesting} loading={apiTesting} color={getTheme().primary} onClick={this.testAPI}>Test</Button>
+                </Grid.Column>
+                <Grid.Column width={2}>
+                  <Button fluid={true} disabled={sckTesting} loading={sckTesting} color={getTheme().primary} onClick={this.testSocketIO}>Test</Button>
+                </Grid.Column>
+                <Grid.Column width={2}>
+                  <Button fluid={true} disabled={webTesting} loading={webTesting} color={getTheme().primary} onClick={this.testWeb}>Test</Button>
+                </Grid.Column>
+                <Grid.Column width={2}>
+                  <Button fluid={true} disabled={toaTesting} loading={toaTesting} color={getTheme().primary} onClick={this.testTOA}>Test</Button>
+                </Grid.Column>
+                <Grid.Column width={2}>
+                  <Button fluid={true} disabled={audTesting} loading={audTesting} color={getTheme().primary} onClick={this.testAudience}>Test</Button>
+                </Grid.Column>
                 <Grid.Column width={3}/>
               </Grid.Row>
             </Grid>
@@ -107,54 +139,59 @@ class MatchTestView extends React.Component<IProps, IState> {
   }
 
   private updateSocketStatus() {
-    this.setState({sckConnected: true, sckTested: true});
+    this.setState({sckConnected: true, sckTested: true, sckTesting: false});
   }
 
   private updateAudStatus() {
-    this.setState({audConnected: true, audTested: true});
+    this.setState({audConnected: true, audTested: true, audTesting: false});
   }
 
   private testAPI() {
+    this.setState({apiTesting: true});
     EMSProvider.ping().then(() => {
-      this.setState({apiConnected: true, apiTested: true});
+      this.setState({apiConnected: true, apiTested: true, apiTesting: false});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
-      this.setState({apiConnected: false, apiTested: true});
+      this.setState({apiConnected: false, apiTested: true, apiTesting: false});
     });
   }
 
   private testSocketIO() {
+    this.setState({sckTesting: true});
     SocketProvider.emit("drip");
     setTimeout(() => {
       if (!this.state.sckConnected) {
-        this.setState({sckConnected: false, sckTested: true});
+        this.setState({sckConnected: false, sckTested: true, sckTesting: false});
       }
     }, 2000);
   }
 
   private testWeb() {
+    this.setState({webTesting: true});
     WebProvider.ping().then(() => {
-      this.setState({webConnected: true, webTested: true});
+      this.setState({webConnected: true, webTested: true, webTesting: false});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
-      this.setState({webConnected: false, webTested: false});
+      this.setState({webConnected: false, webTested: false, webTesting: false});
     });
   }
 
   private testTOA() {
+    this.setState({toaTesting: true});
     TOAProvider.ping().then(() => {
-      this.setState({toaConnected: true, toaTested: true});
+      this.setState({toaConnected: true, toaTested: true, toaTesting: false});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
-      this.setState({toaConnected: false, toaTested: true});
+      this.setState({toaConnected: false, toaTested: true, toaTesting: false});
     });
   }
 
   private testAudience() {
+    this.setState({audTesting: true});
     SocketProvider.emit("test-audience");
     setTimeout(() => {
       if (!this.state.audConnected) {
-        this.setState({audConnected: false, audTested: true});
+        this.setState({audConnected: false, audTested: true, audTesting: false});
       }
     }, 2000);
   }

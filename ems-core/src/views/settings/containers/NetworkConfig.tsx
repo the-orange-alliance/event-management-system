@@ -30,7 +30,8 @@ interface IState {
   updateIP: string,
   updateIPValid: boolean,
   networkModalOpen: boolean,
-  processModalOpen: boolean
+  processModalOpen: boolean,
+  resetModalOpen: boolean,
 }
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
@@ -42,16 +43,20 @@ class NetworkConfig extends React.Component<IProps, IState> {
       updateIP: "",
       updateIPValid: false,
       networkModalOpen: false,
-      processModalOpen: false
+      processModalOpen: false,
+      resetModalOpen: false,
     };
 
     this.setUpdateIP = this.setUpdateIP.bind(this);
     this.updateNetworkHost = this.updateNetworkHost.bind(this);
+    this.resetNetworkHost = this.resetNetworkHost.bind(this);
     this.deleteProcesses = this.deleteProcesses.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.openProcessModal = this.openProcessModal.bind(this);
     this.closeProcessModal = this.closeProcessModal.bind(this);
+    this.openResetModal = this.openResetModal.bind(this);
+    this.closeResetModal = this.closeResetModal.bind(this);
   }
 
   public componentWillMount() {
@@ -61,7 +66,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {updateIP, updateIPValid, networkModalOpen, processModalOpen} = this.state;
+    const {updateIP, updateIPValid, networkModalOpen, processModalOpen, resetModalOpen} = this.state;
     const processes = this.props.processList.map(process => {
       return <ProcessDescriptor key={process.id} process={process}/>;
     });
@@ -72,6 +77,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
       <Tab.Pane className="tab-subview">
         <RestrictedAccessModal open={networkModalOpen} onClose={this.closeModal} onSuccess={this.updateNetworkHost}/>
         <RestrictedAccessModal open={processModalOpen} onClose={this.closeProcessModal} onSuccess={this.deleteProcesses}/>
+        <RestrictedAccessModal open={resetModalOpen} onClose={this.closeResetModal} onSuccess={this.resetNetworkHost}/>
         <h3>Network Config</h3>
         <Divider />
         <Card fluid={true} color={getTheme().secondary}>
@@ -104,7 +110,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
                     <Grid.Column width={6} className="align-bottom"><Form.Button fluid={true} disabled={!updateIPValid} color="orange" onClick={this.openModal}>Update Network Address</Form.Button></Grid.Column>
                   </Grid.Row>
                   <Grid.Row>
-                    <Grid.Column width={6} floated="right"><Button fluid={true} color="red">Reset Network Addresses</Button></Grid.Column>
+                    <Grid.Column width={6} floated="right"><Button fluid={true} color="red" onClick={this.openResetModal}>Reset Network Addresses</Button></Grid.Column>
                   </Grid.Row>
                 </Grid>
               </Form>
@@ -135,15 +141,24 @@ class NetworkConfig extends React.Component<IProps, IState> {
   }
 
   private updateNetworkHost() {
+    this.updateNetworkAddress(this.state.updateIP);
+  }
+
+  private resetNetworkHost() {
+    this.updateNetworkAddress();
+  }
+
+  private updateNetworkAddress(host?: string) {
     this.props.setNavigationDisabled(true);
     this.props.setProcessActionsDisabled(true);
-    ProcessManager.startEcosystem(this.state.updateIP).then(() => {
+    ProcessManager.startEcosystem(host).then(() => {
       ProcessManager.listEcosystem().then((procList: Process[]) => {
-        EMSProvider.initialize(this.state.updateIP);
-        WebProvider.initialize(this.state.updateIP);
-        SocketProvider.initialize(this.state.updateIP);
+        const newHost: string = procList[0].address;
+        EMSProvider.initialize(newHost);
+        WebProvider.initialize(newHost);
+        SocketProvider.initialize(newHost);
         this.props.updateProcessList(procList);
-        this.props.setNetworkHost(this.state.updateIP); // TODO - Update EMSProvider, WebProvider, SocketProvider
+        this.props.setNetworkHost(newHost);
         this.props.setNavigationDisabled(false);
         this.props.setProcessActionsDisabled(false);
       }).catch((error: AppError) => {
@@ -193,6 +208,14 @@ class NetworkConfig extends React.Component<IProps, IState> {
 
   private closeProcessModal() {
     this.setState({processModalOpen: false});
+  }
+
+  private openResetModal() {
+    this.setState({resetModalOpen: true});
+  }
+
+  private closeResetModal() {
+    this.setState({resetModalOpen: false});
   }
 }
 

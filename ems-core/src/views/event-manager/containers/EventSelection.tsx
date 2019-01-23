@@ -413,7 +413,6 @@ class EventSelection extends React.Component<IProps, IState> {
               eventConfig.playoffsConfig === "finals" &&
               <Grid.Column width={4}><Form.Input fluid={true} value={eventConfig.rankingCutoff} onChange={this.setRankingCutoff} label={<ExplanationIcon title={"Ranking Cutoff"} content={"This configuration may be changed after the event is created in the 'Settings' tab."}/>}/></Grid.Column>
             }
-            {/*<Grid.Column width={4}><Form.Input fluid={true} value={eventConfig.postQualTeamsPerAlliance} onChange={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>*/}
             <Grid.Column width={4}><NumericInput value={eventConfig.postQualTeamsPerAlliance} onUpdate={this.setPostQualTeamsPerAlliance} error={!eventValidator.isValidPostQualTPA()} label={postQualLabel + " Teams Per Alliance"}/></Grid.Column>
           </Grid.Row>
         </Grid>

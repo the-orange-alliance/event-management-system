@@ -12,20 +12,25 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
     }).catch((error: any) => {
       next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
     });
-  } else if (req.query.level) {
-    if (req.query.level.toString() === "elims") {
-      DatabaseManager.getMatchAndParticipants(10, ">=").then((rows: any[]) => {
-        res.send({payload: rows});
-      }).catch((error: any) => {
-        next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
-      });
-    } else {
-      DatabaseManager.getMatchAndParticipants(req.query.level).then((rows: any[]) => {
-        res.send({payload: rows});
-      }).catch((error: any) => {
-        next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
-      });
-    }
+  } else if (req.query.match_key_partial) {
+    const promises: Array<Promise<any>> = [];
+    promises.push(DatabaseManager.selectAllWhere("match", `match_key LIKE "${req.query.match_key_partial}%"`));
+    promises.push(DatabaseManager.selectAllWhere("match_participant", `match_key LIKE "${req.query.match_key_partial}%"`));
+    Promise.all(promises).then((values: any) => {
+      const participantMap: Map<string, object[]> = new Map<string, object[]>();
+      const matches: object[] = [];
+      for (const participant of values[1]) {
+        if (typeof participantMap.get(participant.match_key) === "undefined") {
+          participantMap.set(participant.match_key, []);
+        }
+        (participantMap.get(participant.match_key) as object[]).push(participant);
+      }
+      for (const match of values[0]) {
+        match.participants = (participantMap.get(match.match_key) as object[]);
+        matches.push(match);
+      }
+      res.send({payload: matches});
+    });
   } else if (req.query.tournament_level) {
     DatabaseManager.selectAllWhere("match", "tournament_level=\"" + req.query.tournament_level + "\"").then((rows: any[]) => {
       res.send({payload: rows});

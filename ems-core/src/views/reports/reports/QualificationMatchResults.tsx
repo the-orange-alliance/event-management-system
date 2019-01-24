@@ -3,7 +3,6 @@ import ReportTemplate from "./ReportTemplate";
 import {Table} from "semantic-ui-react";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import {AxiosResponse} from "axios";
 import DialogManager from "../../../managers/DialogManager";
 import * as moment from "moment";
 import {EMSProvider, EventConfiguration, HttpError, Match, Ranking} from "@the-orange-alliance/lib-ems";
@@ -30,14 +29,8 @@ class QualificationMatchResults extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getMatches(1).then((qualMatchesResponse: AxiosResponse) => {
-      const matches: Match[] = [];
-      if (qualMatchesResponse.data && qualMatchesResponse.data.payload && qualMatchesResponse.data.payload.length > 0) {
-        for (const matchJSON of qualMatchesResponse.data.payload) {
-          matches.push(new Match().fromJSON(matchJSON));
-        }
-      }
-      this.setState({generated: true, matches: matches});
+    EMSProvider.getMatchesByTournamentLevel(1).then((matches: Match[]) => {
+      this.setState({generated: true, matches});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
       this.setState({generated: true});

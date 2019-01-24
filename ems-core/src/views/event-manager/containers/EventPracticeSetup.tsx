@@ -10,7 +10,7 @@ import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOv
 import {IDisableNavigation, ISetPracticeMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setPracticeMatches} from "../../../stores/internal/actions";
-import EventPostingController from "../controllers/EventPostingController";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
@@ -79,7 +79,7 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
     this.props.setNavigationDisabled(true);
-    EventPostingController.createSchedule("Practice", scheduleItems).then(() => {
+    EventCreationManager.createSchedule("Practice", scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({activeIndex: 1});
     }).catch((error: HttpError) => {
@@ -103,7 +103,7 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
-    EventPostingController.createMatchSchedule(0, this.props.practiceMatches).then(() => {
+    EventCreationManager.createMatchSchedule(0, this.props.practiceMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {

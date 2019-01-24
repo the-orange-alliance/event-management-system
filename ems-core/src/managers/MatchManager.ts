@@ -1,6 +1,5 @@
-import {AxiosResponse} from "axios";
 import {AllianceColor, EliminationFormat, EMSProvider, EventConfiguration, HttpError, Match, MatchParticipant,
-  MatchState, SocketProvider, Team
+  MatchState, SocketProvider
 } from "@the-orange-alliance/lib-ems";
 
 const PRESTART_ID = 0;
@@ -9,14 +8,14 @@ const START_ID = 2;
 const ABORT_ID = 3;
 const COMMIT_ID = 4;
 
-class MatchFlowController {
-  private static _instance: MatchFlowController;
+class MatchManager {
+  private static _instance: MatchManager;
 
-  public static getInstance(): MatchFlowController {
-    if (typeof MatchFlowController._instance === "undefined") {
-      MatchFlowController._instance = new MatchFlowController();
+  public static getInstance(): MatchManager {
+    if (typeof MatchManager._instance === "undefined") {
+      MatchManager._instance = new MatchManager();
     }
-    return MatchFlowController._instance;
+    return MatchManager._instance;
   }
 
   private constructor() {}
@@ -95,15 +94,11 @@ class MatchFlowController {
       const promises: Array<Promise<any>> = [];
       promises.push(EMSProvider.getMatch(matchKey));
       promises.push(EMSProvider.getMatchDetails(matchKey));
-      promises.push(EMSProvider.getMatchParticipantTeams(matchKey));
+      promises.push(EMSProvider.getMatchTeams(matchKey));
       Promise.all(promises).then((values: any[]) => {
-        const match: Match = new Match().fromJSON(values[0].data.payload[0]);
-        const seasonKey = match.matchKey.split("-")[0];
-        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(values[1].data.payload[0]);
-        match.participants = values[2].data.payload.map((json: any) => new MatchParticipant().fromJSON(json));
-        for (let i = 0; i < match.participants.length; i++) {
-          match.participants[i].team = new Team().fromJSON(values[2].data.payload[i]);
-        }
+        const match: Match = values[0];
+        match.matchDetails = values[1];
+        match.participants = values[2];
         resolve(match);
       }).catch((error: any) => {
         reject(error);
@@ -189,9 +184,8 @@ class MatchFlowController {
 
   public checkForAdvancements(tournamentLevel: number, format: EliminationFormat): Promise<Match[]> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getMatches(tournamentLevel).then((response: AxiosResponse) => {
-        if (response.data && response.data.payload && response.data.payload.length > 0) {
-          const matches: Match[] = response.data.payload.map((matchJSON: any) => new Match().fromJSON(matchJSON));
+      EMSProvider.getMatchesByTournamentLevel(tournamentLevel).then((matches: Match[]) => {
+        if (matches.length > 0) {
           const advancementWins = this.getWinsFromFormat(format);
           let redWins: number = 0;
           let blueWins: number = 0;
@@ -204,15 +198,7 @@ class MatchFlowController {
               }
             }
           }
-          const participants: MatchParticipant[] = [];
-          for (let i = 0; i < response.data.payload[0].participants.split(",").length; i++) {
-            const participant: MatchParticipant = new MatchParticipant();
-            participant.allianceKey = response.data.payload[0].alliance_keys.split(",")[i];
-            participant.teamKey = parseInt(response.data.payload[0].participants.split(",")[i], 10);
-            participant.surrogate = response.data.payload[0].surrogates.split(",")[i] === "1";
-            participant.station = parseInt(response.data.payload[0].stations.split(",")[i], 10);
-            participants.push(participant);
-          }
+          const participants: MatchParticipant[] = matches[0].participants;
           if (redWins >= advancementWins) {
             console.log("Advancing red to the next series...");
             this.advanceAlliance(tournamentLevel, participants.filter((participant) => participant.station < 20)).then(() => {
@@ -298,10 +284,9 @@ class MatchFlowController {
 
   private makeAndPostParticipants(advancementLevel: number, alliance: MatchParticipant[], allianceColor: AllianceColor): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getMatchResults(advancementLevel).then((response: AxiosResponse) => {
-        if (response.data && response.data.payload && response.data.payload.length > 0) {
+      EMSProvider.getMatchesByTournamentLevel(advancementLevel).then((matches: Match[]) => {
+        if (matches.length > 0) {
           const participants: MatchParticipant[] = [];
-          const matches: Match[] = response.data.payload.map((matchJSON: any) => new Match().fromJSON(matchJSON));
           for (const match of matches) {
             for (let i = 0; i < alliance.length; i++) {
               const participant: MatchParticipant = new MatchParticipant().fromJSON(alliance[i].toJSON()); // Essentially de-referencing
@@ -339,26 +324,9 @@ class MatchFlowController {
 
   private fetchElimsMatches(): Promise<Match[]> {
     return new Promise<Match[]>((resolve, reject) => {
-      EMSProvider.getMatches("elims").then((elimsMatchesResposne: AxiosResponse) => {
-        if (elimsMatchesResposne.data && elimsMatchesResposne.data.payload && elimsMatchesResposne.data.payload.length > 0) {
-          const elimsMatches: Match[] = [];
-          for (const matchJSON of elimsMatchesResposne.data.payload) {
-            const match: Match = new Match().fromJSON(matchJSON);
-            const participants: MatchParticipant[] = [];
-            for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
-              const participant: MatchParticipant = new MatchParticipant();
-              participant.allianceKey = matchJSON.alliance_keys.split(",")[i];
-              participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
-              participant.matchKey = match.matchKey;
-              participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
-              participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
-              participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
-              participants.push(participant);
-            }
-            match.participants = participants;
-            elimsMatches.push(match);
-          }
-          resolve(elimsMatches);
+      EMSProvider.getMatchesAndParticipants("").then((matches: Match[]) => {
+        if (matches.length > 0) {
+          resolve(matches);
         } else {
           reject(new HttpError(500, "ERR_NO_RESULTS", "No eliminations matches were found."));
         }
@@ -424,4 +392,4 @@ class MatchFlowController {
 
 }
 
-export default MatchFlowController.getInstance();
+export default MatchManager.getInstance();

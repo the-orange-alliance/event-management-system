@@ -10,7 +10,7 @@ import {addTeam, alterTeam, disableNavigation, removeTeam, updateTeamList} from 
 import {connect} from "react-redux";
 import DialogManager from "../../../managers/DialogManager";
 import TeamValidator from "../controllers/TeamValidator";
-import EventPostingController from "../controllers/EventPostingController";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider} from "@the-orange-alliance/lib-ems";
 
@@ -130,7 +130,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
-    EventPostingController.createTeamList(updatedTeams).then(() => {
+    EventCreationManager.createTeamList(updatedTeams).then(() => {
       setTimeout(() => {
         this.setState({loadingTeams: false});
         this.props.setNavigationDisabled(false);

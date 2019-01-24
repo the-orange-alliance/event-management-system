@@ -4,7 +4,7 @@ import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import SetupElimsScheduleParams from "../../../components/SetupElimsScheduleParams";
-import EventPostingController from "../controllers/EventPostingController";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
@@ -68,7 +68,7 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
     this.props.setNavigationDisabled(true);
-    EventPostingController.createSchedule("Eliminations", scheduleItems).then(() => {
+    EventCreationManager.createSchedule("Eliminations", scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({activeIndex: 1});
     }).catch((error: HttpError) => {
@@ -92,7 +92,7 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
-    EventPostingController.createElimsSchedule(this.props.elimsMatches).then(() => {
+    EventCreationManager.createElimsSchedule(this.props.elimsMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {

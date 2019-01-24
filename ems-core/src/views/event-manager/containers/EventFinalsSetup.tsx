@@ -4,7 +4,7 @@ import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import SetupRankingsOverview from "../../../components/SetupRankingsOverview";
 import SetupScheduleParams from "../../../components/SetupScheduleParams";
-import EventPostingController from "../controllers/EventPostingController";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, ISetFinalsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
@@ -75,7 +75,7 @@ class EventFinalsSetup extends React.Component<IProps, IState> {
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
     this.props.setNavigationDisabled(true);
-    EventPostingController.createSchedule("Finals", scheduleItems).then(() => {
+    EventCreationManager.createSchedule("Finals", scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({activeIndex: 2});
     }).catch((error: HttpError) => {
@@ -91,9 +91,9 @@ class EventFinalsSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
-    EventPostingController.deleteRanks().then(() => {
-      EventPostingController.createMatchSchedule(6, this.props.finalsMatches).then(() => {
-        EventPostingController.createRanks(this.state.qualifiedTeams, this.props.event.eventKey).then(() => {
+    EventCreationManager.deleteRanks().then(() => {
+      EventCreationManager.createMatchSchedule(6, this.props.finalsMatches).then(() => {
+        EventCreationManager.createRanks(this.state.qualifiedTeams, this.props.event.eventKey).then(() => {
           this.props.setNavigationDisabled(false);
           this.props.onComplete();
         }).catch((rankError: HttpError) => {

@@ -6,7 +6,6 @@ import {ApplicationActions, IApplicationState} from "../stores";
 import {Dispatch} from "redux";
 import {connect} from "react-redux";
 import {SyntheticEvent} from "react";
-import {AxiosResponse} from "axios";
 import DialogManager from "../managers/DialogManager";
 import * as socket from "socket.io-client";
 import {ISetEvent, ISetEventConfiguration, IToggleSlaveMode} from "../stores/config/types";
@@ -139,13 +138,13 @@ class SettingsSlave extends React.Component<IProps, IState> {
   private verifyAddress() {
     this.setState({verifying: true});
     EMSProvider.initialize(this.state.masterAddress);
-    EMSProvider.getEvent().then((response: AxiosResponse) => {
-      if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
+    EMSProvider.getEvent().then((events: Event[]) => {
+      if (events.length > 0) {
         this.requestConfig(this.state.masterAddress).then((config: any) => {
           EMSProvider.initialize(this.props.networkHost);
           this.setState({
             verifying: false,
-            masterEvent: new Event().fromJSON(response.data.payload[0]),
+            masterEvent: events[0],
             masterEventConfig: new EventConfiguration().fromJSON(config),
             masterAddressVerified: true
           });

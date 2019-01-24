@@ -1,13 +1,12 @@
 import * as React from "react";
 import ReportTemplate from "./ReportTemplate";
-import {AxiosResponse} from "axios";
 import DialogManager from "../../../managers/DialogManager";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import EnergyImpactRankTable from "../../../components/game-specifics/EnergyImpactRankTable";
 import RoverRuckusRankTable from "../../../components/game-specifics/RoverRuckusRankTable";
 import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking,
-  RoverRuckusRank, Team
+  RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -30,16 +29,8 @@ class QualificationRankings extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((rankRes: AxiosResponse) => {
-      const rankings: Ranking[] = [];
-      if (rankRes.data && rankRes.data.payload && rankRes.data.payload.length > 0) {
-        for (const rankJSON of rankRes.data.payload) {
-          const ranking: Ranking = this.getByEventType(this.props.eventConfig.eventType).fromJSON(rankJSON);
-          ranking.team = new Team().fromJSON(rankJSON);
-          rankings.push(ranking);
-        }
-      }
-      this.setState({generated: true, rankings: rankings});
+    EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+      this.setState({generated: true, rankings});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
       this.setState({generated: true});
@@ -62,17 +53,6 @@ class QualificationRankings extends React.Component<IProps, IState> {
         children={view}
       />
     );
-  }
-
-  private getByEventType(eventType: EventType): Ranking {
-    switch (eventType) {
-      case "fgc_2018":
-        return new EnergyImpactRanking();
-      case "ftc_1819":
-        return new RoverRuckusRank();
-      default:
-        return new Ranking();
-    }
   }
 
   private getRankingTable(eventType: EventType) {

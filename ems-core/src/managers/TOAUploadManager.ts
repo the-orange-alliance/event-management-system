@@ -1,4 +1,3 @@
-import {AxiosResponse} from "axios";
 import {EMSProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team,
   TOAEventParticipant, TOAEventParticipantAdapter, TOAMatch, TOAMatchAdapter, TOAMatchDetails, TOAMatchDetailsAdapter,
   TOAMatchParticipant, TOAMatchParticipantAdapter, TOAProvider, TOARanking, TOARankingAdapter
@@ -80,10 +79,8 @@ class TOAUploadManager {
         if (match.tournamentLevel > 0 && match.tournamentLevel < 10) {
           TOAProvider.deleteRankings(eventKey).then(() => {
             setTimeout(() => {
-              EMSProvider.getRankings().then((rankRes: AxiosResponse) => {
-                if (rankRes.data && rankRes.data.payload && rankRes.data.payload.length > 0) {
-                  const seasonKey: string = eventKey.split("-")[0];
-                  const rankings: Ranking[] = rankRes.data.payload.map((rankJSON: any) => TOARankingAdapter.getRankingFromSeasonKey(seasonKey).fromJSON(rankJSON));
+              EMSProvider.getRankings().then((rankings: Ranking[]) => {
+                if (rankings.length > 0) {
                   const toaRankings: TOARanking[] = rankings.map((r: Ranking) => new TOARankingAdapter(r).get());
                   TOAProvider.postRankings(eventKey, toaRankings).then(() => {
                     resolve();

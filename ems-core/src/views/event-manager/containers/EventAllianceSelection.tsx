@@ -3,14 +3,13 @@ import {Button, Card, Divider, DropdownItemProps, DropdownProps, Form, Grid, Tab
 import {getTheme} from "../../../AppTheme";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import {AxiosResponse} from "axios";
 import DialogManager from "../../../managers/DialogManager";
 import {SyntheticEvent} from "react";
 import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
-import EventPostingController from "../controllers/EventPostingController";
-import {AllianceMember, EMSProvider, Event, EventConfiguration, HttpError, Ranking, SocketProvider, Team} from "@the-orange-alliance/lib-ems";
+import EventCreaetionManager from "../../../managers/EventCreationManager";
+import {AllianceMember, EMSProvider, Event, EventConfiguration, HttpError, Ranking, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -49,18 +48,12 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((response: AxiosResponse) => {
-      if (response.data && response.data.payload && response.data.payload.length > 0) {
-        const ranks: Ranking[] = [];
-        for (const rankJSON of response.data.payload) {
-          const rank: Ranking = new Ranking().fromJSON(rankJSON);
-          rank.team = new Team().fromJSON(rankJSON);
-          ranks.push(rank);
-        }
-        this._teamOptions = ranks.map(ranking => {
+    EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+      if (rankings.length) {
+        this._teamOptions = rankings.map(ranking => {
           return {key: ranking.teamKey, value: ranking.teamKey, text: `#${ranking.rank}. ${ranking.team.getFromIdentifier(this.props.eventConfig.teamIdentifier)}`};
         });
-        this.setState({rankings: ranks});
+        this.setState({rankings});
       }
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
@@ -213,7 +206,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       member.teamKey = this.state.inputValues[i];
       members.push(member);
     }
-    EventPostingController.postAlliances(members).then(() => {
+    EventCreaetionManager.postAlliances(members).then(() => {
       this.props.setAllianceMembers(members);
       this.props.setNavigationDisabled(false);
       this.props.onComplete();

@@ -12,7 +12,7 @@ import {
 } from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setActiveDetails, setActiveMatch, setActiveParticipants, setMatchState} from "../../../stores/scoring/actions";
-import MatchFlowController from "../controllers/MatchFlowController";
+import MatchManager from "../../../managers/MatchManager";
 import * as moment from "moment";
 import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
@@ -108,7 +108,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
 
     const activeMatch: Match = this.props.activeMatch === null ? new Match() : this.props.activeMatch;
-    const disabledStates = MatchFlowController.getDisabledStates(this.props.matchState);
+    const disabledStates = MatchManager.getDisabledStates(this.props.matchState);
     const hasRedAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station < 20).length > 0;
     const hasBlueAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station >= 20).length > 0;
     const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance && connected;
@@ -177,7 +177,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
     console.log("Prestarting match " + this.props.activeMatch.matchKey + "...");
-    MatchFlowController.prestart(this.props.activeMatch).then(() => {
+    MatchManager.prestart(this.props.activeMatch).then(() => {
       this.props.setActiveDetails(this.props.activeMatch.matchDetails);
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
     }).catch((error: HttpError) => {
@@ -187,7 +187,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private setAudienceDisplay() {
-    MatchFlowController.setAudienceDisplay().then(() => {
+    MatchManager.setAudienceDisplay().then(() => {
       console.log(this.props.activeMatch.matchKey);
       this.props.setMatchState(MatchState.AUDIENCE_DISPLAY_SET);
     });
@@ -246,7 +246,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       }
 
     });
-    MatchFlowController.startMatch().then(() => {
+    MatchManager.startMatch().then(() => {
       this.props.setMatchState(MatchState.MATCH_IN_PROGRESS);
       this.forceUpdate();
       console.log(this.props.activeMatch.matchKey);
@@ -256,7 +256,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   private abortMatch() {
     this.props.setNavigationDisabled(false);
     SocketProvider.off("score-update");
-    MatchFlowController.abortMatch().then(() => {
+    MatchManager.abortMatch().then(() => {
       SocketProvider.off("match-end");
       this.props.setMatchState(MatchState.MATCH_ABORTED);
     });
@@ -274,12 +274,12 @@ class MatchPlay extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
-    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
+    MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
       this.setState({committingScores: false});
       if (this.props.activeMatch.tournamentLevel >= 10) {
-        MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
+        MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
           if (this.props.elimsMatches.length < matches.length) {
             this.props.setEliminationsMatches(matches);
           }
@@ -339,7 +339,7 @@ class MatchPlay extends React.Component<IProps, IState> {
         this.props.setActiveMatch(match);
         this.setState({activeMatch: match});
         // Temporarily set the match to what we have now, and then get ALL the details.
-        MatchFlowController.getMatchResults(match.matchKey).then((data: Match) => {
+        MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
           this.props.setActiveMatch(data);
           this.props.setActiveParticipants(data.participants);
           this.props.setActiveDetails(data.matchDetails);

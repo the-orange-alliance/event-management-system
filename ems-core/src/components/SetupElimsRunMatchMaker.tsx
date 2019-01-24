@@ -7,7 +7,6 @@ import {connect} from "react-redux";
 import {IDisableNavigation} from "../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation} from "../stores/internal/actions";
-import {AxiosResponse} from "axios";
 import {SyntheticEvent} from "react";
 import AllianceBracketManager from "../managers/AllianceBracketManager";
 import {AllianceMember, AppError, EliminationsSchedule, EMSProvider, Event, Match, ScheduleItem} from "@the-orange-alliance/lib-ems";
@@ -40,14 +39,8 @@ class SetupElimsRunMatchMaker extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getScheduleItems(this.props.schedule.type).then((response: AxiosResponse) => {
-      const items: ScheduleItem[] = [];
-      if (response.data.payload && response.data.payload.length > 0) {
-        for (const item of response.data.payload) {
-          items.push(new ScheduleItem(this.props.schedule.type).fromJSON(item));
-        }
-      }
-      this.setState({scheduleItems: items, requestingData: false});
+    EMSProvider.getScheduleItems(this.props.schedule.type).then((scheduleItems: ScheduleItem[]) => {
+      this.setState({scheduleItems, requestingData: false});
     }).catch(() => {
       this.setState({requestingData: false});
     });

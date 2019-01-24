@@ -1,6 +1,5 @@
 import * as React from "react";
 import ReportTemplate from "./ReportTemplate";
-import {AxiosResponse} from "axios";
 import DialogManager from "../../../managers/DialogManager";
 import {Table} from "semantic-ui-react";
 import {EMSProvider, EventConfiguration, HttpError, Team} from "@the-orange-alliance/lib-ems";
@@ -25,14 +24,8 @@ class OtherCompetingTeams extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getTeams().then((teamRes: AxiosResponse) => {
-      const teams: Team[] = [];
-      if (teamRes.data && teamRes.data.payload && teamRes.data.payload.length > 0) {
-        for (const teamJSON of teamRes.data.payload) {
-          teams.push(new Team().fromJSON(teamJSON));
-        }
-      }
-      this.setState({generated: true, teams: teams});
+    EMSProvider.getTeams().then((teams: Team[]) => {
+      this.setState({generated: true, teams});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
       this.setState({generated: true});

@@ -10,7 +10,7 @@ import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOv
 import {IDisableNavigation, ISetQualificationMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setQualificationMatches} from "../../../stores/internal/actions";
-import EventPostingController from "../controllers/EventPostingController";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
@@ -79,7 +79,7 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
     this.props.setNavigationDisabled(true);
-    EventPostingController.createSchedule("Qualification", scheduleItems).then(() => {
+    EventCreationManager.createSchedule("Qualification", scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({activeIndex: 1});
     }).catch((error: HttpError) => {
@@ -102,8 +102,8 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
-    EventPostingController.createMatchSchedule(1, this.props.qualificationMatches).then(() => {
-      EventPostingController.createRanks(this.props.teamList, this.props.event.eventKey).then(() => {
+    EventCreationManager.createMatchSchedule(1, this.props.qualificationMatches).then(() => {
+      EventCreationManager.createRanks(this.props.teamList, this.props.event.eventKey).then(() => {
         this.props.setNavigationDisabled(false);
         this.props.onComplete();
       }).catch((rankError: HttpError) => {

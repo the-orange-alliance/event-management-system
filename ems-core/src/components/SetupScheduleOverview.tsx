@@ -2,7 +2,6 @@ import * as React from "react";
 import {Card, Table} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
 import DialogManager from "../managers/DialogManager";
-import {AxiosResponse} from "axios";
 import {EMSProvider, HttpError, ScheduleItem, TournamentType} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -22,14 +21,8 @@ class SetupScheduleOverview extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getScheduleItems(this.props.type).then((response: AxiosResponse) => {
-      const items: ScheduleItem[] = [];
-      if (response.data.payload && response.data.payload.length > 0) {
-        for (const item of response.data.payload) {
-          items.push(new ScheduleItem(this.props.type).fromJSON(item));
-        }
-      }
-      this.setState({scheduleItems: items});
+    EMSProvider.getScheduleItems(this.props.type).then((scheduleItems: ScheduleItem[]) => {
+      this.setState({scheduleItems});
     }).catch((err: HttpError) => {
       DialogManager.showErrorBox(err);
     });

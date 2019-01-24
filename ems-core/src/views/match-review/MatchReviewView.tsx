@@ -5,7 +5,7 @@ import {ApplicationActions, IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import {getTheme} from "../../AppTheme";
 import {SyntheticEvent} from "react";
-import MatchFlowController from "../match-play/controllers/MatchFlowController";
+import MatchManager from "../../managers/MatchManager";
 import {ISetActiveDetails, ISetActiveMatch, ISetActiveParticipants} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setActiveDetails, setActiveMatch, setActiveParticipants} from "../../stores/scoring/actions";
@@ -147,7 +147,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
       if (match.matchKey === (props.value as string)) {
         this.props.setActiveMatch(match);
         // Temporarily set the match to what we have now, and then get ALL the details.
-        MatchFlowController.getMatchResults(match.matchKey).then((data: Match) => {
+        MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
           this.props.setActiveMatch(data);
           this.props.setActiveParticipants(data.participants);
           this.props.setActiveDetails(data.matchDetails);
@@ -169,11 +169,11 @@ class MatchReviewView extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
-    MatchFlowController.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
+    MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({updatingScores: false});
       if (this.props.activeMatch.tournamentLevel >= 10) {
-        MatchFlowController.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
+        MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
           if (this.props.elimsMatches.length < matches.length) {
             this.props.setEliminationsMatches(matches);
           }

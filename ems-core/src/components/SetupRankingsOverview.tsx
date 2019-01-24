@@ -2,14 +2,12 @@ import * as React from "react";
 import {getTheme} from "../AppTheme";
 import {Card} from "semantic-ui-react";
 import {IApplicationState} from "../stores";
-import {AxiosResponse} from "axios";
 import DialogManager from "../managers/DialogManager";
 import EnergyImpactRankTable from "./game-specifics/EnergyImpactRankTable";
 import {connect} from "react-redux";
 import RoverRuckusRankTable from "./game-specifics/RoverRuckusRankTable";
 import {
-  EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking,
-  RoverRuckusRank, Team
+  EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking, RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -29,16 +27,8 @@ class SetupRankingsOverview extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((response: AxiosResponse) => {
-      const rankings: Ranking[] = [];
-      if (response.data.payload && response.data.payload.length > 0) {
-        for (let i = 0; i < this.props.eventConfig.rankingCutoff; i++) {
-          const ranking: Ranking = this.getByEventType(this.props.eventConfig.eventType).fromJSON(response.data.payload[i]);
-          ranking.team = new Team().fromJSON(response.data.payload[i]);
-          rankings.push(ranking);
-        }
-      }
-      this.setState({rankings: rankings});
+    EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+      this.setState({rankings});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
     });
@@ -65,17 +55,6 @@ class SetupRankingsOverview extends React.Component<IProps, IState> {
         </Card>
       </div>
     );
-  }
-
-  private getByEventType(eventType: EventType): Ranking {
-    switch (eventType) {
-      case "fgc_2018":
-        return new EnergyImpactRanking();
-      case "ftc_1819":
-        return new RoverRuckusRank();
-      default:
-        return new Ranking();
-    }
   }
 
   private getRankingTable(eventType: EventType) {

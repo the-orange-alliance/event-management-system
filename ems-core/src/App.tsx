@@ -16,9 +16,8 @@ import {
   updateTeamList
 } from "./stores/internal/actions";
 
-import {EMSProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration, Team, Match,
-AllianceMember, MatchParticipant} from "@the-orange-alliance/lib-ems";
-import {AxiosResponse} from "axios";
+import {EMSProvider, Event, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration, Team, Match,
+AllianceMember} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   slaveModeEnabled: boolean,
@@ -57,110 +56,35 @@ class App extends React.Component<IProps> {
     }
 
     // Preload app-wide variables like team list, schedule, etc.
-    EMSProvider.getEvent().then((eventResponse: AxiosResponse) => {
-      if (eventResponse.data.payload && eventResponse.data.payload[0] && eventResponse.data.payload[0].event_key) {
+    EMSProvider.getEvent().then((events: Event[]) => {
+      if (events.length > 0) {
         this.props.setCompletedStep(1);
       }
-      EMSProvider.getTeams().then((teamResponse: AxiosResponse) => {
-        if (teamResponse.data && teamResponse.data.payload && teamResponse.data.payload.length > 0) {
-          const teams: Team[] = [];
-          for (const teamJSON of teamResponse.data.payload) {
-            let team: Team = new Team();
-            team = team.fromJSON(teamJSON);
-            teams.push(team);
-          }
+      EMSProvider.getTeams().then((teams: Team[]) => {
+        if (teams.length > 0) {
           this.props.setTeamList(teams);
           this.props.setCompletedStep(2);
         }
-        EMSProvider.getMatches(0).then((practiceMatchesResponse: AxiosResponse) => {
-          if (practiceMatchesResponse.data && practiceMatchesResponse.data.payload && practiceMatchesResponse.data.payload.length > 0) {
-            const practiceMatches: Match[] = [];
-            for (const matchJSON of practiceMatchesResponse.data.payload) {
-              const match: Match = new Match().fromJSON(matchJSON);
-              const participants: MatchParticipant[] = [];
-              for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
-                const participant: MatchParticipant = new MatchParticipant();
-                participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
-                participant.matchKey = match.matchKey;
-                participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
-                participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
-                participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
-                participants.push(participant);
-              }
-              match.participants = participants;
-              practiceMatches.push(match);
-            }
+        EMSProvider.getMatchesAndParticipants("").then((practiceMatches: Match[]) => {
+          if (practiceMatches.length > 0) {
             this.props.setPracticeMatches(practiceMatches);
             this.props.setCompletedStep(3);
-            EMSProvider.getMatches(1).then((qualMatchesResponse: AxiosResponse) => {
-              if (qualMatchesResponse.data && qualMatchesResponse.data.payload && qualMatchesResponse.data.payload.length > 0) {
-                const qualMatches: Match[] = [];
-                for (const matchJSON of qualMatchesResponse.data.payload) {
-                  const match: Match = new Match().fromJSON(matchJSON);
-                  const participants: MatchParticipant[] = [];
-                  for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
-                    const participant: MatchParticipant = new MatchParticipant();
-                    participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
-                    participant.matchKey = match.matchKey;
-                    participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
-                    participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
-                    participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
-                    participants.push(participant);
-                  }
-                  match.participants = participants;
-                  qualMatches.push(match);
-                }
+            EMSProvider.getMatchesAndParticipants("").then((qualMatches: Match[]) => {
+              if (qualMatches.length > 0) {
                 this.props.setQualificationMatches(qualMatches);
                 this.props.setCompletedStep(4);
-                EMSProvider.getMatches(6).then((finalsMatchesResponse: AxiosResponse) => {
-                  if (finalsMatchesResponse.data && finalsMatchesResponse.data.payload && finalsMatchesResponse.data.payload.length > 0) {
-                    const finalsMatches: Match[] = [];
-                    for (const matchJSON of finalsMatchesResponse.data.payload) {
-                      const match: Match = new Match().fromJSON(matchJSON);
-                      const participants: MatchParticipant[] = [];
-                      for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
-                        const participant: MatchParticipant = new MatchParticipant();
-                        participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
-                        participant.matchKey = match.matchKey;
-                        participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
-                        participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
-                        participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
-                        participants.push(participant);
-                      }
-                      match.participants = participants;
-                      finalsMatches.push(match);
-                    }
+                EMSProvider.getMatchesAndParticipants("").then((finalsMatches: Match[]) => {
+                  if (finalsMatches.length > 0) {
                     this.props.setFinalsMatches(finalsMatches);
                     this.props.setCompletedStep(6);
                   }
                 });
-                EMSProvider.getAlliances().then((allianceResponse: AxiosResponse) => {
-                  if (allianceResponse.data && allianceResponse.data.payload && allianceResponse.data.payload.length > 0) {
-                    const members: AllianceMember[] = [];
-                    for (const memberJSON of allianceResponse.data.payload) {
-                      members.push(new AllianceMember().fromJSON(memberJSON));
-                    }
-                    this.props.setAllianceMembers(members);
+                EMSProvider.getAlliances().then((allianceMembers: AllianceMember[]) => {
+                  if (allianceMembers.length > 0) {
+                    this.props.setAllianceMembers(allianceMembers);
                     this.props.setCompletedStep(5);
-                    EMSProvider.getMatches("elims").then((elimsMatchesResposne: AxiosResponse) => {
-                      if (elimsMatchesResposne.data && elimsMatchesResposne.data.payload && elimsMatchesResposne.data.payload.length > 0) {
-                        const elimsMatches: Match[] = [];
-                        for (const matchJSON of elimsMatchesResposne.data.payload) {
-                          const match: Match = new Match().fromJSON(matchJSON);
-                          const participants: MatchParticipant[] = [];
-                          for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
-                            const participant: MatchParticipant = new MatchParticipant();
-                            participant.allianceKey = matchJSON.alliance_keys.split(",")[i];
-                            participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
-                            participant.matchKey = match.matchKey;
-                            participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
-                            participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
-                            participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
-                            participants.push(participant);
-                          }
-                          match.participants = participants;
-                          elimsMatches.push(match);
-                        }
+                    EMSProvider.getMatchesAndParticipants("").then((elimsMatches: Match[]) => {
+                      if (elimsMatches.length > 0) {
                         this.props.setElimsMatches(elimsMatches);
                         this.props.setCompletedStep(6);
                       }

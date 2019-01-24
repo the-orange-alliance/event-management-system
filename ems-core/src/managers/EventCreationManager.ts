@@ -2,7 +2,6 @@ import {
   AllianceMember, EMSProvider, Event, EventType, HttpError, Match, MatchParticipant, Ranking, ScheduleItem, Team,
   TournamentType
 } from "@the-orange-alliance/lib-ems";
-import {AxiosResponse} from "axios";
 
 class EventCreationManager {
   private static _instance: EventCreationManager;
@@ -19,14 +18,14 @@ class EventCreationManager {
   public createEventDatabase(eventType: EventType, event: Event): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       try {
-        EMSProvider.getEvent().then((response: AxiosResponse) => {
-          if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
+        EMSProvider.getEvent().then((events: Event[]) => {
+          if (events.length > 0) {
             /* Resolve. The event database was originally created, and nothing needs to be done. This is
                completely safe.*/
-            resolve(response.data.payload[0]);
+            resolve(events[0]);
           } else {
-            EMSProvider.postEvent(event).then((eventResponse: AxiosResponse) => {
-              resolve(eventResponse.data.payload[0]);
+            EMSProvider.postEvent(event).then((res: any) => {
+              resolve(res[0]);
             }).catch((error: HttpError) => {
               // If we can't post the event, then something is wrong.
               reject(error);
@@ -35,8 +34,8 @@ class EventCreationManager {
         }).catch(() => {
           // If this errors out, then the database has not been created.
           EMSProvider.createEvent(eventType).then(() => {
-            EMSProvider.postEvent(event).then((response: AxiosResponse) => {
-              resolve(response.data.payload[0]);
+            EMSProvider.postEvent(event).then((res: any) => {
+              resolve(res);
             }).catch((error: HttpError) => {
               // If we can't post the event, then something is wrong.
               reject(error);
@@ -54,8 +53,8 @@ class EventCreationManager {
 
   public createTeamList(teams: Team[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getTeams().then((response: AxiosResponse) => {
-        if (response.data.payload && response.data.payload.length > 0) {
+      EMSProvider.getTeams().then((emsTeams: Team[]) => {
+        if (emsTeams.length > 0) {
           resolve();
         } else {
           EMSProvider.postTeams(teams).then(() => {
@@ -94,8 +93,8 @@ class EventCreationManager {
 
   public createMatchSchedule(tournamentLevel: number, matches: Match[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getMatches(tournamentLevel).then((matchesResponse: AxiosResponse) => {
-        if (matchesResponse.data && matchesResponse.data.payload && matchesResponse.data.payload.length > 0) {
+      EMSProvider.getMatchesByTournamentLevel(tournamentLevel).then((emsMatches: Match[]) => {
+        if (matches.length > 0) {
           resolve();
         } else {
           EMSProvider.postMatchSchedule(matches).then(() => {
@@ -173,8 +172,8 @@ class EventCreationManager {
         teamRanking.teamKey = team.teamKey;
         rankings.push(teamRanking);
       }
-      EMSProvider.getRankings().then((rankRes: AxiosResponse) => {
-        if (rankRes.data && rankRes.data.payload && rankRes.data.payload.length > 0) {
+      EMSProvider.getRankings().then((emsRankings: Ranking[]) => {
+        if (emsRankings.length > 0) {
           resolve();
         } else {
           EMSProvider.postRankings(rankings).then(() => {
@@ -195,8 +194,8 @@ class EventCreationManager {
 
   public postAlliances(members: AllianceMember[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getAlliances().then((allianceResponse: AxiosResponse) => {
-        if (allianceResponse.data && allianceResponse.data.payload && allianceResponse.data.payload.length > 0) {
+      EMSProvider.getAlliances().then((emsMembers: AllianceMember[]) => {
+        if (emsMembers.length > 0) {
           resolve();
         } else {
           EMSProvider.postAllianceMembers(members).then(() => {

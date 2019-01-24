@@ -16,10 +16,10 @@ import ExplanationIcon from "../../../components/ExplanationIcon";
 import {SyntheticEvent} from "react";
 import EventCreationValidator from "../controllers/EventCreationValidator";
 import {CONFIG_STORE} from "../../../AppStore";
-import EventPostingController from "../controllers/EventPostingController";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
 import DialogManager from "../../../managers/DialogManager";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import {DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, PlayoffsType, Region, RegionData, SeasonData,
   TOAConfig, TOAEvent, TOAProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_EI_PRESET, FTC_ROVER_PRESET
 } from "@the-orange-alliance/lib-ems";
@@ -278,7 +278,7 @@ class EventSelection extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(true);
     const toaConfig = (this.props.toaConfig.enabled && this.props.eventConfig.requiresTOA) ? this.props.toaConfig.toJSON() : undefined;
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), toaConfig: toaConfig}).catch((err) => console.log(err));
-    EventPostingController.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
+    EventCreationManager.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
       this.setState({creatingEvent: false});
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
@@ -286,6 +286,7 @@ class EventSelection extends React.Component<IProps, IState> {
       this.setState({creatingEvent: false});
       this.props.setNavigationDisabled(false);
       console.log(error);
+      DialogManager.showErrorBox(error);
     });
   }
 

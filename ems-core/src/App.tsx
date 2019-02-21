@@ -65,15 +65,16 @@ class App extends React.Component<IProps> {
           this.props.setTeamList(teams);
           this.props.setCompletedStep(2);
         }
-        EMSProvider.getMatchesAndParticipants("").then((practiceMatches: Match[]) => {
+        const eventKey: string = events[0].eventKey;
+        EMSProvider.getMatchesAndParticipants(eventKey + "-P").then((practiceMatches: Match[]) => {
           if (practiceMatches.length > 0) {
             this.props.setPracticeMatches(practiceMatches);
             this.props.setCompletedStep(3);
-            EMSProvider.getMatchesAndParticipants("").then((qualMatches: Match[]) => {
+            EMSProvider.getMatchesAndParticipants(eventKey + "-Q").then((qualMatches: Match[]) => {
               if (qualMatches.length > 0) {
                 this.props.setQualificationMatches(qualMatches);
                 this.props.setCompletedStep(4);
-                EMSProvider.getMatchesAndParticipants("").then((finalsMatches: Match[]) => {
+                EMSProvider.getMatchesAndParticipants(eventKey + "-E").then((finalsMatches: Match[]) => {
                   if (finalsMatches.length > 0) {
                     this.props.setFinalsMatches(finalsMatches);
                     this.props.setCompletedStep(6);
@@ -83,7 +84,7 @@ class App extends React.Component<IProps> {
                   if (allianceMembers.length > 0) {
                     this.props.setAllianceMembers(allianceMembers);
                     this.props.setCompletedStep(5);
-                    EMSProvider.getMatchesAndParticipants("").then((elimsMatches: Match[]) => {
+                    EMSProvider.getMatchesAndParticipants(eventKey + "-E").then((elimsMatches: Match[]) => {
                       if (elimsMatches.length > 0) {
                         this.props.setElimsMatches(elimsMatches);
                         this.props.setCompletedStep(6);

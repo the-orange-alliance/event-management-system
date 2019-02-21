@@ -13,7 +13,10 @@ import * as Internal from "./stores/internal/reducer";
 import {IInternalState} from "./stores/internal/models";
 import ProcessManager from "./managers/ProcessManager";
 import DialogManager from "./managers/DialogManager";
-import {AppError, Process} from "@the-orange-alliance/lib-ems";
+import {AppError, EMSProvider, Event, Match, Process} from "@the-orange-alliance/lib-ems";
+import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
+import EventConfiguration from "@the-orange-alliance/lib-ems/dist/models/ems/EventConfiguration";
+import AllianceMember from "@the-orange-alliance/lib-ems/dist/models/ems/AllianceMember";
 
 const {ipcRenderer} = (window as any).require("electron");
 
@@ -90,6 +93,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
   }).catch((error: AppError) => {
     console.log(error);
     const applicationStore = createStore(reducers);
+
     ipcRenderer.send("preload-finish");
     ReactDOM.render(
       <Provider store={applicationStore}>
@@ -102,3 +106,58 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
 }).catch((error: AppError) => {
   DialogManager.showErrorBox(error);
 });
+
+async function setCompletedStep(eventConfig: EventConfiguration, networkHost: string) {
+  let completedStep: number = 0;
+
+  EMSProvider.initialize(networkHost);
+  const events: Event[] = await EMSProvider.getEvent();
+
+  if (events.length === 0) {
+    return completedStep;
+  } else {
+    completedStep++;
+  }
+
+  const teams: Team[] = await EMSProvider.getTeams();
+
+  if (teams.length === 0) {
+    return completedStep;
+  } else {
+    completedStep++;
+  }
+
+  const eventKey: string = events[0].eventKey;
+
+  const pMatches: Match[] = await EMSProvider.getMatchesAndParticipants(eventKey + "-P");
+
+  if (pMatches.length === 0) {
+    return completedStep;
+  } else {
+    completedStep++;
+  }
+
+  const qMatches: Match[] = await EMSProvider.getMatchesAndParticipants(eventKey + "-Q");
+
+  if (qMatches.length === 0) {
+    return completedStep;
+  } else {
+    completedStep++;
+  }
+
+  const alliances: AllianceMember[] = await EMSProvider.getAlliances();
+
+  if (alliances.length === 0 && eventConfig.playoffsConfig === "finals") {
+    completedStep+=2;
+  }
+
+  const eMatches: Match[] = await EMSProvider.getMatchesAndParticipants(eventKey + "-E");
+
+  if (eMatches.length === 0) {
+    return completedStep;
+  } else {
+    completedStep++;
+  }
+
+  return completedStep;
+}

@@ -8,7 +8,7 @@ import {SyntheticEvent} from "react";
 import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
-import EventCreaetionManager from "../../../managers/EventCreationManager";
+import EventCreationManager from "../../../managers/EventCreationManager";
 import {AllianceMember, EMSProvider, Event, EventConfiguration, HttpError, Ranking, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -206,7 +206,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       member.teamKey = this.state.inputValues[i];
       members.push(member);
     }
-    EventCreaetionManager.postAlliances(members).then(() => {
+    EventCreationManager.postAlliances(members).then(() => {
       this.props.setAllianceMembers(members);
       this.props.setNavigationDisabled(false);
       this.props.onComplete();

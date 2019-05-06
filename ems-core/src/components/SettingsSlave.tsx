@@ -22,10 +22,10 @@ interface IProps {
   slaveInstanceID?: number,
   masterHost?: string,
   networkHost?: string,
-  setEvent: (event: Event) => ISetEvent,
-  setEventConfig: (eventConfig: EventConfiguration) => ISetEventConfiguration,
-  setSlaveModeEnabled: (enabled: boolean) => IToggleSlaveMode,
-  setCompletedStep: (step: number) => IIncrementCompletedStep
+  setEvent?: (event: Event) => ISetEvent,
+  setEventConfig?: (eventConfig: EventConfiguration) => ISetEventConfiguration,
+  setSlaveModeEnabled?: (enabled: boolean) => IToggleSlaveMode,
+  setCompletedStep?: (step: number) => IIncrementCompletedStep
 }
 
 interface IState {

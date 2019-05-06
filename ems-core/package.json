@@ -4,7 +4,7 @@
   "private": true,
   "main": "public/electron.js",
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "0.1.24",
+    "@the-orange-alliance/lib-ems": "0.1.26",
     "axios": "^0.18.0",
     "dotenv": "^6.0.0",
     "local-ipv4-address": "0.0.2",
@@ -33,7 +33,6 @@
     "postinstall": "electron-rebuild"
   },
   "devDependencies": {
-    "@types/jest": "^23.1.5",
     "@types/node": "^10.5.2",
     "@types/react": "^16.4.6",
     "@types/react-datepicker": "^1.1.5",
@@ -44,7 +43,7 @@
     "concurrently": "^3.6.0",
     "electron": "^2.0.4",
     "electron-debug": "^2.0.0",
-    "electron-rebuild": "^1.8.1",
+    "electron-rebuild": "^1.8.4",
     "typescript": "^2.9.2"
   },
   "proxy": "http://localhost:4200",

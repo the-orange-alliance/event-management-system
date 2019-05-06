@@ -13,10 +13,8 @@ import * as Internal from "./stores/internal/reducer";
 import {IInternalState} from "./stores/internal/models";
 import ProcessManager from "./managers/ProcessManager";
 import DialogManager from "./managers/DialogManager";
-import {AppError, EMSProvider, Event, Match, Process} from "@the-orange-alliance/lib-ems";
-import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
-import EventConfiguration from "@the-orange-alliance/lib-ems/dist/models/ems/EventConfiguration";
-import AllianceMember from "@the-orange-alliance/lib-ems/dist/models/ems/AllianceMember";
+import {AppError, EMSProvider, Process} from "@the-orange-alliance/lib-ems";
+import InternalStateManager, {IInternalProgress} from "./managers/InternalStateManager";
 
 const {ipcRenderer} = (window as any).require("electron");
 
@@ -73,27 +71,32 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.backupDir = configStore.backupDir;
     }
 
-    const applicationStore = createStore(reducers, {
-      configState: configState,
-      internalState: internalState
-    });
+    EMSProvider.initialize(configState.networkHost);
 
-    // The microservices aren't 100% ready when the application loads, so we give it some time here.
-    const time = process.env.NODE_ENV === "production" ? 4000 : 1000;
-    setTimeout(() => {
-      console.log("Preloaded application state.");
-      ipcRenderer.send("preload-finish");
-      ReactDOM.render(
-        <Provider store={applicationStore}>
-          <App />
-        </Provider>,
-        document.getElementById('root') as HTMLElement
-      );
-    }, time);
+    InternalStateManager.pollServicesForResponse().then((res: any) => {
+      InternalStateManager.refreshInternalProgress(configState.eventConfiguration).then((internalProgress: IInternalProgress) => {
+        internalState.completedStep = internalProgress.currentStep;
+        const applicationStore = createStore(reducers, {
+          configState: configState,
+          internalState: internalState
+        });
+
+        console.log("Preloaded application state.");
+        ipcRenderer.send("preload-finish");
+        ReactDOM.render(
+          <Provider store={applicationStore}>
+            <App />
+          </Provider>,
+          document.getElementById('root') as HTMLElement
+        );
+      });
+    }).catch((reason: any) => {
+      console.log("Fatal error occurred. Please restart EMS entirely, or consider reinstalling.");
+    });
   }).catch((error: AppError) => {
     console.log(error);
     const applicationStore = createStore(reducers);
-
+    console.log("Could not load previous application config state. Resetting...");
     ipcRenderer.send("preload-finish");
     ReactDOM.render(
       <Provider store={applicationStore}>
@@ -106,58 +109,3 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
 }).catch((error: AppError) => {
   DialogManager.showErrorBox(error);
 });
-
-async function setCompletedStep(eventConfig: EventConfiguration, networkHost: string) {
-  let completedStep: number = 0;
-
-  EMSProvider.initialize(networkHost);
-  const events: Event[] = await EMSProvider.getEvent();
-
-  if (events.length === 0) {
-    return completedStep;
-  } else {
-    completedStep++;
-  }
-
-  const teams: Team[] = await EMSProvider.getTeams();
-
-  if (teams.length === 0) {
-    return completedStep;
-  } else {
-    completedStep++;
-  }
-
-  const eventKey: string = events[0].eventKey;
-
-  const pMatches: Match[] = await EMSProvider.getMatchesAndParticipants(eventKey + "-P");
-
-  if (pMatches.length === 0) {
-    return completedStep;
-  } else {
-    completedStep++;
-  }
-
-  const qMatches: Match[] = await EMSProvider.getMatchesAndParticipants(eventKey + "-Q");
-
-  if (qMatches.length === 0) {
-    return completedStep;
-  } else {
-    completedStep++;
-  }
-
-  const alliances: AllianceMember[] = await EMSProvider.getAlliances();
-
-  if (alliances.length === 0 && eventConfig.playoffsConfig === "finals") {
-    completedStep+=2;
-  }
-
-  const eMatches: Match[] = await EMSProvider.getMatchesAndParticipants(eventKey + "-E");
-
-  if (eMatches.length === 0) {
-    return completedStep;
-  } else {
-    completedStep++;
-  }
-
-  return completedStep;
-}

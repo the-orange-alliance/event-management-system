@@ -77,7 +77,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
               </Grid.Column>
             </Grid.Row>
             <Grid.Row width={16} centered={true}>
-              <Grid.Column width={6}><Button fluid={true} color={getTheme().primary} onClick={this.openConfirmModal}>Save &amps; Update</Button></Grid.Column>
+              <Grid.Column width={6}><Button fluid={true} color={getTheme().primary} onClick={this.openConfirmModal}>Save &amp; Update</Button></Grid.Column>
             </Grid.Row>
           </Grid>
         </Card.Content>

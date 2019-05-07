@@ -91,6 +91,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
         );
       });
     }).catch((reason: any) => {
+      // TODO - Handle error dialog and application exit.
       console.log("Fatal error occurred. Please restart EMS entirely, or consider reinstalling.");
     });
   }).catch((error: AppError) => {

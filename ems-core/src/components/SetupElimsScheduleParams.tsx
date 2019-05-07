@@ -67,7 +67,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
                   timeIntervals={15}
                   dateFormat="dddd, MMMM Do YYYY, h:mm a"
                   onChange={this.updateDayStartTime.bind(this, day.id)}
-                  selected={day.startTime}
+                  selected={day.startTime.toDate()}
                 />
               </Form.Field>
             </Grid.Column>

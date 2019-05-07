@@ -28,6 +28,7 @@ class InternalStateManager {
     while (!apiReady) {
       await EMSProvider.ping().then(() => {
         apiReady = true;
+        console.log("Received API response. Launching application.");
       }).catch((res: any) => {
         console.log("Did not receive API response. Trying again...");
         apiReady = false;

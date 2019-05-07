@@ -38,7 +38,16 @@ function createWindow () {
   });
 
   // Create the browser window.
-  win = new BrowserWindow({width: 1280, height: 720, minHeight: 600, minWidth: 900, show: false});
+  win = new BrowserWindow({
+    height: 720,
+    minHeight: 600,
+    minWidth: 900,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true
+    },
+    width: 1280
+  });
   if (prod) {
     const logger = require("./main/logger");
     require("./main/process-communication");

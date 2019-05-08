@@ -9,7 +9,7 @@ import {IAddTeam, IAlterTeam, IDisableNavigation, IRemoveTeam, IUpdateTeamList} 
 import {addTeam, alterTeam, disableNavigation, removeTeam, updateTeamList} from "../../../stores/internal/actions";
 import {connect} from "react-redux";
 import DialogManager from "../../../managers/DialogManager";
-import TeamValidator from "../controllers/TeamValidator";
+import TeamValidator from "../../../validators/TeamValidator";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider} from "@the-orange-alliance/lib-ems";

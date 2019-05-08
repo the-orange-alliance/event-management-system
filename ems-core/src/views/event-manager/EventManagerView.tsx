@@ -2,18 +2,18 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {Step} from "semantic-ui-react";
 import {ApplicationActions, IApplicationState} from "../../stores";
-import EventSelection from "./containers/EventSelection";
-import EventParticipantSelection from "./containers/EventParticipantSelection";
-import EventPracticeSetup from "./containers/EventPracticeSetup";
+import EventSelection from "./views/EventSelection";
+import EventParticipantSelection from "./views/EventParticipantSelection";
+import EventPracticeSetup from "./views/EventPracticeSetup";
 import {Dispatch} from "redux";
 import {incrementCompletedStep} from "../../stores/internal/actions";
 import {IIncrementCompletedStep} from "../../stores/internal/types";
-import EventQualificationSetup from "./containers/EventQualificationSetup";
-import EventFinalsSetup from "./containers/EventFinalsSetup";
-import EventAllianceSelection from "./containers/EventAllianceSelection";
-import EventEliminationsSetup from "./containers/EventEliminationsSetup";
-import EventAwardsSetup from "./containers/EventAwardsSetup";
-import EventDataUpload from "./containers/EventDataUpload";
+import EventQualificationSetup from "./views/EventQualificationSetup";
+import EventFinalsSetup from "./views/EventFinalsSetup";
+import EventAllianceSelection from "./views/EventAllianceSelection";
+import EventEliminationsSetup from "./views/EventEliminationsSetup";
+import EventAwardsSetup from "./views/EventAwardsSetup";
+import EventDataUpload from "./views/EventDataUpload";
 import {EventConfiguration} from "@the-orange-alliance/lib-ems";
 
 interface IProps {

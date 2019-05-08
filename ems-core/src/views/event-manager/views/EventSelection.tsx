@@ -14,7 +14,7 @@ import {setEvent, setEventConfiguration} from "../../../stores/config/actions";
 import {getTheme} from "../../../AppTheme";
 import ExplanationIcon from "../../../components/ExplanationIcon";
 import {SyntheticEvent} from "react";
-import EventCreationValidator from "../controllers/EventCreationValidator";
+import EventCreationValidator from "../../../validators/EventCreationValidator";
 import {CONFIG_STORE} from "../../../AppStore";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";

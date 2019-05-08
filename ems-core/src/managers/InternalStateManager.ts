@@ -40,20 +40,19 @@ class InternalStateManager {
   public async refreshInternalProgress(eventConfig: EventConfiguration): Promise<IInternalProgress> {
     let completedStep: number = 0;
 
-    const events: Event[] = [];
+    let events: Event[] = [];
     await EMSProvider.getEvent().then((res: Event[]) => {
-      events.concat(res);
+      events = res;
     }).catch((error: HttpError) => console.log(error));
-
     if (events.length === 0) {
       return {completedStep, currentStep: completedStep};
     } else {
       completedStep++;
     }
 
-    const teams: Team[] = [];
+    let teams: Team[] = [];
     await EMSProvider.getTeams().then((res: Team[]) => {
-      teams.concat(res);
+      teams = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (teams.length === 0) {
@@ -63,9 +62,9 @@ class InternalStateManager {
     }
 
     const eventKey: string = events[0].eventKey;
-    const pMatches: Match[] = [];
+    let pMatches: Match[] = [];
     await EMSProvider.getMatchesAndParticipants(eventKey + "-P").then((res: Match[]) => {
-      pMatches.concat(res);
+      pMatches = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (pMatches.length === 0) {
@@ -74,9 +73,9 @@ class InternalStateManager {
       completedStep++;
     }
 
-    const qMatches: Match[] = [];
+    let qMatches: Match[] = [];
     await EMSProvider.getMatchesAndParticipants(eventKey + "-Q").then((res: Match[]) => {
-      qMatches.concat(res);
+      qMatches = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (qMatches.length === 0) {
@@ -85,18 +84,18 @@ class InternalStateManager {
       completedStep++;
     }
 
-    const alliances: AllianceMember[] = [];
+    let alliances: AllianceMember[] = [];
     await EMSProvider.getAlliances().then((res: AllianceMember[]) => {
-      alliances.concat(res);
+      alliances = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (alliances.length === 0 && eventConfig.playoffsConfig === "finals") {
       completedStep+=2;
     }
 
-    const eMatches: Match[] = [];
+    let eMatches: Match[] = [];
     await EMSProvider.getMatchesAndParticipants(eventKey + "-E").then((res: Match[]) => {
-      eMatches.concat(res);
+      eMatches = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (eMatches.length === 0) {

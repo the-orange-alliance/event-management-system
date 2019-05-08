@@ -2,7 +2,7 @@ import * as React from "react";
 import {Button, Form, Grid, Icon, InputProps, Modal} from "semantic-ui-react";
 import ExplanationIcon from "./ExplanationIcon";
 import {SyntheticEvent} from "react";
-import TeamValidator from "../views/event-manager/controllers/TeamValidator";
+import TeamValidator from "../validators/TeamValidator";
 import {Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {

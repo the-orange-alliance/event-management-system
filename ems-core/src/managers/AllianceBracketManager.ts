@@ -218,7 +218,7 @@ class AllianceBracketManager {
       participant.allianceKey = redAlliance[i].allianceKey;
       participant.teamKey = redAlliance[i].teamKey;
       participant.surrogate = false;
-      participant.station = 10 + i;
+      participant.station = 11 + i;
       participants.push(participant);
     }
     for (let i = 0; i < blueAlliance.length; i++) {
@@ -226,7 +226,7 @@ class AllianceBracketManager {
       participant.allianceKey = blueAlliance[i].allianceKey;
       participant.teamKey = blueAlliance[i].teamKey;
       participant.surrogate = false;
-      participant.station = 20 + i;
+      participant.station = 21 + i;
       participants.push(participant);
     }
     return participants;

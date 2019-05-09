@@ -2,6 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
 import logger from "../logger";
+import {Match, MatchDetails} from "@the-orange-alliance/lib-ems";
 
 const router: Router = Router();
 
@@ -90,10 +91,17 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
   DatabaseManager.insertValues("match", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " matches in the database.");
     setTimeout(() => {
-      const minimalDetailJSON = req.body.records.map((match: any) => {return {match_key: match.match_key, match_detail_key: match.match_detail_key}});
-      DatabaseManager.insertValues("match_detail", minimalDetailJSON).then((data: any) => {
-        logger.info("Created " + minimalDetailJSON.length + " match details in the database.");
-        res.send({payload: "Created " + req.body.records.length + " matches and " + minimalDetailJSON.length + " match details in the database."});
+      const seasonKey: string = req.body.records[0].match_key.split("-")[0];
+      const matchDetails: MatchDetails[] = [];
+      for (const matchJSON of req.body.records) {
+        const matchDetail: MatchDetails = Match.getDetailsFromSeasonKey(seasonKey);
+        matchDetail.matchKey = matchJSON.match_key;
+        matchDetail.matchDetailKey = matchJSON.match_detail_key;
+        matchDetails.push(matchDetail);
+      }
+      DatabaseManager.insertValues("match_detail", matchDetails.map((details: MatchDetails) => details.toJSON())).then((data: any) => {
+        logger.info("Created " + matchDetails.length + " match details in the database.");
+        res.send({payload: "Created " + req.body.records.length + " matches and " + matchDetails.length + " match details in the database."});
       }).catch((error: any) => {
         next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
       });

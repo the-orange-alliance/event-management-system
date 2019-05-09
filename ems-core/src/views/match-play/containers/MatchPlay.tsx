@@ -22,6 +22,7 @@ import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {Event, EventConfiguration, HttpError, Match, MatchDetails, MatchConfiguration, MatchParticipant,
   MatchState, MatchTimer, PlayoffsType, SocketProvider, TOAConfig, TournamentType
 } from "@the-orange-alliance/lib-ems";
+import InternalStateManager from "../../../managers/InternalStateManager";
 
 interface IProps {
   mode: string,
@@ -78,7 +79,13 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    this.setState({activeMatch: this.props.activeMatch});
+    if (this.props.elimsMatches.length > 0) {
+      this.changeSelectedMatch(null, {value: this.props.elimsMatches[0].matchKey});
+    } else if (this.props.qualificationMatches.length > 0) {
+      this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
+    } else if (this.props.practiceMatches.length > 0) {
+      this.changeSelectedMatch(null, {value: this.props.practiceMatches[0].matchKey});
+    }
   }
 
   public render() {
@@ -278,20 +285,27 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
       this.setState({committingScores: false});
+      const tournamentMatches: Match[] = this.getMatchesByTournamentLevel(this.state.selectedLevel);
+      for (let i = 0; i < tournamentMatches.length; i++) {
+        if (tournamentMatches[i].matchKey === this.props.activeMatch.matchKey && typeof tournamentMatches[i + 1] !== "undefined") {
+          this.changeSelectedMatch(null, {value: tournamentMatches[i + 1].matchKey});
+          break;
+        }
+      }
       if (this.props.activeMatch.tournamentLevel >= 10) {
         MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
           if (this.props.elimsMatches.length < matches.length) {
             this.props.setEliminationsMatches(matches);
           }
           if (this.props.backupDir.length > 0) {
-            DialogManager.createBackup(this.props.backupDir);
+            InternalStateManager.createBackup(this.props.backupDir);
           }
         }).catch((error: HttpError) => {
           console.error(error);
         });
       } else {
         if (this.props.backupDir.length > 0) {
-          DialogManager.createBackup(this.props.backupDir);
+          InternalStateManager.createBackup(this.props.backupDir);
         }
       }
     }).catch((error: HttpError) => {

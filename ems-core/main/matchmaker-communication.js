@@ -51,17 +51,19 @@ ipcMain.on("match-maker", (event, config) => {
          for (let j = 0; j < (config.teamsPerAlliance * 2); j++) {
            if (j < config.teamsPerAlliance) {
              participants.push({
+               card_status: 0,
                match_key: matchKey,
                match_participant_key: matchKey + "-T" + parseInt(fields[(j * 2) + 1], 10),
-               station: 10 + j,
+               station: 11 + j,
                surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
                team_key: parseInt(fields[(j * 2) + 1], 10)
              });
            } else {
              participants.push({
+               card_status: 0,
                match_key: matchKey,
                match_participant_key: matchKey + "-T" + parseInt(fields[(j * 2) + 1], 10),
-               station: 20 + j - config.teamsPerAlliance,
+               station: 21 + j - config.teamsPerAlliance,
                surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
                team_key: parseInt(fields[(j * 2) + 1], 10)
              });
@@ -73,6 +75,7 @@ ipcMain.on("match-maker", (event, config) => {
            match_key: matchKey,
            match_name: config.type + " Match " + matchNumber,
            participants: participants,
+           result: -1,
            tournament_level: getTournamentLevelFromType(config.type)
          });
         }

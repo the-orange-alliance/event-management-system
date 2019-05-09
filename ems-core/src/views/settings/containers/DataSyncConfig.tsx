@@ -13,6 +13,7 @@ import {CONFIG_STORE} from "../../../AppStore";
 import {ISetBackupDir} from "../../../stores/config/types";
 import {setBackupDir} from "../../../stores/config/actions";
 import {AppError, EMSProvider, HttpError} from "@the-orange-alliance/lib-ems";
+import InternalStateManager from "../../../managers/InternalStateManager";
 
 interface IProps {
   backupDir?: string
@@ -122,7 +123,7 @@ class DataSyncConfig extends React.Component<IProps, IState> {
 
   private forceBackup() {
     console.log("forcing backup");
-    DialogManager.createBackup(this.props.backupDir).then(() => {
+    InternalStateManager.createBackup(this.props.backupDir).then(() => {
       console.log("Successfully created backup");
     }).catch((error: AppError) => {
       DialogManager.showErrorBox(error);

@@ -4,6 +4,10 @@ import EMSProvider from "@the-orange-alliance/lib-ems/dist/providers/EMSProvider
 import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
 import AllianceMember from "@the-orange-alliance/lib-ems/dist/models/ems/AllianceMember";
+import AppError from "@the-orange-alliance/lib-ems/dist/models/ems/AppError";
+import * as moment from "moment";
+
+const {ipcRenderer} = (window as any).require("electron");
 
 export interface IInternalProgress {
   completedStep: number,
@@ -105,6 +109,19 @@ class InternalStateManager {
     }
 
     return {completedStep, currentStep: completedStep};
+  }
+
+  public createBackup(location: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      ipcRenderer.once("create-backup-success", () => {
+        resolve();
+      });
+      ipcRenderer.once("create-backup-error", (event: any, error: any) => {
+        reject(new AppError(1202, "BACKUP_ERROR", error));
+      });
+      const name: string = moment().format("M-DD-YYYY-HH.mm");
+      ipcRenderer.send("create-backup", location, name);
+    });
   }
 
 }

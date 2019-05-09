@@ -97,7 +97,9 @@ class MatchManager {
       promises.push(EMSProvider.getMatchTeams(matchKey));
       Promise.all(promises).then((values: any[]) => {
         const match: Match = values[0];
-        match.matchDetails = values[1];
+        if (Array.isArray(values[1])) {
+          match.matchDetails = values[1][0];
+        }
         match.participants = values[2];
         resolve(match);
       }).catch((error: any) => {

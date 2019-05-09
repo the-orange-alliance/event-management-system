@@ -91,7 +91,7 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
             }
             {
               this.props.matchList.length === 0 &&
-              <span><i>There is currently no generated {this.props.type.toString().toLowerCase()} match schedule. Generate one from the 'Match Maker Parameters' tab.</i></span>
+              <span className={"error-text"}><i>There is currently no generated {this.props.type.toString().toLowerCase()} match schedule. Generate one from the 'Match Maker Parameters' tab.</i></span>
             }
           </Card.Content>
           <Card.Content>

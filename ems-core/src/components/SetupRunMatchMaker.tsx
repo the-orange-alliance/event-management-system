@@ -82,29 +82,24 @@ class SetupRunMatchMaker extends React.Component<IProps, IState> {
 
   private runMatchMaker() {
     this.props.setNavigationDisabled(true);
-    MatchMakerManager.createTeamList(this.props.teams).then(() => {
-      MatchMakerManager.execute({
-        teams: this.props.schedule.teamsParticipating,
-        rounds: this.props.schedule.matchesPerTeam,
-        quality: this.state.matchMakerQuality,
-        teamsPerAlliance: this.props.schedule.teamsPerAlliance,
-        fields: this.props.event.fieldCount,
-        eventKey: this.props.event.eventKey,
-        type: this.props.schedule.type
-      }).then((matches: Match[]) => {
-        let matchNumber: number = 0;
-        for (const item of this.state.scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
-          if (item.isMatch) {
-            matches[matchNumber].scheduledStartTime = item.startTime;
-            matchNumber++;
-          }
+    MatchMakerManager.execute({
+      teams: this.props.schedule.teamsParticipating,
+      rounds: this.props.schedule.matchesPerTeam,
+      quality: this.state.matchMakerQuality,
+      teamsPerAlliance: this.props.schedule.teamsPerAlliance,
+      fields: this.props.event.fieldCount,
+      eventKey: this.props.event.eventKey,
+      type: this.props.schedule.type
+    }).then((matches: Match[]) => {
+      let matchNumber: number = 0;
+      for (const item of this.state.scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
+        if (item.isMatch) {
+          matches[matchNumber].scheduledStartTime = item.startTime;
+          matchNumber++;
         }
-        this.props.setNavigationDisabled(false);
-        this.props.onComplete(matches);
-      }).catch((error: AppError) => {
-        this.props.setNavigationDisabled(false);
-        DialogManager.showErrorBox(error);
-      });
+      }
+      this.props.setNavigationDisabled(false);
+      this.props.onComplete(matches);
     }).catch((error: AppError) => {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);

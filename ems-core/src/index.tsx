@@ -18,10 +18,6 @@ import InternalStateManager, {IInternalProgress} from "./managers/InternalStateM
 
 const {ipcRenderer} = (window as any).require("electron");
 
-(window as any).eval = global.eval = () => {
-  throw new Error("This app does not support window.eval().")
-};
-
 console.log("Preloading application state...");
 
 ProcessManager.performStartupCheck().then((procList: Process[]) => {

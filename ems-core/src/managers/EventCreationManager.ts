@@ -94,13 +94,16 @@ class EventCreationManager {
   public createMatchSchedule(tournamentLevel: number, matches: Match[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getMatchesByTournamentLevel(tournamentLevel).then((emsMatches: Match[]) => {
-        if (matches.length > 0) {
+        if (emsMatches.length > 0) {
           resolve();
         } else {
           EMSProvider.postMatchSchedule(matches).then(() => {
             const participants: MatchParticipant[] = [];
             for (const match of matches) {
               for (const participant of match.participants) {
+                // The 'team_key' portion of these gets filled out and confuses the database.
+                participant.teamRank = undefined;
+                participant.team = undefined;
                 participants.push(participant);
               }
             }
@@ -118,6 +121,8 @@ class EventCreationManager {
           const participants: MatchParticipant[] = [];
           for (const match of matches) {
             for (const participant of match.participants) {
+              participant.teamRank = undefined;
+              participant.team = undefined;
               participants.push(participant);
             }
           }

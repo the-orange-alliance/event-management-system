@@ -1,4 +1,4 @@
-import {AppError, Match, MatchParticipant, Team, TournamentType} from "@the-orange-alliance/lib-ems";
+import {AppError, Match, MatchParticipant, TournamentType} from "@the-orange-alliance/lib-ems";
 
 const ipcRenderer = (window as any).require("electron").ipcRenderer;
 
@@ -52,7 +52,7 @@ class MatchMakerManager {
     });
   }
 
-  public createTeamList(teamList: Team[]): Promise<any[]> {
+  public createTeamList(scheduleType: TournamentType, teamList: number[]): Promise<any[]> {
     return new Promise((resolve, reject) => {
       ipcRenderer.once("match-maker-teams-success", (event: any, data: any) => {
         resolve(data);
@@ -60,7 +60,7 @@ class MatchMakerManager {
       ipcRenderer.once("match-maker-teams-error", (event: any, error: any) => {
         reject(new AppError(1501, "MATCH_MAKER_TEAMS", error));
       });
-      ipcRenderer.send("match-maker-teams", teamList.map(team => team.teamKey));
+      ipcRenderer.send("match-maker-teams", scheduleType, teamList);
     });
   }
 

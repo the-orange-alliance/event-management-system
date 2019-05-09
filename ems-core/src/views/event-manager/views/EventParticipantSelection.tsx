@@ -54,6 +54,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     this.closeTeamModal = this.closeTeamModal.bind(this);
     this.updateModifiedTeam = this.updateModifiedTeam.bind(this);
     this.createNewTeam = this.createNewTeam.bind(this);
+    this.createTestTeam = this.createTestTeam.bind(this);
     this.removeTeam = this.removeTeam.bind(this);
     this.importTeamsByCSV = this.importTeamsByCSV.bind(this);
     this.importByTOA = this.importByTOA.bind(this);
@@ -108,6 +109,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
             }
           </div>
           <div>
+            <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.createTestTeam}>Add Test Team</Button>
             <Button color={getTheme().secondary} loading={loadingTeams} disabled={loadingTeams} onClick={this.createNewTeam}>Add Team</Button>
             <Button color={removeMode ? "red" : getTheme().secondary} loading={loadingTeams} disabled={loadingTeams} onClick={this.toggleRemoveMode}>Remove Team</Button>
           </div>
@@ -121,7 +123,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(true);
     const updatedTeams: Team[] = this.props.teams;
     for (let i = 0; i < this.props.teams.length; i++) {
-      updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + (i + 1);
+      updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + this.props.teams[i].teamKey;
     }
     if (this.props.toaConfig.enabled) {
       TOAUploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
@@ -163,6 +165,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
             team.stateProv = data[5];
             team.country = data[6];
             team.countryCode = data[7];
+            team.participantKey = this.props.event.eventKey + "-T" + team.teamKey;
             validator.update(team);
             if (validator.isValid) {
               teams.push(team);
@@ -227,6 +230,19 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     } else {
       return this.props.teams.length > 8;
     }
+  }
+
+  private createTestTeam() {
+    const testTeam: Team = new Team();
+    testTeam.teamKey = this.props.teams.length + 1;
+    testTeam.teamNameShort = "Team " + (this.props.teams.length + 1);
+    testTeam.teamNameLong = "Test Team " + (this.props.teams.length + 1);
+    testTeam.robotName = "Test Robot " + (this.props.teams.length + 1);
+    testTeam.city = "Petoskey";
+    testTeam.stateProv = "MI";
+    testTeam.country = "USA";
+    testTeam.countryCode = "us";
+    this.props.addTeam(testTeam);
   }
 
   private modifyTeam(team: Team, index: number) {

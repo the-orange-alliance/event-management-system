@@ -14,6 +14,7 @@ import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
+import SetupScheduleParticipants from "../../../components/SetupScheduleParticipants";
 
 interface IProps {
   onComplete: () => void,
@@ -39,6 +40,7 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
       activeIndex: 0
     };
     this.onTabChange = this.onTabChange.bind(this);
+    this.onParticipantSelectionComplete = this.onParticipantSelectionComplete.bind(this);
     this.onParamsComplete = this.onParamsComplete.bind(this);
     this.onMatchMakerComplete = this.onMatchMakerComplete.bind(this);
     this.onPublishSchedule = this.onPublishSchedule.bind(this);
@@ -46,21 +48,22 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   public componentDidMount() {
     this.props.schedule.teamsPerAlliance = this.props.eventConfig.teamsPerAlliance;
-    this.props.schedule.teamsParticipating = this.props.teamList.length;
+    // this.props.schedule.teamsParticipating = this.props.teamList.length;
     this.forceUpdate();
   }
 
   public componentDidUpdate(prevProps: IProps) {
-    if (prevProps.teamList.length !== this.props.teamList.length) {
-      this.props.schedule.teamsParticipating = this.props.teamList.length;
-      this.forceUpdate();
-    }
+    // if (prevProps.teamList.length !== this.props.teamList.length) {
+    //   this.props.schedule.teamsParticipating = this.props.teamList.length;
+    //   this.forceUpdate();
+    // }
   }
 
   public render() {
     return (
       <div className="step-view no-overflow">
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
+          { menuItem: "Schedule Participants", render: () => <SetupScheduleParticipants schedule={this.props.schedule} type={"Practice"} onComplete={this.onParticipantSelectionComplete}/>},
           { menuItem: "Schedule Parameters", render: () => <SetupScheduleParams schedule={this.props.schedule} teams={this.props.teamList} onComplete={this.onParamsComplete}/>},
           { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Practice"}/>},
           { menuItem: "Match Maker Parameters", render: () => <SetupRunMatchMaker schedule={this.props.schedule} teams={this.props.teamList} onComplete={this.onMatchMakerComplete}/>},
@@ -75,6 +78,10 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
     if (!this.props.navigationDisabled) {
       this.setState({activeIndex: parseInt(props.activeIndex as string, 10)});
     }
+  }
+
+  private onParticipantSelectionComplete() {
+    this.setState({activeIndex: 1});
   }
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
@@ -95,7 +102,6 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule(postOnline: boolean) {
     this.props.setNavigationDisabled(true);
-    console.log(postOnline);
     if (postOnline && this.props.toaConfig.enabled) {
       TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.practiceMatches).then(() => {
         console.log(`${this.props.practiceMatches.length} matches have been posted to TOA.`);

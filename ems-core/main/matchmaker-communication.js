@@ -14,8 +14,8 @@ if (os.type() === "Windows_NT") {
   matchMakerPath = path.join(__dirname, "../match-maker/macOS/MatchMaker");
 }
 
-ipcMain.on("match-maker-teams", (event, teams) => {
-  const teamListPath = path.join(appDataPath, "team-list.txt");
+ipcMain.on("match-maker-teams", (event, scheduleType, teams) => {
+  const teamListPath = path.join(appDataPath, (scheduleType + "-teams.txt").toLowerCase());
   let contents = "";
   for (const team of teams) {
     contents += team + "\n";
@@ -25,14 +25,14 @@ ipcMain.on("match-maker-teams", (event, teams) => {
       logger.error(err);
       event.sender.send("match-maker-teams-error", err);
     } else {
-      logger.info(`Successfully created team-list.txt (${teamListPath})`);
+      logger.info(`Successfully created team list: (${teamListPath})`);
       event.sender.send("match-maker-teams-success", teamListPath);
     }
   });
 });
 
 ipcMain.on("match-maker", (event, config) => {
-  const teamListPath = path.join(appDataPath, "team-list.txt");
+  const teamListPath = path.join(appDataPath, (config.type + "-teams.txt").toLowerCase());
   const args = `-l ${teamListPath} -t ${config.teams} -r ${config.rounds} -a ${config.teamsPerAlliance} ${config.quality} -s -o`;
   logger.debug(`Executing ${matchMakerPath} with ${args}`);
   execute(matchMakerPath, ["-l", teamListPath, "-t", config.teams, "-r", config.rounds, "-a", config.teamsPerAlliance, config.quality, "-s", "-o"], (error, stdout, stderr) => {
@@ -52,7 +52,7 @@ ipcMain.on("match-maker", (event, config) => {
            if (j < config.teamsPerAlliance) {
              participants.push({
                match_key: matchKey,
-               match_participant_key: matchKey + "-T" + (j + 1),
+               match_participant_key: matchKey + "-T" + parseInt(fields[(j * 2) + 1], 10),
                station: 10 + j,
                surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
                team_key: parseInt(fields[(j * 2) + 1], 10)
@@ -60,7 +60,7 @@ ipcMain.on("match-maker", (event, config) => {
            } else {
              participants.push({
                match_key: matchKey,
-               match_participant_key: matchKey + "-T" + (j + 1),
+               match_participant_key: matchKey + "-T" + parseInt(fields[(j * 2) + 1], 10),
                station: 20 + j - config.teamsPerAlliance,
                surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
                team_key: parseInt(fields[(j * 2) + 1], 10)

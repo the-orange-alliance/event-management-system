@@ -49,7 +49,7 @@ class SetupScheduleOverview extends React.Component<IProps, IState> {
             }
             {
               scheduleItems.length === 0 &&
-              <span><i>There is currently no generated {this.props.type.toString().toLowerCase()} schedule. Generate one from the 'Schedule Parameters' tab.</i></span>
+              <span className={"error-text"}><i>There is currently no generated {this.props.type.toString().toLowerCase()} schedule. Generate one from the 'Schedule Parameters' tab.</i></span>
             }
           </Card.Content>
           <Card.Content>

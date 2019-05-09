@@ -4,7 +4,7 @@ import {getTheme} from "../AppTheme";
 import ExplanationIcon from "./ExplanationIcon";
 import {SyntheticEvent} from "react";
 import DatePicker from "react-datepicker";
-import {Moment} from "moment";
+import * as moment from "moment";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {CONFIG_STORE} from "../AppStore";
@@ -40,13 +40,6 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
     this.generateSchedule = this.generateSchedule.bind(this);
   }
 
-  public componentDidUpdate(prevProps: IProps) {
-    if (prevProps.teams.length !== this.props.teams.length) {
-      this.props.schedule.teamsParticipating = this.props.teams.length;
-      this.forceUpdate();
-    }
-  }
-
   public render() {
     const {warningModalOpen} = this.state;
     const days = this.props.schedule.days.map(day => {
@@ -73,7 +66,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
                   customInput={<Input fluid={true}/>}
                   showTimeSelect={true}
                   timeIntervals={15}
-                  dateFormat="dddd, MMMM Do YYYY, h:mm a"
+                  dateFormat="EEEE, MMMM io YYYY, h:mm a"
                   onChange={this.updateDayStartTime.bind(this, day.id)}
                   selected={day.startTime.toDate()}
                 />
@@ -84,8 +77,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
           </Grid.Row>
           {dayBreaks}
           <Grid.Row>
-            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.addBreak.bind(this, day.id)} fluid={true} disabled={this.props.navigationDisabled}>Add Break</Button></Grid.Column>
-            <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.removeBreak.bind(this, day.id)} fluid={true} disabled={!this.canRemoveBreak(day.id) || this.props.navigationDisabled}>Remove Break</Button></Grid.Column>
+            <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.addBreak.bind(this, day.id)} fluid={true} disabled={this.props.navigationDisabled}>Add Break</Button></Grid.Column>
+            <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().secondary} onClick={this.removeBreak.bind(this, day.id)} fluid={true} disabled={!this.canRemoveBreak(day.id) || this.props.navigationDisabled}>Remove Break</Button></Grid.Column>
           </Grid.Row>
         </Grid>
       );
@@ -126,8 +119,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
               <Divider />
               <Grid columns={16}>
                 <Grid.Row>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} disabled={this.props.navigationDisabled} fluid={true}>Add Day</Button></Grid.Column>
-                  <Grid.Column width={2} largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.removeDay} disabled={!this.canRemoveDay() || this.props.navigationDisabled} fluid={true}>Remove Day</Button></Grid.Column>
+                  <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} disabled={this.props.navigationDisabled} fluid={true}>Add Day</Button></Grid.Column>
+                  <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.removeDay} disabled={!this.canRemoveDay() || this.props.navigationDisabled} fluid={true}>Remove Day</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>
@@ -235,8 +228,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
     this.forceUpdate();
   }
 
-  private updateDayStartTime(day: number, time: Moment) {
-    this.props.schedule.days[day].startTime = time;
+  private updateDayStartTime(day: number, time: Date) {
+    this.props.schedule.days[day].startTime = moment(time);
     this.props.schedule.forceUpdate();
     this.forceUpdate();
   }

@@ -1,21 +1,22 @@
-const {app, ipcMain, BrowserWindow} = require("electron");
-const url = require("url");
-const path = require("path");
+import {app, ipcMain, BrowserWindow} from "electron";
+import * as url from "url";
+import * as path from "path";
+import logger from "./main/Logger";
 
 require("dotenv").config({path: path.join(__dirname, ".env")});
 
-const prod = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging";
+const prod: boolean = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging";
 
 if (!prod) {
   require("electron-debug")({showDevTools: true, enabled: true});
 }
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win;
+let win: Electron.BrowserWindow;
 
 function createWindow () {
   // Create the splash screen window.
-  let splashWin = new BrowserWindow({width: 480, height: 360, frame: false, show: false});
+  let splashWin: Electron.BrowserWindow = new BrowserWindow({width: 480, height: 360, frame: false, show: false});
   splashWin.loadURL(url.format({
     pathname: path.join(__dirname, "./splash.html"),
     protocol: "file:",
@@ -49,26 +50,23 @@ function createWindow () {
     width: 1280
   });
   if (prod) {
-    const logger = require("./main/logger");
-    require("./main/process-communication");
-    require("./main/store-communication");
-    require("./main/dialog-communication");
-    require("./main/matchmaker-communication");
+    require("./main/Services");
+    require("./main/ConfigStores");
+    require("./main/Dialog");
+    require("./main/Matchmaker");
 
     logger.transports[0].level = "debug";
     logger.info("------------STARTING EMS IN PRODUCTION MODE------------");
     win.loadURL(url.format({
       pathname: path.join(__dirname, "./index.html"),
       protocol: "file:",
-      resizable: false,
       slashes: true
     }));
   } else {
-    const logger = require("../main/logger");
-    require("../main/process-communication");
-    require("../main/store-communication");
-    require("../main/dialog-communication");
-    require("../main/matchmaker-communication");
+    require("./main/Services");
+    require("./main/ConfigStores");
+    require("./main/Dialog");
+    require("./main/Matchmaker");
 
     logger.transports[0].level = "debug";
     logger.info("------------STARTING EMS IN DEVELOPMENT MODE------------");

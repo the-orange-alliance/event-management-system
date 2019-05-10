@@ -1,46 +1,51 @@
-const {ipcMain, BrowserWindow, dialog, app} = require("electron");
-const fs = require("fs");
-const url = require("url");
-const path = require("path");
-const open = require("open");
-const logger = require("./logger");
+import {ipcMain, BrowserWindow, dialog, app, IpcMessageEvent, FileFilter} from "electron";
+import * as fs from "fs";
+import * as url from "url";
+import * as path from "path";
+import * as open from "open";
+import logger from "./logger";
 
-ipcMain.on("parse-csv", (event, file) => {
+interface IOpenDialogProps {
+  title?: string,
+  files?: boolean,
+  directories?: boolean
+  filters?: FileFilter[],
+  parse?: boolean
+}
+
+ipcMain.on("parse-csv", (event: IpcMessageEvent, file: string) => {
   if (!file.endsWith(".csv")) {
-    event.sender.send("parse-csv-error", "File does not end with a .csv extension.");
+    event.sender.send("parse-csv-response", "File does not end with a .csv extension.", null);
   }
   fs.readFile(file, (error, data) => {
-    if (error) {
-      event.sender.send("parse-csv-error", error);
-    } else {
-      event.sender.send("parse-csv-success", data.toString().split("\n"));
-    }
+    event.sender.send("parse-csv-response", error, data.toString().split("\n"));
   });
 });
 
-ipcMain.on("open-dialog", (event, openProperties) => {
+ipcMain.on("open-dialog", (event: IpcMessageEvent, openProperties: IOpenDialogProps) => {
   dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
     filters: openProperties.filters || [],
-    properties: [openProperties.files ? "openFile" : "", openProperties.directories ? "openDirectory" : ""],
+    // @ts-ignore - Unless there is another way to do this...
+    properties: [(openProperties.files ? "openFile" : ""), openProperties.directories ? "openDirectory" : ""],
     title: openProperties.title || "Open Dialog"
-  }, (paths) => {
+  }, (paths: string[]) => {
     if (paths && paths[0]) {
-      event.sender.send("open-dialog-success", paths);
+      event.sender.send("open-dialog-response", undefined, paths);
     } else {
-      event.sender.send("open-dialog-error", "No file was selected.");
+      event.sender.send("open-dialog-response", "No file was selected.", null);
     }
   });
 });
 
-ipcMain.on("show-info", (event, title, message) => {
+ipcMain.on("show-info", (event: IpcMessageEvent, title: string, message: string) => {
   dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
-    detail: message,
+    message: message,
     title: title,
     type: "info",
   });
 });
 
-ipcMain.on("show-error", (event, error) => {
+ipcMain.on("show-error", (event: IpcMessageEvent, error: any) => {
   if (error._stacktrace) {
     dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: "There was an error while trying to complete a vital operation. Error code " + error._errorCode + " (" + error._errorMessage + "). Stacktrace: " + error._stacktrace +
@@ -58,7 +63,7 @@ ipcMain.on("show-error", (event, error) => {
   }
 });
 
-ipcMain.on("generate-report", (event, reportHTML) => {
+ipcMain.on("generate-report", (event: any, reportHTML: any) => {
   const appDataPath = app.getPath("appData") + path.sep + app.getName();
   const cssCurPath = path.join(__dirname, "../build/css/semantic.min.css");
   const reportPath = path.join(appDataPath, "report.html");

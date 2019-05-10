@@ -20,11 +20,12 @@ class AppStore {
 
   public set(key: string, data: object | string): Promise<object> {
     return new Promise<object>((resolve, reject) => {
-      ipcRenderer.once("store-set-success", (event: any, storeState: object) => {
-        resolve(storeState);
-      });
-      ipcRenderer.once("store-set-error", (event: any, error: any) => {
-        reject(new AppError(1100, "STORE_SET", error));
+      ipcRenderer.once("store-set-response", (event: any, error: any, storeState: object) => {
+        if (error) {
+          reject(new AppError(1100, "STORE_SET", error));
+        } else {
+          resolve(storeState);
+        }
       });
       ipcRenderer.send("store-set", {key: key, data: data, file: this.name});
     });
@@ -32,11 +33,12 @@ class AppStore {
 
   public setAll(data: object): Promise<object> {
     return new Promise<object>((resolve, reject) => {
-      ipcRenderer.once("store-set-all-success", (event: any, storeState: object) => {
-        resolve(storeState);
-      });
-      ipcRenderer.once("store-set-all-error", (event: any, error: any) => {
-        reject(new AppError(1101, "STORE_SET_ALL", error));
+      ipcRenderer.once("store-set-all-response", (event: any, error: any, storeState: object) => {
+        if (error) {
+          reject(new AppError(1101, "STORE_SET_ALL", error));
+        } else {
+          resolve(storeState);
+        }
       });
       ipcRenderer.send("store-set-all", {data: data, file: this.name});
     });
@@ -44,11 +46,12 @@ class AppStore {
 
   public getAll(): Promise<object> {
     return new Promise<object>((resolve, reject) => {
-      ipcRenderer.once("store-get-all-success", (event: any, storeState: object) => {
-        resolve(storeState);
-      });
-      ipcRenderer.once("store-get-all-error", (event: any, error: any) => {
-        reject(new AppError(1102, "STORE_GET_ALL", error));
+      ipcRenderer.once("store-get-all-response", (event: any, error: any, storeState: object) => {
+        if (error) {
+          reject(new AppError(1102, "STORE_GET_ALL", error));
+        } else {
+          resolve(storeState);
+        }
       });
       ipcRenderer.send("store-get-all", this.name);
     });

@@ -34,17 +34,18 @@ class ProcessManager {
 
   public listEcosystem(): Promise<Process[]> {
     return new Promise<Process[]>((resolve, reject) => {
-      ipcRenderer.once("list-ecosystem-success", (event: any, procList: any) => {
-        const processes: Process[] = [];
-        if (procList.length === 3) {
-          processes.push(Process.fromPM2(procList[0]));
-          processes.push(Process.fromPM2(procList[1]));
-          processes.push(Process.fromPM2(procList[2]));
+      ipcRenderer.once("list-ecosystem-response", (event: any, error: any, procList: any) => {
+        if (error) {
+          reject(new AppError(1013, "PM2_LIST", error));
+        } else {
+          const processes: Process[] = [];
+          if (procList.length === 3) {
+            processes.push(Process.fromPM2(procList[0]));
+            processes.push(Process.fromPM2(procList[1]));
+            processes.push(Process.fromPM2(procList[2]));
+          }
+          resolve(processes);
         }
-        resolve(processes);
-      });
-      ipcRenderer.once("list-ecosystem-error", (event: any, error: any) => {
-        reject(new AppError(1013, "PM2_LIST", error));
       });
       ipcRenderer.send("list-ecosystem");
     });
@@ -52,15 +53,16 @@ class ProcessManager {
 
   public startEcosystem(newHost?: string): Promise<Process[]> {
     return new Promise<Process[]>((resolve, reject) => {
-      ipcRenderer.once("start-ecosystem-success", (event: any, procList: any, host: string) => {
-        const proc1 = Process.fromPM2(procList[0][0], host);
-        const proc2 = Process.fromPM2(procList[1][0], host);
-        const proc3 = Process.fromPM2(procList[2][0], host);
-        const processes: Process[] = [proc1, proc2, proc3];
-        resolve(processes);
-      });
-      ipcRenderer.once("start-ecosystem-error", (event: any, error: any) => {
-        reject(new AppError(1010, "PM2_START", error));
+      ipcRenderer.once("start-ecosystem-response", (event: any, error: any, procList: any, host: string) => {
+        if (error) {
+          reject(new AppError(1010, "PM2_START", error));
+        } else {
+          const proc1 = Process.fromPM2(procList[0][0], host);
+          const proc2 = Process.fromPM2(procList[1][0], host);
+          const proc3 = Process.fromPM2(procList[2][0], host);
+          const processes: Process[] = [proc1, proc2, proc3];
+          resolve(processes);
+        }
       });
       ipcRenderer.send("start-ecosystem", newHost);
     });
@@ -68,11 +70,12 @@ class ProcessManager {
 
   public killEcosystem(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      ipcRenderer.once("kill-ecosystem-success", () => {
-        resolve();
-      });
-      ipcRenderer.once("kill-ecosystem-error", (event: any, error: any) => {
-        reject(new AppError(1015, "PM2_KILL", error));
+      ipcRenderer.once("kill-ecosystem-response", (event: any, error: any) => {
+        if (error) {
+          reject(new AppError(1015, "PM2_KILL", error));
+        } else {
+          resolve();
+        }
       });
       ipcRenderer.send("kill-ecosystem");
     });
@@ -80,16 +83,17 @@ class ProcessManager {
 
   public startProcess(process: Process, host?: string): Promise<Process> {
     return new Promise<Process>((resolve, reject) => {
-      ipcRenderer.once("start-process-success", (event: any, startedProcess: any) => {
-        if (typeof startedProcess[0] === "undefined") {
-          process.status = "error";
+      ipcRenderer.once("start-process-response", (event: any, error: any, startedProcess: any) => {
+        if (error) {
+          reject(new AppError(1000, "PM2_START", error));
         } else {
-          process.status = startedProcess[0].pm2_env.status;
+          if (typeof startedProcess[0] === "undefined") {
+            process.status = "error";
+          } else {
+            process.status = startedProcess[0].pm2_env.status;
+          }
+          resolve(process);
         }
-        resolve(process);
-      });
-      ipcRenderer.once("start-process-error", (event: any, error: any) => {
-        reject(new AppError(1000, "PM2_START", error));
       });
       ipcRenderer.send("start-process", process.name, host);
     });
@@ -97,16 +101,17 @@ class ProcessManager {
 
   public stopProcess(process: Process): Promise<Process> {
     return new Promise<Process>((resolve, reject) => {
-      ipcRenderer.once("stop-process-success", (event: any, stoppedProcess: any) => {
-        if (typeof stoppedProcess[0] === "undefined") {
-          process.status = "error";
+      ipcRenderer.once("stop-process-response", (event: any, error: any, stoppedProcess: any) => {
+        if (error) {
+          reject(new AppError(1001, "PM2_STOP", error));
         } else {
-          process.status = stoppedProcess[0].pm2_env.status;
+          if (typeof stoppedProcess[0] === "undefined") {
+            process.status = "error";
+          } else {
+            process.status = stoppedProcess[0].pm2_env.status;
+          }
+          resolve(process);
         }
-        resolve(process);
-      });
-      ipcRenderer.once("stop-process-error", (event: any, error: any) => {
-        reject(new AppError(1001, "PM2_STOP", error));
       });
       ipcRenderer.send("stop-process", process.name);
     });
@@ -114,16 +119,17 @@ class ProcessManager {
 
   public restartProcess(process: Process): Promise<Process> {
     return new Promise<Process>((resolve, reject) => {
-      ipcRenderer.once("restart-process-success", (event: any, restartedProcess: any) => {
-        if (typeof restartedProcess[0] === "undefined") {
-          process.status = "error";
+      ipcRenderer.once("restart-process-response", (event: any, error: any, restartedProcess: any) => {
+        if (error) {
+          reject(new AppError(1002, "PM2_RESTART", error));
         } else {
-          process.status = restartedProcess[0].pm2_env.status;
+          if (typeof restartedProcess[0] === "undefined") {
+            process.status = "error";
+          } else {
+            process.status = restartedProcess[0].pm2_env.status;
+          }
+          resolve(process);
         }
-        resolve(process);
-      });
-      ipcRenderer.once("restart-process-error", (event: any, error: any) => {
-        reject(new AppError(1002, "PM2_RESTART", error));
       });
       ipcRenderer.send("restart-process", process.name);
     });

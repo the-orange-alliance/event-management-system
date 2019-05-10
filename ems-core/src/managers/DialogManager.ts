@@ -25,11 +25,12 @@ class DialogManager {
 
   public parseCSV(file: string): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
-      ipcRenderer.once("parse-csv-success", (event: any, lines: string[]) => {
-        resolve(lines);
-      });
-      ipcRenderer.once("parse-csv-error", (event: any, error: any) => {
-        reject(new AppError(1200, "CSV_PARSE", error));
+      ipcRenderer.once("parse-csv-response", (event: any, error: any, lines: string[]) => {
+        if (error) {
+          reject(new AppError(1200, "CSV_PARSE", error));
+        } else {
+          resolve(lines);
+        }
       });
       ipcRenderer.send("parse-csv", file);
     });
@@ -37,11 +38,12 @@ class DialogManager {
 
   public showOpenDialog(props?: IOpenDialogProps): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
-      ipcRenderer.once("open-dialog-success", (event: any, paths: string[]) => {
-        resolve(paths);
-      });
-      ipcRenderer.once("open-dialog-error", (event: any, error: any) => {
-        reject(new AppError(1201, "DIALOG_OPEN", error));
+      ipcRenderer.once("open-dialog-response", (event: any, error: any, paths: string[]) => {
+        if (error) {
+          reject(new AppError(1201, "DIALOG_OPEN", error));
+        } else {
+          resolve(paths);
+        }
       });
       ipcRenderer.send("open-dialog", props);
     });

@@ -1,10 +1,23 @@
-const {ipcMain, app} = require("electron");
-const path = require("path");
-const fs = require("fs");
-const os = require("os");
-const logger = require("./logger");
-const execute = require("child_process").execFile;
+import {IpcMessageEvent, ipcMain, app} from "electron";
+import * as path from "path";
+import * as fs from "fs";
+import * as os from "os";
+import logger from "./logger";
+import {execFile} from "child_process";
+import {TournamentType} from "@the-orange-alliance/lib-ems";
+
 const appDataPath = app.getPath("appData") + path.sep + app.getName();
+
+interface IMatchMakerOptions {
+  teams: number,
+  rounds: number,
+  quality: string,
+  teamsPerAlliance: number,
+  fields: number,
+  eventKey: string,
+  type: TournamentType
+}
+
 
 let matchMakerPath = "";
 
@@ -14,7 +27,7 @@ if (os.type() === "Windows_NT") {
   matchMakerPath = path.join(__dirname, "../match-maker/macOS/MatchMaker");
 }
 
-ipcMain.on("match-maker-teams", (event, scheduleType, teams) => {
+ipcMain.on("match-maker-teams", (event: IpcMessageEvent, scheduleType: TournamentType, teams: number[]) => {
   const teamListPath = path.join(appDataPath, (scheduleType + "-teams.txt").toLowerCase());
   let contents = "";
   for (const team of teams) {
@@ -23,22 +36,22 @@ ipcMain.on("match-maker-teams", (event, scheduleType, teams) => {
   fs.writeFile(teamListPath, contents, (err) => {
     if (err) {
       logger.error(err);
-      event.sender.send("match-maker-teams-error", err);
     } else {
       logger.info(`Successfully created team list: (${teamListPath})`);
-      event.sender.send("match-maker-teams-success", teamListPath);
     }
+    event.sender.send("match-maker-teams-response", err, teamListPath);
   });
 });
 
-ipcMain.on("match-maker", (event, config) => {
+ipcMain.on("match-maker", (event: IpcMessageEvent, config: IMatchMakerOptions) => {
   const teamListPath = path.join(appDataPath, (config.type + "-teams.txt").toLowerCase());
   const args = `-l ${teamListPath} -t ${config.teams} -r ${config.rounds} -a ${config.teamsPerAlliance} ${config.quality} -s -o`;
   logger.debug(`Executing ${matchMakerPath} with ${args}`);
-  execute(matchMakerPath, ["-l", teamListPath, "-t", config.teams, "-r", config.rounds, "-a", config.teamsPerAlliance, config.quality, "-s", "-o"], (error, stdout, stderr) => {
+  // @ts-ignore - Unless there is a better way to do this...
+  execFile(matchMakerPath, ["-l", teamListPath, "-t", config.teams, "-r", config.rounds, "-a", config.teamsPerAlliance, config.quality, "-s", "-o"], (error: any, stdout: any, stderr: any) => {
     if (error) {
       logger.error(error);
-      event.sender.send("match-maker-error", error);
+      event.sender.send("match-maker-response", error, null);
     } else {
       const result = [];
       const lines = stdout.toString().split("\n");
@@ -80,12 +93,12 @@ ipcMain.on("match-maker", (event, config) => {
          });
         }
       }
-      event.sender.send("match-maker-success", result);
+      event.sender.send("match-maker-response", undefined, result);
     }
   });
 });
 
-function getTournamentLevelFromType(type) {
+function getTournamentLevelFromType(type: TournamentType) {
   switch (type) {
     case "Practice":
       return 0;
@@ -98,7 +111,7 @@ function getTournamentLevelFromType(type) {
   }
 }
 
-function getMatchKeyPartialFromType(type) {
+function getMatchKeyPartialFromType(type: TournamentType) {
   switch (type) {
     case "Practice":
       return "P";

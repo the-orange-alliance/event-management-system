@@ -65,7 +65,7 @@ ipcMain.on("show-error", (event: IpcMessageEvent, error: any) => {
 
 ipcMain.on("generate-report", (event: any, reportHTML: any) => {
   const appDataPath = app.getPath("appData") + path.sep + app.getName();
-  const cssCurPath = path.join(__dirname, "../build/css/semantic.min.css");
+  const cssCurPath = path.join(__dirname, "../../build/css/semantic.min.css");
   const reportPath = path.join(appDataPath, "report.html");
   const cssCpyPath = path.join(appDataPath, "semantic.min.css");
   fs.writeFile(reportPath, reportHTML, (writeErr) => {

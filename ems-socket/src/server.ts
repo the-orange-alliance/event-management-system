@@ -46,7 +46,7 @@ const refereeRoom = new RefereeRoom(socket, timer);
 socket.on("connection", (client: Socket) => {
   logger.info(`Client connection (${client.id})`);
   client.on("identify", (params: string[]) => {
-    logger.info(`Identified client ${client.id} as ${params[0]}.`);
+    logger.info(`Identified client ${client.id} [${params}].`);
     clients.set(client.id, params[0]);
     for (let i = 1; i < params.length; i++) {
       client.join(params[i]);

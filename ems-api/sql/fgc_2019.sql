@@ -1,0 +1,19 @@
+ALTER TABLE "ranking" ADD ranking_points INT;
+ALTER TABLE "ranking" ADD total_points INT;
+ALTER TABLE "ranking" ADD coopertition_points INT;
+
+ALTER TABLE "match_detail" ADD red_processing_barge_reuse INT;
+ALTER TABLE "match_detail" ADD red_processing_barge_recycle INT;
+ALTER TABLE "match_detail" ADD red_processing_barge_recovery INT;
+ALTER TABLE "match_detail" ADD red_reduction_processing INT;
+ALTER TABLE "match_detail" ADD red_end_robot_one_docking INT;
+ALTER TABLE "match_detail" ADD red_end_robot_two_docking INT;
+ALTER TABLE "match_detail" ADD red_end_robot_three_docking INT;
+ALTER TABLE "match_detail" ADD blue_processing_barge_reuse INT;
+ALTER TABLE "match_detail" ADD blue_processing_barge_recycle INT;
+ALTER TABLE "match_detail" ADD blue_processing_barge_recovery INT;
+ALTER TABLE "match_detail" ADD blue_reduction_processing INT;
+ALTER TABLE "match_detail" ADD blue_end_robot_one_docking INT;
+ALTER TABLE "match_detail" ADD blue_end_robot_two_docking INT;
+ALTER TABLE "match_detail" ADD blue_end_robot_three_docking INT;
+ALTER TABLE "match_detail" ADD coopertition_bonus INT;

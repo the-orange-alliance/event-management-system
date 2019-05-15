@@ -1,6 +1,6 @@
 {
   "name": "ems-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "scripts": {
     "build": "tsc",
@@ -23,7 +23,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.1.20",
+    "@the-orange-alliance/lib-ems": "^0.2.3",
     "appdata-path": "^0.1.2",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",

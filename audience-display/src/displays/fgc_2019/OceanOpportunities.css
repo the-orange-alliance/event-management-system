@@ -1,0 +1,35 @@
+#fgc-body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-image: url("./res/global-bg.png");
+    -webkit-background-size: cover;
+    background-size: cover;
+}
+
+#fgc-container {
+    height: 100vh;
+    margin-left: 20vw;
+    width: 60vw;
+    background-color: rgba(0, 0, 0, 0.38);
+    display: flex;
+    flex-direction: column;
+}
+
+#fgc-container-wide {
+    height: 80vh;
+    margin-top: 10vh;
+    width: 75vw;
+    margin-left: 12.5vw;
+    background-color: rgba(0, 0, 0, 0.38);
+    display: flex;
+    flex-direction: column;
+}
+
+.red-bg {
+    background-color: #CE2000;
+}
+
+.blue-bg {
+    background-color: #5C88FF;
+}

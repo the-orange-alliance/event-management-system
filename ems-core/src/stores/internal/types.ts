@@ -13,7 +13,7 @@ import {
   SET_SOCKET_CONNECTED,
   SET_FINALS_MATCHES,
   SET_ELIMINATIONS_MATCHES,
-  SET_ALLIANCE_MEMBERS
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES
 } from "./constants";
 import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
@@ -74,6 +74,13 @@ export interface IRemoveTeam extends Action {
   }
 }
 
+export interface ISetTestMatches extends Action {
+  type: SET_TEST_MATCHES,
+  payload: {
+    matches: Match[]
+  }
+}
+
 export interface ISetPracticeMatches extends Action {
   type: SET_PRACTICE_MATCHES,
   payload: {
@@ -117,5 +124,5 @@ export interface ISetSocketConnected extends Action {
 }
 
 export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation |
-  IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetPracticeMatches |
+  IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetTestMatches | ISetPracticeMatches |
   ISetFinalsMatches | ISetQualificationMatches | ISetEliminationsMatches | ISetSocketConnected | ISetAllianceMembers;

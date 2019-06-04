@@ -1,14 +1,14 @@
 import * as React from "react";
-import {getTheme} from "../../AppTheme";
+import {getTheme} from "../../../AppTheme";
 import {Table} from "semantic-ui-react";
-import {RoverRuckusRank, TeamIdentifier} from "@the-orange-alliance/lib-ems";
+import {EnergyImpactRanking, TeamIdentifier} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
-  rankings: RoverRuckusRank[],
+  rankings: EnergyImpactRanking[],
   identifier?: TeamIdentifier
 }
 
-class RoverRuckusRankTable extends React.Component<IProps> {
+class EnergyImpactRankTable extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
   }
@@ -22,8 +22,9 @@ class RoverRuckusRankTable extends React.Component<IProps> {
           <Table.Cell>{ranking.rank}</Table.Cell>
           <Table.Cell>{displayName}</Table.Cell>
           <Table.Cell>{ranking.rankingPoints}</Table.Cell>
-          <Table.Cell>{ranking.tiebreakerPoints}</Table.Cell>
-          <Table.Cell>{ranking.highScore}</Table.Cell>
+          <Table.Cell>{ranking.totalPoints}</Table.Cell>
+          <Table.Cell>{ranking.coopertitionPoints}</Table.Cell>
+          <Table.Cell>{ranking.parkingPoints}</Table.Cell>
           <Table.Cell>{ranking.played}</Table.Cell>
         </Table.Row>
       );
@@ -35,8 +36,9 @@ class RoverRuckusRankTable extends React.Component<IProps> {
             <Table.HeaderCell width={1}>Rank</Table.HeaderCell>
             <Table.HeaderCell width={1}>Team #</Table.HeaderCell>
             <Table.HeaderCell>Ranking Points</Table.HeaderCell>
-            <Table.HeaderCell>Tiebreaker Points</Table.HeaderCell>
-            <Table.HeaderCell>High Score</Table.HeaderCell>
+            <Table.HeaderCell>Total Points</Table.HeaderCell>
+            <Table.HeaderCell>Coopertition Points</Table.HeaderCell>
+            <Table.HeaderCell>Parking Points</Table.HeaderCell>
             <Table.HeaderCell>Matches Played</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -48,4 +50,4 @@ class RoverRuckusRankTable extends React.Component<IProps> {
   }
 }
 
-export default RoverRuckusRankTable;
+export default EnergyImpactRankTable;

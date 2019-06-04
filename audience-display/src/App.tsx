@@ -1,15 +1,16 @@
 import * as React from 'react';
 import './App.css';
 import {
-  AllianceMember, Event, EMSProvider, SocketProvider, Team, Match, MatchParticipant
+  Event, EMSProvider, SocketProvider, Team, Match, MatchParticipant
 } from "@the-orange-alliance/lib-ems";
 import {Cookies, withCookies} from "react-cookie";
-import {AxiosResponse} from "axios";
 import EnergyImpact from "./displays/fgc_2018/EnergyImpact";
 
 import MATCH_START from "./displays/fgc_2018/res/sounds/match_start.wav";
 import RoverRuckus from "./displays/ftc_1819/RoverRuckus";
 import {Route, RouteComponentProps} from "react-router";
+import OceanOpportunities from "./displays/fgc_2019/OceanOpportunities";
+import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
 
 interface IProps {
   cookies: Cookies
@@ -44,7 +45,7 @@ class App extends React.Component<IProps, IState> {
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
-      SocketProvider.emit("identify", "audience-display", "event", "scoring", "referee");
+      SocketProvider.emit("identify", "audience-display", ["event", "scoring", "referee"]);
     });
     SocketProvider.on("disconnect", () => {
       console.log("Disconnected from SocketIO.");
@@ -66,73 +67,23 @@ class App extends React.Component<IProps, IState> {
         SocketProvider.emit("test-audience-success");
       });
     });
-    SocketProvider.on("prestart", (matchKey: string) => {
-      EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
-        if (matchRes.data) {
-          const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-          if (match.tournamentLevel > 0) {
-            EMSProvider.getMatchTeamRanks(matchKey).then((partRes: AxiosResponse) => {
-              match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-              if (match.participants[0].allianceKey !== null && match.participants[0].allianceKey.length > 0) {
-                EMSProvider.getAlliances().then((allianceRes: AxiosResponse) => {
-                  match.allianceMembers = allianceRes.data.payload.map((member: any) => new AllianceMember().fromJSON(member));
-                  this.setState({
-                    activeMatch: match,
-                    videoID: 1 // Universal Match Preview Screen
-                  });
-                });
-              } else {
-                this.setState({
-                  activeMatch: match,
-                  videoID: 1 // Universal Match Preview Screen
-                });
-              }
-            });
-          } else {
-            EMSProvider.getMatchTeams(matchKey).then((partRes: AxiosResponse) => {
-              match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-              this.setState({
-                activeMatch: match,
-                videoID: 1 // Universal Match Preview Screen
-              });
-            });
-          }
+    SocketProvider.on("prestart-response", (err: any, matchJSON: any) => {
+      const match: Match = new Match().fromJSON(matchJSON);
+      const seasonKey: string = match.matchKey.split("-")[0];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+      }
+      this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
+        if (participants.length > 0) {
+          match.participants = participants;
         }
-      }).catch((matchRes: any) => console.error(matchRes));
+        this.setState({activeMatch: match, videoID: 1});
+      });
     });
     SocketProvider.on("commit-scores", (matchKey: string) => {
-      EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
-        EMSProvider.getMatchDetails(matchKey).then((detailRes: AxiosResponse) => {
-          if (matchRes.data && detailRes.data) {
-            const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-            if (match.tournamentLevel > 0) {
-              EMSProvider.getMatchTeamRanks(matchKey).then((teamRes: AxiosResponse) => {
-                if (teamRes.data) {
-                  const seasonKey: number = parseInt(matchKey.split("-")[0], 10);
-                  match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(detailRes.data.payload[0]);
-                  match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-                  this.setState({
-                    activeMatch: match,
-                    videoID: 3 // Universal Match Results Screen
-                  });
-                }
-              }).catch((teamRes: any) => console.error(teamRes));
-            } else {
-              EMSProvider.getMatchTeams(matchKey).then((teamRes: AxiosResponse) => {
-                if (teamRes.data) {
-                  const seasonKey: number = parseInt(matchKey.split("-")[0], 10);
-                  match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(detailRes.data.payload[0]);
-                  match.participants = teamRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-                  this.setState({
-                    activeMatch: match,
-                    videoID: 3 // Universal Match Results Screen
-                  });
-                }
-              }).catch((teamRes: any) => console.error(teamRes));
-            }
-          }
-        }).catch((detailsRes: any) => console.error(detailsRes));
-      }).catch((matchRes: any) => console.error(matchRes));
+      // TODO - Fix this.
+      console.log(matchKey);
     });
 
     this.renderAudienceDisplay = this.renderAudienceDisplay.bind(this);
@@ -154,15 +105,18 @@ class App extends React.Component<IProps, IState> {
   private renderAudienceDisplay(props: RouteComponentProps<any>) {
     const {event, teams, loading, videoID, activeMatch} = this.state;
     let display: JSX.Element;
-    switch (event.season.seasonKey) {
-      case 2018:
+    switch (event.eventType) {
+      case "fgc_2018":
         display = <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
-      case 1819:
+      case "fgc_2019":
+        display = <OceanOpportunities event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        break;
+      case "ftc_1819":
         display = <RoverRuckus displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       default:
-        display = <div id="app-error">REST API CONNECTION LOST</div>;
+        display = <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
     }
 
     if (!loading) {
@@ -172,18 +126,49 @@ class App extends React.Component<IProps, IState> {
     }
   }
 
+  private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {
+    return new Promise<MatchParticipant[]>((resolve, reject) => {
+      let participants: MatchParticipant[] = [];
+      EMSProvider.getMatchTeams(match.matchKey).then((matchTeams: MatchParticipant[]) => {
+        if (matchTeams.length > 0) {
+          participants = matchTeams;
+        } else if (typeof match.participants !== "undefined") {
+          participants = match.participants;
+        }
+        participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+        for (let i = 0; i < participants.length; i++) {
+          const participant: MatchParticipant = participants[i];
+          if (typeof participant.team === "undefined") {
+            const team: Team = new Team();
+            team.teamKey = i;
+            team.teamNameShort = "Test Team #" + (i + 1);
+            team.country = "TST";
+            team.countryCode = "us";
+            participant.team = team;
+          }
+          if (typeof participant.teamRank === "undefined") {
+            const ranking: Ranking = new Ranking();
+            ranking.rank = 0;
+            participant.teamRank = ranking;
+          }
+        }
+        resolve(participants);
+      });
+    });
+  }
+
   private initState() {
-    EMSProvider.getEvent().then((response: AxiosResponse) => {
-      if (response.data.payload && response.data.payload[0] && response.data.payload[0].event_key) {
-        EMSProvider.getTeams().then((teamsResponse: AxiosResponse) => {
-          if (teamsResponse.data.payload && teamsResponse.data.payload.length > 0) {
+    EMSProvider.getEvent().then((events: Event[]) => {
+      if (events.length > 0) {
+        EMSProvider.getTeams().then((teams: Team[]) => {
+          if (teams.length > 0) {
             this.setState({
-              event: new Event().fromJSON(response.data.payload[0]),
-              teams: teamsResponse.data.payload.map((teamJSON: any) => new Team().fromJSON(teamJSON)),
+              event: events[0],
+              teams: teams,
               loading: false
             });
           } else {
-            this.setState({loading: false});
+            this.setState({event: events[0], loading: false});
           }
         }).catch((err: any) => {
           this.setState({loading: false});

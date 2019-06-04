@@ -13,7 +13,7 @@ import {
   SET_SOCKET_CONNECTED,
   SET_FINALS_MATCHES,
   SET_ELIMINATIONS_MATCHES,
-  SET_ALLIANCE_MEMBERS,
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES,
 } from "./constants";
 import {IInternalState} from "./models";
 import {InternalActions} from "./types";
@@ -24,6 +24,7 @@ export const initialState: IInternalState = {
   navigationDisabled: false,
   completedStep: 0,
   teamList: [],
+  testMatches: [],
   practiceMatches: [],
   qualificationMatches: [],
   finalsMatches: [],
@@ -68,6 +69,8 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
         ...state,
         teamList: [...state.teamList.slice(0, action.payload.index), ...state.teamList.slice(1 + action.payload.index)] // TODO - Make this and change element constant functions inside of this reducer
       };
+    case SET_TEST_MATCHES:
+      return {...state, testMatches: action.payload.matches};
     case SET_PRACTICE_MATCHES:
       return {...state, practiceMatches: action.payload.matches};
     case SET_QUALIFICATION_MATCHES:

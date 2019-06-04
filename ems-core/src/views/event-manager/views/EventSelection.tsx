@@ -2,7 +2,7 @@ import * as React from "react";
 import {Grid, Form, Radio, Button, DropdownProps, InputProps} from "semantic-ui-react";
 import EventSelectionSetupCard from "../../../components/EventSelectionSetupCard";
 import EventConfigurationCard from "../../../components/EventConfigurationCard";
-import fgc_2018 from "../../../resources/FGC_ei.png";
+import fgc_2019 from "../../../resources/FGC_oo.png";
 import ftc_1718 from "../../../resources/FTC_rr.png";
 import ftc_1819 from "../../../resources/FTC_roverruckus.png";
 import ftc_logo from "../../../resources/FTC_logo.png";
@@ -16,14 +16,15 @@ import ExplanationIcon from "../../../components/ExplanationIcon";
 import {SyntheticEvent} from "react";
 import EventCreationValidator from "../../../validators/EventCreationValidator";
 import {CONFIG_STORE} from "../../../AppStore";
-import {IDisableNavigation} from "../../../stores/internal/types";
-import {disableNavigation} from "../../../stores/internal/actions";
+import {IDisableNavigation, ISetTestMatches} from "../../../stores/internal/types";
+import {disableNavigation, setTestMatches} from "../../../stores/internal/actions";
 import DialogManager from "../../../managers/DialogManager";
 import EventCreationManager from "../../../managers/EventCreationManager";
-import {DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, PlayoffsType, Region, RegionData, SeasonData,
-  TOAConfig, TOAEvent, TOAProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_EI_PRESET, FTC_ROVER_PRESET
+import {DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData, SeasonData,
+  TOAConfig, TOAEvent, TOAProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET
 } from "@the-orange-alliance/lib-ems";
 import NumericInput from "../../../components/NumericInput";
+import MatchManager from "../../../managers/MatchManager";
 
 interface IProps {
   onComplete: () => void,
@@ -32,6 +33,7 @@ interface IProps {
   toaConfig?: TOAConfig,
   selectConfigPreset?: (preset: EventConfiguration) => ISetEventConfiguration
   setEvent?: (event: Event) => ISetEvent,
+  setTestMatches?: (matches: Match[]) => ISetTestMatches,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
 }
 
@@ -194,7 +196,7 @@ class EventSelection extends React.Component<IProps, IState> {
 
   private setEventType(event: SyntheticEvent, props: DropdownProps) {
     if (typeof props.value === "string") {
-      this.props.event.eventType = props.value;
+      this.props.event.eventTypeKey = props.value;
       this.props.setEvent(this.props.event);
       this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
@@ -276,12 +278,21 @@ class EventSelection extends React.Component<IProps, IState> {
   private createEvent(): void {
     this.setState({creatingEvent: true});
     this.props.setNavigationDisabled(true);
+    this.props.event.eventType = this.props.eventConfig.eventType;
     const toaConfig = (this.props.toaConfig.enabled && this.props.eventConfig.requiresTOA) ? this.props.toaConfig.toJSON() : undefined;
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), toaConfig: toaConfig}).catch((err) => console.log(err));
     EventCreationManager.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
-      this.setState({creatingEvent: false});
-      this.props.setNavigationDisabled(false);
-      this.props.onComplete();
+      MatchManager.createTestMatch(this.props.event, this.props.eventConfig).then((match: Match) => {
+        this.setState({creatingEvent: false});
+        this.props.setNavigationDisabled(false);
+        this.props.setTestMatches([match]);
+        this.props.onComplete();
+      }).catch((error: HttpError) => {
+        this.setState({creatingEvent: false});
+        this.props.setNavigationDisabled(false);
+        console.log(error);
+        DialogManager.showErrorBox(error);
+      });
     }).catch((error: HttpError) => {
       this.setState({creatingEvent: false});
       this.props.setNavigationDisabled(false);
@@ -295,7 +306,7 @@ class EventSelection extends React.Component<IProps, IState> {
       <Grid columns={16}>
         <Grid.Row>
           <Grid.Column width={4}>
-            <EventConfigurationCard title={"FIRST Global Energy Impact"} color={"green"} imgUrl={fgc_2018} onClick={this.setConfigurationPreset.bind(this, FGC_EI_PRESET)}/>
+            <EventConfigurationCard title={"FIRST Global Ocean Opportunities"} color={"green"} imgUrl={fgc_2019} onClick={this.setConfigurationPreset.bind(this, FGC_PRESET)}/>
           </Grid.Column>
           <Grid.Column width={4}>
             <EventConfigurationCard title={"Standard FIRST Tech Challenge Relic Recovery Event"} color={"brown"} imgUrl={ftc_1718} onClick={this.setConfigurationPreset.bind(this, FTC_RELIC_PRESET)}/>
@@ -357,10 +368,10 @@ class EventSelection extends React.Component<IProps, IState> {
   private renderBasicEventInformation(): JSX.Element {
     const eventValidator = this._validator;
     const selectedRegion = typeof this.props.event.region === "undefined" ? new Region("", "").regionKey : this.props.event.region.regionKey;
-    const selectedEventType = this.props.event.eventType;
+    const selectedEventType = this.props.event.eventTypeKey;
     const {event, eventConfig} = this.props;
     const isValidRegion = typeof event.region === "undefined" ? false : event.region.regionKey.length > 0;
-    const isValidEventType = typeof event.eventType === "undefined" ? false : event.eventType.length > 0;
+    const isValidEventType = typeof event.eventTypeKey === "undefined" ? false : event.eventTypeKey.length > 0;
     return (
       <Form>
         <Grid>
@@ -449,6 +460,7 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     selectConfigPreset: (preset: EventConfiguration) => dispatch(setEventConfiguration(preset)),
     setEvent: (event: Event) => dispatch(setEvent(event)),
+    setTestMatches: (matches: Match[]) => dispatch(setTestMatches(matches)),
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
   };
 }

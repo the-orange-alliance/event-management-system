@@ -72,6 +72,30 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
     InternalStateManager.pollServicesForResponse().then((res: any) => {
       InternalStateManager.refreshInternalProgress(configState.eventConfiguration).then((internalProgress: IInternalProgress) => {
         internalState.completedStep = internalProgress.currentStep;
+        if (internalProgress.teams) {
+          internalState.teamList = internalProgress.teams;
+        }
+        if (internalProgress.testMatches) {
+          internalState.testMatches = internalProgress.testMatches;
+        }
+        if (internalProgress.practiceMatches) {
+          internalState.practiceMatches = internalProgress.practiceMatches;
+        }
+        if (internalProgress.qualificationMatches) {
+          internalState.qualificationMatches = internalProgress.qualificationMatches;
+        }
+        if (configState.eventConfiguration.playoffsConfig === "finals") {
+          if (internalProgress.playoffMatches) {
+            internalState.finalsMatches = internalProgress.playoffMatches;
+          }
+        } else {
+          if (internalProgress.allianceMembers) {
+            internalState.allianceMembers = internalProgress.allianceMembers;
+          }
+          if (internalProgress.playoffMatches) {
+            internalState.eliminationsMatches = internalProgress.playoffMatches;
+          }
+        }
         const applicationStore = createStore(reducers, {
           configState: configState,
           internalState: internalState

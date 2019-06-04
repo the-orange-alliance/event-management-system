@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS "event" (
     event_key VARCHAR(15) PRIMARY KEY NOT NULL,
-    season_key VARCAHAR(4) NOT NULL,
+    season_key VARCHAR(4) NOT NULL,
     region_key VARCHAR(4) NOT NULL,
+    event_type VARCHAR(8) NOT NULL,
     event_name VARCHAR(255) NOT NULL,
     division_name VARCHAR(255) NULL,
     venue VARCHAR(255),
@@ -77,6 +78,7 @@ CREATE TABLE IF NOT EXISTS "match" (
     blue_min_pen INT,
     blue_maj_pen INT,
     active INT,
+    result INT,
     uploaded INT
 );
 
@@ -90,8 +92,7 @@ CREATE TABLE IF NOT EXISTS "match_participant" (
     surrogate INT,
     no_show INT,
     alliance_key VARCHAR(25),
-    FOREIGN KEY (match_key) REFERENCES "match"(match_key),
-    FOREIGN KEY (team_key) REFERENCES "team"(team_key)
+    FOREIGN KEY (match_key) REFERENCES "match"(match_key)
 );
 
 CREATE TABLE IF NOT EXISTS "match_detail" (

@@ -1,9 +1,9 @@
 import * as React from "react";
-import {EMSProvider, EnergyImpactRanking, Team} from "@the-orange-alliance/lib-ems";
-import {AxiosResponse} from "axios";
+import {EMSProvider, EnergyImpactRanking} from "@the-orange-alliance/lib-ems";
 import * as ReactScroll from "react-scroll";
 
 import "./RankingsScreen.css";
+import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
 
 interface IState {
   rankings: EnergyImpactRanking[],
@@ -25,17 +25,11 @@ class RankingsScreen extends React.Component<{}, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((response: AxiosResponse) => {
-      if (response.data && response.data.payload && response.data.payload.length > 0) {
-        const rankings: EnergyImpactRanking[] = [];
-        for (const rankJSON of response.data.payload) {
-          const ranking: EnergyImpactRanking = new EnergyImpactRanking().fromJSON(rankJSON);
-          ranking.team = new Team().fromJSON(rankJSON);
-          rankings.push(ranking);
-        }
+    EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+      if (rankings.length > 0) {
         console.log(this.getTotalScrollTime(rankings.length));
         this.scrollAndLoop(this.getTotalScrollTime(rankings.length), this.getReturnScrollTime(rankings.length)); // TODO - Make these functions based upon window height and items in the list * 40px
-        this.setState({rankings: rankings, loading: false});
+        this.setState({rankings: rankings as EnergyImpactRanking[], loading: false});
       } else {
         this.setState({loading: false});
       }

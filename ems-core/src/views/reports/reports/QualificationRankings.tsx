@@ -3,8 +3,8 @@ import ReportTemplate from "./ReportTemplate";
 import DialogManager from "../../../managers/DialogManager";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import EnergyImpactRankTable from "../../../components/game-specifics/EnergyImpactRankTable";
-import RoverRuckusRankTable from "../../../components/game-specifics/RoverRuckusRankTable";
+import EnergyImpactRankTable from "../../../components/game-specifics/energy-impact/EnergyImpactRankTable";
+import RoverRuckusRankTable from "../../../components/game-specifics/rover-ruckus/RoverRuckusRankTable";
 import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking,
   RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";

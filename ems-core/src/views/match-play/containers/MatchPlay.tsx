@@ -36,6 +36,7 @@ interface IProps {
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
   matchState?: MatchState,
+  testMatches: Match[],
   practiceMatches: Match[],
   qualificationMatches: Match[],
   finalsMatches: Match[],
@@ -82,9 +83,14 @@ class MatchPlay extends React.Component<IProps, IState> {
     if (this.props.elimsMatches.length > 0) {
       this.changeSelectedMatch(null, {value: this.props.elimsMatches[0].matchKey});
     } else if (this.props.qualificationMatches.length > 0) {
+      this.changeSelectedLevel(null, {value: "Qualification"});
       this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
     } else if (this.props.practiceMatches.length > 0) {
+      this.changeSelectedLevel(null, {value: "Practice"});
       this.changeSelectedMatch(null, {value: this.props.practiceMatches[0].matchKey});
+    } else if (this.props.testMatches.length > 0) {
+      this.changeSelectedLevel(null, {value: "Test"});
+      this.changeSelectedMatch(null, {value: this.props.testMatches[0].matchKey});
     }
   }
 
@@ -315,11 +321,13 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private getAvailableTournamentLevels(postQualConfig: PlayoffsType): TournamentType[] {
-    return ["Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Finals"];
+    return ["Test", "Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Finals"];
   }
 
   private getMatchesByTournamentLevel(tournamentLevel: TournamentType): Match[] { // TODO - Only show fields that EMS controls
     switch (tournamentLevel) {
+      case "Test":
+        return this.props.testMatches;
       case "Practice":
         return this.props.practiceMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Qualification":
@@ -381,6 +389,7 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,
     matchState: scoringState.matchState,
+    testMatches: internalState.testMatches,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,
     finalsMatches: internalState.finalsMatches,

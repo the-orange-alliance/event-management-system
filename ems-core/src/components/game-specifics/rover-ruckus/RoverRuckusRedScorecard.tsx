@@ -1,10 +1,10 @@
 import * as React from "react";
 import {Card, CheckboxProps, DropdownProps, Form, Grid, InputProps} from "semantic-ui-react";
-import {ApplicationActions, IApplicationState} from "../../stores";
+import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import {ISetActiveDetails, ISetActiveMatch} from "../../stores/scoring/types";
+import {ISetActiveDetails, ISetActiveMatch} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {setActiveDetails} from "../../stores/scoring/actions";
+import {setActiveDetails} from "../../../stores/scoring/actions";
 import RoverRuckusTeamStatus from "./RoverRuckusTeamStatus";
 import {SyntheticEvent} from "react";
 import {DropdownData, Match, MatchDetails, MatchParticipant, MatchState, RoverRuckusMatchDetails} from "@the-orange-alliance/lib-ems";

@@ -16,7 +16,7 @@ import {
   updateTeamList
 } from "./stores/internal/actions";
 
-import {EMSProvider, Event, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration, Team, Match,
+import {EMSProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration, Team, Match,
 AllianceMember} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -54,50 +54,6 @@ class App extends React.Component<IProps> {
       document.title = "Event Management System";
       EMSProvider.initialize(this.props.networkHost);
     }
-
-    // Preload app-wide variables like team list, schedule, etc.
-    EMSProvider.getEvent().then((events: Event[]) => {
-      if (events.length > 0) {
-        this.props.setCompletedStep(1);
-      }
-      EMSProvider.getTeams().then((teams: Team[]) => {
-        if (teams.length > 0) {
-          this.props.setTeamList(teams);
-          this.props.setCompletedStep(2);
-        }
-        const eventKey: string = events[0].eventKey;
-        EMSProvider.getMatchesAndParticipants(eventKey + "-P").then((practiceMatches: Match[]) => {
-          if (practiceMatches.length > 0) {
-            this.props.setPracticeMatches(practiceMatches);
-            this.props.setCompletedStep(3);
-            EMSProvider.getMatchesAndParticipants(eventKey + "-Q").then((qualMatches: Match[]) => {
-              if (qualMatches.length > 0) {
-                this.props.setQualificationMatches(qualMatches);
-                this.props.setCompletedStep(4);
-                EMSProvider.getMatchesAndParticipants(eventKey + "-E").then((finalsMatches: Match[]) => {
-                  if (finalsMatches.length > 0) {
-                    this.props.setFinalsMatches(finalsMatches);
-                    this.props.setCompletedStep(6);
-                  }
-                });
-                EMSProvider.getAlliances().then((allianceMembers: AllianceMember[]) => {
-                  if (allianceMembers.length > 0) {
-                    this.props.setAllianceMembers(allianceMembers);
-                    this.props.setCompletedStep(5);
-                    EMSProvider.getMatchesAndParticipants(eventKey + "-E").then((elimsMatches: Match[]) => {
-                      if (elimsMatches.length > 0) {
-                        this.props.setElimsMatches(elimsMatches);
-                        this.props.setCompletedStep(6);
-                      }
-                    });
-                  }
-                });
-              }
-            });
-          }
-        });
-      });
-    });
   }
 
   public render() {
@@ -109,7 +65,7 @@ class App extends React.Component<IProps> {
   private initializeSocket(host: string) {
     SocketProvider.initialize(host);
     SocketProvider.on("connect", () => {
-      SocketProvider.emit("identify", "ems-core", "scoring", "event");
+      SocketProvider.emit("identify", "ems-core", ["scoring", "event"]);
       this.props.setSocketConnected(true);
       if (this.props.slaveModeEnabled) {
         setTimeout(() => {

@@ -1,4 +1,4 @@
-import {AllianceColor, EliminationFormat, EMSProvider, EventConfiguration, HttpError, Match, MatchParticipant,
+import {AllianceColor, EliminationFormat, EMSProvider, Event, EventConfiguration, HttpError, Match, MatchParticipant,
   MatchState, SocketProvider
 } from "@the-orange-alliance/lib-ems";
 
@@ -20,6 +20,40 @@ class MatchManager {
 
   private constructor() {}
 
+  public createTestMatch(event: Event, eventConfig: EventConfiguration): Promise<Match> {
+    return new Promise<any>((resolve, reject) => {
+      const match: Match = new Match();
+      match.matchKey = event.eventKey + "-T001";
+      match.matchDetailKey = event.eventKey + "-T001D";
+      match.matchName = "Match Test";
+      match.tournamentLevel = Match.TEST_LEVEL;
+      match.fieldNumber = 1;
+      match.participants = [];
+      for (let i = 0; i < eventConfig.teamsPerAlliance; i++) {
+        const redParticipant: MatchParticipant = new MatchParticipant();
+        redParticipant.matchKey = match.matchKey;
+        redParticipant.matchParticipantKey = match.matchKey + "-T" + (i + 1);
+        redParticipant.station = (i + 11);
+        redParticipant.teamKey = MatchParticipant.TEST_TEAM_KEY;
+
+        const blueParticipant: MatchParticipant = new MatchParticipant();
+        blueParticipant.matchKey = match.matchKey;
+        blueParticipant.matchParticipantKey = match.matchKey + "-T" + (i + 1 + eventConfig.teamsPerAlliance);
+        blueParticipant.station = (i + 21);
+        blueParticipant.teamKey = MatchParticipant.TEST_TEAM_KEY;
+
+        match.participants.push(redParticipant);
+        match.participants.push(blueParticipant);
+      }
+
+      EMSProvider.postMatchSchedule([match]).then(() => {
+        EMSProvider.postMatchScheduleParticipants(match.participants).then(() => {
+          resolve(match);
+        }).catch((partErr: HttpError) => reject(partErr));
+      }).catch((matchErr: HttpError) => reject(matchErr));
+    });
+  }
+
   public prestart(match: Match): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.makeActiveMatch(match).then(() => {
@@ -36,8 +70,14 @@ class MatchManager {
         for (const participant of match.participants) {
           participant.cardStatus = 0;
         }
-        SocketProvider.emit("prestart", match.matchKey, match.fieldNumber);
-        resolve();
+        SocketProvider.on("prestart-response", (err: any, data: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+        SocketProvider.emit("prestart", match.matchKey);
       }).catch((error: HttpError) => {
         reject(error);
       })

@@ -1,9 +1,9 @@
 import * as React from "react";
 import {AllianceColor, EventType} from "@the-orange-alliance/lib-ems";
-import EnergyImpactRedScorecard from "./game-specifics/EnergyImpactRedScorecard";
-import EnergyImpactBlueScorecard from "./game-specifics/EnergyImpactBlueScorecard";
-import RoverRuckusRedScorecard from "./game-specifics/RoverRuckusRedScorecard";
-import RoverRuckusBlueScorecard from "./game-specifics/RoverRuckusBlueScorecard";
+import EnergyImpactRedScorecard from "./game-specifics/energy-impact/EnergyImpactRedScorecard";
+import EnergyImpactBlueScorecard from "./game-specifics/energy-impact/EnergyImpactBlueScorecard";
+import RoverRuckusRedScorecard from "./game-specifics/rover-ruckus/RoverRuckusRedScorecard";
+import RoverRuckusBlueScorecard from "./game-specifics/rover-ruckus/RoverRuckusBlueScorecard";
 
 interface IProps {
   type: EventType,

@@ -3,9 +3,9 @@ import {getTheme} from "../AppTheme";
 import {Card} from "semantic-ui-react";
 import {IApplicationState} from "../stores";
 import DialogManager from "../managers/DialogManager";
-import EnergyImpactRankTable from "./game-specifics/EnergyImpactRankTable";
+import EnergyImpactRankTable from "./game-specifics/energy-impact/EnergyImpactRankTable";
 import {connect} from "react-redux";
-import RoverRuckusRankTable from "./game-specifics/RoverRuckusRankTable";
+import RoverRuckusRankTable from "./game-specifics/rover-ruckus/RoverRuckusRankTable";
 import {
   EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking, RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";

@@ -11,7 +11,14 @@ const {ipcRenderer} = (window as any).require("electron");
 
 export interface IInternalProgress {
   completedStep: number,
-  currentStep: number
+  currentStep: number,
+  event?: Event,
+  teams?: Team[],
+  testMatches?: Match[],
+  practiceMatches?: Match[],
+  qualificationMatches?: Match[],
+  playoffMatches?: Match[],
+  allianceMembers?: AllianceMember[]
 }
 
 class InternalStateManager {
@@ -54,25 +61,32 @@ class InternalStateManager {
       completedStep++;
     }
 
+    const eventKey: string = events[0].eventKey;
+    let tMatches: Match[] = [];
+    await EMSProvider.getMatchesAndParticipants(eventKey + "-T").then((res: Match[]) => {
+      tMatches = res;
+    }).catch((error: HttpError) => console.log(error));
+
     let teams: Team[] = [];
     await EMSProvider.getTeams().then((res: Team[]) => {
       teams = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (teams.length === 0) {
-      return {completedStep, currentStep: completedStep};
+      return {completedStep, currentStep: completedStep, event: events[0], testMatches: tMatches};
     } else {
       completedStep++;
     }
 
-    const eventKey: string = events[0].eventKey;
+    // Test matches don't 100% matter, so just throw them in here...
+
     let pMatches: Match[] = [];
     await EMSProvider.getMatchesAndParticipants(eventKey + "-P").then((res: Match[]) => {
       pMatches = res;
     }).catch((error: HttpError) => console.log(error));
 
     if (pMatches.length === 0) {
-      return {completedStep, currentStep: completedStep};
+      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches};
     } else {
       completedStep++;
     }
@@ -83,7 +97,7 @@ class InternalStateManager {
     }).catch((error: HttpError) => console.log(error));
 
     if (qMatches.length === 0) {
-      return {completedStep, currentStep: completedStep};
+      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches};
     } else {
       completedStep++;
     }
@@ -103,12 +117,12 @@ class InternalStateManager {
     }).catch((error: HttpError) => console.log(error));
 
     if (eMatches.length === 0) {
-      return {completedStep, currentStep: completedStep};
+      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, qualificationMatches: qMatches, allianceMembers: alliances};
     } else {
       completedStep++;
     }
 
-    return {completedStep, currentStep: completedStep};
+    return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, qualificationMatches: qMatches, allianceMembers: alliances, playoffMatches: eMatches};
   }
 
   public createBackup(location: string): Promise<any> {

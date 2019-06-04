@@ -1,10 +1,9 @@
 import * as React from 'react';
 import "./AllianceBracketScreen.css";
-import {Event, EMSProvider, Match, MatchParticipant} from "@the-orange-alliance/lib-ems";
+import {Event, EMSProvider, Match} from "@the-orange-alliance/lib-ems";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
 import EightAllianceBracket from "../../../components/alliance-brackets/8AllianceBracket";
-import {AxiosResponse} from "axios";
 
 interface IProps {
   event: Event
@@ -23,27 +22,10 @@ class AllianceBracketScreen extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getMatches("elims").then((elimsMatchesResposne: AxiosResponse) => {
-      if (elimsMatchesResposne.data && elimsMatchesResposne.data.payload && elimsMatchesResposne.data.payload.length > 0) {
-        const elimsMatches: Match[] = [];
-        for (const matchJSON of elimsMatchesResposne.data.payload) {
-          const match: Match = new Match().fromJSON(matchJSON);
-          const participants: MatchParticipant[] = [];
-          for (let i = 0; i < matchJSON.participants.split(",").length; i++) {
-            const participant: MatchParticipant = new MatchParticipant();
-            participant.allianceKey = matchJSON.alliance_keys.split(",")[i];
-            participant.matchParticipantKey = matchJSON.participant_keys.split(",")[i];
-            participant.matchKey = match.matchKey;
-            participant.teamKey = parseInt(matchJSON.participants.split(",")[i], 10);
-            participant.surrogate = matchJSON.surrogates.split(",")[i] === "1";
-            participant.station = parseInt(matchJSON.stations.split(",")[i], 10);
-            participants.push(participant);
-          }
-          match.participants = participants;
-          elimsMatches.push(match);
-        }
+    EMSProvider.getMatchesAndParticipants("E").then((matches: Match[]) => {
+      if (matches.length > 0) {
         const map: Map<number, Match[]> = new Map<number, Match[]>();
-        for (const match of elimsMatches) {
+        for (const match of matches) {
           if (typeof map.get(match.tournamentLevel) === "undefined") {
             map.set(match.tournamentLevel, []);
           }

@@ -1,10 +1,10 @@
 import * as React from "react";
 import {Button, Grid, SemanticCOLORS} from "semantic-ui-react";
-import {ApplicationActions, IApplicationState} from "../../stores";
+import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import {IUpdateParticipantStatus} from "../../stores/scoring/types";
+import {IUpdateParticipantStatus} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {updateParticipantStatus} from "../../stores/scoring/actions";
+import {updateParticipantStatus} from "../../../stores/scoring/actions";
 import {AllianceColor, EventConfiguration, Match, MatchParticipant, MatchState} from "@the-orange-alliance/lib-ems";
 
 interface IProps {

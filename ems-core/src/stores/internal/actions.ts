@@ -13,7 +13,7 @@ import {
   SET_SOCKET_CONNECTED,
   SET_FINALS_MATCHES,
   SET_ELIMINATIONS_MATCHES,
-  SET_ALLIANCE_MEMBERS
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES
 } from "./constants";
 import {
   IUpdateProcessList,
@@ -27,7 +27,7 @@ import {
   ISetPracticeMatches,
   ISetQualificationMatches,
   ISetSocketConnected,
-  ISetFinalsMatches, ISetEliminationsMatches, ISetAllianceMembers
+  ISetFinalsMatches, ISetEliminationsMatches, ISetAllianceMembers, ISetTestMatches
 } from "./types";
 import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
@@ -85,6 +85,13 @@ export const removeTeam: ActionCreator<IRemoveTeam> = (index: number) => ({
   type: REMOVE_TEAM,
   payload: {
     index: index
+  }
+});
+
+export const setTestMatches: ActionCreator<ISetTestMatches> = (matches: Match[]) => ({
+  type: SET_TEST_MATCHES,
+  payload: {
+    matches: matches
   }
 });
 

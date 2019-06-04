@@ -9,7 +9,8 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
-import {FTC_CONFIG} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, FTC_CONFIG} from "@the-orange-alliance/lib-ems";
+import HttpError from "@the-orange-alliance/lib-ems/dist/models/ems/HttpError";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -34,10 +35,12 @@ app.use(cors());
 
 const timer = new MatchTimer();
 timer.matchConfig = FTC_CONFIG;
-const clients: Map<string, string> = new Map<string, string>();
+const clients: Map<string, string[]> = new Map<string, string[]>();
 const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);
 const refereeRoom = new RefereeRoom(socket, timer);
+
+EMSProvider.initialize(host, parseInt(process.env.REACT_APP_EMS_API_PORT as string, 10));
 
 /**
  * Main socket connection/event logic. We're not trying to be super secure, but inside of EMS you will (eventually)
@@ -45,18 +48,18 @@ const refereeRoom = new RefereeRoom(socket, timer);
  */
 socket.on("connection", (client: Socket) => {
   logger.info(`Client connection (${client.id})`);
-  client.on("identify", (params: string[]) => {
-    logger.info(`Identified client ${client.id} [${params}].`);
-    clients.set(client.id, params[0]);
-    for (let i = 1; i < params.length; i++) {
-      client.join(params[i]);
-      if (params[i] === "scoring") {
+  client.on("identify", (clientStr: string, rooms: string[]) => {
+    logger.info(`Identified client ${client.id} [${clientStr} joining (${rooms})].`);
+    clients.set(client.id, rooms);
+    for (const room of rooms) {
+      client.join(room);
+      if (room === "scoring") {
         scoringRoom.addClient(client);
       }
-      if (params[i] === "event") {
+      if (room === "event") {
         eventRoom.addClient(client);
       }
-      if (params[i] === "referee") {
+      if (room === "referee") {
         refereeRoom.addClient(client);
       }
     }

@@ -1,0 +1,162 @@
+#fgc-pre-header {
+    height: 22.5vh;
+    padding: 10px;
+    width: 100%;
+    margin-top: 5vh;
+    text-align: center;
+}
+
+#fgc-pre-logo {
+    margin-top: 5%;
+    width: 60%;
+}
+
+#fgc-pre-match-info {
+    width: 100%;
+    height: 5%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+#fgc-pre-match-info-left {
+    height: 100%;
+    min-width: 20%;
+    margin-right: 3%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    background-color: #ffffff;
+}
+
+#fgc-pre-match-info-right {
+    height: 100%;
+    min-width: 20%;
+    margin-left: 3%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    background-color: #ffffff;
+}
+
+.pre-match-info-left {
+    background-color: #CACACA;
+    width: 60%;
+    height: 100%;
+    font-family: Roboto, sans-serif;
+    font-weight: bold;
+    font-size: 2.0rem;
+    padding: 5px;
+}
+
+.pre-match-info-right {
+    background-color: #FFFFFF;
+    width: 40%;
+    height: 100%;
+    font-family: Roboto, sans-serif;
+    font-weight: bold;
+    font-size: 1.75rem;
+    padding: 5px;
+}
+
+.pre-match-alliance {
+    height: 23vh;
+    width: 85%;
+    margin-left: 7.5%;
+    margin-top: 3vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.pre-match-alliance-left {
+    width: 17.5%;
+    height: 100%;
+    text-align: right;
+}
+
+.pre-match-alliance-right {
+    width: 82.5%;
+    height: 100%;
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.pre-match-alliance-row {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-family: Roboto, sans-serif;
+    font-weight: bold;
+    font-size: 2.25rem;
+}
+
+.pre-match-border {
+    border-bottom: 3px solid #CACACA;
+}
+
+.pre-match-rank {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.pre-match-team {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.pre-match-flag {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.match-test-team {
+  width: 85%;
+}
+
+.match-test-flag {
+  justify-content: center;
+}
+
+@media only screen and (max-width: 1600px) {
+    #fgc-pre-header {
+        height: 25vh;
+        margin-top: 0;
+    }
+    #fgc-pre-logo {
+        margin-top: 3%;
+    }
+    #fgc-pre-match-info {
+        margin-top: 2vh;
+    }
+    #fgc-pre-match-info-left {
+        min-width: 25%;
+    }
+    #fgc-pre-match-info-right {
+        min-width: 25%;
+    }
+    .pre-match-alliance-row {
+        font-family: Roboto, sans-serif;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    .pre-match-alliance-left {
+        width: 13.5%;
+    }
+    .pre-match-alliance-right {
+        width: 86.5%;
+    }
+}

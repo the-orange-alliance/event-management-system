@@ -6,6 +6,7 @@ export interface IInternalState {
   navigationDisabled: boolean,
   completedStep: number,
   teamList: Team[],
+  testMatches: Match[],
   practiceMatches: Match[],
   qualificationMatches: Match[],
   finalsMatches: Match[],

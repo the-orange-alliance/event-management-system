@@ -22,6 +22,9 @@ export type ALTER_TEAM = typeof ALTER_TEAM;
 export const REMOVE_TEAM = "REMOVE_TEAM";
 export type REMOVE_TEAM = typeof REMOVE_TEAM;
 
+export const SET_TEST_MATCHES = "SET_TEST_MATCHES";
+export type SET_TEST_MATCHES = typeof SET_TEST_MATCHES;
+
 export const SET_PRACTICE_MATCHES = "SET_PRACTICE_MATCHES";
 export type SET_PRACTICE_MATCHES = typeof SET_PRACTICE_MATCHES;
 

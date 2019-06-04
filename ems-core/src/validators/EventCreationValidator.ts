@@ -27,7 +27,7 @@ class EventCreationValidator {
   }
 
   public isValidEventType(): boolean {
-    const type = this._event.eventType;
+    const type = this._event.eventTypeKey;
     return typeof type !== "undefined" && this.isSafe(type.toString()) && type.length > 0;
   }
 

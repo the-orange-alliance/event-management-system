@@ -32,7 +32,7 @@ class AppContainer extends React.Component<IProps, IState> {
 
   public render() {
     const {activeItem} = this.state;
-    const limitedMode = this.props.completedStep < 3;
+    const limitedMode = this.props.completedStep < 1;
     return (
       <div>
         <Menu inverted={true} widths={7} color={getTheme().primary}>

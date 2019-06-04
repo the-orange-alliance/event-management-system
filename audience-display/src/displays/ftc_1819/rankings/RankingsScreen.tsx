@@ -1,10 +1,10 @@
 import * as React from 'react';
 import './RankingsScreen.css';
-import {Event, EMSProvider, Team, RoverRuckusRank} from "@the-orange-alliance/lib-ems";
-import {AxiosResponse} from "axios";
+import {Event, EMSProvider, RoverRuckusRank} from "@the-orange-alliance/lib-ems";
 import * as ReactScroll from "react-scroll";
 import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
 import RR_LOGO from "../res/rr_logo_transparent.png";
+import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
 
 interface IProps {
   event: Event
@@ -28,15 +28,9 @@ class RankingsScreen extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((response: AxiosResponse) => {
-      if (response.data && response.data.payload && response.data.payload.length > 0) {
-        const rankings: RoverRuckusRank[] = [];
-        for (const rankJSON of response.data.payload) {
-          const ranking: RoverRuckusRank = new RoverRuckusRank().fromJSON(rankJSON);
-          ranking.team = new Team().fromJSON(rankJSON);
-          rankings.push(ranking);
-        }
-        this.setState({rankings: rankings, loading: false});
+    EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+      if (rankings.length > 0) {
+        this.setState({rankings: rankings as RoverRuckusRank[], loading: false});
         this.loop();
       } else {
         this.setState({loading: false});
@@ -114,15 +108,9 @@ class RankingsScreen extends React.Component<IProps, IState> {
       this.scrollBottomThenTop().then(() => {
         this._timerID = global.setInterval(() => {
           this.scrollBottomThenTop().then(() => {
-            EMSProvider.getRankingTeams().then((response: AxiosResponse) => {
-              if (response.data && response.data.payload && response.data.payload.length > 0) {
-                const rankings: RoverRuckusRank[] = [];
-                for (const rankJSON of response.data.payload) {
-                  const ranking: RoverRuckusRank = new RoverRuckusRank().fromJSON(rankJSON);
-                  ranking.team = new Team().fromJSON(rankJSON);
-                  rankings.push(ranking);
-                }
-                this.setState({rankings: rankings});
+            EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+              if (rankings.length > 0) {
+                this.setState({rankings: rankings as RoverRuckusRank[]});
               }
             }).catch((error: any) => {
               console.error(error);

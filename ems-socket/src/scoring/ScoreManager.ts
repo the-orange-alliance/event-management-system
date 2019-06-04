@@ -18,20 +18,6 @@ class ScoreManager {
     this._matchMetadata = new Match();
   }
 
-  public reset(matchKey: string) {
-    this._match = new Match();
-    this._match.matchKey = matchKey;
-    this._match.matchDetailKey = matchKey + "D";
-    this._matchMetadata = this.getMetadataFromMatchKey(matchKey);
-  }
-
-  public createDetails() {
-    const seasonKey: number = parseInt(this._match.matchKey.split("-")[0],  10);
-    this._match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
-    this._match.matchDetails.matchKey = this._match.matchKey;
-    this._match.matchDetails.matchDetailKey = this._match.matchKey + "D";
-  }
-
   public updateMatch(matchJSON: any) {
     const seasonKey: number = parseInt(this._match.matchKey.split("-")[0],  10);
     this._match = new Match().fromJSON(matchJSON);
@@ -45,6 +31,15 @@ class ScoreManager {
 
   public updateMatchMetaData(dataJSON: any) {
     this._matchMetadata = this.getMetadataFromMatchKey(this._match.matchKey).fromJSON(dataJSON);
+  }
+
+  public getJSON(): any {
+    const matchJSON: any = this.match.toJSON();
+    const detailsJSON: any = this.match.matchDetails.toJSON();
+    const participantsJSON: any = this.match.participants.map((p: MatchParticipant) => p.toJSON());
+    matchJSON.details = detailsJSON;
+    matchJSON.participants = participantsJSON;
+    return matchJSON;
   }
 
   private getMetadataFromMatchKey(matchKey: string): IPostableObject {
@@ -63,6 +58,7 @@ class ScoreManager {
 
   set match(value: Match) {
     this._match = value;
+    // this._matchMetadata = this.getMetadataFromMatchKey(value.matchKey);
   }
 
   get matchMetadata(): IPostableObject {

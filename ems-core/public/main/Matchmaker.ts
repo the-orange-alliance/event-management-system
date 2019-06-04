@@ -18,13 +18,12 @@ interface IMatchMakerOptions {
   type: TournamentType
 }
 
-
 let matchMakerPath = "";
 
 if (os.type() === "Windows_NT") {
-  matchMakerPath = path.join(__dirname, "../match-maker/windows/MatchMaker.exe");
+  matchMakerPath = path.join(__dirname, "../../match-maker/windows/MatchMaker.exe");
 } else {
-  matchMakerPath = path.join(__dirname, "../match-maker/macOS/MatchMaker");
+  matchMakerPath = path.join(__dirname, "../../match-maker/macOS/MatchMaker");
 }
 
 ipcMain.on("match-maker-teams", (event: IpcMessageEvent, scheduleType: TournamentType, teams: number[]) => {

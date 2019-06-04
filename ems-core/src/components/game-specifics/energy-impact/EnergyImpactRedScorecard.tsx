@@ -1,12 +1,12 @@
 import * as React from "react";
 import {Card, Form, Grid, InputProps} from "semantic-ui-react";
-import {ApplicationActions, IApplicationState} from "../../stores";
+import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import EnergyImpactTeamStatus from "./EnergyImpactTeamStatus";
 import {SyntheticEvent} from "react";
-import {ISetActiveDetails, ISetActiveMatch} from "../../stores/scoring/types";
+import {ISetActiveDetails, ISetActiveMatch} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
-import {setActiveDetails, setActiveMatch} from "../../stores/scoring/actions";
+import {setActiveDetails, setActiveMatch} from "../../../stores/scoring/actions";
 import {EnergyImpactMatchDetails, Match, MatchDetails, MatchParticipant, MatchState} from "@the-orange-alliance/lib-ems";
 
 interface IProps {

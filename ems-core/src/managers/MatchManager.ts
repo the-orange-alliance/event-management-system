@@ -54,9 +54,9 @@ class MatchManager {
     });
   }
 
-  public prestart(match: Match): Promise<any> {
+  public prestart(match: Match, uploadTeams?: boolean): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      this.makeActiveMatch(match).then(() => {
+      this.makeActiveMatch(match, uploadTeams).then(() => {
         const seasonKey: string = match.matchKey.split("-")[0];
         // Reset all of the scoring variables to show a new match is about to start...
         // TODO - Maybe store this match, and if prestart is canceled, restore that match.
@@ -376,8 +376,18 @@ class MatchManager {
     });
   }
 
-  private makeActiveMatch(match: Match): Promise<any> {
-    return EMSProvider.putActiveMatch(match);
+  private makeActiveMatch(match: Match, uploadTeams?: boolean): Promise<any> {
+    if (uploadTeams) {
+      return new Promise<any>((resolve, reject) => {
+        EMSProvider.putActiveMatch(match).then(() => {
+          EMSProvider.putMatchParticipants(match.participants).then(() => {
+            resolve();
+          }).catch((pError: HttpError) => reject(pError));
+        }).catch((error: HttpError) => reject(error));
+      });
+    } else {
+      return EMSProvider.putActiveMatch(match);
+    }
   }
 
   private postMatchResults(match: Match): Promise<any> {

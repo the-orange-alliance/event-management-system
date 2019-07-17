@@ -65,7 +65,7 @@ ipcMain.on("match-maker", (event: IpcMessageEvent, config: IMatchMakerOptions) =
              participants.push({
                card_status: 0,
                match_key: matchKey,
-               match_participant_key: matchKey + "-T" + parseInt(fields[(j * 2) + 1], 10),
+               match_participant_key: matchKey + "-T" + (j + 1),
                station: 11 + j,
                surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
                team_key: parseInt(fields[(j * 2) + 1], 10)
@@ -74,7 +74,7 @@ ipcMain.on("match-maker", (event: IpcMessageEvent, config: IMatchMakerOptions) =
              participants.push({
                card_status: 0,
                match_key: matchKey,
-               match_participant_key: matchKey + "-T" + parseInt(fields[(j * 2) + 1], 10),
+               match_participant_key: matchKey + "-T" + (j + 1),
                station: 21 + j - config.teamsPerAlliance,
                surrogate: parseInt(fields[(j * 2) + 2].replace("\r", ""), 10),
                team_key: parseInt(fields[(j * 2) + 1], 10)

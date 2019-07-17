@@ -99,6 +99,17 @@ body {
     font-size: 24px;
 }
 
+.match-play-team {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0.5vh !important;
+  margin-bottom: 0.5vh !important;
+}
+
+.match-play-team > .column > .field {
+  min-width: 66%;
+}
+
 @media only screen and (max-width: 991px) and (min-width: 768px) {
   .ui.container {
     width: 95%;

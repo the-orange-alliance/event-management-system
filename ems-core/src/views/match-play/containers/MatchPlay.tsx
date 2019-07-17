@@ -23,6 +23,7 @@ import {Event, EventConfiguration, HttpError, Match, MatchDetails, MatchConfigur
   MatchState, MatchTimer, PlayoffsType, SocketProvider, TOAConfig, TournamentType
 } from "@the-orange-alliance/lib-ems";
 import InternalStateManager from "../../../managers/InternalStateManager";
+import ConfirmActionModal from "../../../components/ConfirmActionModal";
 
 interface IProps {
   mode: string,
@@ -55,7 +56,8 @@ interface IState {
   selectedLevel: TournamentType
   configModalOpen: boolean,
   activeMatch: Match,
-  committingScores: boolean
+  committingScores: boolean,
+  differentTeamModalOpen: boolean
 }
 
 class MatchPlay extends React.Component<IProps, IState> {
@@ -65,18 +67,23 @@ class MatchPlay extends React.Component<IProps, IState> {
       selectedLevel: "Practice",
       configModalOpen: false,
       activeMatch: this.props.activeMatch,
-      committingScores: false
+      committingScores: false,
+      differentTeamModalOpen: false
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
     this.changeSelectedField = this.changeSelectedField.bind(this);
 
+    this.beginPrestart = this.beginPrestart.bind(this);
     this.cancelPrestart = this.cancelPrestart.bind(this);
     this.prestart = this.prestart.bind(this);
     this.setAudienceDisplay = this.setAudienceDisplay.bind(this);
     this.startMatch = this.startMatch.bind(this);
     this.abortMatch = this.abortMatch.bind(this);
     this.commitScores = this.commitScores.bind(this);
+
+    this.openDifferentTeamModal = this.openDifferentTeamModal.bind(this);
+    this.closeDifferentTeamModal = this.closeDifferentTeamModal.bind(this);
   }
 
   public componentDidMount() {
@@ -95,7 +102,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {selectedLevel, committingScores} = this.state;
+    const {selectedLevel, committingScores, differentTeamModalOpen} = this.state;
     const {eventConfig, matchState, connected, matchDuration, mode} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
@@ -131,6 +138,7 @@ class MatchPlay extends React.Component<IProps, IState> {
 
     return (
       <Tab.Pane className="tab-subview">
+        <ConfirmActionModal open={differentTeamModalOpen} onClose={this.closeDifferentTeamModal} onConfirm={this.prestart.bind(this, true)} innerText={"You are about to prestart a match with a different team selected. Are you sure you want to do this?"}/>
         <Grid columns="equal">
           <Grid.Row>
             <Grid.Column textAlign="left"><b>Match Status: </b>{matchState}</Grid.Column>
@@ -147,7 +155,7 @@ class MatchPlay extends React.Component<IProps, IState> {
             }
             {
               !hasPrestarted &&
-              <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[0] || !canPrestart} color="orange" onClick={this.prestart}>Prestart</Button></Grid.Column>
+              <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[0] || !canPrestart} color="orange" onClick={this.beginPrestart}>Prestart</Button></Grid.Column>
             }
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[1]} color="blue" onClick={this.setAudienceDisplay}>Set Audience Display</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[2]} color="purple" onClick={this.startMatch}>Start Match</Button></Grid.Column>
@@ -185,15 +193,38 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setMatchState(MatchState.PRESTART_READY);
   }
 
-  private prestart() { // TODO - Emit field number that match is also prestarting on
+  private beginPrestart() {
+    const participantKeys: number[] = this.props.activeMatch.participants.map((p: MatchParticipant) => p.teamKey);
+    const activeParticipantKeys: number[] = this.props.activeParticipants.map((p: MatchParticipant) => p.teamKey);
+    let changedParticipants: boolean = false;
+    for (const p of participantKeys) {
+      if (activeParticipantKeys.indexOf(p) === -1) {
+        // Participants were changed and we need to address this.
+        changedParticipants = true;
+      }
+    }
+    if (changedParticipants) {
+      this.openDifferentTeamModal();
+    } else {
+      this.prestart();
+    }
+  }
+
+  private prestart(differentTeams?: boolean) {
+    if (this.state.differentTeamModalOpen) {
+      this.closeDifferentTeamModal();
+    }
+
     this.props.setNavigationDisabled(true);
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
+    this.props.activeMatch.participants = this.props.activeParticipants;
     console.log("Prestarting match " + this.props.activeMatch.matchKey + "...");
-    MatchManager.prestart(this.props.activeMatch).then(() => {
+    MatchManager.prestart(this.props.activeMatch, differentTeams).then(() => {
       this.props.setActiveDetails(this.props.activeMatch.matchDetails);
       this.props.setMatchState(MatchState.PRESTART_COMPLETE);
     }).catch((error: HttpError) => {
+      this.cancelPrestart();
       this.props.setMatchState(MatchState.PRESTART_READY);
       DialogManager.showErrorBox(error);
     });
@@ -344,9 +375,10 @@ class MatchPlay extends React.Component<IProps, IState> {
   private changeSelectedLevel(event: SyntheticEvent, props: DropdownProps) {
     const matches = this.getMatchesByTournamentLevel((props.value as TournamentType));
     if (matches.length > 0) {
-      this.props.setActiveMatch(matches[0]);
       this.setState({
         selectedLevel: (props.value as TournamentType),
+      }, () => {
+        this.changeSelectedMatch(null, {value: matches[0].matchKey});
       });
     } else {
       this.setState({
@@ -363,7 +395,8 @@ class MatchPlay extends React.Component<IProps, IState> {
         // Temporarily set the match to what we have now, and then get ALL the details.
         MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
           this.props.setActiveMatch(data);
-          this.props.setActiveParticipants(data.participants);
+          // De-referencing from the current match.
+          this.props.setActiveParticipants(data.participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON())));
           this.props.setActiveDetails(data.matchDetails);
           this.setState({activeMatch: data});
         });
@@ -375,6 +408,14 @@ class MatchPlay extends React.Component<IProps, IState> {
   private changeSelectedField(event: SyntheticEvent, props: DropdownProps) {
     this.props.activeMatch.fieldNumber = props.value as number;
     this.forceUpdate();
+  }
+
+  private openDifferentTeamModal() {
+    this.setState({differentTeamModalOpen: true});
+  }
+
+  private closeDifferentTeamModal() {
+    this.setState({differentTeamModalOpen: false});
   }
 }
 

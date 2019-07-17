@@ -48,15 +48,7 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   public componentDidMount() {
     this.props.schedule.teamsPerAlliance = this.props.eventConfig.teamsPerAlliance;
-    // this.props.schedule.teamsParticipating = this.props.teamList.length;
     this.forceUpdate();
-  }
-
-  public componentDidUpdate(prevProps: IProps) {
-    // if (prevProps.teamList.length !== this.props.teamList.length) {
-    //   this.props.schedule.teamsParticipating = this.props.teamList.length;
-    //   this.forceUpdate();
-    // }
   }
 
   public render() {

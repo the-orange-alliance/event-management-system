@@ -7,7 +7,6 @@ import MainView from "./views/MainView";
 import RedView from "./views/RedView";
 import BlueView from "./views/BlueView";
 import HeadRefereeView from "./views/HeadRefereeView";
-import {AxiosResponse} from "axios";
 import {EMSProvider, Event, Match, MatchParticipant, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -59,29 +58,17 @@ class App extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    SocketProvider.on("prestart", (matchKey: string, fieldNumber: number) => {
-      EMSProvider.getMatch(matchKey).then((matchRes: AxiosResponse) => {
-        if (matchRes.data) {
-          const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-          EMSProvider.getMatchTeams(matchKey).then((partRes: AxiosResponse) => {
-            match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
-            this.setState({match});
-          });
-        }
-      });
-    });
-    EMSProvider.getEvent().then((response: AxiosResponse) => {
-      if (response.data.payload && response.data.payload.length > 0) {
-        this.setState({event: new Event().fromJSON(response.data.payload[0])});
-      }
-    });
-    EMSProvider.getActiveMatch(1).then((matchRes: AxiosResponse) => {
-      if (matchRes.data && matchRes.data.payload && matchRes.data.payload.length > 0) {
-        const match: Match = new Match().fromJSON(matchRes.data.payload[0]);
-        EMSProvider.getMatchTeams(match.matchKey).then((partRes: AxiosResponse) => {
-          match.participants = partRes.data.payload.map((participant: any) => new MatchParticipant().fromJSON(participant));
+    SocketProvider.on("prestart", (matchKey: string) => {
+      EMSProvider.getMatch(matchKey).then((match: Match) => {
+        EMSProvider.getMatchTeams(matchKey).then((participants: MatchParticipant[]) => {
+          match.participants = participants;
           this.setState({match});
         });
+      });
+    });
+    EMSProvider.getEvent().then((events: Event[]) => {
+      if (events.length > 0) {
+        this.setState({event: events[0]});
       }
     });
   }

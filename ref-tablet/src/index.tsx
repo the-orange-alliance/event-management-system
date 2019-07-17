@@ -9,6 +9,7 @@ import {HashRouter} from "react-router-dom";
 ReactDOM.render(
   <CookiesProvider>
     <HashRouter>
+      // tslint:disable-next-line
       <App />
     </HashRouter>
   </CookiesProvider>,

@@ -13,7 +13,7 @@ import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
 import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
 
 interface IProps {
-  cookies?: Cookies
+  cookies: Cookies
 }
 
 interface IState {

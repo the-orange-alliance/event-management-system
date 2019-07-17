@@ -470,7 +470,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.sendUpdatedScore();
   }
 
-  private updateRobotOneCard(cardStatus: number) {
+  private updateRobotOneCard(participant: MatchParticipant, cardStatus: number) {
     this.props.match.participants[0].cardStatus = cardStatus;
     if (this.state.activeMatch.participants.length <= 0) {
       if (this.props.match.participants.length > 0) {
@@ -484,7 +484,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.sendUpdatedScore();
   }
 
-  private updateRobotTwoCard(cardStatus: number) {
+  private updateRobotTwoCard(participant: MatchParticipant, cardStatus: number) {
     this.props.match.participants[1].cardStatus = cardStatus;
     if (this.state.activeMatch.participants.length <= 0) {
       if (this.props.match.participants.length > 0) {

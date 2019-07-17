@@ -7,7 +7,10 @@ import MainView from "./views/MainView";
 import RedView from "./views/RedView";
 import BlueView from "./views/BlueView";
 import HeadRefereeView from "./views/HeadRefereeView";
-import {EMSProvider, Event, Match, MatchParticipant, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
+import MatchParticipant from "@the-orange-alliance/lib-ems/dist/models/ems/MatchParticipant";
+import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
+import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
 
 interface IProps {
   cookies: Cookies
@@ -27,18 +30,17 @@ class App extends React.Component<IProps, IState> {
       match: new Match(),
       connected: false
     };
-
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      EMSProvider.initialize("192.168.0.124");
-      SocketProvider.initialize("192.168.0.124");
+      EMSProvider.initialize("192.168.1.103");
+      SocketProvider.initialize("192.168.1.103");
     }
 
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
-      SocketProvider.emit("identify","ref-tablet", "event", "scoring", "referee");
+      SocketProvider.emit("identify","ref-tablet", ["event", "scoring", "referee"]);
       this.setState({connected: true});
     });
     SocketProvider.on("disconnect", () => {
@@ -49,21 +51,18 @@ class App extends React.Component<IProps, IState> {
       console.log("Entered slave mode with master address " + masterHost);
       EMSProvider.initialize(masterHost);
     });
-
-    this.renderLoginView = this.renderLoginView.bind(this);
-    this.renderRedView = this.renderRedView.bind(this);
-    this.renderBlueView = this.renderBlueView.bind(this);
-    this.renderHeadRefereeView = this.renderHeadRefereeView.bind(this);
-    this.renderMainView = this.renderMainView.bind(this);
-  }
-
-  public componentDidMount() {
-    SocketProvider.on("prestart", (matchKey: string) => {
-      EMSProvider.getMatch(matchKey).then((match: Match) => {
-        EMSProvider.getMatchTeams(matchKey).then((participants: MatchParticipant[]) => {
+    SocketProvider.on("prestart-response", (err: any, matchJSON: any) => {
+      const match: Match = new Match().fromJSON(matchJSON);
+      const seasonKey: string = match.matchKey.split("-")[0];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+      }
+      this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
+        if (participants.length > 0) {
           match.participants = participants;
-          this.setState({match});
-        });
+        }
+        this.setState({match: match});
       });
     });
     EMSProvider.getEvent().then((events: Event[]) => {
@@ -71,6 +70,12 @@ class App extends React.Component<IProps, IState> {
         this.setState({event: events[0]});
       }
     });
+
+    this.renderLoginView = this.renderLoginView.bind(this);
+    this.renderRedView = this.renderRedView.bind(this);
+    this.renderBlueView = this.renderBlueView.bind(this);
+    this.renderHeadRefereeView = this.renderHeadRefereeView.bind(this);
+    this.renderMainView = this.renderMainView.bind(this);
   }
 
   public render() {
@@ -156,6 +161,37 @@ class App extends React.Component<IProps, IState> {
       onHeadRefereeLogin={navigateToHeadRef}
       event={this.state.event}
     />;
+  }
+
+  private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {
+    return new Promise<MatchParticipant[]>((resolve, reject) => {
+      let participants: MatchParticipant[] = [];
+      EMSProvider.getMatchTeams(match.matchKey).then((matchTeams: MatchParticipant[]) => {
+        if (matchTeams.length > 0) {
+          participants = matchTeams;
+        } else if (typeof match.participants !== "undefined") {
+          participants = match.participants;
+        }
+        participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+        for (let i = 0; i < participants.length; i++) {
+          const participant: MatchParticipant = participants[i];
+          if (typeof participant.team === "undefined") {
+            const team: Team = new Team();
+            team.teamKey = i;
+            team.teamNameShort = "Test Team #" + (i + 1);
+            team.country = "TST";
+            team.countryCode = "us";
+            participant.team = team;
+          }
+          if (typeof participant.teamRank === "undefined") {
+            const ranking: Ranking = new Ranking();
+            ranking.rank = 0;
+            participant.teamRank = ranking;
+          }
+        }
+        resolve(participants);
+      });
+    });
   }
 }
 

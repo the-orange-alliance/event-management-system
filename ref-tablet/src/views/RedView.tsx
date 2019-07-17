@@ -1,5 +1,6 @@
 import * as React from 'react';
-import RedAllianceView from "./ftc_1819/RedAllianceView";
+import RoverRuckusRedView from "./ftc_1819/RedAllianceView";
+import OceanOpportunitiesRedView from "./fgc_2019/RedAllianceView";
 import {Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -23,7 +24,6 @@ class RedView extends React.Component<IProps, IState> {
   public componentDidMount() {
     SocketProvider.emit("get-mode");
     SocketProvider.on("mode-update", (mode: string) => {
-      console.log(mode);
       this.setState({mode});
     });
     SocketProvider.on("match-start", () => {
@@ -38,14 +38,14 @@ class RedView extends React.Component<IProps, IState> {
     SocketProvider.on("match-end", () => {
       this.setState({mode: "MATCH END"});
     });
-    SocketProvider.on("match-aborg", () => {
+    SocketProvider.on("match-abort", () => {
       this.setState({mode: "MATCH ABORTED"});
     });
   }
 
   public componentWillUnmount() {
     SocketProvider.off("mode-update");
-    SocketProvider.off("match-auto");
+    SocketProvider.off("match-start");
     SocketProvider.off("match-tele");
     SocketProvider.off("match-endgame");
     SocketProvider.off("match-end");
@@ -59,7 +59,10 @@ class RedView extends React.Component<IProps, IState> {
 
     switch (event.season.seasonKey) {
       case 1819:
-        display = <RedAllianceView event={event} match={match} mode={mode} connected={connected}/>;
+        display = <RoverRuckusRedView event={event} match={match} mode={mode} connected={connected}/>;
+        break;
+      case 2019:
+        display = <OceanOpportunitiesRedView event={event} match={match} mode={mode} connected={connected}/>;
         break;
       default:
         display = <span>No ref tablet application has been made for {event.season.seasonKey}</span>;

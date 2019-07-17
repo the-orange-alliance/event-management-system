@@ -1,5 +1,6 @@
 import * as React from 'react';
-import BlueAllianceView from "./ftc_1819/BlueAllianceView";
+import RoverRuckusBlueView from "./ftc_1819/BlueAllianceView";
+import OceanOpportunitiesBlueView from "./fgc_2019/BlueAllianceView";
 import {Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -45,7 +46,7 @@ class BlueView extends React.Component<IProps, IState> {
 
   public componentWillUnmount() {
     SocketProvider.off("mode-update");
-    SocketProvider.off("match-auto");
+    SocketProvider.off("match-start");
     SocketProvider.off("match-tele");
     SocketProvider.off("match-endgame");
     SocketProvider.off("match-end");
@@ -59,7 +60,10 @@ class BlueView extends React.Component<IProps, IState> {
 
     switch (event.season.seasonKey) {
       case 1819:
-        display = <BlueAllianceView event={event} match={match} mode={mode} connected={connected}/>;
+        display = <RoverRuckusBlueView event={event} match={match} mode={mode} connected={connected}/>;
+        break;
+      case 2019:
+        display = <OceanOpportunitiesBlueView event={event} match={match} mode={mode} connected={connected}/>;
         break;
       default:
         display = <span>No ref tablet application has been made for {event.season.seasonKey}</span>;

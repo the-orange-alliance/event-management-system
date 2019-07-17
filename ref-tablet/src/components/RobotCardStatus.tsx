@@ -3,7 +3,7 @@ import {MatchParticipant} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   participant: MatchParticipant,
-  onUpdate?: (status: number) => void
+  onUpdate?: (participant: MatchParticipant, status: number) => void
 }
 
 class RobotCardStatus extends React.Component<IProps> {
@@ -14,10 +14,11 @@ class RobotCardStatus extends React.Component<IProps> {
   public render() {
     const {participant} = this.props;
     const selected: number = participant.cardStatus || 0;
+    /* TODO - Load identifier from EMS-CORE */
     return (
       <div className="robot-card-container">
         <div className="robot-card-team">
-          Team {participant.teamKey}
+          {participant.team.teamNameShort}
         </div>
         <div className="robot-card-cards">
           <div className={"robot-card-none " + (selected === 0 ? "selected" : "")} onClick={this.updateSelected.bind(this, 0)}>None</div>
@@ -30,7 +31,7 @@ class RobotCardStatus extends React.Component<IProps> {
 
   private updateSelected(index: number) {
     if (typeof this.props.onUpdate !== "undefined") {
-      this.props.onUpdate(index);
+      this.props.onUpdate(this.props.participant, index);
     }
   }
 }

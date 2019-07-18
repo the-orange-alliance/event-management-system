@@ -128,28 +128,31 @@ class App extends React.Component<IProps, IState> {
 
   private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {
     return new Promise<MatchParticipant[]>((resolve, reject) => {
-      let participants: MatchParticipant[] = [];
       EMSProvider.getMatchTeams(match.matchKey).then((matchTeams: MatchParticipant[]) => {
-        if (matchTeams.length > 0) {
-          participants = matchTeams;
-        } else if (typeof match.participants !== "undefined") {
-          participants = match.participants;
-        }
-        participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
-        for (let i = 0; i < participants.length; i++) {
-          const participant: MatchParticipant = participants[i];
-          if (typeof participant.team === "undefined") {
-            const team: Team = new Team();
-            team.teamKey = i;
-            team.teamNameShort = "Test Team #" + (i + 1);
-            team.country = "TST";
-            team.countryCode = "us";
-            participant.team = team;
-          }
-          if (typeof participant.teamRank === "undefined") {
-            const ranking: Ranking = new Ranking();
-            ranking.rank = 0;
-            participant.teamRank = ranking;
+        const participants: MatchParticipant[] = [];
+        const matchTeamKeys = matchTeams.map((p: MatchParticipant) => p.teamKey);
+        match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+        for (let i = 0; i < match.participants.length; i++) {
+          let participant: MatchParticipant = match.participants[i];
+          if (matchTeamKeys.includes(participant.teamKey)) {
+            const index = matchTeamKeys.indexOf(participant.teamKey);
+            participant = matchTeams[index];
+            participants.push(participant);
+          } else {
+            if (typeof participant.team === "undefined") {
+              const team: Team = new Team();
+              team.teamKey = i;
+              team.teamNameShort = "Test Team #" + (i + 1);
+              team.country = "TST";
+              team.countryCode = "us";
+              participant.team = team;
+            }
+            if (typeof participant.teamRank === "undefined") {
+              const ranking: Ranking = new Ranking();
+              ranking.rank = 0;
+              participant.teamRank = ranking;
+            }
+            participants.push(participant);
           }
         }
         resolve(participants);

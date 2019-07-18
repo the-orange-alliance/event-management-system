@@ -197,8 +197,8 @@ class MatchPlay extends React.Component<IProps, IState> {
     const participantKeys: number[] = this.props.activeMatch.participants.map((p: MatchParticipant) => p.teamKey);
     const activeParticipantKeys: number[] = this.props.activeParticipants.map((p: MatchParticipant) => p.teamKey);
     let changedParticipants: boolean = false;
-    for (const p of participantKeys) {
-      if (activeParticipantKeys.indexOf(p) === -1) {
+    for (let i = 0; i < participantKeys.length; i++) {
+      if (!(participantKeys[i] === activeParticipantKeys[i])) {
         // Participants were changed and we need to address this.
         changedParticipants = true;
       }
@@ -218,7 +218,8 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(true);
     this.props.setMatchState(MatchState.PRESTART_IN_PROGRESS);
     this.props.activeMatch.active = 1; // TODO - Change activeID... if this even ends up mattering...
-    this.props.activeMatch.participants = this.props.activeParticipants;
+    // This dereferences the participants, so we may perform the above checks again safely.
+    this.props.activeMatch.participants = this.props.activeParticipants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON()));
     console.log("Prestarting match " + this.props.activeMatch.matchKey + "...");
     MatchManager.prestart(this.props.activeMatch, differentTeams).then(() => {
       this.props.setActiveDetails(this.props.activeMatch.matchDetails);
@@ -394,9 +395,23 @@ class MatchPlay extends React.Component<IProps, IState> {
         this.setState({activeMatch: match});
         // Temporarily set the match to what we have now, and then get ALL the details.
         MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
+          const participants: MatchParticipant[] = [];
+          for (let i = 0; i < match.participants.length; i++) {
+            const participant: MatchParticipant = match.participants[i];
+            if (typeof data.participants[i] !== "undefined") {
+              if (participant.teamKey !== data.participants[i].teamKey) {
+                participants.push(data.participants[i]);
+              } else {
+                participants.push(participant);
+              }
+            } else {
+              participants.push(participant);
+            }
+          }
+          data.participants = participants;
+
           this.props.setActiveMatch(data);
-          // De-referencing from the current match.
-          this.props.setActiveParticipants(data.participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON())));
+          this.props.setActiveParticipants(participants);
           this.props.setActiveDetails(data.matchDetails);
           this.setState({activeMatch: data});
         });

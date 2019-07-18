@@ -101,7 +101,15 @@ class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
   }
 
   private getTeamOptions() {
-    return this.props.teams.map((t: Team) => {
+    const testTeam: Team = new Team();
+    testTeam.teamKey = -1;
+    testTeam.countryCode = "us";
+    testTeam.country = "USA";
+    testTeam.teamNameShort = "Test Team";
+
+    const teamsCopy: Team[] = [testTeam, ...this.props.teams];
+
+    return teamsCopy.map((t: Team) => {
       const displayName: any = t.getFromIdentifier(this.props.eventConfig.teamIdentifier);
       return {
         key: t.teamKey,

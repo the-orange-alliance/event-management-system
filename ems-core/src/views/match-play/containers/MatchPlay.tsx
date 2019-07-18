@@ -408,7 +408,7 @@ class MatchPlay extends React.Component<IProps, IState> {
               participants.push(participant);
             }
           }
-          data.participants = participants;
+          data.participants = participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON()));
 
           this.props.setActiveMatch(data);
           this.props.setActiveParticipants(participants);

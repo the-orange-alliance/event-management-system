@@ -74,7 +74,7 @@ export default class ScoringRoom implements IRoom {
     // In case tablet or audience display disconnects after prestart, but before match play.
     if (!this._timer.inProgress() && this._hasPrestarted) {
       logger.info("Detected that client disconnected after prestart. Sending match info for " + ScoreManager.match.matchKey + ".");
-      client.emit("prestart-response", null, ScoreManager.getJSON());
+      client.emit("prestart-response", null, ScoreManager.getJSON(), 2);
     }
 
     client.on("get-mode", () => {

@@ -36,6 +36,7 @@ class App extends React.Component<IProps, IState> {
       videoID: 0,
       activeMatch: new Match(),
     };
+
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
@@ -67,7 +68,8 @@ class App extends React.Component<IProps, IState> {
         SocketProvider.emit("test-audience-success");
       });
     });
-    SocketProvider.on("prestart-response", (err: any, matchJSON: any) => {
+    SocketProvider.on("prestart-response", (err: any, matchJSON: any, videoID?: number) => {
+      const displayID: number = videoID ? videoID : 1;
       const match: Match = new Match().fromJSON(matchJSON);
       const seasonKey: string = match.matchKey.split("-")[0];
       match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
@@ -78,7 +80,7 @@ class App extends React.Component<IProps, IState> {
         if (participants.length > 0) {
           match.participants = participants;
         }
-        this.setState({activeMatch: match, videoID: 1});
+        this.setState({activeMatch: match, videoID: displayID});
       });
     });
     SocketProvider.on("commit-scores", (matchKey: string) => {

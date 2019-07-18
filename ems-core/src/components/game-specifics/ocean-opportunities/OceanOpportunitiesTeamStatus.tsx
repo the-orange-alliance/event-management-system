@@ -17,7 +17,7 @@ interface IProps {
   matchParticipants?: MatchParticipant[]
   matchState?: MatchState,
   teams?: Team[],
-  updateParticipantStatus?: (index: number, status: number) => IUpdateParticipantStatus
+  updateParticipantStatus?: (participant: MatchParticipant, status: number) => IUpdateParticipantStatus
 }
 
 class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
@@ -32,11 +32,11 @@ class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
     const canChangeTeam = this.props.matchState === MatchState.PRESTART_READY;
     const disabled = this.props.matchState === MatchState.MATCH_IN_PROGRESS;
     const participants = matchParticipants.filter((p: MatchParticipant) => alliance === "Red" ? (p.station < 20) : (p.station >= 20));
-    const teamsView = participants.map((p: MatchParticipant, index: number) => {
+    const teamsView = participants.map((p: MatchParticipant) => {
       return (
         <Grid.Row key={p.matchParticipantKey} className="match-play-team">
           <Grid.Column largeScreen={8} widescreen={10} className="center-left-items"><Form.Dropdown disabled={!canChangeTeam || disabled} fluid={true} search={true} selection={true} value={p.teamKey} options={this.getTeamOptions()} onChange={this.updateParticipant.bind(this, p)}/></Grid.Column>
-          <Grid.Column largeScreen={8} widescreen={6}><Button onClick={this.changeCardStatus.bind(this, index)} disabled={disabled} color={this.getButtonColor(p.cardStatus)} fluid={true}>{this.getButtonText(p.cardStatus)}</Button></Grid.Column>
+          <Grid.Column largeScreen={8} widescreen={6}><Button onClick={this.changeCardStatus.bind(this, p)} disabled={disabled} color={this.getButtonColor(p.cardStatus)} fluid={true}>{this.getButtonText(p.cardStatus)}</Button></Grid.Column>
         </Grid.Row>
       );
     });
@@ -54,22 +54,20 @@ class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
     this.forceUpdate();
   }
 
-  private changeCardStatus(index: number) {
+  private changeCardStatus(participant: MatchParticipant) {
     if (this.props.matchParticipants !== null && typeof this.props.matchParticipants !== "undefined" && this.props.matchParticipants.length > 0) {
-      index = this.props.alliance === "Red" ? index : index + (this.props.matchParticipants.length / 2);
-      const participant: MatchParticipant = this.props.matchParticipants[index];
       switch (participant.cardStatus) {
         case 0:
-          this.props.updateParticipantStatus(index, 1);
+          this.props.updateParticipantStatus(participant, 1);
           break;
         case 1:
-          this.props.updateParticipantStatus(index, 2);
+          this.props.updateParticipantStatus(participant, 2);
           break;
         case 2:
-          this.props.updateParticipantStatus(index, 0);
+          this.props.updateParticipantStatus(participant, 0);
           break;
         default:
-          this.props.updateParticipantStatus(index, 0);
+          this.props.updateParticipantStatus(participant, 0);
       }
     }
   }
@@ -132,7 +130,7 @@ function mapStateToProps({configState, internalState, scoringState}: IApplicatio
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    updateParticipantStatus: (index: number, status: number) => dispatch(updateParticipantStatus(index, status))
+    updateParticipantStatus: (participant: MatchParticipant, status: number) => dispatch(updateParticipantStatus(participant, status))
   };
 }
 

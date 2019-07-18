@@ -9,7 +9,7 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
-import {EMSProvider, FTC_CONFIG} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, FGC_CONFIG, FTC_CONFIG} from "@the-orange-alliance/lib-ems";
 import HttpError from "@the-orange-alliance/lib-ems/dist/models/ems/HttpError";
 
 /* Load our environment variables. The .env file is not included in the repository.
@@ -34,7 +34,7 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 app.use(cors());
 
 const timer = new MatchTimer();
-timer.matchConfig = FTC_CONFIG;
+timer.matchConfig = FGC_CONFIG;
 const clients: Map<string, string[]> = new Map<string, string[]>();
 const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);

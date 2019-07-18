@@ -49,10 +49,10 @@ export const setMatchDuration: ActionCreator<ISetMatchDuration> = (duration: mom
   }
 });
 
-export const updateParticipantStatus: ActionCreator<IUpdateParticipantStatus> = (index: number, status: number) => ({
+export const updateParticipantStatus: ActionCreator<IUpdateParticipantStatus> = (participant: MatchParticipant, status: number) => ({
   type: UPDATE_PARTICIPANT_STATUS,
   payload: {
-    index: index,
+    participant: participant,
     status: status
   }
 });

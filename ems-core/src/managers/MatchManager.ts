@@ -84,6 +84,10 @@ class MatchManager {
     });
   }
 
+  public cancelPrestart(): void {
+    SocketProvider.emit("prestart-cancel");
+  }
+
   public setAudienceDisplay(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       SocketProvider.send("request-video", 2);
@@ -111,6 +115,13 @@ class MatchManager {
         if (match.tournamentLevel > 0 && match.tournamentLevel < 10) {
           setTimeout(() => {
             EMSProvider.calculateRankings(match.tournamentLevel, config.eventType).then(() => {
+              SocketProvider.once("commit-scores-response", (err: any, data: any) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve();
+                }
+              });
               SocketProvider.send("commit-scores", match.matchKey);
               resolve();
             }).catch((rankError: HttpError) => {
@@ -119,6 +130,13 @@ class MatchManager {
           }, 500);
         } else {
           setTimeout(() => {
+            SocketProvider.once("commit-scores-response", (err: any, data: any) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
             SocketProvider.send("commit-scores", match.matchKey);
             resolve();
           }, 250);

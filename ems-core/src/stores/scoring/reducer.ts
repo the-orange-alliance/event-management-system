@@ -33,8 +33,8 @@ const reducer: Reducer<IScoringState> = (state: IScoringState = initialState, ac
     case SET_MATCH_DURATION:
       return {...state, matchDuration: action.payload.duration};
     case UPDATE_PARTICIPANT_STATUS:
-      return {...state, activeParticipants: state.activeParticipants.map((participant, index) => {
-        if (index !== action.payload.index) {
+      return {...state, activeParticipants: state.activeParticipants.map((participant) => {
+        if (participant.matchParticipantKey !== action.payload.participant.matchParticipantKey) {
           return participant;
         } else {
           participant.cardStatus = action.payload.status;

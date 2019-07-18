@@ -65,7 +65,8 @@ class MatchPreviewScreen extends React.Component<IProps> {
   private renderRedAlliance() {
     const {match} = this.props;
     const isMatchTest = match.tournamentLevel <= 0;
-    const redAlliance: MatchParticipant[] = match.participants.filter((p: MatchParticipant) => p.station < 20);
+    const participants: MatchParticipant[] = typeof match.participants !== "undefined" ? match.participants : [];
+    const redAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station < 20);
     const redAllianceView = redAlliance.map((participant: MatchParticipant) => {
       // TODO - Get Team Identifier
       const team: Team = participant.team;
@@ -87,7 +88,8 @@ class MatchPreviewScreen extends React.Component<IProps> {
   private renderBlueAlliance() {
     const {match} = this.props;
     const isMatchTest = match.tournamentLevel <= 0;
-    const blueAlliance: MatchParticipant[] = match.participants.filter((p: MatchParticipant) => p.station > 20);
+    const participants: MatchParticipant[] = typeof match.participants !== "undefined" ? match.participants : [];
+    const blueAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station > 20);
     const blueAllianceView = blueAlliance.map((participant: MatchParticipant) => {
       // TODO - Get Team Identifier
       const team: Team = participant.team;

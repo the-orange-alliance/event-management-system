@@ -83,9 +83,19 @@ class App extends React.Component<IProps, IState> {
         this.setState({activeMatch: match, videoID: displayID});
       });
     });
-    SocketProvider.on("commit-scores", (matchKey: string) => {
-      // TODO - Fix this.
-      console.log(matchKey);
+    SocketProvider.on("commit-scores-response", (err: any, matchJSON: any) => {
+      const match: Match = new Match().fromJSON(matchJSON);
+      const seasonKey: string = match.matchKey.split("-")[0];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      if (typeof matchJSON.participants !== "undefined") {
+        match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+      }
+      this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
+        if (participants.length > 0) {
+          match.participants = participants;
+        }
+        this.setState({activeMatch: match, videoID: 3});
+      });
     });
 
     this.renderAudienceDisplay = this.renderAudienceDisplay.bind(this);

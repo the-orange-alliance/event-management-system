@@ -45,7 +45,7 @@ export interface ISetMatchDuration {
 export interface IUpdateParticipantStatus {
   type: UPDATE_PARTICIPANT_STATUS,
   payload: {
-    index: number,
+    participant: MatchParticipant,
     status: number
   }
 }

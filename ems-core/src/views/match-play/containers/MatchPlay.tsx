@@ -189,6 +189,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private cancelPrestart() {
+    MatchManager.cancelPrestart();
     this.props.setNavigationDisabled(false);
     this.props.setMatchState(MatchState.PRESTART_READY);
   }

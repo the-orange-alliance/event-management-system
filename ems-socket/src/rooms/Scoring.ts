@@ -74,7 +74,7 @@ export default class ScoringRoom implements IRoom {
     // In case tablet or audience display disconnects after prestart, but before match play.
     if (!this._timer.inProgress() && this._hasPrestarted) {
       logger.info("Detected that client disconnected after prestart. Sending match info for " + ScoreManager.match.matchKey + ".");
-      client.emit("prestart-response", null, ScoreManager.getJSON(), 2);
+      client.emit("prestart-response", null, ScoreManager.getJSON(), this._currentVideoID);
     }
 
     client.on("get-mode", () => {
@@ -114,10 +114,19 @@ export default class ScoringRoom implements IRoom {
         client.send("prestart-response", reason, null);
       });
     });
+    client.on("prestart-cancel", () => {
+      this._currentVideoID = 1;
+      this._hasPrestarted = false;
+      this._mode = "UNDEFINED"
+    });
     client.on("commit-scores", (matchKey: string) => {
-      this._server.to("scoring").emit("commit-scores", matchKey);
-      this._timer.mode = MatchMode.RESET;
-      this._hasCommittedScore = true;
+      this.getMatch(matchKey).then((match: Match) => {
+        this._server.to("scoring").emit("commit-scores-response", null, match.toJSON());
+        this._timer.mode = MatchMode.RESET;
+        this._hasCommittedScore = true;
+      }).catch((reason: any) => {
+        client.send("commit-scores-response", reason, null);
+      });
     });
     client.on("start", () => {
       if (!this._timer.inProgress()) {

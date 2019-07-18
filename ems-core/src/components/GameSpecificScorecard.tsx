@@ -9,7 +9,8 @@ import OceanOpportunitiesBlueScorecard from "./game-specifics/ocean-opportunitie
 
 interface IProps {
   type: EventType,
-  alliance: AllianceColor
+  alliance: AllianceColor,
+  loading: boolean
 }
 
 class GameSpecificScorecard extends React.Component<IProps> {
@@ -18,7 +19,7 @@ class GameSpecificScorecard extends React.Component<IProps> {
   }
 
   public render() {
-    const {type, alliance} = this.props;
+    const {type, alliance, loading} = this.props;
     let display;
     switch (type) {
       case "fgc_2018":
@@ -30,9 +31,9 @@ class GameSpecificScorecard extends React.Component<IProps> {
         break;
       case "fgc_2019":
         if (alliance === "Red") {
-          display = <OceanOpportunitiesRedScorecard/>;
+          display = <OceanOpportunitiesRedScorecard loading={loading}/>;
         } else {
-          display = <OceanOpportunitiesBlueScorecard/>;
+          display = <OceanOpportunitiesBlueScorecard loading={loading}/>;
         }
         break;
       case "ftc_1819":

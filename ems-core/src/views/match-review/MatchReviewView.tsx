@@ -39,7 +39,8 @@ interface IProps {
 interface IState {
   selectedLevel: TournamentType,
   updatingScores: boolean,
-  confirmModalOpen: boolean
+  confirmModalOpen: boolean,
+  loadingMatch: boolean
 }
 
 class MatchReviewView extends React.Component<IProps, IState> {
@@ -48,7 +49,8 @@ class MatchReviewView extends React.Component<IProps, IState> {
     this.state = {
       selectedLevel: "Practice",
       updatingScores: false,
-      confirmModalOpen: false
+      confirmModalOpen: false,
+      loadingMatch: false
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
@@ -59,7 +61,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
 
   public render() {
     const {eventConfig, activeMatch} = this.props;
-    const {selectedLevel, updatingScores, confirmModalOpen} = this.state;
+    const {selectedLevel, updatingScores, confirmModalOpen, loadingMatch} = this.state;
 
     const availableLevels = this.getAvailableTournamentLevels(eventConfig.playoffsConfig).map(tournamentLevel => {
       return {
@@ -94,8 +96,8 @@ class MatchReviewView extends React.Component<IProps, IState> {
           <Dimmer active={updatingScores}>
             <Loader/>
           </Dimmer>
-          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Red"}/>
-          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Blue"}/>
+          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Red"} loading={loadingMatch}/>
+          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Blue"} loading={loadingMatch}/>
         </Card.Group>
       </div>
     );

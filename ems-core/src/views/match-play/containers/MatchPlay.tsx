@@ -57,6 +57,7 @@ interface IState {
   configModalOpen: boolean,
   activeMatch: Match,
   committingScores: boolean,
+  loadingMatch: boolean,
   differentTeamModalOpen: boolean
 }
 
@@ -68,6 +69,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       configModalOpen: false,
       activeMatch: this.props.activeMatch,
       committingScores: false,
+      loadingMatch: true,
       differentTeamModalOpen: false
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
@@ -87,22 +89,24 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    if (this.props.elimsMatches.length > 0) {
-      this.changeSelectedMatch(null, {value: this.props.elimsMatches[0].matchKey});
-    } else if (this.props.qualificationMatches.length > 0) {
-      this.changeSelectedLevel(null, {value: "Qualification"});
-      this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
-    } else if (this.props.practiceMatches.length > 0) {
-      this.changeSelectedLevel(null, {value: "Practice"});
-      this.changeSelectedMatch(null, {value: this.props.practiceMatches[0].matchKey});
-    } else if (this.props.testMatches.length > 0) {
-      this.changeSelectedLevel(null, {value: "Test"});
-      this.changeSelectedMatch(null, {value: this.props.testMatches[0].matchKey});
-    }
+    setTimeout(() => {
+      if (this.props.elimsMatches.length > 0) {
+        this.changeSelectedMatch(null, {value: this.props.elimsMatches[0].matchKey});
+      } else if (this.props.qualificationMatches.length > 0) {
+        this.changeSelectedLevel(null, {value: "Qualification"});
+        this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
+      } else if (this.props.practiceMatches.length > 0) {
+        this.changeSelectedLevel(null, {value: "Practice"});
+        this.changeSelectedMatch(null, {value: this.props.practiceMatches[0].matchKey});
+      } else if (this.props.testMatches.length > 0) {
+        this.changeSelectedLevel(null, {value: "Test"});
+        this.changeSelectedMatch(null, {value: this.props.testMatches[0].matchKey});
+      }
+    }, 250); // Gives the renderer process a chance to catch up.
   }
 
   public render() {
-    const {selectedLevel, committingScores, differentTeamModalOpen} = this.state;
+    const {selectedLevel, committingScores, loadingMatch, differentTeamModalOpen} = this.state;
     const {eventConfig, matchState, connected, matchDuration, mode} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
@@ -131,7 +135,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     const disabledStates = MatchManager.getDisabledStates(this.props.matchState);
     const hasRedAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station < 20).length > 0;
     const hasBlueAlliance = typeof activeMatch.participants !== "undefined" && activeMatch.participants.filter((participant) => participant.station >= 20).length > 0;
-    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance && connected;
+    const canPrestart = activeMatch.matchKey.length > 0 && activeMatch.fieldNumber > 0 && typeof activeMatch.participants !== null && hasRedAlliance && hasBlueAlliance && connected && !loadingMatch;
     const hasPrestarted = matchState !== MatchState.PRESTART_READY && matchState !== MatchState.PRESTART_IN_PROGRESS && matchState !== MatchState.MATCH_ABORTED;
     const disMin = matchDuration.minutes() < 10 ? "0" + matchDuration.minutes().toString() : matchDuration.minutes().toString();
     const disSec = matchDuration.seconds() < 10 ? "0" + matchDuration.seconds().toString() : matchDuration.seconds().toString();
@@ -181,8 +185,8 @@ class MatchPlay extends React.Component<IProps, IState> {
               </Form>
             </Card.Content>
           </Card>
-          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Red"}/>
-          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Blue"}/>
+          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Red"} loading={loadingMatch}/>
+          <GameSpecificScorecard type={eventConfig.eventType} alliance={"Blue"} loading={loadingMatch}/>
         </Card.Group>
       </Tab.Pane>
     );
@@ -390,35 +394,40 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private changeSelectedMatch(event: SyntheticEvent, props: DropdownProps) {
-    for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
-      if (match.matchKey === (props.value as string)) {
-        this.props.setActiveMatch(match);
-        this.setState({activeMatch: match});
-        // Temporarily set the match to what we have now, and then get ALL the details.
-        MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
-          const participants: MatchParticipant[] = [];
-          for (let i = 0; i < match.participants.length; i++) {
-            const participant: MatchParticipant = match.participants[i];
-            if (typeof data.participants[i] !== "undefined") {
-              if (participant.teamKey !== data.participants[i].teamKey) {
-                participants.push(data.participants[i]);
+    this.setState({loadingMatch: true});
+    const matchPromise = new Promise((resolve, reject) => {
+      for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
+        if (match.matchKey === (props.value as string)) {
+          this.props.setActiveMatch(match);
+          this.setState({activeMatch: match});
+          // Temporarily set the match to what we have now, and then get ALL the details.
+          MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
+            const participants: MatchParticipant[] = [];
+            for (let i = 0; i < match.participants.length; i++) {
+              const participant: MatchParticipant = match.participants[i];
+              if (typeof data.participants[i] !== "undefined") {
+                if (participant.teamKey !== data.participants[i].teamKey) {
+                  participants.push(data.participants[i]);
+                } else {
+                  participants.push(participant);
+                }
               } else {
                 participants.push(participant);
               }
-            } else {
-              participants.push(participant);
             }
-          }
-          data.participants = participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON()));
+            data.participants = participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON()));
 
-          this.props.setActiveMatch(data);
-          this.props.setActiveParticipants(participants);
-          this.props.setActiveDetails(data.matchDetails);
-          this.setState({activeMatch: data});
-        });
-        break;
+            this.props.setActiveMatch(data);
+            this.props.setActiveParticipants(participants);
+            this.props.setActiveDetails(data.matchDetails);
+            this.setState({activeMatch: data});
+            resolve();
+          });
+          break;
+        }
       }
-    }
+    });
+    matchPromise.then(() => this.setState({loadingMatch: false}));
   }
 
   private changeSelectedField(event: SyntheticEvent, props: DropdownProps) {

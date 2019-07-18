@@ -1,23 +1,25 @@
 import * as React from "react";
-import {AllianceColor, Match, MatchParticipant, MatchState} from "@the-orange-alliance/lib-ems";
+import {AllianceColor, EventConfiguration, Match, MatchDetails, MatchParticipant, MatchState} from "@the-orange-alliance/lib-ems";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Button, DropdownProps, Form, Grid, SemanticCOLORS} from "semantic-ui-react";
-import EventConfiguration from "@the-orange-alliance/lib-ems/dist/models/ems/EventConfiguration";
 import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
 import {SyntheticEvent} from "react";
-import {IUpdateParticipantStatus} from "../../../stores/scoring/types";
-import {updateParticipantStatus} from "../../../stores/scoring/actions";
+import {ISetActiveDetails, IUpdateParticipantStatus} from "../../../stores/scoring/types";
+import {setActiveDetails, updateParticipantStatus} from "../../../stores/scoring/actions";
 import {Dispatch} from "redux";
+import OceanOpportunitiesMatchDetails from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesMatchDetails";
 
 interface IProps {
   alliance: AllianceColor,
   eventConfig?: EventConfiguration
   match?: Match,
+  details?: MatchDetails,
   matchParticipants?: MatchParticipant[]
   matchState?: MatchState,
   teams?: Team[],
-  updateParticipantStatus?: (participant: MatchParticipant, status: number) => IUpdateParticipantStatus
+  updateParticipantStatus?: (participant: MatchParticipant, status: number) => IUpdateParticipantStatus,
+  updateMatchDetails: (details: MatchDetails) => ISetActiveDetails
 }
 
 class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
@@ -48,6 +50,33 @@ class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
     );
   }
 
+  private tallyPenalties() {
+    if (typeof this.props.matchParticipants !== "undefined") {
+      if (this.props.alliance === "Red") {
+        let count = 0;
+        for (const p of this.props.matchParticipants.filter((team: MatchParticipant) => team.station < 20)) {
+          if (p.cardStatus === 1) {
+            count++;
+          }
+        }
+        this.props.match.redMinPen = count;
+        this.props.match.blueScore = (this.props.details as OceanOpportunitiesMatchDetails).getBlueScore(this.props.match.redMinPen, 0);
+        this.forceUpdate();
+      } else {
+        let count = 0;
+        for (const p of this.props.matchParticipants.filter((team: MatchParticipant) => team.station > 20)) {
+          if (p.cardStatus === 1) {
+            count++;
+          }
+        }
+        this.props.match.redMinPen = count;
+        this.props.match.blueScore = (this.props.details as OceanOpportunitiesMatchDetails).getBlueScore(this.props.match.redMinPen, 0);
+        this.forceUpdate();
+      }
+      this.props.updateMatchDetails(new OceanOpportunitiesMatchDetails().fromJSON((this.props.details as OceanOpportunitiesMatchDetails).toJSON()));
+    }
+  }
+
   private updateParticipant(participant: MatchParticipant, event: SyntheticEvent, props: DropdownProps) {
     participant.teamKey = props.value as number;
     participant.team = this.props.teams.filter((t: Team) => t.teamKey === props.value as number)[0];
@@ -70,6 +99,7 @@ class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
           this.props.updateParticipantStatus(participant, 0);
       }
     }
+    this.tallyPenalties();
   }
 
   private getButtonText(cardStatus: number): string {
@@ -122,6 +152,7 @@ function mapStateToProps({configState, internalState, scoringState}: IApplicatio
   return {
     eventConfig: configState.eventConfiguration,
     match: scoringState.activeMatch,
+    details: scoringState.activeDetails,
     matchParticipants: scoringState.activeParticipants,
     matchState: scoringState.matchState,
     teams: internalState.teamList
@@ -130,9 +161,9 @@ function mapStateToProps({configState, internalState, scoringState}: IApplicatio
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    updateParticipantStatus: (participant: MatchParticipant, status: number) => dispatch(updateParticipantStatus(participant, status))
+    updateParticipantStatus: (participant: MatchParticipant, status: number) => dispatch(updateParticipantStatus(participant, status)),
+    updateMatchDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
   };
 }
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(OceanOpportunitiesTeamStatus);

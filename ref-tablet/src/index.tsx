@@ -9,6 +9,7 @@ import {HashRouter} from "react-router-dom";
 ReactDOM.render(
   <CookiesProvider>
     <HashRouter>
+      {/* @ts-ignore */}
       <App />
     </HashRouter>
   </CookiesProvider>,

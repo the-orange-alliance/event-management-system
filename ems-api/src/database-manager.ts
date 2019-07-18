@@ -18,7 +18,9 @@ class DatabaseManager {
   private constructor() {
     const isProd = process.env.NODE_ENV === "production";
     const fileName = isProd ? "production.db" : "development.db";
-    this._db = new SQL.Database(path.resolve(getAppDataPath("") + "/ems-core/" + fileName));
+    const dbDir = path.join(getAppDataPath(""), "ems-core");
+    fs.mkdirSync(dbDir, {recursive: true});
+    this._db = new SQL.Database(dbDir + path.sep + "ems-core" + path.sep + fileName);
   }
 
   public delete(): Promise<any> {

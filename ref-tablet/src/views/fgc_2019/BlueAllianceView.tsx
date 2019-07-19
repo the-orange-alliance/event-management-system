@@ -1,11 +1,10 @@
 import * as React from "react";
 import StatusBar from "../../components/StatusBar";
-import {Event, Match, MatchParticipant, SocketProvider} from "@the-orange-alliance/lib-ems";
-import {Col, Nav, NavItem, NavLink, Row} from "reactstrap";
+import {Event, Match, MatchParticipant, OceanOpportunitiesMatchDetails, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {Col, Nav, NavItem, NavLink, Row, Spinner} from "reactstrap";
 import RobotCardStatus from "../../components/RobotCardStatus";
 import RobotPenaltyInput from "../../components/RobotPenaltyInput";
 import RobotNumberInput from "../../components/RobotNumberInput";
-import OceanOpportunitiesMatchDetails from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesMatchDetails";
 import RobotButtonGroup from "../../components/RobotButtonGroup";
 
 interface IProps {
@@ -16,14 +15,18 @@ interface IProps {
 }
 
 interface IState {
-  currentMode: number
+  currentMode: number,
+  match: Match,
+  waitingForMatch: boolean
 }
 
 class BlueAllianceView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      currentMode: 0
+      currentMode: 0,
+      match: this.props.match,
+      waitingForMatch: true
     };
 
     this.changeModeTab = this.changeModeTab.bind(this);
@@ -39,33 +42,80 @@ class BlueAllianceView extends React.Component<IProps, IState> {
   }
 
   public componentWillMount() {
+    SocketProvider.on("score-update", (matchJSON: any) => {
+      const oldMatch = this.props.match;
+      const match: Match = new Match().fromJSON(matchJSON);
+      const seasonKey: string = match.matchKey.split("-")[0];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+      match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+      for (let i = 0; i < match.participants.length; i++) {
+        if (typeof oldMatch.participants !== "undefined") {
+          match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
+        }
+      }
+      this.setState({match: match});
+    });
+
     if (typeof this.props.match.matchDetails === "undefined") {
       this.props.match.matchDetails = new OceanOpportunitiesMatchDetails();
     }
+    if (typeof this.props.match.participants === "undefined") {
+      this.props.match.participants = [];
+    }
+    SocketProvider.on("prestart-cancel", () => {
+      this.setState({waitingForMatch: true});
+    });
   }
 
   public componentWillUnmount() {
-    // SocketProvider.off("score-update");
+    SocketProvider.off("score-update");
+    SocketProvider.off("prestart-cancel");
+  }
+
+  public componentDidMount() {
+    if (this.state.waitingForMatch && this.props.match.matchKey.length > 0) {
+      this.setState({waitingForMatch: false});
+    }
+  }
+
+  public componentDidUpdate(prevProps: IProps, prevState: IState) {
+    if (prevProps.match !== this.props.match) {
+      // A change in match has been detected.
+      this.setState({match: this.props.match, waitingForMatch: false});
+    }
   }
 
   public render() {
-    const {match, mode, connected} = this.props;
-    const {currentMode} = this.state;
+    const {mode, connected} = this.props;
+    const {currentMode, match, waitingForMatch} = this.state;
 
     let modeView: JSX.Element;
 
-    switch (currentMode) {
-      case 0:
-        modeView = this.renderTeleView();
-        break;
-      case 1:
-        modeView = this.renderEndView();
-        break;
-      case 2:
-        modeView = this.renderPenaltyView();
-        break;
-      default:
-        modeView = this.renderTeleView();
+    if (waitingForMatch) {
+      modeView = (
+        <div id={"spinner-container"}>
+          <span>Waiting For a Match...</span>
+          <Spinner
+            color={"success"}
+            style={{ width: '7rem', height: '7rem' }}
+          />
+        </div>
+      );
+    } else {
+      switch (currentMode) {
+        case 0:
+          modeView = this.renderTeleView();
+          break;
+        case 1:
+          modeView = this.renderEndView();
+          break;
+        case 2:
+          modeView = this.renderPenaltyView();
+          break;
+        default:
+          modeView = this.renderTeleView();
+      }
     }
 
     return (
@@ -88,7 +138,7 @@ class BlueAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderTeleView(): JSX.Element {
-    const {match} = this.props;
+    const {match} = this.state;
     const reusePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeReuse;
     const recyclePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecycle;
     const recoveryPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecovery;
@@ -120,7 +170,7 @@ class BlueAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderEndView(): JSX.Element {
-    const {match} = this.props;
+    const {match} = this.state;
     const robotOneDocking = (match.matchDetails as OceanOpportunitiesMatchDetails).blueEndRobotOneDocking;
     const robotTwoDocking = (match.matchDetails as OceanOpportunitiesMatchDetails).blueEndRobotTwoDocking;
     const robotThreeDocking = (match.matchDetails as OceanOpportunitiesMatchDetails).blueEndRobotThreeDocking;
@@ -148,7 +198,7 @@ class BlueAllianceView extends React.Component<IProps, IState> {
   }
 
   private renderPenaltyView(): JSX.Element {
-    const {match} = this.props;
+    const {match} = this.state;
     const minorPenalties = match.blueMinPen || 0;
     const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station >= 20) : [];
 
@@ -178,81 +228,86 @@ class BlueAllianceView extends React.Component<IProps, IState> {
   }
 
   private changeProcessingBargeReuse(n: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueProcessingBargeReuse += n;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeProcessingBargeRecycle(n: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueProcessingBargeRecycle += n;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeProcessingBargeRecovery(n: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueProcessingBargeRecovery += n;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeReductionProcessing(n: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueReductionProcessing += n;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeRobotOneDocking(state: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueEndRobotOneDocking = state;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeRobotTwoDocking(state: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueEndRobotTwoDocking = state;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeRobotThreeDocking(state: number) {
-    const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
+    const details: OceanOpportunitiesMatchDetails = this.state.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.blueEndRobotThreeDocking = state;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private changeMinorPenalties(n: number) {
-    this.props.match.blueMinPen += n;
+    this.state.match.blueMinPen += n;
     this.forceUpdate();
     this.sendUpdatedScore();
   }
 
   private updateRobotCard(participant: MatchParticipant, cardStatus: number) {
-    const participants: MatchParticipant[] = this.props.match.participants.filter((p: MatchParticipant) => p.matchParticipantKey === participant.matchParticipantKey);
+    const participants: MatchParticipant[] = this.state.match.participants.filter((p: MatchParticipant) => p.matchParticipantKey === participant.matchParticipantKey);
     let pIndex: number = 0;
     if (participants.length > 0) {
-      pIndex = this.props.match.participants.indexOf(participants[0]);
-      const prevState = this.props.match.participants[pIndex].cardStatus;
-      this.props.match.participants[pIndex].cardStatus = cardStatus;
+      pIndex = this.state.match.participants.indexOf(participants[0]);
+      const prevState = this.state.match.participants[pIndex].cardStatus;
+      this.state.match.participants[pIndex].cardStatus = cardStatus;
       if (cardStatus === 1) {
         this.changeMinorPenalties(1);
       } else if (cardStatus !== 1 && prevState === 1) {
         this.changeMinorPenalties(-1);
+      } else {
+        this.sendUpdatedScore();
       }
-      this.forceUpdate();
-      this.sendUpdatedScore();
     } else {
       // Do Nothing
     }
   }
 
   private sendUpdatedScore() {
-    SocketProvider.emit("score-update", this.props.match.toJSON());
+    const {match} = this.state;
+    const matchJSON: any = match.toJSON();
+    matchJSON.details = match.matchDetails.toJSON();
+    matchJSON.participants = match.participants.map((p: MatchParticipant) => p.toJSON());
+    SocketProvider.emit("score-update", matchJSON);
+    this.forceUpdate();
   }
 }
 

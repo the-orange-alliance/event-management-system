@@ -411,6 +411,20 @@
   background-color: #ffffff;
 }
 
+#spinner-container {
+  width: 100vw;
+  height: 70vh;
+  display: flex;
+  color: #28a745;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#spinner-container > span {
+  margin-bottom: 6vh;
+}
+
 .header-logo {
   width: 23%;
   max-width: 300px;

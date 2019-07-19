@@ -20,7 +20,7 @@ class DatabaseManager {
     const fileName = isProd ? "production.db" : "development.db";
     const dbDir = path.join(getAppDataPath(""), "ems-core");
     fs.mkdirSync(dbDir, {recursive: true});
-    this._db = new SQL.Database(dbDir + path.sep + "ems-core" + path.sep + fileName);
+    this._db = new SQL.Database(dbDir + path.sep + fileName);
   }
 
   public delete(): Promise<any> {

@@ -29,9 +29,9 @@ class RobotCardStatus extends React.Component<IProps> {
     );
   }
 
-  private updateSelected(index: number) {
+  private updateSelected(cardStatus: number) {
     if (typeof this.props.onUpdate !== "undefined") {
-      this.props.onUpdate(this.props.participant, index);
+      this.props.onUpdate(this.props.participant, cardStatus);
     }
   }
 }

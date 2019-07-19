@@ -84,10 +84,11 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("score-update", (matchJSON: any) => {
       if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART || !this._hasCommittedScore) {
-        if (matchJSON[0] && typeof matchJSON[0].match_key !== "undefined" && matchJSON[0].match_key.length > 0) {
-          ScoreManager.updateMatch(matchJSON[0]);
-          // TODO - Think about what to do here...
-          this._server.to("scoring").emit("score-update", ScoreManager.match.toJSON());
+        if (matchJSON && typeof matchJSON.match_key !== "undefined" && matchJSON.match_key.length > 0) {
+          if (typeof matchJSON.details !== "undefined" && typeof matchJSON.participants !== "undefined") {
+            ScoreManager.updateMatch(matchJSON);
+            this._server.to("scoring").emit("score-update", ScoreManager.getJSON());
+          }
         } else {
           logger.warn("Client sent an empty matchKey. Ignoring score update.");
         }
@@ -108,7 +109,6 @@ export default class ScoringRoom implements IRoom {
         this._currentVideoID = 1;
         this._mode = "PRESTART";
         this._server.to("scoring").emit("prestart-response", null, ScoreManager.getJSON());
-        this._server.to("scoring").emit("score-update", ScoreManager.getJSON());
         this._server.to("referee").emit("data-update", ScoreManager.matchMetadata.toJSON());
       }).catch((reason: any) => {
         client.send("prestart-response", reason, null);
@@ -118,6 +118,7 @@ export default class ScoringRoom implements IRoom {
       this._currentVideoID = 1;
       this._hasPrestarted = false;
       this._mode = "UNDEFINED"
+      this._server.to("scoring").emit("prestart-cancel");
     });
     client.on("commit-scores", (matchKey: string) => {
       this.getMatch(matchKey).then((match: Match) => {

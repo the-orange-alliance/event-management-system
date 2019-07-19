@@ -27,6 +27,9 @@ class RedView extends React.Component<IProps, IState> {
       this.setState({mode});
     });
     SocketProvider.on("match-start", () => {
+      this.setState({mode: "MATCH STARTED"});
+    });
+    SocketProvider.on("match-auto", () => {
       this.setState({mode: "AUTONOMOUS"});
     });
     SocketProvider.on("match-tele", () => {
@@ -46,6 +49,7 @@ class RedView extends React.Component<IProps, IState> {
   public componentWillUnmount() {
     SocketProvider.off("mode-update");
     SocketProvider.off("match-start");
+    SocketProvider.off("match-auto");
     SocketProvider.off("match-tele");
     SocketProvider.off("match-endgame");
     SocketProvider.off("match-end");

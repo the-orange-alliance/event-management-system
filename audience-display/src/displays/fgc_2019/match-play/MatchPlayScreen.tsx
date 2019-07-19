@@ -29,6 +29,7 @@ interface IProps {
 }
 
 interface IState {
+  match: Match
   timeLeft: number
 }
 
@@ -41,6 +42,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     this._timer = new MatchTimer();
 
     this.state = {
+      match: this.props.match,
       timeLeft: this._timer.timeLeft
     };
   }
@@ -86,6 +88,20 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       this._timer.removeAllListeners("match-endgame");
       this._timer.removeAllListeners("match-end");
     });
+    SocketProvider.on("score-update", (matchJSON: any) => {
+      const oldMatch = this.props.match;
+      const match: Match = new Match().fromJSON(matchJSON);
+      const seasonKey: string = match.matchKey.split("-")[0];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+      match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+      for (let i = 0; i < match.participants.length; i++) {
+        if (typeof oldMatch.participants !== "undefined") {
+          match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
+        }
+      }
+      this.setState({match: match});
+    });
   }
 
   public componentWillUnmount() {
@@ -94,8 +110,15 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     SocketProvider.off("match-abort");
   }
 
+  public componentDidUpdate(prevProps: IProps) {
+    // This should only matter if score-update processes faster than prestart-response, of which we override score-update and take the prestart-response match.
+    if (prevProps.match.matchKey.length !== this.props.match.matchKey.length && this.props.match.matchKey.length > 0) {
+      this.setState({match: this.props.match});
+    }
+  }
+
   public render() {
-    const {match} = this.props;
+    const {match} = this.state;
     const {timeLeft} = this.state;
 
     const time = moment.duration(timeLeft, "seconds");
@@ -160,7 +183,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
   }
 
   private displayRedAlliance() {
-    const {match} = this.props;
+    const {match} = this.state;
     const participants: MatchParticipant[] = typeof match.participants !== "undefined" ? match.participants : [];
     const redAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station < 20);
     const redAllianceView = redAlliance.map((p: MatchParticipant) => {
@@ -180,7 +203,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
   }
 
   private displayBlueAlliance() {
-    const {match} = this.props;
+    const {match} = this.state;
     const participants: MatchParticipant[] = typeof match.participants !== "undefined" ? match.participants : [];
     const blueAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station >= 20);
     const blueAllianceView = blueAlliance.map((p: MatchParticipant) => {

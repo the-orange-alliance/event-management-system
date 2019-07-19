@@ -170,11 +170,12 @@ class App extends React.Component<IProps, IState> {
         const matchTeamKeys = matchTeams.map((p: MatchParticipant) => p.teamKey);
         match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
         for (let i = 0; i < match.participants.length; i++) {
-          let participant: MatchParticipant = match.participants[i];
+          const participant: MatchParticipant = match.participants[i];
           if (matchTeamKeys.includes(participant.teamKey)) {
             const index = matchTeamKeys.indexOf(participant.teamKey);
-            participant = matchTeams[index];
-            participants.push(participant);
+            const newParticipant: MatchParticipant = matchTeams[index];
+            newParticipant.cardStatus = participant.cardStatus;
+            participants.push(newParticipant);
           } else {
             if (typeof participant.team === "undefined") {
               const team: Team = new Team();

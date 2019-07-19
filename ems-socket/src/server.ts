@@ -10,7 +10,6 @@ import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
 import {EMSProvider, FGC_CONFIG, FTC_CONFIG} from "@the-orange-alliance/lib-ems";
-import HttpError from "@the-orange-alliance/lib-ems/dist/models/ems/HttpError";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -76,5 +75,5 @@ socket.on("connection", (client: Socket) => {
 
 server.listen({
   port: port,
-  host: host
+  host: host,
 }, () => logger.info(`EMS Socket.IO running on ${host}:${port} in ${mode} mode.`));

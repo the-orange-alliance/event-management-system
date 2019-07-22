@@ -112,7 +112,7 @@ class OceanOpportunitiesBlueScorecard extends React.Component<IProps> {
   private renderPenaltyView(disabled: boolean, loading: boolean): JSX.Element {
     if (!loading) {
       const {match} = this.props;
-      const penalties = match.redMinPen;
+      const penalties = match.blueMinPen;
       return (
         <Grid>
           <Grid.Row columns={3}>

@@ -62,6 +62,27 @@ class App extends React.Component<IProps, IState> {
         this.setState({match: match});
       });
     });
+    SocketProvider.on("score-update", (matchJSON: any) => {
+      const oldMatch = this.state.match;
+      const match: Match = new Match().fromJSON(matchJSON);
+      const seasonKey: string = match.matchKey.split("-")[0];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+      match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+      match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+      for (let i = 0; i < match.participants.length; i++) {
+        if (typeof oldMatch.participants !== "undefined" && typeof oldMatch.participants[i].team !== "undefined") {
+          match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
+        }
+      }
+      this.setState({match: match});
+    });
+    SocketProvider.on("prestart-cancel", () => {
+      const match: Match = new Match();
+      const seasonKey: string = this.state.event.season.seasonKey + "";
+      match.participants = [];
+      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
+      this.setState({match: match});
+    });
     EMSProvider.getEvent().then((events: Event[]) => {
       if (events.length > 0) {
         this.setState({event: events[0]});

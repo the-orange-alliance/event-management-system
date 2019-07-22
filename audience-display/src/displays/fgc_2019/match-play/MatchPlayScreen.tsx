@@ -152,7 +152,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       details.blueProcessingBargeRecycle +
       details.blueProcessingBargeReuse;
     const coopertitionCompletion = pollutantsScored / totalPollutants;
-    console.log(coopertitionCompletion);
+
     return (
       <div>
         <div id="play-display-base">

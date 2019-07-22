@@ -10,14 +10,16 @@ interface IProps {
 }
 
 interface IState {
-  mode: string
+  mode: string,
+  waitingForMatch: boolean
 }
 
 class RedView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      mode: "UNDEFINED"
+      mode: "UNDEFINED",
+      waitingForMatch: true
     };
   }
 
@@ -42,8 +44,24 @@ class RedView extends React.Component<IProps, IState> {
       this.setState({mode: "MATCH END"});
     });
     SocketProvider.on("match-abort", () => {
-      this.setState({mode: "MATCH ABORTED"});
+      this.setState({mode: "MATCH ABORTED", waitingForMatch: true});
     });
+    SocketProvider.on("commit-scores-response", () => {
+      this.setState({waitingForMatch: true});
+    });
+
+    if (this.state.waitingForMatch && this.props.match.matchKey.length > 0) {
+      this.setState({waitingForMatch: false});
+    }
+  }
+
+  public componentDidUpdate(prevProps: IProps, prevState: IState) {
+    if (!this.state.waitingForMatch && this.props.match.matchKey.length <= 0) {
+      this.setState({waitingForMatch: true});
+    }
+    if (this.state.waitingForMatch && this.props.match.matchKey.length > 0) {
+      this.setState({waitingForMatch: false});
+    }
   }
 
   public componentWillUnmount() {
@@ -54,11 +72,12 @@ class RedView extends React.Component<IProps, IState> {
     SocketProvider.off("match-endgame");
     SocketProvider.off("match-end");
     SocketProvider.off("match-abort");
+    SocketProvider.off("commit-scores-response");
   }
 
   public render() {
     const {event, match, connected} = this.props;
-    const {mode} = this.state;
+    const {mode, waitingForMatch} = this.state;
     let display;
 
     switch (event.season.seasonKey) {
@@ -66,7 +85,7 @@ class RedView extends React.Component<IProps, IState> {
         display = <RoverRuckusRedView event={event} match={match} mode={mode} connected={connected}/>;
         break;
       case 2019:
-        display = <OceanOpportunitiesRedView event={event} match={match} mode={mode} connected={connected}/>;
+        display = <OceanOpportunitiesRedView event={event} match={match} mode={mode} connected={connected} waitingForMatch={waitingForMatch}/>;
         break;
       default:
         display = <span>No ref tablet application has been made for {event.season.seasonKey}</span>;

@@ -307,6 +307,8 @@
 
 .coopertition-bar-container.left-bar {
   right: 0;
+  border-top-left-radius: 500px;
+  overflow: hidden;
 }
 
 .coopertition-bar-container.right-bar {
@@ -349,7 +351,7 @@
 }
 
 .left-bar > .coopertition-bar > .coopertition-bar-fill {
-  border-top-left-radius: 500px;
+
 }
 
 .right-bar > div > .coopertition-bar-fill {

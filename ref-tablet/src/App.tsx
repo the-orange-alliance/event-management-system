@@ -7,10 +7,7 @@ import MainView from "./views/MainView";
 import RedView from "./views/RedView";
 import BlueView from "./views/BlueView";
 import HeadRefereeView from "./views/HeadRefereeView";
-import {EMSProvider, Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
-import MatchParticipant from "@the-orange-alliance/lib-ems/dist/models/ems/MatchParticipant";
-import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
-import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
+import {EMSProvider, Event, Team, Match, MatchParticipant, Ranking, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   cookies: Cookies
@@ -34,8 +31,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      EMSProvider.initialize("192.168.1.103");
-      SocketProvider.initialize("192.168.1.103");
+      EMSProvider.initialize("192.168.1.104");
+      SocketProvider.initialize("192.168.1.104");
     }
 
     SocketProvider.on("connect", () => {

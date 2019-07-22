@@ -41,8 +41,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.1.103"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.1.103"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.1.104"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.1.104"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
@@ -151,7 +151,7 @@ class App extends React.Component<IProps, IState> {
             participant = matchTeams[index];
             participants.push(participant);
           } else {
-            if (typeof participant.team === "undefined") {
+            if (typeof participant.team === "undefined" || participant.teamKey === -1) {
               const team: Team = new Team();
               team.teamKey = i;
               team.teamNameShort = "Test Team #" + (i + 1);
@@ -159,7 +159,7 @@ class App extends React.Component<IProps, IState> {
               team.countryCode = "us";
               participant.team = team;
             }
-            if (typeof participant.teamRank === "undefined") {
+            if (typeof participant.teamRank === "undefined" || participant.teamKey === -1) {
               const ranking: Ranking = new Ranking();
               ranking.rank = 0;
               participant.teamRank = ranking;

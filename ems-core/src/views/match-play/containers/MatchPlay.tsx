@@ -255,7 +255,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
       const match: Match = new Match().fromJSON(matchJSON);
-      
+
       this.state.activeMatch.redScore = match.redScore;
       this.state.activeMatch.redMinPen = match.redMinPen;
       this.state.activeMatch.redMajPen = match.redMajPen;

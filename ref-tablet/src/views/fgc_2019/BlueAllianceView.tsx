@@ -66,6 +66,9 @@ class BlueAllianceView extends React.Component<IProps, IState> {
     SocketProvider.on("prestart-cancel", () => {
       this.setState({waitingForMatch: true});
     });
+    SocketProvider.on("commit-scores-response", () => {
+      this.setState({waitingForMatch: true});
+    });
   }
 
   public componentWillUnmount() {

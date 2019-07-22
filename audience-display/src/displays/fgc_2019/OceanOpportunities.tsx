@@ -2,6 +2,7 @@ import * as React from "react";
 import {Event, Match, Team} from "@the-orange-alliance/lib-ems";
 import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
 import MatchPlayScreen from "./match-play/MatchPlayScreen";
+import MatchResultsScreen from "./match-results/MatchResultsScreen";
 
 import "./OceanOpportunities.css";
 
@@ -29,6 +30,9 @@ class OceanOpportunities extends React.Component<IProps> {
         break;
       case 2:
         view = <MatchPlayScreen match={match}/>;
+        break;
+      case 3:
+        view = <MatchResultsScreen match={match}/>;
         break;
       default:
         view = <span>default</span>;

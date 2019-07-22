@@ -58,7 +58,7 @@ export default class ScoringRoom implements IRoom {
     // In case EMS itself disconnects mid-match.
     if (!this._timer.inProgress() && this._timer.mode === MatchMode.ENDED && !this._hasCommittedScore) {
       logger.info("Detected that client previously disconnected during match. Sending last match results.");
-      client.emit("score-update", ScoreManager.getJSON(), this._timer.matchConfig.toJSON());
+      client.emit("prestart-response", ScoreManager.getJSON(), this._timer.matchConfig.toJSON());
       setTimeout(() => {
         client.emit("match-end");
       }, 500);
@@ -68,7 +68,7 @@ export default class ScoringRoom implements IRoom {
     if (this._timer.inProgress()) {
       logger.info("Sending current match information to newly connectedclient.");
       // TODO - Think about?!
-      client.emit("score-update", ScoreManager.getJSON(), this._timer.matchConfig.toJSON());
+      client.emit("prestart-response", ScoreManager.getJSON(), this._timer.matchConfig.toJSON());
     }
 
     // In case tablet or audience display disconnects after prestart, but before match play.
@@ -101,12 +101,13 @@ export default class ScoringRoom implements IRoom {
     client.on("prestart", (matchKey: string) => {
       this.getMatch(matchKey).then((match: Match) => {
         logger.info(`Successfully prestarted match ${match.matchKey}`);
+        this.resetScores(match);
         ScoreManager.match = match;
         this._timer.mode = MatchMode.PRESTART;
         this._hasPrestarted = true;
         this._currentMatchKey = match.matchKey;
         this._currentFieldNumber = match.fieldNumber;
-        this._currentVideoID = 1;
+        this._currentVideoID = 1; // Universal Match Preview Screen
         this._mode = "PRESTART";
         this._server.to("scoring").emit("prestart-response", null, ScoreManager.getJSON());
         this._server.to("referee").emit("data-update", ScoreManager.matchMetadata.toJSON());
@@ -117,12 +118,14 @@ export default class ScoringRoom implements IRoom {
     client.on("prestart-cancel", () => {
       this._currentVideoID = 1;
       this._hasPrestarted = false;
-      this._mode = "UNDEFINED"
+      this._mode = "UNDEFINED";
       this._server.to("scoring").emit("prestart-cancel");
     });
     client.on("commit-scores", (matchKey: string) => {
       this.getMatch(matchKey).then((match: Match) => {
-        this._server.to("scoring").emit("commit-scores-response", null, match.toJSON());
+        ScoreManager.match = match;
+        this._currentVideoID = 3; // Universal Match Results Screen
+        this._server.to("scoring").emit("commit-scores-response", null, ScoreManager.getJSON());
         this._timer.mode = MatchMode.RESET;
         this._hasCommittedScore = true;
       }).catch((reason: any) => {
@@ -226,6 +229,22 @@ export default class ScoringRoom implements IRoom {
         reject(reason);
       });
     });
+  }
+
+  private resetScores(match: Match) {
+    match.redScore = 0;
+    match.redMinPen = 0;
+    match.redMajPen = 0;
+    match.blueScore = 0;
+    match.blueMinPen = 0;
+    match.blueMajPen = 0;
+    match.result = 0; // NOT SCORED
+
+    const seasonKey: string = match.matchKey.split("-")[0];
+    match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
+    for (const participant of match.participants) {
+      participant.cardStatus = 0;
+    }
   }
 
   get name(): string {

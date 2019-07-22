@@ -50,7 +50,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
       match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
       match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
       for (let i = 0; i < match.participants.length; i++) {
-        if (typeof oldMatch.participants !== "undefined") {
+        if (typeof oldMatch.participants !== "undefined" && typeof oldMatch.participants[i].team !== "undefined") {
           match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
         }
       }
@@ -74,6 +74,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   public componentWillUnmount() {
     SocketProvider.off("score-update");
     SocketProvider.off("prestart-cancel");
+    SocketProvider.off("commit-scores-response");
   }
 
   public componentDidMount() {
@@ -151,22 +152,22 @@ class RedAllianceView extends React.Component<IProps, IState> {
       <div>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={reusePollutants} image={"https://via.placeholder.com/150"} min={0} max={30} onChange={this.changeProcessingBargeReuse}/>
+            <RobotNumberInput value={reusePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeReuse}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={recyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={30} onChange={this.changeProcessingBargeRecycle}/>
+            <RobotNumberInput value={recyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecycle}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={recoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={30} onChange={this.changeProcessingBargeRecovery}/>
+            <RobotNumberInput value={recoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecovery}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={reductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={30} onChange={this.changeReductionProcessing}/>
+            <RobotNumberInput value={reductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeReductionProcessing}/>
           </Col>
         </Row>
       </div>

@@ -58,7 +58,7 @@ export default class ScoringRoom implements IRoom {
     // In case EMS itself disconnects mid-match.
     if (!this._timer.inProgress() && this._timer.mode === MatchMode.ENDED && !this._hasCommittedScore) {
       logger.info("Detected that client previously disconnected during match. Sending last match results.");
-      client.emit("prestart-response", ScoreManager.getJSON(), this._timer.matchConfig.toJSON());
+      client.emit("prestart-response", ScoreManager.getJSON(), this._timer.matchConfig.toJSON(), 3);
       setTimeout(() => {
         client.emit("match-end");
       }, 500);
@@ -66,9 +66,9 @@ export default class ScoringRoom implements IRoom {
 
     // In case tablet or audience display disconnects mid-match
     if (this._timer.inProgress()) {
-      logger.info("Sending current match information to newly connectedclient.");
+      logger.info("Sending current match information to newly connected client.");
       // TODO - Think about?!
-      client.emit("prestart-response", ScoreManager.getJSON(), this._timer.matchConfig.toJSON());
+      client.emit("prestart-response", ScoreManager.getJSON(), this._timer.matchConfig.toJSON(), 2);
     }
 
     // In case tablet or audience display disconnects after prestart, but before match play.

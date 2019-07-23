@@ -227,7 +227,7 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const blueRecoveryPollutants = (matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecovery;
     const blueReductionPollutants = (matchDetails as OceanOpportunitiesMatchDetails).blueReductionProcessing;
 
-    const maxPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS;
+    const maxPollutants = match.tournamentLevel > Match.QUALIFICATION_LEVEL ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS;
     const redPollutants = redReusePollutants + redRecyclePollutants + redRecoveryPollutants + redReductionPollutants;
     const bluePollutants = blueReusePollutants + blueRecyclePollutants + blueRecoveryPollutants + blueReductionPollutants;
     const totalPollutants = redPollutants + bluePollutants;
@@ -235,6 +235,10 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const remainingPollutants = maxPollutants - totalPollutants;
 
     (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus = remainingPollutants === 0;
+    if (match.tournamentLevel > Match.QUALIFICATION_LEVEL) {
+      match.redScore += (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
+      match.blueScore += (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
+    }
     // this.props.setActiveDetails(new OceanOpportunitiesMatchDetails().fromJSON(this.props.matchDetails.toJSON()));
   }
 }

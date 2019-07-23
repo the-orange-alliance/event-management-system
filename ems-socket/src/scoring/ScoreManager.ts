@@ -1,4 +1,4 @@
-import {IPostableObject, Match, MatchParticipant, RoverRuckusRefereeData} from "@the-orange-alliance/lib-ems";
+import {IPostableObject, Match, MatchParticipant, OceanOpportunitiesMatchDetails, RoverRuckusRefereeData} from "@the-orange-alliance/lib-ems";
 
 class ScoreManager {
   private static _instance: ScoreManager;
@@ -27,6 +27,7 @@ class ScoreManager {
     }
     this._match.redScore = this._match.matchDetails.getRedScore(this._match.blueMinPen, this._match.blueMajPen);
     this._match.blueScore = this._match.matchDetails.getBlueScore(this._match.redMinPen, this._match.redMajPen);
+    this.handleGameSpecifics();
   }
 
   public updateMatchMetaData(dataJSON: any) {
@@ -40,6 +41,19 @@ class ScoreManager {
     matchJSON.details = detailsJSON;
     matchJSON.participants = participantsJSON;
     return matchJSON;
+  }
+
+  private handleGameSpecifics() {
+    const seasonKey: string = this._match.matchKey.split("-")[0];
+    switch (seasonKey){
+      case "2019":
+        if (this._match.tournamentLevel > Match.QUALIFICATION_LEVEL) {
+          const details: OceanOpportunitiesMatchDetails = (this._match.matchDetails as OceanOpportunitiesMatchDetails);
+          this._match.redScore += details.coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
+          this._match.blueScore += details.coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
+        }
+        break;
+    }
   }
 
   private getMetadataFromMatchKey(matchKey: string): IPostableObject {

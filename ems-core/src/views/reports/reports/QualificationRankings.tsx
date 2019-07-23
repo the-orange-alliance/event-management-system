@@ -8,6 +8,8 @@ import RoverRuckusRankTable from "../../../components/game-specifics/rover-rucku
 import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking,
   RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
+import OceanOpportunitiesRankTable from "../../../components/game-specifics/ocean-opportunities/OceanOpportunitiesRankTable";
+import OceanOpportunitiesRank from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesRank";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -59,6 +61,8 @@ class QualificationRankings extends React.Component<IProps, IState> {
     switch (eventType) {
       case "fgc_2018":
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]} identifier={this.props.eventConfig.teamIdentifier}/>;
+      case "fgc_2019":
+        return <OceanOpportunitiesRankTable rankings={this.state.rankings as OceanOpportunitiesRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
       case "ftc_1819":
         return <RoverRuckusRankTable rankings={this.state.rankings as RoverRuckusRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
       default:

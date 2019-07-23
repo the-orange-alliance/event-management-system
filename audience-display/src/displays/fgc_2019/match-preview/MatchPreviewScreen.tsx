@@ -65,6 +65,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
   private renderRedAlliance() {
     const {match} = this.props;
     const isMatchTest = match.tournamentLevel <= 0;
+    const displayRank = match.tournamentLevel !== 0;
     const participants: MatchParticipant[] = typeof match.participants !== "undefined" ? match.participants : [];
     const redAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station < 20);
     const redAllianceView = redAlliance.map((participant: MatchParticipant) => {
@@ -76,8 +77,8 @@ class MatchPreviewScreen extends React.Component<IProps> {
           <div className={"pre-match-flag " + (isMatchTest ? "match-test-flag" : "")}><span className={"flag-icon flag-border flag-icon-" + team.countryCode}/></div>
           <div className={"pre-match-team " + (isMatchTest ? "match-test-team" : "")}>({team.country}) {team.teamNameShort}</div>
           {
-            isMatchTest &&
-            <div className="pre-match-rank">{rank.rank}</div>
+            displayRank &&
+            <div className="pre-match-rank">{rank.rank === 0 ? "NP" : `#${rank.rank}`}</div>
           }
         </div>
       );
@@ -88,6 +89,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
   private renderBlueAlliance() {
     const {match} = this.props;
     const isMatchTest = match.tournamentLevel <= 0;
+    const displayRank = match.tournamentLevel !== 0;
     const participants: MatchParticipant[] = typeof match.participants !== "undefined" ? match.participants : [];
     const blueAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station > 20);
     const blueAllianceView = blueAlliance.map((participant: MatchParticipant) => {
@@ -99,8 +101,8 @@ class MatchPreviewScreen extends React.Component<IProps> {
           <div className={"pre-match-flag " + (isMatchTest ? "match-test-flag" : "")}><span className={"flag-icon flag-border flag-icon-" + team.countryCode}/></div>
           <div className={"pre-match-team " + (isMatchTest ? "match-test-team" : "")}>({team.country}) {team.teamNameShort}</div>
           {
-            isMatchTest &&
-            <div className="pre-match-rank">{rank.rank}</div>
+            displayRank &&
+            <div className="pre-match-rank">{rank.rank === 0 ? "NP" : `#${rank.rank}`}</div>
           }
         </div>
       );

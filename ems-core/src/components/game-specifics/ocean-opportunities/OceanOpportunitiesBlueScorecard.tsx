@@ -236,6 +236,10 @@ class OceanOpportunitiesBlueScorecard extends React.Component<IProps> {
 
     (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus = remainingPollutants === 0;
     // this.props.setActiveDetails(new OceanOpportunitiesMatchDetails().fromJSON(this.props.matchDetails.toJSON()));
+    if (match.tournamentLevel > Match.QUALIFICATION_LEVEL) {
+      match.redScore += (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
+      match.blueScore += (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
+    }
   }
 }
 

@@ -101,30 +101,51 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
   private renderTeleView(): JSX.Element {
     const {match} = this.props;
-    const reusePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeReuse;
-    const recyclePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecycle;
-    const recoveryPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecovery;
-    const reductionPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redReductionProcessing;
+    const redReusePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeReuse;
+    const redRecyclePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecycle;
+    const redRecoveryPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecovery;
+    const redReductionPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redReductionProcessing;
+
+    const blueReusePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeReuse;
+    const blueRecyclePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecycle;
+    const blueRecoveryPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecovery;
+    const blueReductionPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueReductionProcessing;
+
+    const maxPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS;
+    const redPollutants = redReusePollutants + redRecyclePollutants + redRecoveryPollutants + redReductionPollutants;
+    const bluePollutants = blueReusePollutants + blueRecyclePollutants + blueRecoveryPollutants + blueReductionPollutants;
+    const totalPollutants = redPollutants + bluePollutants;
+    const remainingPollutants = maxPollutants - totalPollutants;
     return (
       <div>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={reusePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeReuse}/>
+            <RobotNumberInput value={redReusePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeReuse}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={recyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecycle}/>
+            <RobotNumberInput value={redRecyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecycle}/>
+          </Col>
+          <Col sm={6}>
+            <div>
+              TOTAL POLLUTANTS: {totalPollutants}
+            </div>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={recoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecovery}/>
+            <RobotNumberInput value={redRecoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecovery}/>
+          </Col>
+          <Col sm={6}>
+            <div>
+              REMAINING POLLUTANTS: {remainingPollutants}
+            </div>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={reductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeReductionProcessing}/>
+            <RobotNumberInput value={redReductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeReductionProcessing}/>
           </Col>
         </Row>
       </div>
@@ -192,6 +213,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private changeProcessingBargeReuse(n: number) {
     const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.redProcessingBargeReuse += n;
+    this.checkForCoopertition();
     this.forceUpdate();
     this.sendUpdatedScore();
   }
@@ -199,6 +221,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private changeProcessingBargeRecycle(n: number) {
     const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.redProcessingBargeRecycle += n;
+    this.checkForCoopertition();
     this.forceUpdate();
     this.sendUpdatedScore();
   }
@@ -206,6 +229,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private changeProcessingBargeRecovery(n: number) {
     const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.redProcessingBargeRecovery += n;
+    this.checkForCoopertition();
     this.forceUpdate();
     this.sendUpdatedScore();
   }
@@ -213,6 +237,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private changeReductionProcessing(n: number) {
     const details: OceanOpportunitiesMatchDetails = this.props.match.matchDetails as OceanOpportunitiesMatchDetails;
     details.redReductionProcessing += n;
+    this.checkForCoopertition();
     this.forceUpdate();
     this.sendUpdatedScore();
   }
@@ -242,6 +267,28 @@ class RedAllianceView extends React.Component<IProps, IState> {
     this.props.match.redMinPen += n;
     this.forceUpdate();
     this.sendUpdatedScore();
+  }
+
+  private checkForCoopertition() {
+    const {match} = this.props;
+    const redReusePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeReuse;
+    const redRecyclePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecycle;
+    const redRecoveryPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecovery;
+    const redReductionPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).redReductionProcessing;
+
+    const blueReusePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeReuse;
+    const blueRecyclePollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecycle;
+    const blueRecoveryPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecovery;
+    const blueReductionPollutants = (match.matchDetails as OceanOpportunitiesMatchDetails).blueReductionProcessing;
+
+    const maxPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS;
+    const redPollutants = redReusePollutants + redRecyclePollutants + redRecoveryPollutants + redReductionPollutants;
+    const bluePollutants = blueReusePollutants + blueRecyclePollutants + blueRecoveryPollutants + blueReductionPollutants;
+    const totalPollutants = redPollutants + bluePollutants;
+
+    const remainingPollutants = maxPollutants - totalPollutants;
+
+    (match.matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus = remainingPollutants === 0;
   }
 
   private updateRobotCard(participant: MatchParticipant, cardStatus: number) {

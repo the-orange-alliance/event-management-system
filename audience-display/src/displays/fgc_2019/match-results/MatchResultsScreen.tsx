@@ -68,7 +68,7 @@ class MatchResultsScreen extends React.Component<IProps> {
                   <div className="res-detail-row bottom-red">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>
                     <div className="res-detail-left right-red">COOPERTITION BONUS</div>
-                    <div className="res-detail-right">{0}</div>
+                    <div className="res-detail-right">{details.coopertitionBonus ? "YES" : "NO"}</div>
                   </div>
                   <div className="res-detail-row bottom-red">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>
@@ -117,13 +117,13 @@ class MatchResultsScreen extends React.Component<IProps> {
                   </div>
                   <div className="res-detail-row bottom-blue">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>
-                    <div className="res-detail-left right-blue">REUSE PROCESSING</div>
+                    <div className="res-detail-left right-blue">REDUCTION PROCESSING</div>
                     <div className="res-detail-right">{details.blueProcessingBargeReuse}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>
                     <div className="res-detail-left right-blue">COOPERTITION BONUS</div>
-                    <div className="res-detail-right">{0}</div>
+                    <div className="res-detail-right">{details.coopertitionBonus ? "YES" : "NO"}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>

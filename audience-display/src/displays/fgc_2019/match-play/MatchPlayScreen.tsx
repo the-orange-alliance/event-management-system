@@ -141,7 +141,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     // 25 for practice/qualifications, 30 for finals/round robin.
     // 15 for practice/qualifications, ?? for finals/round robin
     // 25 * 2 + 15 * 2 = 80 total pollutants.
-    const totalPollutants = match.tournamentLevel > -1 && match.tournamentLevel < 10 ? 80 : 90; // TODO - May be changed.
+    const totalPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS; // TODO - May be changed.
     const pollutantsScored =
       details.redReductionProcessing +
       details.redProcessingBargeRecovery +

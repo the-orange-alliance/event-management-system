@@ -81,7 +81,9 @@
     margin: 0 !important;
 }
 
-.details, .details > .row > .column > .field > label, .details > .row > .column > .field > .checkbox > label {
+.details,
+.details > .row > .column > .field > label,
+.details > .row > .column > .field > .checkbox > label {
     color: #ffffff !important;
 }
 

@@ -50,13 +50,27 @@ class MatchReviewView extends React.Component<IProps, IState> {
       selectedLevel: "Practice",
       updatingScores: false,
       confirmModalOpen: false,
-      loadingMatch: false
+      loadingMatch: true
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
     this.openConfirmModal = this.openConfirmModal.bind(this);
     this.closeConfirmModal = this.closeConfirmModal.bind(this);
     this.updateScores = this.updateScores.bind(this);
+  }
+
+  public componentDidMount() {
+    setTimeout(() => {
+      if (this.props.elimsMatches.length > 0) {
+        this.changeSelectedMatch(null, {value: this.props.elimsMatches[0].matchKey});
+      } else if (this.props.qualificationMatches.length > 0) {
+        this.changeSelectedLevel(null, {value: "Qualification"});
+        this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
+      } else if (this.props.practiceMatches.length > 0) {
+        this.changeSelectedLevel(null, {value: "Practice"});
+        this.changeSelectedMatch(null, {value: this.props.practiceMatches[0].matchKey});
+      }
+    }, 250); // Gives the renderer process a chance to catch up.
   }
 
   public render() {
@@ -145,6 +159,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
   }
 
   private changeSelectedMatch(event: SyntheticEvent, props: DropdownProps) {
+    this.setState({loadingMatch: true});
     for (const match of this.getMatchesByTournamentLevel(this.state.selectedLevel)) {
       if (match.matchKey === (props.value as string)) {
         this.props.setActiveMatch(match);
@@ -153,6 +168,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
           this.props.setActiveMatch(data);
           this.props.setActiveParticipants(data.participants);
           this.props.setActiveDetails(data.matchDetails);
+          this.setState({loadingMatch: false});
         });
         break;
       }

@@ -157,7 +157,7 @@ router.put("/:match_key/participants", (req: Request, res: Response, next: NextF
     if (typeof record.team_rank !== "undefined") delete record.team_rank;
 
     promises.push(DatabaseManager.updateWhere("match_participant", record, "match_participant_key=\"" + record.match_participant_key + "\""));
-    if (typeof record.card_status !== "undefined" && !isNaN(record.card_status) && record.card_status > 0) {
+    if (typeof record.card_status !== "undefined" && !isNaN(record.card_status)) {
       promises.push(DatabaseManager.updateWhere("team", {card_status: record.card_status}, `team_key=${record.team_key}`));
     }
   }

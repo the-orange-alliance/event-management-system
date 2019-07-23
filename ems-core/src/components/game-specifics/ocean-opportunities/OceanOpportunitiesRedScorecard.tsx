@@ -1,18 +1,20 @@
 import * as React from "react";
-import {Card, Dimmer, DropdownProps, Form, Grid, Loader} from "semantic-ui-react";
+import {Card, CheckboxProps, Dimmer, DropdownProps, Form, Grid, Loader} from "semantic-ui-react";
 import OceanOpportunitiesTeamStatus from "./OceanOpportunitiesTeamStatus";
-import {DropdownData, Match, MatchState} from "@the-orange-alliance/lib-ems";
-import MatchDetails from "@the-orange-alliance/lib-ems/dist/models/ems/MatchDetails";
-import {IApplicationState} from "../../../stores";
+import {DropdownData, Match, MatchDetails, MatchState, OceanOpportunitiesMatchDetails} from "@the-orange-alliance/lib-ems";
+import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import OceanOpportunitiesMatchDetails from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesMatchDetails";
 import {SyntheticEvent} from "react";
+import {ISetActiveDetails} from "../../../stores/scoring/types";
+import {Dispatch} from "redux";
+import {setActiveDetails} from "../../../stores/scoring/actions";
 
 interface IProps {
   match?: Match
   matchDetails?: MatchDetails,
   matchState?: MatchState,
-  loading: boolean
+  loading: boolean,
+  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails
 }
 
 class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
@@ -26,6 +28,7 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     this.changeRobotTwoEndState = this.changeRobotTwoEndState.bind(this);
     this.changeRobotThreeEndState = this.changeRobotThreeEndState.bind(this);
     this.changeMinorPenalties = this.changeMinorPenalties.bind(this);
+    this.changeCoopertition = this.changeCoopertition.bind(this);
   }
 
   public render() {
@@ -112,15 +115,18 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
 
   private renderPenaltyView(disabled: boolean, loading: boolean): JSX.Element {
     if (!loading) {
-      const {match} = this.props;
+      const {match, matchDetails} = this.props;
       const penalties = match.redMinPen;
+      const coopertition = (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus;
       return (
-        <Grid>
+        <Grid className={"details"}>
           <Grid.Row columns={3}>
             <Grid.Column>
               <Form.Input label={"Minor Penalties"} disabled={disabled} fluid={true} value={penalties} onChange={this.changeMinorPenalties}/>
             </Grid.Column>
-            <Grid.Column><div/></Grid.Column>
+            <Grid.Column className={"align-center"}>
+              <Form.Checkbox label={"Coopertition"} disabled={disabled} fluid={true} checked={coopertition} onChange={this.changeCoopertition}/>
+            </Grid.Column>
             <Grid.Column className={"align-center"}>
               <span>SCORE: {match.redScore}</span>
             </Grid.Column>
@@ -137,6 +143,7 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const details: OceanOpportunitiesMatchDetails = (matchDetails as OceanOpportunitiesMatchDetails);
     details.redProcessingBargeReuse = parseInt(props.value as string, 10);
     match.redScore = details.getRedScore(match.blueMinPen, 0);
+    this.checkForCoopertition();
     this.forceUpdate();
   }
 
@@ -145,6 +152,7 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const details: OceanOpportunitiesMatchDetails = (matchDetails as OceanOpportunitiesMatchDetails);
     details.redProcessingBargeRecycle = parseInt(props.value as string, 10);
     match.redScore = details.getRedScore(match.blueMinPen, 0);
+    this.checkForCoopertition();
     this.forceUpdate();
   }
 
@@ -153,6 +161,7 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const details: OceanOpportunitiesMatchDetails = (matchDetails as OceanOpportunitiesMatchDetails);
     details.redProcessingBargeRecovery = parseInt(props.value as string, 10);
     match.redScore = details.getRedScore(match.blueMinPen, 0);
+    this.checkForCoopertition();
     this.forceUpdate();
   }
 
@@ -161,6 +170,7 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const details: OceanOpportunitiesMatchDetails = (matchDetails as OceanOpportunitiesMatchDetails);
     details.redReductionProcessing = parseInt(props.value as string, 10);
     match.redScore = details.getRedScore(match.blueMinPen, 0);
+    this.checkForCoopertition();
     this.forceUpdate();
   }
 
@@ -193,7 +203,39 @@ class OceanOpportunitiesRedScorecard extends React.Component<IProps> {
     const details: OceanOpportunitiesMatchDetails = (matchDetails as OceanOpportunitiesMatchDetails);
     match.redMinPen = parseInt(props.value as string, 10);
     match.blueScore = details.getBlueScore(match.redMinPen, 0);
+    // this.props.setActiveDetails(new OceanOpportunitiesMatchDetails().fromJSON(this.props.matchDetails.toJSON()));
     this.forceUpdate();
+  }
+
+  private changeCoopertition(event: SyntheticEvent, props: CheckboxProps) {
+    const {matchDetails} = this.props;
+    const details: OceanOpportunitiesMatchDetails = (matchDetails as OceanOpportunitiesMatchDetails);
+    details.coopertitionBonus = props.checked;
+    // this.props.setActiveDetails(new OceanOpportunitiesMatchDetails().fromJSON(details.toJSON()));
+    this.forceUpdate();
+  }
+
+  private checkForCoopertition() {
+    const {match, matchDetails} = this.props;
+    const redReusePollutants = (matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeReuse;
+    const redRecyclePollutants = (matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecycle;
+    const redRecoveryPollutants = (matchDetails as OceanOpportunitiesMatchDetails).redProcessingBargeRecovery;
+    const redReductionPollutants = (matchDetails as OceanOpportunitiesMatchDetails).redReductionProcessing;
+
+    const blueReusePollutants = (matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeReuse;
+    const blueRecyclePollutants = (matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecycle;
+    const blueRecoveryPollutants = (matchDetails as OceanOpportunitiesMatchDetails).blueProcessingBargeRecovery;
+    const blueReductionPollutants = (matchDetails as OceanOpportunitiesMatchDetails).blueReductionProcessing;
+
+    const maxPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS;
+    const redPollutants = redReusePollutants + redRecyclePollutants + redRecoveryPollutants + redReductionPollutants;
+    const bluePollutants = blueReusePollutants + blueRecyclePollutants + blueRecoveryPollutants + blueReductionPollutants;
+    const totalPollutants = redPollutants + bluePollutants;
+
+    const remainingPollutants = maxPollutants - totalPollutants;
+
+    (matchDetails as OceanOpportunitiesMatchDetails).coopertitionBonus = remainingPollutants === 0;
+    // this.props.setActiveDetails(new OceanOpportunitiesMatchDetails().fromJSON(this.props.matchDetails.toJSON()));
   }
 }
 
@@ -205,4 +247,10 @@ export function mapStateToProps({scoringState}: IApplicationState) {
   };
 }
 
-export default connect(mapStateToProps)(OceanOpportunitiesRedScorecard);
+export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
+  return {
+    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(OceanOpportunitiesRedScorecard);

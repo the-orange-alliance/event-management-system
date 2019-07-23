@@ -69,8 +69,8 @@ class OceanOpportunitiesTeamStatus extends React.Component<IProps> {
             count++;
           }
         }
-        this.props.match.redMinPen = count;
-        this.props.match.blueScore = (this.props.details as OceanOpportunitiesMatchDetails).getBlueScore(this.props.match.redMinPen, 0);
+        this.props.match.blueMinPen = count;
+        this.props.match.redScore = (this.props.details as OceanOpportunitiesMatchDetails).getBlueScore(this.props.match.blueMinPen, 0);
         this.forceUpdate();
       }
       this.props.updateMatchDetails(new OceanOpportunitiesMatchDetails().fromJSON((this.props.details as OceanOpportunitiesMatchDetails).toJSON()));

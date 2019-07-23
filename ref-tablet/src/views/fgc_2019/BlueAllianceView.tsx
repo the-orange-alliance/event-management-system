@@ -119,12 +119,12 @@ class BlueAllianceView extends React.Component<IProps, IState> {
       <div>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueReusePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeReuse}/>
+            <RobotNumberInput value={blueReusePollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeReuse}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueRecyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecycle}/>
+            <RobotNumberInput value={blueRecyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
           </Col>
           <Col sm={6}>
             <div>
@@ -134,7 +134,7 @@ class BlueAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueRecoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeProcessingBargeRecovery}/>
+            <RobotNumberInput value={blueRecoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
           </Col>
           <Col sm={6}>
             <div>
@@ -144,7 +144,7 @@ class BlueAllianceView extends React.Component<IProps, IState> {
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueReductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={80} onChange={this.changeReductionProcessing}/>
+            <RobotNumberInput value={blueReductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
           </Col>
         </Row>
       </div>

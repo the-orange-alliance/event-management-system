@@ -410,11 +410,9 @@ class MatchPlay extends React.Component<IProps, IState> {
                   participants.push(data.participants[i]);
                 } else {
                   participant.cardStatus = data.participants[i].cardStatus;
-                  console.log("data.participant", participant.cardStatus, data.participants[i].cardStatus);
                   participants.push(participant);
                 }
               } else {
-                console.log("participant", participant.cardStatus, data.participants[i].cardStatus);
                 participants.push(participant);
               }
             }

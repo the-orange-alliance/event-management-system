@@ -7,7 +7,8 @@ import EnergyImpactRankTable from "./game-specifics/energy-impact/EnergyImpactRa
 import {connect} from "react-redux";
 import RoverRuckusRankTable from "./game-specifics/rover-ruckus/RoverRuckusRankTable";
 import {
-  EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking, RoverRuckusRank
+  EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking, RankingMatchesFormat,
+  RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -36,16 +37,17 @@ class SetupRankingsOverview extends React.Component<IProps, IState> {
 
   public render() {
     const {eventConfig} = this.props;
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     return (
       <div className="step-view-tab">
         <Card fluid={true} color={getTheme().secondary}>
           <Card.Content>
             {
-              typeof eventConfig.rankingCutoff === "undefined" || eventConfig.rankingCutoff <= 0 &&
+              tournamentRound.type === "ranking" && (tournamentRound.format as RankingMatchesFormat).rankingCutoff <= 0 &&
               <span><i>You currently don't have a valid ranking cutoff for finals matches. Please go over to the 'settings' tab and provide a valid value.</i></span>
             }
             {
-              typeof eventConfig.rankingCutoff !== "undefined" && eventConfig.rankingCutoff > 0 &&
+              tournamentRound.type === "ranking" && (tournamentRound.format as RankingMatchesFormat).rankingCutoff > 0 &&
               <span><i>The following teams have qualified for finals matches based upon the ranking cutoff. Once you have finished your qualification matches, head over to the 'Schedule Parameters' tab to generate a finals schedule.</i></span>
             }
           </Card.Content>

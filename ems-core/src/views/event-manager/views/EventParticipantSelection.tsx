@@ -12,7 +12,10 @@ import DialogManager from "../../../managers/DialogManager";
 import TeamValidator from "../../../validators/TeamValidator";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
-import {EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider} from "@the-orange-alliance/lib-ems";
+import {
+  EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider,
+  EliminationMatchesFormat
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -224,9 +227,10 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   }
 
   private canCreateTeamList(): boolean {
-    if (this.props.eventConfig.playoffsConfig === "elims") {
-      const maxTeamsPerAlliance = Math.max(this.props.eventConfig.teamsPerAlliance, this.props.eventConfig.postQualTeamsPerAlliance);
-      return this.props.teams.length >= (maxTeamsPerAlliance * this.props.eventConfig.allianceCaptains);
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    if (this.props.eventConfig.tournamentConfig === "elims") {
+      const maxTeamsPerAlliance = Math.max(this.props.eventConfig.teamsPerAlliance, tournamentRound.format.teamsPerAlliance);
+      return this.props.teams.length >= (maxTeamsPerAlliance * (tournamentRound.format as EliminationMatchesFormat).alliances);
     } else {
       return this.props.teams.length > 8;
     }

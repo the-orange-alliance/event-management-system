@@ -13,7 +13,10 @@ import {connect} from "react-redux";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupRunMatchMaker from "../../../components/SetupRunMatchMaker";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
-import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team} from "@the-orange-alliance/lib-ems";
+import {
+  Event, EventConfiguration, HttpError, Match, RankingMatchesFormat, Schedule, ScheduleItem,
+  Team
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -46,9 +49,10 @@ class EventFinalsSetup extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    this.props.schedule.teamsPerAlliance = this.props.eventConfig.postQualTeamsPerAlliance;
-    this.props.schedule.teamsParticipating = this.props.eventConfig.rankingCutoff;
-    this.setState({qualifiedTeams: this.props.teamList.slice(0, this.props.eventConfig.rankingCutoff)});
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    this.props.schedule.teamsPerAlliance = tournamentRound.format.teamsPerAlliance;
+    this.props.schedule.teamsParticipating = (tournamentRound.format as RankingMatchesFormat).rankingCutoff;
+    this.setState({qualifiedTeams: this.props.teamList.slice(0, (tournamentRound.format as RankingMatchesFormat).rankingCutoff)});
     this.forceUpdate();
   }
 
@@ -58,9 +62,9 @@ class EventFinalsSetup extends React.Component<IProps, IState> {
         <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
           { menuItem: "Finals Participants", render: () => <SetupRankingsOverview/>},
           { menuItem: "Schedule Parameters", render: () => <SetupScheduleParams schedule={this.props.schedule} teams={this.state.qualifiedTeams} onComplete={this.onParamsComplete}/>},
-          { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Finals"}/>},
+          { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Ranking"}/>},
           { menuItem: "Match Maker Parameters", render: () => <SetupRunMatchMaker schedule={this.props.schedule} teams={this.state.qualifiedTeams} onComplete={this.onMatchMakerComplete}/>},
-          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Finals" matchList={this.props.finalsMatches} onComplete={this.onPublishSchedule}/>},
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Ranking" matchList={this.props.finalsMatches} onComplete={this.onPublishSchedule}/>},
         ]}
         />
       </div>
@@ -68,14 +72,15 @@ class EventFinalsSetup extends React.Component<IProps, IState> {
   }
 
   private onTabChange(event: SyntheticEvent, props: TabProps) {
-    if (!this.props.navigationDisabled && typeof this.props.eventConfig.rankingCutoff !== "undefined") {
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    if (!this.props.navigationDisabled && typeof (tournamentRound.format as RankingMatchesFormat).rankingCutoff !== "undefined") {
       this.setState({activeIndex: parseInt(props.activeIndex as string, 10)});
     }
   }
 
   private onParamsComplete(scheduleItems: ScheduleItem[]) {
     this.props.setNavigationDisabled(true);
-    EventCreationManager.createSchedule("Finals", scheduleItems).then(() => {
+    EventCreationManager.createSchedule("Ranking", scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({activeIndex: 2});
     }).catch((error: HttpError) => {

@@ -53,6 +53,10 @@ router.get("/calculate/:tournament_level", (req: Request, res: Response, next: N
 });
 
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
+  for (const rankJSON of req.body.records) {
+    if (typeof rankJSON.team !== "undefined") delete rankJSON.team;
+  }
+
   DatabaseManager.insertValues("ranking", req.body.records).then((rows: any[]) => {
     res.send({payload: rows});
   }).catch((error: any) => {

@@ -3,7 +3,10 @@ import ReportTemplate from "./ReportTemplate";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Table} from "semantic-ui-react";
-import {EventConfiguration, Match, MatchParticipant, Team} from "@the-orange-alliance/lib-ems";
+import {
+  EliminationMatchesFormat, EventConfiguration, Match, MatchParticipant,
+  Team
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   teamList?: Team[],
@@ -44,6 +47,7 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
   public render() {
     const {onHTMLUpdate, eventConfig, eliminationsMatches} = this.props;
     const {generated} = this.state;
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     const matches = eliminationsMatches.map(match => {
       const participants = match.participants.map((participant: MatchParticipant, index: number) => {
         if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
@@ -52,7 +56,7 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
             <Table.Row key={participant.matchParticipantKey}>
               {
                 index === 0 &&
-                <Table.Cell rowSpan={eventConfig.postQualTeamsPerAlliance * 2}>{match.matchName}</Table.Cell>
+                <Table.Cell rowSpan={(tournamentRound.format as EliminationMatchesFormat).teamsPerAlliance * 2}>{match.matchName}</Table.Cell>
               }
               <Table.Cell className={participant.station < 20 ? "red-bg" : "blue-bg"}>{team.getFromIdentifier(eventConfig.teamIdentifier)}{participant.surrogate ? "*" : ""}</Table.Cell>
               <Table.Cell>{team.teamNameShort}</Table.Cell>
@@ -65,7 +69,7 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
             <Table.Row key={participant.matchParticipantKey}>
               {
                 index === 0 &&
-                <Table.Cell rowSpan={eventConfig.postQualTeamsPerAlliance * 2}>{match.matchName}</Table.Cell>
+                <Table.Cell rowSpan={(tournamentRound.format as EliminationMatchesFormat).teamsPerAlliance * 2}>{match.matchName}</Table.Cell>
               }
               <Table.Cell className={participant.station < 20 ? "red-bg" : "blue-bg"}>{participant.teamKey}{participant.surrogate ? "*" : ""}</Table.Cell>
               <Table.Cell>-</Table.Cell>

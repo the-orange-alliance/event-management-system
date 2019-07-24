@@ -1,4 +1,4 @@
-import {AllianceColor, EliminationFormat, EMSProvider, Event, EventConfiguration, HttpError, Match, MatchParticipant,
+import {AllianceColor, SeriesType, EMSProvider, Event, EventConfiguration, HttpError, Match, MatchParticipant,
   MatchState, SocketProvider
 } from "@the-orange-alliance/lib-ems";
 
@@ -242,7 +242,7 @@ class MatchManager {
     return states;
   }
 
-  public checkForAdvancements(tournamentLevel: number, format: EliminationFormat): Promise<Match[]> {
+  public checkForAdvancements(tournamentLevel: number, format: SeriesType): Promise<Match[]> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getMatchesByTournamentLevel(tournamentLevel).then((matches: Match[]) => {
         if (matches.length > 0) {
@@ -428,7 +428,7 @@ class MatchManager {
     return Promise.all(promises);
   }
 
-  private getWinsFromFormat(format: EliminationFormat): number {
+  private getWinsFromFormat(format: SeriesType): number {
     switch (format) {
       case "bo1":
         return 1;

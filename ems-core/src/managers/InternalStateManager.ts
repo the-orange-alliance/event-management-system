@@ -1,10 +1,4 @@
-import {EventConfiguration, HttpError} from "@the-orange-alliance/lib-ems";
-import Event from "@the-orange-alliance/lib-ems/dist/models/ems/Event";
-import EMSProvider from "@the-orange-alliance/lib-ems/dist/providers/EMSProvider";
-import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
-import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
-import AllianceMember from "@the-orange-alliance/lib-ems/dist/models/ems/AllianceMember";
-import AppError from "@the-orange-alliance/lib-ems/dist/models/ems/AppError";
+import {AllianceMember, AppError, EMSProvider, Event, EventConfiguration, HttpError, Team, Match} from "@the-orange-alliance/lib-ems";
 import * as moment from "moment";
 
 const {ipcRenderer} = (window as any).require("electron");
@@ -107,7 +101,7 @@ class InternalStateManager {
       alliances = res;
     }).catch((error: HttpError) => console.log(error));
 
-    if (alliances.length === 0 && eventConfig.playoffsConfig === "finals") {
+    if (alliances.length === 0 && eventConfig.tournamentConfig === "ranking") {
       completedStep+=2;
     }
 

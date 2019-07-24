@@ -23,7 +23,7 @@ export const initialState: IConfigState = {
   masterHost: undefined,
   practiceSchedule: new Schedule("Practice"),
   qualificationSchedule: new Schedule("Qualification"),
-  finalsSchedule: new Schedule("Finals"),
+  finalsSchedule: new Schedule("Ranking"),
   eliminationsSchedule: new EliminationsSchedule(),
   toaConfig: new TOAConfig(),
   backupDir: "",

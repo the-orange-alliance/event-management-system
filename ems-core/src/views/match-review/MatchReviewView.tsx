@@ -14,8 +14,9 @@ import {IDisableNavigation, ISetEliminationsMatches} from "../../stores/internal
 import {disableNavigation, setEliminationsMatches} from "../../stores/internal/actions";
 import ConfirmActionModal from "../../components/ConfirmActionModal";
 import TOAUploadManager from "../../managers/TOAUploadManager";
-import {Event, EventConfiguration, HttpError, Match, MatchDetails, MatchParticipant,
-  PlayoffsType, TournamentType, TOAConfig
+import {
+  Event, EventConfiguration, HttpError, Match, MatchDetails, MatchParticipant,
+  PlayoffsType, TournamentType, TOAConfig, EliminationMatchesFormat
 } from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -77,7 +78,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
     const {eventConfig, activeMatch} = this.props;
     const {selectedLevel, updatingScores, confirmModalOpen, loadingMatch} = this.state;
 
-    const availableLevels = this.getAvailableTournamentLevels(eventConfig.playoffsConfig).map(tournamentLevel => {
+    const availableLevels = this.getAvailableTournamentLevels(eventConfig.tournamentConfig as PlayoffsType).map(tournamentLevel => {
       return {
         text: tournamentLevel,
         value: tournamentLevel
@@ -126,7 +127,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
   }
 
   private getAvailableTournamentLevels(postQualConfig: PlayoffsType): TournamentType[] {
-    return ["Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Finals"];
+    return ["Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Ranking"];
   }
 
   private getMatchesByTournamentLevel(tournamentLevel: TournamentType): Match[] { // TODO - Only show fields that EMS controls
@@ -135,7 +136,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
         return this.props.practiceMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Qualification":
         return this.props.qualificationMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
-      case "Finals":
+      case "Ranking":
         return this.props.finalsMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Eliminations":
         return this.props.elimsMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
@@ -187,11 +188,12 @@ class MatchReviewView extends React.Component<IProps, IState> {
         DialogManager.showErrorBox(error);
       });
     }
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       this.props.setNavigationDisabled(false);
       this.setState({updatingScores: false});
       if (this.props.activeMatch.tournamentLevel >= 10) {
-        MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, this.props.eventConfig.elimsFormat).then((matches: Match[]) => {
+        MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, (tournamentRound.format as EliminationMatchesFormat).seriesType).then((matches: Match[]) => {
           if (this.props.elimsMatches.length < matches.length) {
             this.props.setEliminationsMatches(matches);
           }

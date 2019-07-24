@@ -13,7 +13,10 @@ import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
-import {EliminationsSchedule, Event, EventConfiguration, HttpError, Match, ScheduleItem, TOAConfig} from "@the-orange-alliance/lib-ems";
+import {
+  EliminationMatchesFormat, EliminationsSchedule, Event, EventConfiguration, HttpError, Match, ScheduleItem,
+  TOAConfig
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -37,9 +40,10 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
     this.state = {
       activeIndex: 0
     };
-    this.props.schedule.teamsPerAlliance = this.props.eventConfig.postQualTeamsPerAlliance;
-    this.props.schedule.allianceCaptains = this.props.eventConfig.allianceCaptains;
-    this.props.schedule.eliminationsFormat = this.props.eventConfig.elimsFormat;
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    this.props.schedule.teamsPerAlliance = tournamentRound.format.teamsPerAlliance;
+    this.props.schedule.allianceCaptains = (tournamentRound.format as EliminationMatchesFormat).alliances;
+    this.props.schedule.eliminationsFormat = (tournamentRound.format as EliminationMatchesFormat).seriesType;
     this.onTabChange = this.onTabChange.bind(this);
     this.onParamsComplete = this.onParamsComplete.bind(this);
     this.onMatchMakerComplete = this.onMatchMakerComplete.bind(this);

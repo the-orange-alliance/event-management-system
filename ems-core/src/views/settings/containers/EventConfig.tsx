@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Card, Divider, Tab} from "semantic-ui-react";
 import SettingsSlave from "../../../components/SettingsSlave";
-import SettingsPostQual from "../../../components/SettingsPostQual";
+import SettingsTournamentConfig from "../../../components/SettingsTournamentConfig";
 import SettingsEvent from "../../../components/SettingsEvent";
 
 class EventConfig extends React.Component {
@@ -12,7 +12,7 @@ class EventConfig extends React.Component {
         <Divider />
         <Card.Group itemsPerRow={3}>
           <SettingsEvent/>
-          <SettingsPostQual/>
+          <SettingsTournamentConfig/>
           <SettingsSlave/>
         </Card.Group>
       </Tab.Pane>

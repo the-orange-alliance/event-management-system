@@ -9,7 +9,10 @@ import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/
 import {Dispatch} from "redux";
 import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
 import EventCreationManager from "../../../managers/EventCreationManager";
-import {AllianceMember, EMSProvider, Event, EventConfiguration, HttpError, Ranking, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {
+  AllianceMember, EliminationMatchesFormat, EMSProvider, Event, EventConfiguration, HttpError, Ranking,
+  SocketProvider
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: () => void,
@@ -33,7 +36,9 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     const initialValues: number[] = [];
-    for (let i = 0; i < (this.props.eventConfig.allianceCaptains * this.props.eventConfig.postQualTeamsPerAlliance); i++) {
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    const alliances = (tournamentRound.format as EliminationMatchesFormat).alliances;
+    for (let i = 0; i < (alliances * tournamentRound.format.teamsPerAlliance); i++) {
       initialValues.push(0);
     }
     this._pickedTeams = [];
@@ -81,10 +86,12 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
 
     const teamOptions = this._teamOptions;
     const alliances: any[] = [];
-    for (let i = 0; i < eventConfig.allianceCaptains; i++) {
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    const captains = (tournamentRound.format as EliminationMatchesFormat).alliances;
+    for (let i = 0; i < captains; i++) {
       const alliancePicks: any[] = [];
-      for (let j = 0; j < (eventConfig.postQualTeamsPerAlliance - 1); j++) {
-        const index = (j + 1) + (i * eventConfig.postQualTeamsPerAlliance);
+      for (let j = 0; j < (tournamentRound.format.teamsPerAlliance - 1); j++) {
+        const index = (j + 1) + (i * tournamentRound.format.teamsPerAlliance);
         alliancePicks.push(
           <Grid.Column key={"alliance-" + (i + 1) + "-pick-" + (j + 1)}>
             <Form.Dropdown fluid={true} search={true} selection={true} options={teamOptions} value={inputValues[index]} onChange={this.changeTeam.bind(this, index)} label={"Pick #" + (j + 1)}/>
@@ -93,7 +100,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       }
       alliances.push(
         <Grid.Row key={"alliance-" + (i + 1)}>
-          <Grid.Column><Form.Dropdown fluid={true} search={true} selection={true} options={teamOptions} value={inputValues[i * eventConfig.postQualTeamsPerAlliance]} onChange={this.changeTeam.bind(this, i * eventConfig.postQualTeamsPerAlliance)} label={"Alliance Captain #" + (i + 1)}/></Grid.Column>
+          <Grid.Column><Form.Dropdown fluid={true} search={true} selection={true} options={teamOptions} value={inputValues[i * tournamentRound.format.teamsPerAlliance]} onChange={this.changeTeam.bind(this, i * tournamentRound.format.teamsPerAlliance)} label={"Alliance Captain #" + (i + 1)}/></Grid.Column>
           {alliancePicks}
         </Grid.Row>
       );
@@ -191,10 +198,11 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(true);
     const members: AllianceMember[] = [];
     let allianceIndex = 0;
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     for (let i = 0; i < this.state.inputValues.length; i++) {
       const member: AllianceMember = new AllianceMember();
-      const memberIndex = i % this.props.eventConfig.postQualTeamsPerAlliance === 0 ? 1 : (i % this.props.eventConfig.postQualTeamsPerAlliance + 1);
-      if (i % this.props.eventConfig.postQualTeamsPerAlliance !== 0) {
+      const memberIndex = i % tournamentRound.format.teamsPerAlliance === 0 ? 1 : (i % tournamentRound.format.teamsPerAlliance + 1);
+      if (i % tournamentRound.format.teamsPerAlliance !== 0) {
         member.isCaptain = false;
       } else {
         member.isCaptain = true;

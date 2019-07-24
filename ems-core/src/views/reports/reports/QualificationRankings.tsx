@@ -5,12 +5,10 @@ import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import EnergyImpactRankTable from "../../../components/game-specifics/energy-impact/EnergyImpactRankTable";
 import RoverRuckusRankTable from "../../../components/game-specifics/rover-ruckus/RoverRuckusRankTable";
-import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking,
+import OceanOpportunitiesRankTable from "../../../components/game-specifics/ocean-opportunities/OceanOpportunitiesRankTable";
+import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, OceanOpportunitiesRank, Ranking,
   RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
-import OceanOpportunitiesRankTable from "../../../components/game-specifics/ocean-opportunities/OceanOpportunitiesRankTable";
-import OceanOpportunitiesRank from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesRank";
-
 interface IProps {
   eventConfig?: EventConfiguration,
   onHTMLUpdate: (htmlStr: string) => void
@@ -31,7 +29,7 @@ class QualificationRankings extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+    EMSProvider.getRankingTeams().then((rankings: any[]) => {
       this.setState({generated: true, rankings});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);

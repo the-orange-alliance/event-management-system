@@ -84,7 +84,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
         if (internalProgress.qualificationMatches) {
           internalState.qualificationMatches = internalProgress.qualificationMatches;
         }
-        if (configState.eventConfiguration.playoffsConfig === "finals") {
+        if (configState.eventConfiguration.tournamentConfig === "ranking") { // TODO - Change
           if (internalProgress.playoffMatches) {
             internalState.finalsMatches = internalProgress.playoffMatches;
           }

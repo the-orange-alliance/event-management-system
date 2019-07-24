@@ -37,7 +37,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 
   public componentDidUpdate(prevProps: IProps) {
     if (prevProps.completedStep !== this.props.completedStep) {
-      if (this.props.completedStep === 4 && this.props.eventConfig.playoffsConfig === "finals") {
+      if (this.props.completedStep === 4 && this.props.eventConfig.tournamentConfig === "ranking") {
         this.props.setCompletedStep(5);
       } else {
         this.setActiveStep(this.props.completedStep + 1);
@@ -77,7 +77,7 @@ class EventManagerView extends React.Component<IProps, IState> {
           </Step>
 
           {
-            this.props.eventConfig.playoffsConfig === "elims" &&
+            this.props.eventConfig.tournamentConfig === "elims" &&
             <Step completed={this.isCompleted(5)} disabled={this.isDisabled(5)} active={this.isActiveStep(5)} onClick={this.setActiveStep.bind(this, 5)}>
               <Step.Content>
                 <Step.Description>Alliance Selections</Step.Description>
@@ -87,7 +87,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 
           <Step completed={this.isCompleted(6)} disabled={this.isDisabled(6)} active={this.isActiveStep(6)} onClick={this.setActiveStep.bind(this, 6)}>
             <Step.Content>
-              <Step.Description>{this.props.eventConfig.playoffsConfig === "elims" ? "Eliminations" : "Finals"} Setup</Step.Description>
+              <Step.Description>{this.props.eventConfig.tournamentConfig === "elims" ? "Eliminations" : "Finals"} Setup</Step.Description>
             </Step.Content>
           </Step>
 
@@ -129,7 +129,7 @@ class EventManagerView extends React.Component<IProps, IState> {
   }
 
   private getStepLength(): 7 | 8 {
-    return this.props.eventConfig.playoffsConfig === "elims" ? 8 : 7;
+    return this.props.eventConfig.tournamentConfig === "elims" ? 8 : 7;
   }
 
   private getViewFromActiveStep(activeStep: number): JSX.Element {
@@ -145,7 +145,7 @@ class EventManagerView extends React.Component<IProps, IState> {
       case 5:
         return <EventAllianceSelection onComplete={this.completeStep.bind(this, 5)}/>;
       case 6:
-        return this.props.eventConfig.playoffsConfig === "finals" ?
+        return this.props.eventConfig.tournamentConfig === "ranking" ?
           <EventFinalsSetup onComplete={this.completeStep.bind(this, 6)}/>
           :
           <EventEliminationsSetup onComplete={this.completeStep.bind(this, 6)}/>;

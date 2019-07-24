@@ -38,8 +38,8 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
 
   public render() {
     const {confirmModalOpen} = this.state;
-
-    const tpa = (this.props.type === "Qualification" || this.props.type === "Practice") ? this.props.eventConfig.teamsPerAlliance : this.props.eventConfig.postQualTeamsPerAlliance;
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
+    const tpa = (this.props.type === "Qualification" || this.props.type === "Practice") ? this.props.eventConfig.teamsPerAlliance : tournamentRound.format.teamsPerAlliance;
 
     const redLabels = [];
     for (let i = 0; i < tpa; i++) {

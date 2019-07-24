@@ -44,9 +44,10 @@ class EliminationsSchedule extends React.Component<IProps, IState> {
   public render() {
     const {onHTMLUpdate, eventConfig, eliminationsMatches} = this.props;
     const {generated} = this.state;
+    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     const matches = eliminationsMatches.map(match => {
       const participants = [];
-      for (let i = 0; i < (eventConfig.postQualTeamsPerAlliance * 2); i++) {
+      for (let i = 0; i < (tournamentRound.format.teamsPerAlliance * 2); i++) {
         if (typeof match.participants[i] !== "undefined") {
           const participant = match.participants[i];
           if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
@@ -76,7 +77,7 @@ class EliminationsSchedule extends React.Component<IProps, IState> {
       );
     });
     const allianceHeaders = [];
-    for (let i = 0; i < eventConfig.postQualTeamsPerAlliance; i++) {
+    for (let i = 0; i < tournamentRound.format.teamsPerAlliance; i++) {
       allianceHeaders.push(
         <Table.HeaderCell key={i}>Team {i + 1}</Table.HeaderCell>
       );
@@ -88,8 +89,8 @@ class EliminationsSchedule extends React.Component<IProps, IState> {
             <Table.HeaderCell rowSpan={2}>Match</Table.HeaderCell>
             <Table.HeaderCell rowSpan={2}>Field</Table.HeaderCell>
             <Table.HeaderCell rowSpan={2}>Time</Table.HeaderCell>
-            <Table.HeaderCell colSpan={eventConfig.postQualTeamsPerAlliance}>Red Alliance</Table.HeaderCell>
-            <Table.HeaderCell colSpan={eventConfig.postQualTeamsPerAlliance}>Blue Alliance</Table.HeaderCell>
+            <Table.HeaderCell colSpan={tournamentRound.format.teamsPerAlliance}>Red Alliance</Table.HeaderCell>
+            <Table.HeaderCell colSpan={tournamentRound.format.teamsPerAlliance}>Blue Alliance</Table.HeaderCell>
           </Table.Row>
           <Table.Row>
             {allianceHeaders}

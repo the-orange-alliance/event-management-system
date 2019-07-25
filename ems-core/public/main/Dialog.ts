@@ -2,8 +2,9 @@ import {ipcMain, BrowserWindow, dialog, app, IpcMessageEvent, FileFilter} from "
 import * as fs from "fs";
 import * as url from "url";
 import * as path from "path";
-import * as open from "open";
 import logger from "./logger";
+
+const open = require("opn");
 
 interface IOpenDialogProps {
   title?: string,
@@ -23,6 +24,7 @@ ipcMain.on("parse-csv", (event: IpcMessageEvent, file: string) => {
 });
 
 ipcMain.on("open-dialog", (event: IpcMessageEvent, openProperties: IOpenDialogProps) => {
+  // @ts-ignore - Unless there is another way to do this...
   dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
     filters: openProperties.filters || [],
     // @ts-ignore - Unless there is another way to do this...

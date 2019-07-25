@@ -5,6 +5,7 @@
     "sourceMap": true,
     "outDir": "build",
     "baseUrl": ".",
+    "lib": ["es6", "es2017"],
     "paths": {
       "*": ["node_modules/*"]
     }
@@ -12,5 +13,8 @@
   "include": [
     "public/electron.ts",
     "public/main/**/*/"
+  ],
+  "exclude": [
+    "src/**/*"
   ]
 }

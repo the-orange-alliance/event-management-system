@@ -57,7 +57,7 @@ ipcMain.on("store-set", (event: IpcMessageEvent, config: IConfigOptions) => {
 });
 
 ipcMain.on("create-backup", (event: IpcMessageEvent, backupDir: string, filename: string) => {
-  if (typeof location !== "undefined" && backupDir.length > 0) {
+  if (typeof backupDir !== "undefined" && backupDir.length > 0) {
     try {
       const dbFile = path.join(appDataPath, "production.db");
       const destFile = path.join(backupDir,  filename + "_production.db");

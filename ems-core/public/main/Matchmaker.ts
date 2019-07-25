@@ -103,7 +103,7 @@ function getTournamentLevelFromType(type: TournamentType) {
       return 0;
     case "Qualification":
       return 1;
-    case "Finals":
+    case "Ranking":
       return 6;
     default:
       return 0;
@@ -116,7 +116,7 @@ function getMatchKeyPartialFromType(type: TournamentType) {
       return "P";
     case "Qualification":
       return "Q";
-    case "Finals":
+    case "Ranking":
       return "E";
     default:
       return "P";

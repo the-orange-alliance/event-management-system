@@ -38,7 +38,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {confirmModalOpen} = this.state;
+    const {configCopy, confirmModalOpen} = this.state;
     const fields = this.props.event.fieldCount || 0;
     const fieldOptions = [];
     for (let i = 0; i < fields; i++) {
@@ -58,7 +58,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
                   fluid={true}
                   selection={true}
                   multiple={true}
-                  value={this.state.configCopy.fieldsControlled}
+                  value={configCopy.fieldsControlled}
                   options={fieldOptions}
                   onChange={this.setFieldsControlled}
                 />
@@ -70,7 +70,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
                 <Dropdown
                   fluid={true}
                   selection={true}
-                  value={this.state.configCopy.teamIdentifier}
+                  value={configCopy.teamIdentifier}
                   options={DropdownData.TeamIdentifierItems}
                   onChange={this.setTeamIdentifier}
                 />

@@ -46,11 +46,14 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     this.setElimsSeriesConfig = this.setElimsSeriesConfig.bind(this);
     this.setRankingCutoffConfig = this.setRankingCutoffConfig.bind(this);
     this.setAlliances = this.setAlliances.bind(this);
+    this.setTeamsPerAlliance = this.setTeamsPerAlliance.bind(this);
     this.updateConfig = this.updateConfig.bind(this);
   }
 
   public render() {
     const {confirmModalOpen} = this.state;
+    const eventConfig = this.state.configCopy;
+    const tournamentRound = Array.isArray(eventConfig.tournament) ? eventConfig.tournament[0] : eventConfig.tournament;
     return (
       <Card fluid={true} color={getTheme().secondary}>
         <ConfirmActionModal open={confirmModalOpen} onClose={this.closeConfirmModal} onConfirm={this.updateConfig} innerText={"Are you sure you want to update this event's post-qualification config?"}/>
@@ -61,7 +64,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
               <Grid.Column className="center-left-items">
                 <span>Tournament Config</span>
               </Grid.Column>
-              <Grid.Column>
+              <Grid.Column className="center-left-items">
                 <Dropdown
                   fluid={true}
                   selection={true}
@@ -72,6 +75,10 @@ class SettingsPostQual extends React.Component<IProps, IState> {
               </Grid.Column>
             </Grid.Row>
             {this.renderAdvancementView()}
+            <Grid.Row>
+              <Grid.Column className="center-left-items"><span>Teams Per Alliance</span></Grid.Column>
+              <Grid.Column><NumericInput value={tournamentRound.format.teamsPerAlliance} onUpdate={this.setTeamsPerAlliance}/></Grid.Column>
+            </Grid.Row>
             <Grid.Row width={16} centered={true}>
               <Grid.Column width={6}><Button fluid={true} color={getTheme().primary} onClick={this.openConfirmModal}>Save &amp; Update</Button></Grid.Column>
             </Grid.Row>
@@ -91,9 +98,8 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         const rrAlliances = (tournamentRound.format as RoundRobinFormat).alliances;
         advancementView = (
           <Grid.Row>
-            <Grid.Column>
-              <NumericInput value={rrAlliances} onUpdate={this.setAlliances} label="Alliances"/>
-            </Grid.Column>
+            <Grid.Column classname={"center-left-items"}><span>Alliances</span></Grid.Column>
+            <Grid.Column><NumericInput value={rrAlliances} onUpdate={this.setAlliances} label="Alliances"/></Grid.Column>
           </Grid.Row>
         );
         break;
@@ -107,7 +113,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         });
         advancementView = (
           <Grid.Row>
-            <Grid.Column><span>Ranking Cutoff</span></Grid.Column>
+            <Grid.Column classname={"center-left-items"}><span>Ranking Cutoff</span></Grid.Column>
             <Grid.Column><Dropdown fluid={true} selection={true} value={rCutoff} options={rankingsOptions} onChange={this.setRankingCutoffConfig}/></Grid.Column>
           </Grid.Row>
         );
@@ -118,13 +124,13 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         advancementView = [
           (
             <Grid.Row key={"#1"}>
-              <Grid.Column><span>Alliance Captains</span></Grid.Column>
+              <Grid.Column classname={"center-left-items"}><span>Alliance Captains</span></Grid.Column>
               <Grid.Column><Dropdown fluid={true} selection={true} value={elimsAlliances} options={DropdownData.AllianceCaptainItems} onChange={this.setAllianceCaptainConfig}/></Grid.Column>
             </Grid.Row>
           ),
           (
             <Grid.Row key={"#2"}>
-              <Grid.Column><span>Eliminations Format</span></Grid.Column>
+              <Grid.Column classname={"center-left-items"}><span>Eliminations Format</span></Grid.Column>
               <Grid.Column><Dropdown fluid={true} selection={true} value={elimsSeries} options={DropdownData.SeriesTypeItems} onChange={this.setElimsSeriesConfig}/></Grid.Column>
             </Grid.Row>
           )
@@ -191,6 +197,13 @@ class SettingsPostQual extends React.Component<IProps, IState> {
   private setAlliances(newValue: number) {
     const tournamentRound = Array.isArray(this.state.configCopy.tournament) ? this.state.configCopy.tournament[0] : this.state.configCopy.tournament;
     (tournamentRound.format as RoundRobinFormat).alliances = newValue;
+    this.forceUpdate();
+  }
+
+  private setTeamsPerAlliance(newValue: number) {
+    const tournamentRound = Array.isArray(this.state.configCopy.tournament) ? this.state.configCopy.tournament[0] : this.state.configCopy.tournament;
+    tournamentRound.format.teamsPerAlliance = newValue;
+    this.forceUpdate();
   }
 
   private updateConfig() {

@@ -9,12 +9,10 @@ import {Dispatch} from "redux";
 import {incrementCompletedStep} from "../../stores/internal/actions";
 import {IIncrementCompletedStep} from "../../stores/internal/types";
 import EventQualificationSetup from "./views/EventQualificationSetup";
-import EventFinalsSetup from "./views/EventFinalsSetup";
-import EventAllianceSelection from "./views/EventAllianceSelection";
-import EventEliminationsSetup from "./views/EventEliminationsSetup";
 import EventAwardsSetup from "./views/EventAwardsSetup";
 import EventDataUpload from "./views/EventDataUpload";
 import {EventConfiguration} from "@the-orange-alliance/lib-ems";
+import EventAdvancement from "./views/EventAdvancement";
 
 interface IProps {
   completedStep?: number,
@@ -76,28 +74,19 @@ class EventManagerView extends React.Component<IProps, IState> {
             </Step.Content>
           </Step>
 
-          {
-            this.props.eventConfig.tournamentConfig === "elims" &&
-            <Step completed={this.isCompleted(5)} disabled={this.isDisabled(5)} active={this.isActiveStep(5)} onClick={this.setActiveStep.bind(this, 5)}>
-              <Step.Content>
-                <Step.Description>Alliance Selections</Step.Description>
-              </Step.Content>
-            </Step>
-          }
-
-          <Step completed={this.isCompleted(6)} disabled={this.isDisabled(6)} active={this.isActiveStep(6)} onClick={this.setActiveStep.bind(this, 6)}>
+          <Step completed={this.isCompleted(5)} disabled={this.isDisabled(5)} active={this.isActiveStep(5)} onClick={this.setActiveStep.bind(this, 5)}>
             <Step.Content>
-              <Step.Description>{this.props.eventConfig.tournamentConfig === "elims" ? "Eliminations" : "Finals"} Setup</Step.Description>
+              <Step.Description>Advancement Setup</Step.Description>
             </Step.Content>
           </Step>
 
-          <Step completed={this.isCompleted(7)} disabled={this.isDisabled(7)} active={this.isActiveStep(7)} onClick={this.setActiveStep.bind(this, 7)}>
+          <Step completed={this.isCompleted(6)} disabled={this.isDisabled(7)} active={this.isActiveStep(7)} onClick={this.setActiveStep.bind(this, 7)}>
             <Step.Content>
               <Step.Description>Awards</Step.Description>
             </Step.Content>
           </Step>
 
-          <Step completed={this.isCompleted(8)} disabled={this.isDisabled(8)} active={this.isActiveStep(8)} onClick={this.setActiveStep.bind(this, 8)}>
+          <Step completed={this.isCompleted(7)} disabled={this.isDisabled(8)} active={this.isActiveStep(8)} onClick={this.setActiveStep.bind(this, 8)}>
             <Step.Content>
               <Step.Description>Data Upload</Step.Description>
             </Step.Content>
@@ -105,6 +94,7 @@ class EventManagerView extends React.Component<IProps, IState> {
         </Step.Group>
       </div>
     );
+
   }
 
   public setActiveStep(step: number): void {
@@ -143,15 +133,10 @@ class EventManagerView extends React.Component<IProps, IState> {
       case 4:
         return <EventQualificationSetup onComplete={this.completeStep.bind(this, 4)}/>;
       case 5:
-        return <EventAllianceSelection onComplete={this.completeStep.bind(this, 5)}/>;
+        return <EventAdvancement onComplete={this.completeStep.bind(this, 5)}/>;
       case 6:
-        return this.props.eventConfig.tournamentConfig === "ranking" ?
-          <EventFinalsSetup onComplete={this.completeStep.bind(this, 6)}/>
-          :
-          <EventEliminationsSetup onComplete={this.completeStep.bind(this, 6)}/>;
+        return <EventAwardsSetup onComplete={this.completeStep.bind(this, 6)}/>;
       case 7:
-        return <EventAwardsSetup onComplete={this.completeStep.bind(this, 7)}/>;
-      case 8:
         return <EventDataUpload/>;
       default:
         return <span>View not found.</span>;

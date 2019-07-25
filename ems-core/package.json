@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "concurrently --kill-others \"npm run desktop\" \"npm run react\"",
-    "desktop": "tsc -p tsconfig.electron.json && electron .",
+    "desktop": "tsc -p tsconfig.electron.json --skipLibCheck && electron .",
     "react": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "postbuild": "tsc -p tsconfig.electron.json --skipLibCheck",

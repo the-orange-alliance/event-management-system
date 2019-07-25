@@ -237,11 +237,19 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   }
 
   private createTestTeam() {
+    let teamID: number = 0;
+    if (this.props.teams.length > 0) {
+      const lastTeam: Team = this.props.teams[this.props.teams.length - 1];
+      teamID = lastTeam.teamKey + 1;
+    } else {
+      teamID = 0;
+    }
+    
     const testTeam: Team = new Team();
-    testTeam.teamKey = this.props.teams.length + 1;
-    testTeam.teamNameShort = "Team " + (this.props.teams.length + 1);
-    testTeam.teamNameLong = "Test Team " + (this.props.teams.length + 1);
-    testTeam.robotName = "Test Robot " + (this.props.teams.length + 1);
+    testTeam.teamKey = teamID;
+    testTeam.teamNameShort = "Team " + teamID;
+    testTeam.teamNameLong = "Test Team " + teamID;
+    testTeam.robotName = "Test Robot " + teamID;
     testTeam.city = "Petoskey";
     testTeam.stateProv = "MI";
     testTeam.country = "USA";

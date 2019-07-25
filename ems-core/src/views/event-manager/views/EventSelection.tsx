@@ -248,7 +248,7 @@ class EventSelection extends React.Component<IProps, IState> {
             ),
             (
               <Grid.Column key={"key#2"} width={4}>
-                <Form.Dropdown fluid={true} selection={true} options={DropdownData.SeriesTypeItems} value={elimsSeries} onChange={this.setAdvancementEliminationsSeries} error={!tournamentValidator.isValidRounds()} label="Alliance Captains"/>
+                <Form.Dropdown fluid={true} selection={true} options={DropdownData.SeriesTypeItems} value={elimsSeries} onChange={this.setAdvancementEliminationsSeries} error={!tournamentValidator.isValidRounds()} label="Series Type"/>
               </Grid.Column>
             )
           ];

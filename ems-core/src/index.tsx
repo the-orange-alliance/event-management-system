@@ -84,17 +84,11 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
         if (internalProgress.qualificationMatches) {
           internalState.qualificationMatches = internalProgress.qualificationMatches;
         }
-        if (configState.eventConfiguration.tournamentConfig === "ranking") { // TODO - Change
-          if (internalProgress.playoffMatches) {
-            internalState.finalsMatches = internalProgress.playoffMatches;
-          }
-        } else {
-          if (internalProgress.allianceMembers) {
-            internalState.allianceMembers = internalProgress.allianceMembers;
-          }
-          if (internalProgress.playoffMatches) {
-            internalState.eliminationsMatches = internalProgress.playoffMatches;
-          }
+        if (internalProgress.allianceMembers) {
+          internalState.allianceMembers = internalProgress.allianceMembers;
+        }
+        if (internalProgress.playoffMatches) {
+          internalState.playoffsMatches = internalProgress.playoffMatches;
         }
         const applicationStore = createStore(reducers, {
           configState: configState,

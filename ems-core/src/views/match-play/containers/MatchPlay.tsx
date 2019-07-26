@@ -15,13 +15,13 @@ import {setActiveDetails, setActiveMatch, setActiveParticipants, setMatchState} 
 import MatchManager from "../../../managers/MatchManager";
 import * as moment from "moment";
 import DialogManager from "../../../managers/DialogManager";
-import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
-import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
+import {IDisableNavigation} from "../../../stores/internal/types";
+import {disableNavigation} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {
   Event, EventConfiguration, HttpError, Match, MatchDetails, MatchConfiguration, MatchParticipant,
-  MatchState, MatchTimer, PlayoffsType, SocketProvider, TOAConfig, TournamentType, EliminationMatchesFormat
+  MatchState, MatchTimer, SocketProvider, TOAConfig, TournamentType, EliminationMatchesFormat
 } from "@the-orange-alliance/lib-ems";
 import InternalStateManager from "../../../managers/InternalStateManager";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
@@ -41,16 +41,14 @@ interface IProps {
   testMatches: Match[],
   practiceMatches: Match[],
   qualificationMatches: Match[],
-  finalsMatches: Match[],
-  elimsMatches: Match[],
+  playoffsMatches: Match[],
   connected: boolean,
   matchDuration?: moment.Duration,
   setMatchState?: (matchState: MatchState) => ISetMatchState,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   setActiveMatch?: (match: Match) => ISetActiveMatch,
   setActiveParticipants?: (participants: MatchParticipant[]) => ISetActiveParticipants,
-  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails,
-  setEliminationsMatches?: (matches: Match[]) => ISetEliminationsMatches
+  setActiveDetails?: (details: MatchDetails) => ISetActiveDetails
 }
 
 interface IState {
@@ -91,8 +89,8 @@ class MatchPlay extends React.Component<IProps, IState> {
 
   public componentDidMount() {
     setTimeout(() => {
-      if (this.props.elimsMatches.length > 0) {
-        this.changeSelectedMatch(null, {value: this.props.elimsMatches[0].matchKey});
+      if (this.props.playoffsMatches.length > 0) {
+        this.changeSelectedMatch(null, {value: this.props.playoffsMatches[0].matchKey});
       } else if (this.props.qualificationMatches.length > 0) {
         this.changeSelectedLevel(null, {value: "Qualification"});
         this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
@@ -111,7 +109,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     const {eventConfig, matchState, connected, matchDuration, mode} = this.props;
     const fieldControl: number[] = (typeof eventConfig.fieldsControlled === "undefined" ? [1] : eventConfig.fieldsControlled);
 
-    const availableLevels = this.getAvailableTournamentLevels(eventConfig.tournamentConfig as PlayoffsType).map(tournamentLevel => {
+    const availableLevels = this.getAvailableTournamentLevels().map(tournamentLevel => {
       return {
         text: tournamentLevel,
         value: tournamentLevel
@@ -339,9 +337,9 @@ class MatchPlay extends React.Component<IProps, IState> {
       const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
       if (this.props.activeMatch.tournamentLevel >= 10) {
         MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, (tournamentRound.format as EliminationMatchesFormat).seriesType).then((matches: Match[]) => {
-          if (this.props.elimsMatches.length < matches.length) {
-            this.props.setEliminationsMatches(matches);
-          }
+          // if (this.props.elimsMatches.length < matches.length) { // TODO - This NEEDS to change!
+          //   this.props.setEliminationsMatches(matches);
+          // }
           if (this.props.backupDir.length > 0) {
             InternalStateManager.createBackup(this.props.backupDir);
           }
@@ -359,11 +357,28 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
   }
 
-  private getAvailableTournamentLevels(postQualConfig: PlayoffsType): TournamentType[] {
-    return ["Test", "Practice", "Qualification", postQualConfig === "elims" ? "Eliminations" : "Ranking"];
+  private getAvailableTournamentLevels(): TournamentType[] {
+    const {playoffsMatches} = this.props;
+    const hasRoundRobin: boolean = playoffsMatches.filter(match => match.tournamentLevel === Match.ROUND_ROBIN_LEVEL).length > 0;
+    const hasRanking: boolean = playoffsMatches.filter(match => match.tournamentLevel === Match.FINALS_LEVEL).length > 0;
+    const hasEliminations: boolean = playoffsMatches.filter(match => match.tournamentLevel >= Match.OCTOFINALS_LEVEL).length > 0;
+
+    const levels: TournamentType[] = ["Test", "Practice", "Qualification"];
+
+    if (hasRoundRobin) {
+      levels.push("Round Robin");
+    }
+    if (hasRanking) {
+      levels.push("Ranking");
+    }
+    if (hasEliminations) {
+      levels.push("Eliminations");
+    }
+
+    return levels;
   }
 
-  private getMatchesByTournamentLevel(tournamentLevel: TournamentType): Match[] { // TODO - Only show fields that EMS controls
+  private getMatchesByTournamentLevel(tournamentLevel: TournamentType): Match[] {
     switch (tournamentLevel) {
       case "Test":
         return this.props.testMatches;
@@ -371,10 +386,21 @@ class MatchPlay extends React.Component<IProps, IState> {
         return this.props.practiceMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
       case "Qualification":
         return this.props.qualificationMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
+      case "Round Robin":
+        return this.props.playoffsMatches.filter(
+          match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1 &&
+            match.tournamentLevel === Match.ROUND_ROBIN_LEVEL
+        );
       case "Ranking":
-        return this.props.finalsMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
+        return this.props.playoffsMatches.filter(
+          match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1 &&
+            match.tournamentLevel === Match.FINALS_LEVEL
+        );
       case "Eliminations":
-        return this.props.elimsMatches.filter(match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1);
+        return this.props.playoffsMatches.filter(
+          match => this.props.eventConfig.fieldsControlled.indexOf(match.fieldNumber) > -1 &&
+            match.tournamentLevel >= 10
+        );
       default:
         return [];
     }
@@ -461,8 +487,7 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     testMatches: internalState.testMatches,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,
-    finalsMatches: internalState.finalsMatches,
-    elimsMatches: internalState.eliminationsMatches,
+    playoffsMatches: internalState.playoffsMatches,
     connected: internalState.socketConnected,
     matchDuration: scoringState.matchDuration
   };
@@ -474,8 +499,7 @@ export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
     setActiveMatch: (match: Match) => dispatch(setActiveMatch(match)),
     setActiveParticipants: (participants: MatchParticipant[]) => dispatch(setActiveParticipants(participants)),
-    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details)),
-    setEliminationsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches))
+    setActiveDetails: (details: MatchDetails) => dispatch(setActiveDetails(details))
   };
 }
 

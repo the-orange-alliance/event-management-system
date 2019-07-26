@@ -6,18 +6,18 @@ import {connect} from "react-redux";
 import {getTheme} from "../../AppTheme";
 import PracticeSchedule from "./reports/PracticeSchedule";
 import QualificationSchedule from "./reports/QualificationSchedule";
-import EliminationsSchedule from "./reports/EliminationsSchedule";
-import FinalsSchedule from "./reports/FinalsSchedule";
+// import EliminationsSchedule from "./reports/EliminationsSchedule";
+// import FinalsSchedule from "./reports/FinalsSchedule";
 import PracticeScheduleByTeam from "./reports/PracticeScheduleByTeam";
 import QualificationScheduleByTeam from "./reports/QualificationScheduleByTeam";
-import EliminationsScheduleByTeam from "./reports/EliminationsScheduleByTeam";
-import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
+// import EliminationsScheduleByTeam from "./reports/EliminationsScheduleByTeam";
+// import FinalsScheduleByTeam from "./reports/FinalsScheduleByTeam";
 import QualificationRankings from "./reports/QualificationRankings";
 import DialogManager from "../../managers/DialogManager";
 import OtherCompetingTeams from "./reports/OtherCompetingTeams";
 import QualificationMatchResults from "./reports/QualificationMatchResults";
 import QualificationAnnouncers from "./reports/QualificationAnnouncers";
-import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
+// import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
 import {EventConfiguration} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -253,11 +253,12 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generatePostQualSchedule() {
-    if (this.props.eventConfig.tournamentConfig === "elims") {
-      this.generateReport(<EliminationsSchedule onHTMLUpdate={this.updateHTML}/>);
-    } else {
-      this.generateReport(<FinalsSchedule onHTMLUpdate={this.updateHTML}/>);
-    }
+    // if (this.props.eventConfig.tournamentConfig === "elims") {
+    //   this.generateReport(<EliminationsSchedule onHTMLUpdate={this.updateHTML}/>);
+    // } else {
+    //   this.generateReport(<FinalsSchedule onHTMLUpdate={this.updateHTML}/>);
+    // }
+    this.generateReport(<span>Will be implemented again soon.</span>);
   }
 
   private generatePracticeScheduleByTeam() {
@@ -269,11 +270,12 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generatePostQualScheduleByTeam() {
-    if (this.props.eventConfig.tournamentConfig === "elims") {
-      this.generateReport(<EliminationsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
-    } else {
-      this.generateReport(<FinalsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
-    }
+    // if (this.props.eventConfig.tournamentConfig === "elims") {
+    //   this.generateReport(<EliminationsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    // } else {
+    //   this.generateReport(<FinalsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    // }
+    this.generateReport(<span>Will be implemented again soon.</span>);
   }
   private generateQualificationRankings() {
     this.generateReport(<QualificationRankings onHTMLUpdate={this.updateHTML}/>);
@@ -288,7 +290,8 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generateEliminationsAnnouncers() {
-    this.generateReport(<EliminationsAnnouncers onHTMLUpdate={this.updateHTML}/>);
+    // this.generateReport(<EliminationsAnnouncers onHTMLUpdate={this.updateHTML}/>);
+    this.generateReport(<span>Will be implemented again soon.</span>);
   }
 }
 

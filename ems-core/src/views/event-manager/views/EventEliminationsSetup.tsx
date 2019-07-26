@@ -6,9 +6,9 @@ import {connect} from "react-redux";
 import SetupElimsScheduleParams from "../../../components/SetupElimsScheduleParams";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
-import {IDisableNavigation, ISetEliminationsMatches} from "../../../stores/internal/types";
+import {IDisableNavigation, IAddPlayoffsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
-import {disableNavigation, setEliminationsMatches} from "../../../stores/internal/actions";
+import {disableNavigation, addPlayoffsMatches} from "../../../stores/internal/actions";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
@@ -25,9 +25,9 @@ interface IProps {
   toaConfig?: TOAConfig,
   navigationDisabled?: boolean,
   schedule?: EliminationsSchedule,
-  elimsMatches?: Match[],
+  playoffsMatches?: Match[],
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
-  setEliminationsMatches?: (matches: Match[]) => ISetEliminationsMatches
+  addPlayoffsMatches?: (matches: Match[]) => IAddPlayoffsMatches
 }
 
 interface IState {
@@ -51,13 +51,15 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
   }
 
   public render() {
+    const {activeIndex} = this.state;
+    const {schedule, playoffsMatches} = this.props;
     return (
       <div className="step-view no-overflow">
-        <Tab menu={{secondary: true}} activeIndex={this.state.activeIndex} onTabChange={this.onTabChange} panes={[
-          { menuItem: "Schedule Parameters", render: () => <SetupElimsScheduleParams onComplete={this.onParamsComplete} schedule={this.props.schedule}/>},
+        <Tab menu={{secondary: true}} activeIndex={activeIndex} onTabChange={this.onTabChange} panes={[
+          { menuItem: "Schedule Parameters", render: () => <SetupElimsScheduleParams onComplete={this.onParamsComplete} schedule={schedule}/>},
           { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Eliminations"}/>},
-          { menuItem: "Match Maker Parameters", render: () => <SetupElimsRunMatchMaker schedule={this.props.schedule} onComplete={this.onMatchMakerComplete}/>},
-          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Eliminations" matchList={this.props.elimsMatches} onComplete={this.onPublishSchedule}/>},
+          { menuItem: "Match Maker Parameters", render: () => <SetupElimsRunMatchMaker schedule={schedule} onComplete={this.onMatchMakerComplete}/>},
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Eliminations" matchList={playoffsMatches} onComplete={this.onPublishSchedule}/>},
         ]}
         />
       </div>
@@ -82,7 +84,7 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
   }
 
   private onMatchMakerComplete(matches: Match[]) {
-    this.props.setEliminationsMatches(matches);
+    this.props.addPlayoffsMatches(matches);
     console.log(matches);
     this.setState({activeIndex: 3});
   }
@@ -90,13 +92,13 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
     if (this.props.toaConfig.enabled) {
-      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.elimsMatches).then(() => {
-        console.log(`${this.props.elimsMatches.length} matches have been posted to TOA.`);
+      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.playoffsMatches).then(() => {
+        console.log(`${this.props.playoffsMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);
       });
     }
-    EventCreationManager.createElimsSchedule(this.props.elimsMatches).then(() => {
+    EventCreationManager.createElimsSchedule(this.props.playoffsMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {
@@ -114,14 +116,14 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     eventConfig: configState.eventConfiguration,
     toaConfig: configState.toaConfig,
     schedule: configState.eliminationsSchedule,
-    elimsMatches: internalState.eliminationsMatches
+    playoffsMatches: internalState.playoffsMatches
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
-    setEliminationsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches))
+    addPlayoffsMatches: (matches: Match[]) => dispatch(addPlayoffsMatches(matches))
   };
 }
 

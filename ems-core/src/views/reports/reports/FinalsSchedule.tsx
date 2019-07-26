@@ -7,7 +7,7 @@ import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   teamList?: Team[],
-  finalsMatches?: Match[],
+  playoffsMatches?: Match[],
   eventConfig?: EventConfiguration,
   onHTMLUpdate: (htmlStr: string) => void
 }
@@ -28,8 +28,8 @@ class FinalsSchedule extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    const {finalsMatches, teamList} = this.props;
-    if (finalsMatches.length <= 0 || teamList.length <= 0) {
+    const {playoffsMatches, teamList} = this.props;
+    if (playoffsMatches.length <= 0 || teamList.length <= 0) {
       this.setState({generated: true});
     } else {
       for (const team of teamList) {
@@ -42,9 +42,9 @@ class FinalsSchedule extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {onHTMLUpdate, eventConfig, finalsMatches} = this.props;
+    const {onHTMLUpdate, eventConfig, playoffsMatches} = this.props;
     const {generated} = this.state;
-    const matches = finalsMatches.map(match => {
+    const matches = playoffsMatches.filter(match => match.tournamentLevel === Match.FINALS_LEVEL).map(match => {
       const participants = match.participants.map(participant => {
         if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
           return (
@@ -95,7 +95,7 @@ class FinalsSchedule extends React.Component<IProps, IState> {
         </Table.Body>
       </Table>
     );
-    if (finalsMatches.length <= 0) {
+    if (playoffsMatches.length <= 0) {
       view = (<span>There are no finals matches to report.</span>);
     }
     return (
@@ -112,7 +112,7 @@ class FinalsSchedule extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     teamList: internalState.teamList,
-    finalsMatches: internalState.finalsMatches,
+    playoffsMatches: internalState.playoffsMatches,
     eventConfig: configState.eventConfiguration
   };
 }

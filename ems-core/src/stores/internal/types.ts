@@ -10,10 +10,9 @@ import {
   REMOVE_TEAM,
   SET_PRACTICE_MATCHES,
   SET_QUALIFICATION_MATCHES,
+  SET_PLAYOFFS_MATCHES,
   SET_SOCKET_CONNECTED,
-  SET_FINALS_MATCHES,
-  SET_ELIMINATIONS_MATCHES,
-  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES, ADD_PLAYOFFS_MATCHES
 } from "./constants";
 import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
@@ -95,15 +94,15 @@ export interface ISetQualificationMatches extends Action {
   }
 }
 
-export interface ISetFinalsMatches extends Action {
-  type: SET_FINALS_MATCHES,
+export interface ISetPlayoffsMatches extends Action {
+  type: SET_PLAYOFFS_MATCHES,
   payload: {
     matches: Match[]
   }
 }
 
-export interface ISetEliminationsMatches extends Action {
-  type: SET_ELIMINATIONS_MATCHES,
+export interface IAddPlayoffsMatches extends Action {
+  type: ADD_PLAYOFFS_MATCHES,
   payload: {
     matches: Match[]
   }
@@ -125,4 +124,4 @@ export interface ISetSocketConnected extends Action {
 
 export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation |
   IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetTestMatches | ISetPracticeMatches |
-  ISetFinalsMatches | ISetQualificationMatches | ISetEliminationsMatches | ISetSocketConnected | ISetAllianceMembers;
+  ISetPlayoffsMatches | IAddPlayoffsMatches | ISetQualificationMatches | ISetSocketConnected | ISetAllianceMembers;

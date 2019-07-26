@@ -11,9 +11,8 @@ import {
   SET_PRACTICE_MATCHES,
   SET_QUALIFICATION_MATCHES,
   SET_SOCKET_CONNECTED,
-  SET_FINALS_MATCHES,
-  SET_ELIMINATIONS_MATCHES,
-  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES
+  SET_PLAYOFFS_MATCHES,
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES, ADD_PLAYOFFS_MATCHES
 } from "./constants";
 import {
   IUpdateProcessList,
@@ -27,7 +26,7 @@ import {
   ISetPracticeMatches,
   ISetQualificationMatches,
   ISetSocketConnected,
-  ISetFinalsMatches, ISetEliminationsMatches, ISetAllianceMembers, ISetTestMatches
+  ISetPlayoffsMatches, ISetAllianceMembers, ISetTestMatches, IAddPlayoffsMatches
 } from "./types";
 import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
@@ -109,15 +108,15 @@ export const setQualificationMatches: ActionCreator<ISetQualificationMatches> = 
   }
 });
 
-export const setFinalsMatches: ActionCreator<ISetFinalsMatches> = (matches: Match[]) => ({
-  type: SET_FINALS_MATCHES,
+export const setPlayoffsMatches: ActionCreator<ISetPlayoffsMatches> = (matches: Match[]) => ({
+  type: SET_PLAYOFFS_MATCHES,
   payload: {
     matches: matches
   }
 });
 
-export const setEliminationsMatches: ActionCreator<ISetEliminationsMatches> = (matches: Match[]) => ({
-  type: SET_ELIMINATIONS_MATCHES,
+export const addPlayoffsMatches: ActionCreator<IAddPlayoffsMatches> = (matches: Match[]) => ({
+  type: ADD_PLAYOFFS_MATCHES,
   payload: {
     matches: matches
   }

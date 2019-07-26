@@ -9,8 +9,7 @@ export interface IInternalState {
   testMatches: Match[],
   practiceMatches: Match[],
   qualificationMatches: Match[],
-  finalsMatches: Match[],
-  eliminationsMatches: Match[],
+  playoffsMatches: Match[],
   allianceMembers: AllianceMember[]
   socketConnected: boolean
 }

@@ -6,9 +6,9 @@ import SetupRankingsOverview from "../../../components/SetupRankingsOverview";
 import SetupScheduleParams from "../../../components/SetupScheduleParams";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
-import {IDisableNavigation, ISetFinalsMatches} from "../../../stores/internal/types";
+import {IDisableNavigation, IAddPlayoffsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
-import {disableNavigation, setFinalsMatches} from "../../../stores/internal/actions";
+import {disableNavigation, addPlayoffsMatches} from "../../../stores/internal/actions";
 import {connect} from "react-redux";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupRunMatchMaker from "../../../components/SetupRunMatchMaker";
@@ -27,7 +27,7 @@ interface IProps {
   schedule?: Schedule,
   finalsMatches?: Match[],
   setNavigationDisabled?: (disabled?: boolean) => IDisableNavigation,
-  setFinalsMatches: (matches: Match[]) => ISetFinalsMatches
+  addPlayoffsMatches: (matches: Match[]) => IAddPlayoffsMatches
 }
 
 interface IState {
@@ -90,7 +90,7 @@ class EventFinalsSetup extends React.Component<IProps, IState> {
   }
 
   private onMatchMakerComplete(matches: Match[]) {
-    this.props.setFinalsMatches(matches);
+    this.props.addPlayoffsMatches(matches);
     this.setState({activeIndex: 4});
   }
 
@@ -124,14 +124,14 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     eventConfig: configState.eventConfiguration,
     event: configState.event,
     schedule: configState.finalsSchedule,
-    finalsMatches: internalState.finalsMatches
+    playoffsMatches: internalState.playoffsMatches
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
-    setFinalsMatches: (matches: Match[]) => dispatch(setFinalsMatches(matches))
+    addPlayoffsMatches: (matches: Match[]) => dispatch(addPlayoffsMatches(matches))
   };
 }
 

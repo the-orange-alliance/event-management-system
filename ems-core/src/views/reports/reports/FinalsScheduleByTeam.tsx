@@ -7,7 +7,7 @@ import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   teamList?: Team[],
-  finalsMatches?: Match[],
+  playoffsMatches?: Match[],
   eventConfig?: EventConfiguration,
   onHTMLUpdate: (htmlStr: string) => void
 }
@@ -32,14 +32,14 @@ class FinalsScheduleByTeam extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    const {finalsMatches, teamList} = this.props;
-    if (finalsMatches.length <= 0 || teamList.length <= 0) {
+    const {playoffsMatches, teamList} = this.props;
+    if (playoffsMatches.length <= 0 || teamList.length <= 0) {
       this.setState({generated: true});
     } else {
       for (const team of teamList) {
         this._teamMap.set(team.teamKey, team);
       }
-      for (const match of finalsMatches) {
+      for (const match of playoffsMatches) {
         for (const participant of match.participants) {
           if (typeof this._teamMatches.get(participant.teamKey) === "undefined") {
             this._teamMatches.set(participant.teamKey, []);
@@ -142,7 +142,7 @@ class FinalsScheduleByTeam extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     teamList: internalState.teamList,
-    finalsMatches: internalState.finalsMatches,
+    playoffsMatches: internalState.playoffsMatches,
     eventConfig: configState.eventConfiguration
   };
 }

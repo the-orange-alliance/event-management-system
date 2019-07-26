@@ -10,7 +10,7 @@ import {
 
 interface IProps {
   teamList?: Team[],
-  eliminationsMatches?: Match[],
+  playoffsMatches?: Match[],
   eventConfig?: EventConfiguration,
   onHTMLUpdate: (htmlStr: string) => void
 }
@@ -31,8 +31,8 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    const {eliminationsMatches, teamList} = this.props;
-    if (eliminationsMatches.length <= 0 || teamList.length <= 0) {
+    const {playoffsMatches, teamList} = this.props;
+    if (playoffsMatches.length <= 0 || teamList.length <= 0) {
       this.setState({generated: true});
     } else {
       for (const team of teamList) {
@@ -45,10 +45,10 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {onHTMLUpdate, eventConfig, eliminationsMatches} = this.props;
+    const {onHTMLUpdate, eventConfig, playoffsMatches} = this.props;
     const {generated} = this.state;
     const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
-    const matches = eliminationsMatches.map(match => {
+    const matches = playoffsMatches.filter(match => match.tournamentLevel > Match.OCTOFINALS_LEVEL).map(match => {
       const participants = match.participants.map((participant: MatchParticipant, index: number) => {
         if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
           const team: Team = this._teamMap.get(participant.teamKey);
@@ -97,7 +97,7 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
         </Table.Body>
       </Table>
     );
-    if (eliminationsMatches.length <= 0) {
+    if (playoffsMatches.length <= 0) {
       view = (<span>There are no eliminations matches to report.</span>);
     }
     return (
@@ -114,7 +114,7 @@ class EliminationsAnnouncers extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     teamList: internalState.teamList,
-    eliminationsMatches: internalState.eliminationsMatches,
+    playoffsMatches: internalState.playoffsMatches,
     eventConfig: configState.eventConfiguration
   };
 }

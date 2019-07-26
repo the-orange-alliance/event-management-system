@@ -2,21 +2,14 @@ import * as React from 'react';
 import './App.css';
 import AppContainer from "./components/AppContainer";
 import {ApplicationActions, IApplicationState} from "./stores";
-import {
-  IIncrementCompletedStep, ISetAllianceMembers, ISetEliminationsMatches, ISetFinalsMatches,
-  ISetPracticeMatches, ISetQualificationMatches, ISetSocketConnected,
-  IUpdateTeamList
-} from "./stores/internal/types";
+import {ISetSocketConnected} from "./stores/internal/types";
 import {Dispatch} from "redux";
 import {connect} from "react-redux";
 import {
-  incrementCompletedStep, setAllianceMembers, setEliminationsMatches, setFinalsMatches,
-  setPracticeMatches,
-  setQualificationMatches, setSocketConnected,
-  updateTeamList
+  incrementCompletedStep, setAllianceMembers, setSocketConnected,
 } from "./stores/internal/actions";
 
-import {EMSProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration, Team, Match,
+import {EMSProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
 AllianceMember} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -25,13 +18,6 @@ interface IProps {
   networkHost: string,
   toaConfig: TOAConfig,
   matchTimerConfig: MatchConfiguration,
-  setCompletedStep?: (step: number) => IIncrementCompletedStep,
-  setTeamList?: (teams: Team[]) => IUpdateTeamList,
-  setPracticeMatches?: (matches: Match[]) => ISetPracticeMatches,
-  setQualificationMatches?: (matches: Match[]) => ISetQualificationMatches,
-  setFinalsMatches?: (matches: Match[]) => ISetFinalsMatches,
-  setElimsMatches?: (matches: Match[]) => ISetEliminationsMatches,
-  setAllianceMembers?: (members: AllianceMember[]) => ISetAllianceMembers,
   setSocketConnected?: (connected: boolean) => ISetSocketConnected
 }
 
@@ -92,11 +78,6 @@ export function mapStateToProps(state: IApplicationState) {
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setCompletedStep: (step: number) => dispatch(incrementCompletedStep(step)),
-    setTeamList: (teams: Team[]) => dispatch(updateTeamList(teams)),
-    setPracticeMatches: (matches: Match[]) => dispatch(setPracticeMatches(matches)),
-    setQualificationMatches: (matches: Match[]) => dispatch(setQualificationMatches(matches)),
-    setFinalsMatches: (matches: Match[]) => dispatch(setFinalsMatches(matches)),
-    setElimsMatches: (matches: Match[]) => dispatch(setEliminationsMatches(matches)),
     setAllianceMembers: (members: AllianceMember[]) => dispatch(setAllianceMembers(members)),
     setSocketConnected: (connected: boolean) => dispatch(setSocketConnected(connected))
   };

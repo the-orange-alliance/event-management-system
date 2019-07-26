@@ -81,6 +81,21 @@ function createWindow () {
   });
 }
 
+const lock = app.requestSingleInstanceLock();
+
+if (!lock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    if (win) {
+      if (win.isMinimized()) {
+        win.restore();
+      }
+      win.focus();
+    }
+  });
+}
+
 app.on("ready", createWindow);
 
 // Quit when all windows are closed.

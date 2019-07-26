@@ -1,3 +1,6 @@
+!include "LogicLib.nsh"
+!include "x64.nsh"
+
 !define PRODUCT_GROUP "TheOrangeAlliance"
 !define DEFAULT_INST_DIR "$PROGRAMFILES\${PRODUCT_GROUP}\${PRODUCT_NAME}"
 
@@ -12,7 +15,8 @@
 
 !macro customInstall
   ClearErrors
-  ReadRegStr $0 HKLM "SOFTWARE\Node.js\Version" "NUL:"
+  ReadRegStr $0 HKLM "SOFTWARE\Node.js" "Version"
+  MessageBox MB_OK '$$0 is "$0"'
   ${If} ${Errors}
     ${If} ${RunningX64}
       File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x64.msi"

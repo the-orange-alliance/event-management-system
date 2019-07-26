@@ -16,7 +16,6 @@
 !macro customInstall
   ClearErrors
   ReadRegStr $0 HKLM "SOFTWARE\Node.js" "Version"
-  MessageBox MB_OK '$$0 is "$0"'
   ${If} ${Errors}
     ${If} ${RunningX64}
       File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x64.msi"

@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import logger from "./logger";
 import {execFile} from "child_process";
-import {TournamentType} from "@the-orange-alliance/lib-ems";
+import {Match, TournamentType} from "@the-orange-alliance/lib-ems";
 
 const appDataPath = app.getPath("appData") + path.sep + app.getName();
 
@@ -100,13 +100,13 @@ ipcMain.on("match-maker", (event: IpcMessageEvent, config: IMatchMakerOptions) =
 function getTournamentLevelFromType(type: TournamentType) {
   switch (type) {
     case "Practice":
-      return 0;
+      return Match.PRACTICE_LEVEL;
     case "Qualification":
-      return 1;
+      return Match.QUALIFICATION_LEVEL;
     case "Ranking":
-      return 6;
+      return Match.FINALS_LEVEL;
     default:
-      return 0;
+      return Match.PRACTICE_LEVEL;
   }
 }
 

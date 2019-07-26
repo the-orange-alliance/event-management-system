@@ -39,7 +39,7 @@ const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);
 const refereeRoom = new RefereeRoom(socket, timer);
 
-EMSProvider.initialize(host, parseInt(process.env.REACT_APP_EMS_API_PORT as string, 10));
+EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
 
 /**
  * Main socket connection/event logic. We're not trying to be super secure, but inside of EMS you will (eventually)

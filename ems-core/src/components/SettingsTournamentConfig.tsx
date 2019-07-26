@@ -98,7 +98,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         const rrAlliances = (tournamentRound.format as RoundRobinFormat).alliances;
         advancementView = (
           <Grid.Row>
-            <Grid.Column classname={"center-left-items"}><span>Alliances</span></Grid.Column>
+            <Grid.Column className={"center-left-items"}><span>Alliances</span></Grid.Column>
             <Grid.Column><NumericInput value={rrAlliances} onUpdate={this.setAlliances} label="Alliances"/></Grid.Column>
           </Grid.Row>
         );
@@ -113,7 +113,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         });
         advancementView = (
           <Grid.Row>
-            <Grid.Column classname={"center-left-items"}><span>Ranking Cutoff</span></Grid.Column>
+            <Grid.Column className={"center-left-items"}><span>Ranking Cutoff</span></Grid.Column>
             <Grid.Column><Dropdown fluid={true} selection={true} value={rCutoff} options={rankingsOptions} onChange={this.setRankingCutoffConfig}/></Grid.Column>
           </Grid.Row>
         );
@@ -124,13 +124,13 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         advancementView = [
           (
             <Grid.Row key={"#1"}>
-              <Grid.Column classname={"center-left-items"}><span>Alliance Captains</span></Grid.Column>
+              <Grid.Column className={"center-left-items"}><span>Alliance Captains</span></Grid.Column>
               <Grid.Column><Dropdown fluid={true} selection={true} value={elimsAlliances} options={DropdownData.AllianceCaptainItems} onChange={this.setAllianceCaptainConfig}/></Grid.Column>
             </Grid.Row>
           ),
           (
             <Grid.Row key={"#2"}>
-              <Grid.Column classname={"center-left-items"}><span>Eliminations Format</span></Grid.Column>
+              <Grid.Column className={"center-left-items"}><span>Eliminations Format</span></Grid.Column>
               <Grid.Column><Dropdown fluid={true} selection={true} value={elimsSeries} options={DropdownData.SeriesTypeItems} onChange={this.setElimsSeriesConfig}/></Grid.Column>
             </Grid.Row>
           )

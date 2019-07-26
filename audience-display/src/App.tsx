@@ -140,7 +140,9 @@ class App extends React.Component<IProps, IState> {
 
   private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {
     return new Promise<MatchParticipant[]>((resolve, reject) => {
-      EMSProvider.getMatchTeamRanks(match.matchKey).then((matchTeams: MatchParticipant[]) => {
+      const promise: Promise<MatchParticipant[]> = match.tournamentLevel !== 0 ? EMSProvider.getMatchTeamRanks(match.matchKey) : EMSProvider.getMatchTeams(match.matchKey);
+
+      promise.then((matchTeams: MatchParticipant[]) => {
         const participants: MatchParticipant[] = [];
         const matchTeamKeys = matchTeams.map((p: MatchParticipant) => p.teamKey);
         match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);

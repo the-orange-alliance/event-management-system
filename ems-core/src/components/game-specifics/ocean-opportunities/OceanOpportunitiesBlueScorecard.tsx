@@ -125,7 +125,7 @@ class OceanOpportunitiesBlueScorecard extends React.Component<IProps> {
               <span>SCORE: {match.blueScore}</span>
             </Grid.Column>
             <Grid.Column className={"align-center"}>
-              <Form.Checkbox label={"Coopertition"} disabled={disabled} fluid={true} checked={coopertition} onChange={this.changeCoopertition}/>
+              <Form.Checkbox label={"Coopertition"} disabled={disabled} checked={coopertition} onChange={this.changeCoopertition}/>
             </Grid.Column>
             <Grid.Column>
               <Form.Input label={"Minor Penalties"} disabled={disabled} fluid={true} value={penalties} onChange={this.changeMinorPenalties}/>

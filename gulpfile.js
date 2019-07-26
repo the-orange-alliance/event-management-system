@@ -16,6 +16,9 @@ gulp.task("generate-env:prod", () => {
         reactAppContents += "REACT_APP_" + app.name.toString().toUpperCase().replace("-", "_") + "_" + key + "=" + app.env_production[key] + "\n";
       }
     }
+    if (app.name === "ems-sck") {
+      contents += "API_PORT=" + ecosystemConfig.apps[0].env_production.PORT;
+    }
     fs.writeFileSync(app.name + ".env", contents);
   }
   fs.writeFileSync("ems-core.env", reactAppContents);
@@ -30,6 +33,9 @@ gulp.task("generate-env", () => {
         contents += key + "=" + app.env[key] + "\n";
         reactAppContents += "REACT_APP_" + app.name.toString().toUpperCase().replace("-", "_") + "_" + key + "=" + app.env[key] + "\n";
       }
+    }
+    if (app.name === "ems-sck") {
+      contents += "API_PORT=" + ecosystemConfig.apps[0].env.PORT;
     }
     fs.writeFileSync(app.name + ".env", contents);
   }

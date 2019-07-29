@@ -210,9 +210,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     this.closeConfirmModal();
     this.props.setEventConfig(this.state.configCopy);
     CONFIG_STORE.set("eventConfig", this.state.configCopy.toJSON()).then((data: any) => {
-      if (this.state.configCopy.tournamentConfig === "ranking" && this.props.completedStep === 4) {
-        this.props.setCompletedStep(5);
-      } else if (this.state.configCopy.tournamentConfig === "elims" && this.props.completedStep !== 4) {
+      if (this.props.completedStep !== 4) {
         this.props.setCompletedStep(4);
       }
     }).catch((error: AppError) => {

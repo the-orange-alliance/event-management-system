@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS "ranking" (
     wins INT,
     losses INT,
     ties INT,
+    alliance_key VARCHAR(25),
     FOREIGN KEY (team_key) REFERENCES "team"(team_key)
 );
 

@@ -130,7 +130,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
     const hasRanking: boolean = playoffsMatches.filter(match => match.tournamentLevel === Match.FINALS_LEVEL).length > 0;
     const hasEliminations: boolean = playoffsMatches.filter(match => match.tournamentLevel >= Match.OCTOFINALS_LEVEL).length > 0;
 
-    const levels: TournamentType[] = ["Test", "Practice", "Qualification"];
+    const levels: TournamentType[] = ["Practice", "Qualification"];
 
     if (hasRoundRobin) {
       levels.push("Round Robin");

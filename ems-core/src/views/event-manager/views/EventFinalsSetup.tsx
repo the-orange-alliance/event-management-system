@@ -123,7 +123,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     teamList: internalState.teamList,
     eventConfig: configState.eventConfiguration,
     event: configState.event,
-    schedule: configState.finalsSchedule,
+    schedule: configState.playoffsSchedule[0], // TODO - THIS NEEDS TO CHANGE
     playoffsMatches: internalState.playoffsMatches
   };
 }

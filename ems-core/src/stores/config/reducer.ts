@@ -1,17 +1,17 @@
 import {Reducer} from "redux";
 import {
+  ADD_PLAYOFFS_SCHEDULE,
   SET_BACKUP_DIR,
-  SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
-  SET_NETWORK_HOST,
+  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
+  SET_NETWORK_HOST, SET_PLAYOFFS_SCHEDULE,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {IConfigState} from "./models";
 import {ConfigActions} from "./types";
-import {MatchConfiguration, Schedule, EliminationsSchedule, TOAConfig, EventConfiguration, Event} from "@the-orange-alliance/lib-ems";
+import {MatchConfiguration, Schedule, TOAConfig, EventConfiguration, Event} from "@the-orange-alliance/lib-ems";
 
 export const initialState: IConfigState = {
   slaveModeEnabled: false,
@@ -23,8 +23,7 @@ export const initialState: IConfigState = {
   masterHost: undefined,
   practiceSchedule: new Schedule("Practice"),
   qualificationSchedule: new Schedule("Qualification"),
-  finalsSchedule: new Schedule("Ranking"),
-  eliminationsSchedule: new EliminationsSchedule(),
+  playoffsSchedule: [],
   toaConfig: new TOAConfig(),
   backupDir: "",
 };
@@ -43,10 +42,10 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, practiceSchedule: action.payload.schedule};
     case SET_QUALIFICATION_SCHEDULE:
       return {...state, qualificationSchedule: action.payload.schedule};
-    case SET_FINALS_SCHEDULE:
-      return {...state, finalsSchedule: action.payload.schedule};
-    case SET_ELIMINATIONS_SCHEDULE:
-      return {...state, eliminationsSchedule: action.payload.schedule};
+    case SET_PLAYOFFS_SCHEDULE:
+      return {...state, playoffsSchedule: action.payload.schedule};
+    case ADD_PLAYOFFS_SCHEDULE:
+      return {...state, playoffsSchedule: [...state.playoffsSchedule, action.payload.schedule]};
     case SET_MATCH_CONFIG:
       return {...state, matchConfig: action.payload.matchConfig};
     case SET_MASTER_HOST:

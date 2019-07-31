@@ -1,15 +1,15 @@
 import {Action} from "redux";
 import {
+  ADD_PLAYOFFS_SCHEDULE,
   SET_BACKUP_DIR,
-  SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
-  SET_NETWORK_HOST,
+  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
+  SET_NETWORK_HOST, SET_PLAYOFFS_SCHEDULE,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
   TOGGLE_SLAVE_MODE
 } from "./constants";
-import {EventConfiguration, MatchConfiguration, Schedule, EliminationsSchedule, TOAConfig} from "@the-orange-alliance/lib-ems";
+import {EventConfiguration, MatchConfiguration, Schedule, TOAConfig} from "@the-orange-alliance/lib-ems";
 
 export interface IToggleSlaveMode extends Action {
   type: TOGGLE_SLAVE_MODE,
@@ -53,17 +53,17 @@ export interface ISetQualificationSchedule extends Action {
   }
 }
 
-export interface ISetFinalsSchedule extends Action {
-  type: SET_FINALS_SCHEDULE,
+export interface ISetPlayoffsSchedule extends Action {
+  type: SET_PLAYOFFS_SCHEDULE,
   payload: {
-    schedule: Schedule
+    schedule: Schedule[]
   }
 }
 
-export interface ISetEliminationsSchedule extends Action {
-  type: SET_ELIMINATIONS_SCHEDULE,
+export interface IAddPlayoffsSchedule extends Action {
+  type: ADD_PLAYOFFS_SCHEDULE,
   payload: {
-    schedule: EliminationsSchedule
+    schedule: Schedule
   }
 }
 
@@ -103,5 +103,5 @@ export interface ISetBackupDir extends Action {
 }
 
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
-  ISetPracticeSchedule | ISetQualificationSchedule | ISetFinalsSchedule| ISetEliminationsSchedule |
+  ISetPracticeSchedule | ISetQualificationSchedule | ISetPlayoffsSchedule | IAddPlayoffsSchedule |
   ISetMatchConfig | ISetMasterHost | ISetSlaveID | ISetTOAConfig | ISetBackupDir;

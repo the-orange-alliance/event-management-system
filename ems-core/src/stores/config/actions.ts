@@ -1,25 +1,25 @@
 import {ActionCreator} from "redux";
 import {
+  ADD_PLAYOFFS_SCHEDULE,
   SET_BACKUP_DIR,
-  SET_ELIMINATIONS_SCHEDULE,
   SET_EVENT,
-  SET_EVENT_CONFIG, SET_FINALS_SCHEDULE, SET_MASTER_HOST, SET_MATCH_CONFIG,
-  SET_NETWORK_HOST,
+  SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
+  SET_NETWORK_HOST, SET_PLAYOFFS_SCHEDULE,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {
+  IAddPlayoffsSchedule,
   ISetBackupDir,
-  ISetEliminationsSchedule,
   ISetEvent,
-  ISetEventConfiguration, ISetFinalsSchedule, ISetMasterHost, ISetMatchConfig,
-  ISetNetworkHost,
+  ISetEventConfiguration, ISetMasterHost, ISetMatchConfig,
+  ISetNetworkHost, ISetPlayoffsSchedule,
   ISetPracticeSchedule,
   ISetQualificationSchedule, ISetSlaveID, ISetTOAConfig,
   IToggleSlaveMode
 } from "./types";
-import {EventConfiguration, MatchConfiguration, Schedule, EliminationsSchedule, TOAConfig} from "@the-orange-alliance/lib-ems";
+import {EventConfiguration, MatchConfiguration, Schedule, TOAConfig} from "@the-orange-alliance/lib-ems";
 
 export const enableSlaveMode: ActionCreator<IToggleSlaveMode> = (slaveModeEnabled: boolean) => ({
   type: TOGGLE_SLAVE_MODE,
@@ -63,15 +63,15 @@ export const setQualificationSchedule: ActionCreator<ISetQualificationSchedule> 
   }
 });
 
-export const setFinalsSchedule: ActionCreator<ISetFinalsSchedule> = (schedule: Schedule) => ({
-  type: SET_FINALS_SCHEDULE,
+export const setPlayoffsSchedule: ActionCreator<ISetPlayoffsSchedule> = (schedule: Schedule[]) => ({
+  type: SET_PLAYOFFS_SCHEDULE,
   payload: {
     schedule: schedule
   }
 });
 
-export const setEliminationsSchedule: ActionCreator<ISetEliminationsSchedule> = (schedule: EliminationsSchedule) => ({
-  type: SET_ELIMINATIONS_SCHEDULE,
+export const addPlayoffsSchedule: ActionCreator<IAddPlayoffsSchedule> = (schedule: Schedule) => ({
+  type: ADD_PLAYOFFS_SCHEDULE,
   payload: {
     schedule: schedule
   }

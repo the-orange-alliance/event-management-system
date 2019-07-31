@@ -13,8 +13,9 @@ import * as Internal from "./stores/internal/reducer";
 import {IInternalState} from "./stores/internal/models";
 import ProcessManager from "./managers/ProcessManager";
 import DialogManager from "./managers/DialogManager";
-import {AppError, EMSProvider, Process} from "@the-orange-alliance/lib-ems";
+import {AppError, EliminationsSchedule, EMSProvider, Process, RoundRobinSchedule} from "@the-orange-alliance/lib-ems";
 import InternalStateManager, {IInternalProgress} from "./managers/InternalStateManager";
+import Schedule from "@the-orange-alliance/lib-ems/dist/models/ems/Schedule";
 
 const {ipcRenderer} = (window as any).require("electron");
 
@@ -42,11 +43,17 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       if (typeof configStore.schedule.Qualification !== "undefined") {
         configState.qualificationSchedule = configState.qualificationSchedule.fromJSON(configStore.schedule.Qualification);
       }
-      if (typeof configStore.schedule.Finals !== "undefined") {
-        configState.finalsSchedule = configState.finalsSchedule.fromJSON(configStore.schedule.Finals);
-      }
-      if (typeof configStore.schedule.Eliminations !== "undefined") {
-        configState.eliminationsSchedule = configState.eliminationsSchedule.fromJSON(configStore.schedule.Eliminations);
+      if (typeof configStore.schedule.Playoffs !== "undefined" && Array.isArray(configStore.schedule.Playoffs)) {
+        configState.playoffsSchedule = configStore.map((scheduleJSON: any) => {
+          switch (scheduleJSON.type) {
+            case "Round Robin":
+              return new RoundRobinSchedule();
+            case "Eliminations":
+              return new EliminationsSchedule();
+            default:
+              return new Schedule("Ranking");
+          }
+        });
       }
     }
 

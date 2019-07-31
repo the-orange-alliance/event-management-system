@@ -197,6 +197,28 @@ class EventCreationManager {
     });
   }
 
+  public createTournamentRanks(rankings: Ranking[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      EMSProvider.getRankings().then((emsRankings: Ranking[]) => {
+        if (emsRankings.length > 0) {
+          resolve();
+        } else {
+          EMSProvider.postRankings(rankings).then(() => {
+            resolve();
+          }).catch((postError: HttpError) => {
+            reject(postError);
+          });
+        }
+      }).catch(() => {
+        EMSProvider.postRankings(rankings).then(() => {
+          resolve();
+        }).catch((postError: HttpError) => {
+          reject(postError);
+        });
+      });
+    });
+  }
+
   public postAlliances(members: AllianceMember[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getAlliances().then((emsMembers: AllianceMember[]) => {

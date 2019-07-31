@@ -1,52 +1,56 @@
 import * as React from "react";
 import {Button, Card, Divider, DropdownItemProps, DropdownProps, Form, Grid, Table} from "semantic-ui-react";
-import {getTheme} from "../../../AppTheme";
-import {ApplicationActions, IApplicationState} from "../../../stores";
+import {getTheme} from "../AppTheme";
+import {ApplicationActions, IApplicationState} from "../stores";
 import {connect} from "react-redux";
-import DialogManager from "../../../managers/DialogManager";
+import DialogManager from "../managers/DialogManager";
 import {SyntheticEvent} from "react";
-import {IDisableNavigation, ISetAllianceMembers} from "../../../stores/internal/types";
+import {IDisableNavigation, ISetAllianceMembers} from "../stores/internal/types";
 import {Dispatch} from "redux";
-import {disableNavigation, setAllianceMembers} from "../../../stores/internal/actions";
-import EventCreationManager from "../../../managers/EventCreationManager";
+import {disableNavigation, setAllianceMembers} from "../stores/internal/actions";
+import EventCreationManager from "../managers/EventCreationManager";
 import {
   AllianceMember, EliminationMatchesFormat, EMSProvider, Event, EventConfiguration, HttpError, Ranking,
-  SocketProvider
+  RoundRobinFormat,
+  SocketProvider, TournamentRound, Schedule
 } from "@the-orange-alliance/lib-ems";
 
 interface IProps {
-  onComplete: () => void,
+  activeRound: TournamentRound,
   eventConfig?: EventConfiguration,
   event?: Event,
+  playoffsSchedule?: Schedule[],
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   setAllianceMembers?: (members: AllianceMember[]) => ISetAllianceMembers
 }
 
 interface IState {
+  availableTeams: Ranking[],
+  canGenerate: boolean,
   rankings: Ranking[],
   inputValues: number[],
   autoAddStack: number[],
+  teamOptions: DropdownItemProps[],
+  pickedTeams: number[]
 }
 
 class EventAllianceSelection extends React.Component<IProps, IState> {
-  private _teamOptions: DropdownItemProps[];
-  private _pickedTeams: number[];
-
   constructor(props: IProps) {
     super(props);
     const initialValues: number[] = [];
-    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
-    const alliances = (tournamentRound.format as EliminationMatchesFormat).alliances;
-    for (let i = 0; i < (alliances * tournamentRound.format.teamsPerAlliance); i++) {
+
+    for (let i = 0; i < (this.getAlliances() * this.props.activeRound.format.teamsPerAlliance); i++) {
       initialValues.push(0);
     }
-    this._pickedTeams = [];
-    this._teamOptions = [];
     this.state = {
+      availableTeams: [],
+      canGenerate: false,
       rankings: [],
       inputValues: initialValues,
-      autoAddStack: []
+      autoAddStack: [],
+      teamOptions: [],
+      pickedTeams: []
     };
     this.autoRemoveTeam = this.autoRemoveTeam.bind(this);
     this.generateAlliances = this.generateAlliances.bind(this);
@@ -54,11 +58,12 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
 
   public componentDidMount() {
     EMSProvider.getRankingTeams().then((rankings: Ranking[]) => {
+      let teamOptions: DropdownItemProps[] = [];
       if (rankings.length) {
-        this._teamOptions = rankings.map(ranking => {
+        teamOptions = rankings.map(ranking => {
           return {key: ranking.teamKey, value: ranking.teamKey, text: `#${ranking.rank}. ${ranking.team.getFromIdentifier(this.props.eventConfig.teamIdentifier)}`};
         });
-        this.setState({rankings});
+        this.setState({rankings, teamOptions, availableTeams: rankings});
       }
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);
@@ -66,32 +71,25 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
   }
 
   public render() {
+    const {availableTeams, canGenerate, teamOptions, inputValues} = this.state;
+    const {activeRound, eventConfig, navigationDisabled} = this.props;
 
-    const {rankings, inputValues} = this.state;
-    const {eventConfig, navigationDisabled} = this.props;
-    let canGenerate: boolean = true;
+    const rankingsView = availableTeams.map((rank: Ranking) => {
+      const displayName = typeof rank.team !== "undefined" ? rank.team.getFromIdentifier(eventConfig.teamIdentifier) : rank.teamKey;
+      return (
+        <Table.Row key={rank.teamKey} onClick={this.autoAddTeam.bind(this, rank.teamKey)}>
+          <Table.Cell>{rank.rank}</Table.Cell>
+          <Table.Cell>{displayName}</Table.Cell>
+          <Table.Cell>{rank.played}</Table.Cell>
+        </Table.Row>
+      );
+    });
 
-    this._pickedTeams = [];
-    for (const value of inputValues) {
-      if (value <= 0) {
-        canGenerate = false;
-      } else {
-        if (value > 0 && this._pickedTeams.indexOf(value) <= -1) {
-          this._pickedTeams.push(value);
-        } else {
-          canGenerate = false;
-        }
-      }
-    }
-
-    const teamOptions = this._teamOptions;
     const alliances: any[] = [];
-    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
-    const captains = (tournamentRound.format as EliminationMatchesFormat).alliances;
-    for (let i = 0; i < captains; i++) {
+    for (let i = 0; i < this.getAlliances(); i++) {
       const alliancePicks: any[] = [];
-      for (let j = 0; j < (tournamentRound.format.teamsPerAlliance - 1); j++) {
-        const index = (j + 1) + (i * tournamentRound.format.teamsPerAlliance);
+      for (let j = 0; j < (activeRound.format.teamsPerAlliance - 1); j++) {
+        const index = (j + 1) + (i * activeRound.format.teamsPerAlliance);
         alliancePicks.push(
           <Grid.Column key={"alliance-" + (i + 1) + "-pick-" + (j + 1)}>
             <Form.Dropdown fluid={true} search={true} selection={true} options={teamOptions} value={inputValues[index]} onChange={this.changeTeam.bind(this, index)} label={"Pick #" + (j + 1)}/>
@@ -100,24 +98,10 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       }
       alliances.push(
         <Grid.Row key={"alliance-" + (i + 1)}>
-          <Grid.Column><Form.Dropdown fluid={true} search={true} selection={true} options={teamOptions} value={inputValues[i * tournamentRound.format.teamsPerAlliance]} onChange={this.changeTeam.bind(this, i * tournamentRound.format.teamsPerAlliance)} label={"Alliance Captain #" + (i + 1)}/></Grid.Column>
+          <Grid.Column><Form.Dropdown fluid={true} search={true} selection={true} options={teamOptions} value={inputValues[i * activeRound.format.teamsPerAlliance]} onChange={this.changeTeam.bind(this, i * activeRound.format.teamsPerAlliance)} label={"Alliance Captain #" + (i + 1)}/></Grid.Column>
           {alliancePicks}
         </Grid.Row>
       );
-    }
-
-    const availableRankings: any[] = [];
-    for (const rank of rankings) {
-      if (this._pickedTeams.indexOf(rank.teamKey) <= -1) {
-        const displayName = typeof rank.team !== "undefined" ? rank.team.getFromIdentifier(eventConfig.teamIdentifier) : rank.teamKey;
-        availableRankings.push(
-          <Table.Row key={rank.teamKey} onClick={this.autoAddTeam.bind(this, rank.teamKey)}>
-            <Table.Cell>{rank.rank}</Table.Cell>
-            <Table.Cell>{displayName}</Table.Cell>
-            <Table.Cell>{rank.played}</Table.Cell>
-          </Table.Row>
-        );
-      }
     }
 
     return (
@@ -145,7 +129,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
-                    {availableRankings}
+                    {rankingsView}
                   </Table.Body>
                 </Table>
               </Grid.Column>
@@ -167,8 +151,32 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
     );
   }
 
+  private getAlliances(): number {
+    const {activeRound} = this.props;
+    switch (activeRound.type) {
+      case "rr":
+        return (activeRound.format as RoundRobinFormat).alliances;
+      case "elims":
+        return (activeRound.format as EliminationMatchesFormat).alliances;
+      default:
+        return 0;
+    }
+  }
+
+  private updateAvailableTeams() {
+    const {availableTeams, inputValues, pickedTeams} = this.state;
+    for (const value of inputValues) {
+      if (value > 0 && pickedTeams.indexOf(value) <= -1) {
+        pickedTeams.push(value);
+      }
+    }
+    const newTeams: Ranking[] = availableTeams.filter((r: Ranking) => pickedTeams.indexOf(r.teamKey) === -1);
+    this.setState({canGenerate: inputValues.length === pickedTeams.length, availableTeams: newTeams});
+  }
+
   private changeTeam(index: number, event: SyntheticEvent, props: DropdownProps) {
     this.state.inputValues[index] = props.value as number;
+    this.updateAvailableTeams();
     this.sendAllianceUpdate();
     this.forceUpdate();
   }
@@ -178,6 +186,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       if (this.state.inputValues[i] <= 0) {
         this.state.inputValues[i] = teamKey;
         this.state.autoAddStack.push(i);
+        this.updateAvailableTeams();
         this.sendAllianceUpdate();
         this.forceUpdate();
         break;
@@ -189,20 +198,22 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
     if (this.state.autoAddStack.length > 0) {
       const index = this.state.autoAddStack.pop();
       this.state.inputValues[index] = 0;
+      this.updateAvailableTeams();
       this.sendAllianceUpdate();
       this.forceUpdate();
     }
   }
 
   private generateAlliances() {
+    const {activeRound, playoffsSchedule} = this.props;
     this.props.setNavigationDisabled(true);
     const members: AllianceMember[] = [];
+    const rankings: Ranking[] = [];
     let allianceIndex = 0;
-    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     for (let i = 0; i < this.state.inputValues.length; i++) {
       const member: AllianceMember = new AllianceMember();
-      const memberIndex = i % tournamentRound.format.teamsPerAlliance === 0 ? 1 : (i % tournamentRound.format.teamsPerAlliance + 1);
-      if (i % tournamentRound.format.teamsPerAlliance !== 0) {
+      const memberIndex = i % activeRound.format.teamsPerAlliance === 0 ? 1 : (i % activeRound.format.teamsPerAlliance + 1);
+      if (i % activeRound.format.teamsPerAlliance !== 0) {
         member.isCaptain = false;
       } else {
         member.isCaptain = true;
@@ -213,14 +224,32 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       member.allianceNameShort = allianceIndex.toString();
       member.teamKey = this.state.inputValues[i];
       members.push(member);
+
+      const rank: Ranking = new Ranking();
+      rank.allianceKey = member.allianceKey;
+      rank.teamKey = member.teamKey;
+      rank.rankKey = this.props.event.eventKey + "R" + member.teamKey;
+      rankings.push(rank);
     }
-    EventCreationManager.postAlliances(members).then(() => {
-      this.props.setAllianceMembers(members);
+    
+    const schedule = playoffsSchedule[activeRound.id];
+    schedule.teams = this.state.pickedTeams;
+    EventCreationManager.deleteRanks().then(() => {
+      EventCreationManager.createTournamentRanks(rankings).then(() => {
+        EventCreationManager.postAlliances(members).then(() => {
+          this.props.setAllianceMembers(members);
+          this.props.setNavigationDisabled(false);
+        }).catch((error: HttpError) => {
+          this.props.setNavigationDisabled(false);
+          DialogManager.showErrorBox(error);
+        });
+      }).catch((postRankErr: HttpError) => {
+        this.props.setNavigationDisabled(false);
+        DialogManager.showErrorBox(postRankErr);
+      });
+    }).catch((delRankErr: HttpError) => {
       this.props.setNavigationDisabled(false);
-      this.props.onComplete();
-    }).catch((error: HttpError) => {
-      this.props.setNavigationDisabled(false);
-      DialogManager.showErrorBox(error);
+      DialogManager.showErrorBox(delRankErr);
     });
   }
 
@@ -237,6 +266,7 @@ export function mapStateToProps({configState, internalState}: IApplicationState)
   return {
     eventConfig: configState.eventConfiguration,
     event: configState.event,
+    playoffsSchedule: configState.playoffsSchedule,
     navigationDisabled: internalState.navigationDisabled
   };
 }

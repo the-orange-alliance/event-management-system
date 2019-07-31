@@ -108,9 +108,7 @@ class SettingsEvent extends React.Component<IProps, IState> {
   private updateConfig() {
     this.closeConfirmModal();
     this.props.setEventConfig(this.state.configCopy);
-    CONFIG_STORE.set("eventConfig", this.state.configCopy.toJSON()).then((data: any) => {
-      console.log(data);
-    }).catch((error: AppError) => {
+    CONFIG_STORE.set("eventConfig", this.state.configCopy.toJSON()).catch((error: AppError) => {
       DialogManager.showErrorBox(error);
     });
   }

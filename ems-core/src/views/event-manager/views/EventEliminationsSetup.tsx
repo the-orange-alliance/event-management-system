@@ -115,7 +115,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     event: configState.event,
     eventConfig: configState.eventConfiguration,
     toaConfig: configState.toaConfig,
-    schedule: configState.eliminationsSchedule,
+    playoffsSchedule: configState.playoffsSchedule, // TODO - THIS NEEDS TO CHANGE HOW DO I EVEN HANDLE THIS HELP
     playoffsMatches: internalState.playoffsMatches
   };
 }

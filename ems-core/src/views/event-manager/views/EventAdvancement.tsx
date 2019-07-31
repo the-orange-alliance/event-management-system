@@ -1,6 +1,9 @@
 import * as React from "react";
 import {IDisableNavigation} from "../../../stores/internal/types";
-import {AppError, Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
+import {
+  AppError, Event, EventConfiguration, EliminationsSchedule, RoundRobinSchedule, Schedule,
+  PlayoffsType
+} from "@the-orange-alliance/lib-ems";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {disableNavigation} from "../../../stores/internal/actions";
 import {Dispatch} from "redux";
@@ -11,13 +14,19 @@ import TournamentRound from "@the-orange-alliance/lib-ems/dist/models/ems/Tourna
 import TournamentRoundCard from "../../../components/TournamentRoundCard";
 import {CONFIG_STORE} from "../../../AppStore";
 import DialogManager from "../../../managers/DialogManager";
+import TournamentParticipantSelection from "../../../components/TournamentParticipantSelection";
+import TournamentScheduleSetup from "../../../components/TournamentScheduleSetup";
+import {IAddPlayoffsSchedule} from "../../../stores/config/types";
+import {addPlayoffsSchedule} from "../../../stores/config/actions";
 
 interface IProps {
   onComplete: () => void,
+  playoffsSchedule: Schedule[],
   eventConfig?: EventConfiguration,
   event?: Event,
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  addSchedule?: (schedule: Schedule) => IAddPlayoffsSchedule
 }
 
 interface IState {
@@ -36,6 +45,10 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     this.onTabChange = this.onTabChange.bind(this);
   }
 
+  public componentDidMount() {
+    this.initSchedules();
+  }
+
   public render() {
     const {activeIndex} = this.state;
 
@@ -43,8 +56,8 @@ class EventAdvancementView extends React.Component<IProps, IState> {
       <div className={"step-view no-overflow"}>
         <Tab menu={{secondary: true}} activeIndex={activeIndex} onTabChange={this.onTabChange} panes={[
           { menuItem: "Tournament Overview", render: this.renderTournamentOverview },
-          { menuItem: "Participants", render: this.renderTournamentOverview },
-          { menuItem: "Schedule Parameters", render: this.renderTournamentOverview },
+          { menuItem: "Participants", render: ()=> <TournamentParticipantSelection/> },
+          { menuItem: "Schedule Parameters", render: ()=> <TournamentScheduleSetup/> },
           { menuItem: "Schedule Overview", render: this.renderTournamentOverview },
           { menuItem: "Match Maker Parameters", render: this.renderTournamentOverview },
           { menuItem: "Match Schedule Overview", render: this.renderTournamentOverview }
@@ -81,6 +94,21 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     );
   }
 
+  private initSchedules() {
+    const {eventConfig, playoffsSchedule} = this.props;
+    if (Array.isArray(eventConfig.tournament)) {
+      if (playoffsSchedule.length < eventConfig.tournament.length) {
+        for (const round of eventConfig.tournament) {
+          this.addScheduleByType(round.type);
+        }
+      }
+    } else {
+      if (playoffsSchedule.length < 1) {
+        this.addScheduleByType(eventConfig.tournament.type);
+      }
+    }
+  }
+
   private onTabChange(event: SyntheticEvent, props: TabProps) {
     if (!this.props.navigationDisabled) {
       this.setState({activeIndex: parseInt(props.activeIndex as string, 10)});
@@ -98,18 +126,34 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     });
   }
 
+  private addScheduleByType(type: PlayoffsType): void {
+    const {addSchedule} = this.props;
+    switch (type) {
+      case "rr":
+        addSchedule(new RoundRobinSchedule());
+        break;
+      case "elims":
+        addSchedule(new EliminationsSchedule());
+        break;
+      default:
+        addSchedule(new Schedule("Ranking"));
+    }
+  }
+
 }
 
 function mapStateToProps({configState}: IApplicationState) {
   return {
     event: configState.event,
-    eventConfig: configState.eventConfiguration
+    eventConfig: configState.eventConfiguration,
+    playoffsSchedule: configState.playoffsSchedule
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
     setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled)),
+    addSchedule: (schedule: Schedule) => dispatch(addPlayoffsSchedule(schedule))
   };
 }
 

@@ -30,6 +30,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
     if (playoffsSchedule.length > 0) {
       const format: RoundRobinFormat = activeRound.format as RoundRobinFormat;
       (playoffsSchedule[activeRound.id] as RoundRobinSchedule).alliances = format.alliances;
+      (playoffsSchedule[activeRound.id] as RoundRobinSchedule).teamsPerAlliance = format.teamsPerAlliance;
       this.forceUpdate();
     }
   }

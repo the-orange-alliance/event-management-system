@@ -10,10 +10,11 @@ import {Dispatch} from "redux";
 import {disableNavigation, setAllianceMembers} from "../stores/internal/actions";
 import EventCreationManager from "../managers/EventCreationManager";
 import {
-  AllianceMember, EliminationMatchesFormat, EMSProvider, Event, EventConfiguration, HttpError, Ranking,
+  AppError, AllianceMember, EliminationMatchesFormat, EMSProvider, Event, EventConfiguration, HttpError, Ranking,
   RoundRobinFormat,
   SocketProvider, TournamentRound, Schedule
 } from "@the-orange-alliance/lib-ems";
+import {CONFIG_STORE} from "../AppStore";
 
 interface IProps {
   activeRound: TournamentRound,
@@ -231,17 +232,32 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
       rank.rankKey = this.props.event.eventKey + "R" + member.teamKey;
       rankings.push(rank);
     }
-    
+
     const schedule = playoffsSchedule[activeRound.id];
     schedule.teams = this.state.pickedTeams;
     EventCreationManager.deleteRanks().then(() => {
       EventCreationManager.createTournamentRanks(rankings).then(() => {
         EventCreationManager.postAlliances(members).then(() => {
-          this.props.setAllianceMembers(members);
+          CONFIG_STORE.getAll().then((config: any) => {
+            let configSchedule: any = {};
+            if (typeof config.schedule !== "undefined") {
+              configSchedule = config.schedule;
+            }
+            configSchedule[schedule.type] = schedule.toJSON();
+            CONFIG_STORE.set("schedule", configSchedule).then(() => {
+              this.props.setAllianceMembers(members);
+              this.props.setNavigationDisabled(false);
+            }).catch((setError: AppError) => {
+              this.props.setNavigationDisabled(false);
+              DialogManager.showErrorBox(setError);
+            });
+          }).catch((getError: AppError) => {
+            this.props.setNavigationDisabled(false);
+            DialogManager.showErrorBox(getError);
+          });
+        }).catch((postError: HttpError) => {
           this.props.setNavigationDisabled(false);
-        }).catch((error: HttpError) => {
-          this.props.setNavigationDisabled(false);
-          DialogManager.showErrorBox(error);
+          DialogManager.showErrorBox(postError);
         });
       }).catch((postRankErr: HttpError) => {
         this.props.setNavigationDisabled(false);

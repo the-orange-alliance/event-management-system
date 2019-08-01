@@ -1,19 +1,23 @@
 import * as React from "react";
 import {Button, Card, Dimmer, Divider, Form, Grid, Input, InputProps, Loader, Tab} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
-import {EventConfiguration, Schedule, RoundRobinFormat, TournamentRound, RoundRobinSchedule} from "@the-orange-alliance/lib-ems";
+import {Event, EventConfiguration, Schedule, ScheduleItem, RoundRobinFormat, TournamentRound, RoundRobinSchedule} from "@the-orange-alliance/lib-ems";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import ExplanationIcon from "./ExplanationIcon";
 import DatePicker from "react-datepicker";
 import * as moment from "moment";
 import {SyntheticEvent} from "react";
+import {CONFIG_STORE} from "../AppStore";
+import DialogManager from "../managers/DialogManager";
 
 interface IProps {
   activeRound: TournamentRound,
+  event?: Event,
   eventConfig?: EventConfiguration,
   navigationDisabled?: boolean,
-  playoffsSchedule?: Schedule[]
+  playoffsSchedule?: Schedule[],
+  onScheduleParamsComplete: (scheduleItems: ScheduleItem[]) => void
 }
 
 class SetupRoundRobinScheduleParams extends React.Component<IProps> {
@@ -21,8 +25,10 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
     super(props);
 
     this.updateCycleTime = this.updateCycleTime.bind(this);
+    this.updateRoundBreakTime = this.updateRoundBreakTime.bind(this);
     this.addDay = this.addDay.bind(this);
     this.removeDay = this.removeDay.bind(this);
+    this.generateSchedule = this.generateSchedule.bind(this);
   }
 
   public componentDidMount() {
@@ -98,6 +104,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
                 <Form.Input label={"Total Rounds"} disabled={true} value={schedule.maxTotalRounds}/>
                 <Form.Input label={"Matches Per Round"} disabled={true} value={schedule.maxMatchesPerRound}/>
                 <Form.Input label={"Total Matches"} disabled={true} value={schedule.maxTotalMatches}/>
+                <Form.Input label={<ExplanationIcon title={"Round Break Time"} content={"This will set a default duration between rounds of the tournament."}/>} value={schedule.roundBreakTime} error={schedule.roundBreakTime < 0} onChange={this.updateRoundBreakTime}/>
                 <Form.Input label="Cycle Time" value={schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
               </Form.Group>
             </Form>
@@ -116,7 +123,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
               <Divider />
               <Grid columns={16}>
                 <Grid.Row>
-                  <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} disabled={this.props.navigationDisabled} fluid={true}>Add Day</Button></Grid.Column>
+                  <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.addDay} disabled={navigationDisabled} fluid={true}>Add Day</Button></Grid.Column>
                   <Grid.Column largeScreen={2} tablet={4}><Button color={getTheme().primary} onClick={this.removeDay} disabled={!this.canRemoveDay() || this.props.navigationDisabled} fluid={true}>Remove Day</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
@@ -130,7 +137,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
           <Card.Content>
             <Grid>
               <Grid.Row columns={16}>
-                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} loading={this.props.navigationDisabled} disabled={!schedule.isValid() || this.props.navigationDisabled}>Generate Schedule</Button></Grid.Column>
+                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} loading={navigationDisabled} disabled={!schedule.isValid() || navigationDisabled} onClick={this.generateSchedule}>Generate Schedule</Button></Grid.Column>
                 <Grid.Column width={12} className="center-left-items">
                   {
                     schedule.validationMessage.length > 0 &&
@@ -151,15 +158,20 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
       const schedule = playoffsSchedule[activeRound.id] as RoundRobinSchedule;
       schedule.cycleTime = parseInt(props.value, 10);
       schedule.forceUpdate();
+      console.log(schedule);
       this.forceUpdate();
     }
   }
 
-  // private isValidMatchConcurrency(): boolean {
-  //   const {activeRound, playoffsSchedule} = this.props;
-  //   const schedule = playoffsSchedule[activeRound.id] as RoundRobinSchedule;
-  //   return !isNaN(schedule.matchConcurrency) && schedule.matchConcurrency  > 0;
-  // }
+  private updateRoundBreakTime(event: SyntheticEvent, props: InputProps) {
+    if (!isNaN(props.value)) {
+      const {activeRound, playoffsSchedule} = this.props;
+      const schedule = playoffsSchedule[activeRound.id] as RoundRobinSchedule;
+      schedule.roundBreakTime = parseInt(props.value, 10);
+      schedule.forceUpdate();
+      this.forceUpdate();
+    }
+  }
 
   private isValidCycleTime(): boolean {
     const {activeRound, playoffsSchedule} = this.props;
@@ -255,10 +267,32 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
       this.forceUpdate();
     }
   }
+
+  private generateSchedule() {
+    const {activeRound, event, playoffsSchedule, onScheduleParamsComplete} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as RoundRobinSchedule;
+    schedule.totalMatches = schedule.maxTotalMatches;
+    CONFIG_STORE.getAll().then((config: any) => {
+      let configSchedule: any = {};
+      if (typeof config.schedule !== "undefined") {
+        configSchedule = config.schedule;
+      }
+      configSchedule.Playoffs = playoffsSchedule.map((s: Schedule) => s.toJSON());
+      CONFIG_STORE.set("schedule", configSchedule).then(() => {
+        onScheduleParamsComplete(schedule.generateSchedule(event));
+      }).catch((err) => {
+        console.log(err);
+        DialogManager.showErrorBox(err);
+      });
+    }).catch((err) => {
+      DialogManager.showErrorBox(err);
+    });
+  }
 }
 
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
+    event: configState.event,
     eventConfig: configState.eventConfiguration,
     navigationDisabled: internalState.navigationDisabled,
     playoffsSchedule: configState.playoffsSchedule

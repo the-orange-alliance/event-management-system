@@ -18,6 +18,8 @@ import TournamentParticipantSelection from "../../../components/TournamentPartic
 import TournamentScheduleSetup from "../../../components/TournamentScheduleSetup";
 import {IAddPlayoffsSchedule} from "../../../stores/config/types";
 import {addPlayoffsSchedule} from "../../../stores/config/actions";
+import TournamentScheduleOverview from "../../../TournamentScheduleOverview";
+import TournamentMatchMakerParams from "../../../components/TournamentMatchMakerParams";
 
 interface IProps {
   onComplete: () => void,
@@ -58,8 +60,8 @@ class EventAdvancementView extends React.Component<IProps, IState> {
           { menuItem: "Tournament Overview", render: this.renderTournamentOverview },
           { menuItem: "Participants", render: ()=> <TournamentParticipantSelection/> },
           { menuItem: "Schedule Parameters", render: ()=> <TournamentScheduleSetup/> },
-          { menuItem: "Schedule Overview", render: this.renderTournamentOverview },
-          { menuItem: "Match Maker Parameters", render: this.renderTournamentOverview },
+          { menuItem: "Schedule Overview", render: ()=> <TournamentScheduleOverview/> },
+          { menuItem: "Match Maker Parameters", render: () => <TournamentMatchMakerParams/> },
           { menuItem: "Match Schedule Overview", render: this.renderTournamentOverview }
         ]}/>
       </div>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {EventConfiguration, TournamentRound, Schedule} from "@the-orange-alliance/lib-ems";
+import {EventConfiguration, TournamentRound, Schedule, ScheduleItem, HttpError} from "@the-orange-alliance/lib-ems";
 import {ApplicationActions, IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Tab} from "semantic-ui-react";
@@ -7,11 +7,16 @@ import SetupRoundRobinScheduleParams from "./SetupRoundRobinScheduleParams";
 import {IAddPlayoffsSchedule} from "../stores/config/types";
 import {addPlayoffsSchedule} from "../stores/config/actions";
 import {Dispatch} from "redux";
+import DialogManager from "../managers/DialogManager";
+import EventCreationManager from "../managers/EventCreationManager";
+import {IDisableNavigation} from "../stores/internal/types";
+import {disableNavigation} from "../stores/internal/actions";
 
 interface IProps {
   eventConfig?: EventConfiguration,
   playoffsSchedule: Schedule[],
-  addSchedule?: (schedule: Schedule) => IAddPlayoffsSchedule
+  addSchedule?: (schedule: Schedule) => IAddPlayoffsSchedule,
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
 }
 
 class TournamentScheduleOverview extends React.Component<IProps> {
@@ -49,10 +54,10 @@ class TournamentScheduleOverview extends React.Component<IProps> {
     } else {
       switch (activeTournament.type) {
         case "rr":
-          view = <SetupRoundRobinScheduleParams activeRound={activeTournament}/>;
+          view = <SetupRoundRobinScheduleParams activeRound={activeTournament} onScheduleParamsComplete={this.onScheduleParamsComplete}/>;
           break;
         case "elims":
-          view = <SetupRoundRobinScheduleParams activeRound={activeTournament}/>;
+          view = <SetupRoundRobinScheduleParams activeRound={activeTournament} onScheduleParamsComplete={this.onScheduleParamsComplete}/>;
           break;
         case "ranking":
           view = <span>Nope.</span>;
@@ -63,8 +68,15 @@ class TournamentScheduleOverview extends React.Component<IProps> {
     return (view);
   }
 
-  private onScheduleParamsComplete(schedule: Schedule) {
-    console.log(schedule);
+  private onScheduleParamsComplete(scheduleItems: ScheduleItem[]) {
+    this.props.setNavigationDisabled(true);
+    EventCreationManager.createSchedule(scheduleItems[0].type, scheduleItems).then(() => {
+      this.props.setNavigationDisabled(false);
+      this.setState({activeIndex: 1});
+    }).catch((error: HttpError) => {
+      this.props.setNavigationDisabled(false);
+      DialogManager.showErrorBox(error);
+    });
   }
 }
 
@@ -77,7 +89,8 @@ export function mapStateToProps({configState}: IApplicationState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    addSchedule: (schedule: Schedule) => dispatch(addPlayoffsSchedule(schedule))
+    addSchedule: (schedule: Schedule) => dispatch(addPlayoffsSchedule(schedule)),
+    setNavigationDisabled: (disabled: boolean) => dispatch(disableNavigation(disabled))
   };
 }
 

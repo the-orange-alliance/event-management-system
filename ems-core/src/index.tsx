@@ -44,14 +44,14 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
         configState.qualificationSchedule = configState.qualificationSchedule.fromJSON(configStore.schedule.Qualification);
       }
       if (typeof configStore.schedule.Playoffs !== "undefined" && Array.isArray(configStore.schedule.Playoffs)) {
-        configState.playoffsSchedule = configStore.map((scheduleJSON: any) => {
+        configState.playoffsSchedule = configStore.schedule.Playoffs.map((scheduleJSON: any) => {
           switch (scheduleJSON.type) {
             case "Round Robin":
-              return new RoundRobinSchedule();
+              return new RoundRobinSchedule().fromJSON(scheduleJSON);
             case "Eliminations":
-              return new EliminationsSchedule();
+              return new EliminationsSchedule().fromJSON(scheduleJSON);
             default:
-              return new Schedule("Ranking");
+              return new Schedule("Ranking").fromJSON(scheduleJSON);
           }
         });
       }

@@ -243,7 +243,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
             if (typeof config.schedule !== "undefined") {
               configSchedule = config.schedule;
             }
-            configSchedule[schedule.type] = schedule.toJSON();
+            configSchedule.Playoffs = playoffsSchedule.map((s: Schedule) => s.toJSON());
             CONFIG_STORE.set("schedule", configSchedule).then(() => {
               this.props.setAllianceMembers(members);
               this.props.setNavigationDisabled(false);

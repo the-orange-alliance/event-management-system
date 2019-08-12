@@ -39,14 +39,15 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
         </Tab.Pane>
       );
     } else {
-      switch (activeTournament.type) {
-        case "rr":
-          view = ();
-        case "elims":
-          view = ();
-        case "ranking":
-          view = ();
-      }
+      view = (<i>hi</i>);
+      // switch (activeTournament.type) {
+      //   case "rr":
+      //     view = ();
+      //   case "elims":
+      //     view = ();
+      //   case "ranking":
+      //     view = ();
+      // }
     }
 
     return (view);

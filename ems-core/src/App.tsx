@@ -9,7 +9,7 @@ import {
   incrementCompletedStep, setAllianceMembers, setSocketConnected,
 } from "./stores/internal/actions";
 
-import {EMSProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
+import {EMSProvider, FGCProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
 AllianceMember} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -30,6 +30,9 @@ class App extends React.Component<IProps> {
     if (this.props.toaConfig.enabled) {
       TOAProvider.initialize(this.props.toaConfig);
     }
+
+    // Debug
+    FGCProvider.initialize("127.0.0.1", 8088);
 
     this.initializeSocket(this.props.networkHost);
     WebProvider.initialize(this.props.networkHost);

@@ -11,11 +11,12 @@ import {connect} from "react-redux";
 import DialogManager from "../../../managers/DialogManager";
 import TeamValidator from "../../../validators/TeamValidator";
 import EventCreationManager from "../../../managers/EventCreationManager";
-import TOAUploadManager from "../../../managers/TOAUploadManager";
+// import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {
   EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider,
   EliminationMatchesFormat
 } from "@the-orange-alliance/lib-ems";
+import FGCUploadedManager from "../../../managers/FGCUploadedManager";
 
 interface IProps {
   onComplete: () => void,
@@ -129,7 +130,12 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
       updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + this.props.teams[i].teamKey;
     }
     if (this.props.toaConfig.enabled) {
-      TOAUploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
+      // TOAUploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
+      //   console.log(`${updatedTeams.length} teams have been posted to TOA`);
+      // }).catch((error: HttpError) => {
+      //   DialogManager.showErrorBox(error);
+      // });
+      FGCUploadedManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
         console.log(`${updatedTeams.length} teams have been posted to TOA`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);

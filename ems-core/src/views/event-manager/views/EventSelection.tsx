@@ -21,9 +21,9 @@ import {disableNavigation, setTestMatches} from "../../../stores/internal/action
 import DialogManager from "../../../managers/DialogManager";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import {
-  DropdownData, EMSEventAdapter, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData,
+  DropdownData, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData,
   SeasonData,
-  TOAConfig, TOAEvent, TOAProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET,
+  TOAConfig, TOAProvider, FGCProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, SeriesType, ROUND_ROBIN_PRESET, RANKING_PRESET,
   ELIMINATIONS_PRESET
 } from "@the-orange-alliance/lib-ems";
@@ -293,9 +293,25 @@ class EventSelection extends React.Component<IProps, IState> {
   private downloadTOAData() {
     this.setState({downloadingData: true});
     TOAProvider.initialize(this.props.toaConfig);
-    TOAProvider.getEvent(this.props.toaConfig.eventKey).then((toaEvent: TOAEvent) => {
-      if (toaEvent && toaEvent.eventKey && toaEvent.eventKey.length > 0) {
-        this.props.setEvent(new EMSEventAdapter(toaEvent).get());
+    // TOAProvider.getEvent(this.props.toaConfig.eventKey).then((toaEvent: TOAEvent) => {
+    //   if (toaEvent && toaEvent.eventKey && toaEvent.eventKey.length > 0) {
+    //     this.props.setEvent(new EMSEventAdapter(toaEvent).get());
+    //     this.props.toaConfig.enabled = true;
+    //     this._validator.update(this.props.eventConfig, this.props.event);
+    //     this.forceUpdate();
+    //   } else {
+    //     DialogManager.showInfoBox("TheOrangeAlliance", `The Orange Alliance does not contain any event info for "${this.props.toaConfig.eventKey}". Are you sure your event information is posted online?`);
+    //   }
+    //   this.setState({downloadingData: false});
+    // }).catch((error: HttpError) => {
+    //   this.props.toaConfig.enabled = false;
+    //   console.log(error);
+    //   this.setState({downloadingData: false});
+    //   DialogManager.showErrorBox(error);
+    // });
+    FGCProvider.getEvent(this.props.toaConfig.eventKey).then((event: Event) => {
+      if (event && event.eventKey && event.eventKey.length > 0) {
+        this.props.setEvent(event);
         this.props.toaConfig.enabled = true;
         this._validator.update(this.props.eventConfig, this.props.event);
         this.forceUpdate();

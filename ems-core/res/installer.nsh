@@ -14,25 +14,12 @@
 !macroend
 
 !macro customInstall
-  ClearErrors
   ReadRegStr $0 HKLM "SOFTWARE\Node.js" "Version"
-  ${If} ${Errors}
-    ${If} ${RunningX64}
-      File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x64.msi"
-      ExecWait "${BUILD_RESOURCES_DIR}}\nodejs\node-v10.16.0-x64.msi"
-    ${Else}
-      File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x86.msi"
-      ExecWait "${BUILD_RESOURCES_DIR}}\nodejs\node-v10.16.0-x86.msi"
-    ${EndIf}
+  ${If} ${RunningX64}
+    File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x64.msi"
+    ExecWait "${BUILD_RESOURCES_DIR}}\nodejs\node-v10.16.0-x64.msi"
   ${Else}
-    ${If} $0 == ""
-      ${If} ${RunningX64}
-        File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x64.msi"
-        ExecWait "${BUILD_RESOURCES_DIR}}\nodejs\node-v10.16.0-x64.msi"
-      ${Else}
-        File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x86.msi"
-        ExecWait "${BUILD_RESOURCES_DIR}}\nodejs\node-v10.16.0-x86.msi"
-      ${EndIf}
-    ${EndIf}
+    File "${BUILD_RESOURCES_DIR}\nodejs\node-v10.16.0-x86.msi"
+    ExecWait "${BUILD_RESOURCES_DIR}}\nodejs\node-v10.16.0-x86.msi"
   ${EndIf}
 !macroend

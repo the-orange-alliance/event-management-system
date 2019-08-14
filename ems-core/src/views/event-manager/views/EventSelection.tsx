@@ -23,13 +23,14 @@ import EventCreationManager from "../../../managers/EventCreationManager";
 import {
   DropdownData, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData,
   SeasonData,
-  TOAConfig, TOAProvider, FGCProvider, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET,
+  TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, SeriesType, ROUND_ROBIN_PRESET, RANKING_PRESET,
   ELIMINATIONS_PRESET
 } from "@the-orange-alliance/lib-ems";
 import NumericInput from "../../../components/NumericInput";
 import MatchManager from "../../../managers/MatchManager";
 import TournamentValidator from "../../../validators/TournamentValidator";
+import UploadManager, {FGC} from "../../../managers/UploadManager";
 
 interface IProps {
   onComplete: () => void,
@@ -289,27 +290,11 @@ class EventSelection extends React.Component<IProps, IState> {
     );
   }
 
-  /* TOA Download Methods */
+  /* Online Download Methods */
   private downloadTOAData() {
     this.setState({downloadingData: true});
-    TOAProvider.initialize(this.props.toaConfig);
-    // TOAProvider.getEvent(this.props.toaConfig.eventKey).then((toaEvent: TOAEvent) => {
-    //   if (toaEvent && toaEvent.eventKey && toaEvent.eventKey.length > 0) {
-    //     this.props.setEvent(new EMSEventAdapter(toaEvent).get());
-    //     this.props.toaConfig.enabled = true;
-    //     this._validator.update(this.props.eventConfig, this.props.event);
-    //     this.forceUpdate();
-    //   } else {
-    //     DialogManager.showInfoBox("TheOrangeAlliance", `The Orange Alliance does not contain any event info for "${this.props.toaConfig.eventKey}". Are you sure your event information is posted online?`);
-    //   }
-    //   this.setState({downloadingData: false});
-    // }).catch((error: HttpError) => {
-    //   this.props.toaConfig.enabled = false;
-    //   console.log(error);
-    //   this.setState({downloadingData: false});
-    //   DialogManager.showErrorBox(error);
-    // });
-    FGCProvider.getEvent(this.props.toaConfig.eventKey).then((event: Event) => {
+    UploadManager.initialize(FGC, this.props.toaConfig);
+    UploadManager.getEvent(this.props.toaConfig.eventKey).then((event: Event) => {
       if (event && event.eventKey && event.eventKey.length > 0) {
         this.props.setEvent(event);
         this.props.toaConfig.enabled = true;

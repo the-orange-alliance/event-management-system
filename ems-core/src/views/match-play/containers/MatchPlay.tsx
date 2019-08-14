@@ -18,13 +18,13 @@ import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
-import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {
   Event, EventConfiguration, HttpError, Match, MatchDetails, MatchConfiguration, MatchParticipant,
   MatchState, MatchTimer, SocketProvider, TOAConfig, TournamentType, EliminationMatchesFormat
 } from "@the-orange-alliance/lib-ems";
 import InternalStateManager from "../../../managers/InternalStateManager";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
+import UploadManager from "../../../managers/UploadManager";
 
 interface IProps {
   mode: string,
@@ -316,14 +316,15 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.setState({committingScores: true});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
-    if (this.props.toaConfig.enabled) {
-      TOAUploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
-        console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
-      }).catch((error: HttpError) => {
-        DialogManager.showErrorBox(error);
-      });
-    }
     MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
+      if (this.props.toaConfig.enabled) {
+        UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
+          console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
+        }).catch((error: HttpError) => {
+          DialogManager.showErrorBox(error);
+        });
+      }
+
       this.props.setNavigationDisabled(false);
       this.props.setMatchState(MatchState.PRESTART_READY);
       this.setState({committingScores: false});

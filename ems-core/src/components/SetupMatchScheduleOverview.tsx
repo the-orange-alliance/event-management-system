@@ -146,7 +146,6 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
   private publish() {
     this.closeConfirmModal();
     this.props.onComplete(this.state.postOnline);
-    console.log(this.state.postOnline);
   }
 }
 

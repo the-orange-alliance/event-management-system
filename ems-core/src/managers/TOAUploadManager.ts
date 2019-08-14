@@ -1,7 +1,10 @@
-import {EMSProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team,
+import {
+  EMSProvider, Event, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team,
   TOAEventParticipant, TOAEventParticipantAdapter, TOAMatch, TOAMatchAdapter, TOAMatchDetails, TOAMatchDetailsAdapter,
-  TOAMatchParticipant, TOAMatchParticipantAdapter, TOAProvider, TOARanking, TOARankingAdapter
+  TOAMatchParticipant, TOAMatchParticipantAdapter, TOAProvider, TOARanking, TOARankingAdapter, EMSEventAdapter,
+  TOAEvent, EMSTeamAdapter
 } from "@the-orange-alliance/lib-ems";
+import TeamValidator from "../validators/TeamValidator";
 
 class TOAUploadManager {
   private static _instance: TOAUploadManager;
@@ -14,6 +17,43 @@ class TOAUploadManager {
   }
 
   private constructor() {}
+
+  public getEvent(eventKey: string): Promise<Event> {
+    return new Promise<Event>((resolve, reject) => {
+      TOAProvider.getEvent(eventKey).then((event: TOAEvent) => {
+        if (event && event.eventKey && event.eventKey.length > 0) {
+          resolve(new EMSEventAdapter(event).get());
+        } else {
+          reject();
+        }
+      }).catch((error: HttpError) => {
+        reject(error);
+      });
+
+    });
+  }
+
+  public getTeams(eventKey: string): Promise<Team[]> {
+    return new Promise<Team[]>((resolve, reject) => {
+      TOAProvider.getTeams(eventKey).then((toaParticipants: TOAEventParticipant[]) => {
+        const teams: Team[] = [];
+        for (const toaParticipant of toaParticipants) {
+          if (typeof toaParticipant.team !== "undefined") {
+            const team: Team = new EMSTeamAdapter(toaParticipant.team).get();
+            team.participantKey = toaParticipant.eventParticipantKey;
+            const validator: TeamValidator = new TeamValidator(team);
+            validator.update(team);
+            if (validator.isValid) {
+              teams.push(team);
+            }
+          }
+        }
+        resolve(teams);
+      }).catch((error: HttpError) => {
+        reject(error);
+      });
+    });
+  }
 
   public postEventParticipants(eventKey: string, teams: Team[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {

@@ -9,8 +9,9 @@ import {
   incrementCompletedStep, setAllianceMembers, setSocketConnected,
 } from "./stores/internal/actions";
 
-import {EMSProvider, FGCProvider, TOAProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
+import {EMSProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
 AllianceMember} from "@the-orange-alliance/lib-ems";
+import UploadManager from "./managers/UploadManager";
 
 interface IProps {
   slaveModeEnabled: boolean,
@@ -28,11 +29,8 @@ class App extends React.Component<IProps> {
 
   public componentDidMount() {
     if (this.props.toaConfig.enabled) {
-      TOAProvider.initialize(this.props.toaConfig);
+      UploadManager.initialize(1, this.props.toaConfig);
     }
-
-    // Debug
-    FGCProvider.initialize("127.0.0.1", 8088);
 
     this.initializeSocket(this.props.networkHost);
     WebProvider.initialize(this.props.networkHost);

@@ -12,9 +12,9 @@ import {Dispatch} from "redux";
 import {disableNavigation, setQualificationMatches} from "../../../stores/internal/actions";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
-import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
 import SetupScheduleParticipants from "../../../components/SetupScheduleParticipants";
+import UploadManager from "../../../managers/UploadManager";
 
 interface IProps {
   onComplete: () => void,
@@ -95,7 +95,7 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
     if (this.props.toaConfig.enabled) {
-      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.qualificationMatches).then(() => {
+      UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.qualificationMatches).then(() => {
         console.log(`${this.props.qualificationMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);

@@ -13,10 +13,10 @@ import TeamValidator from "../../../validators/TeamValidator";
 import EventCreationManager from "../../../managers/EventCreationManager";
 // import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {
-  EMSTeamAdapter, Event, EventConfiguration, HttpError, Team, TOAEventParticipant, TOAConfig, TOAProvider,
+  Event, EventConfiguration, HttpError, Team, TOAConfig,
   EliminationMatchesFormat
 } from "@the-orange-alliance/lib-ems";
-import FGCUploadedManager from "../../../managers/FGCUploadedManager";
+import UploadManager from "../../../managers/UploadManager";
 
 interface IProps {
   onComplete: () => void,
@@ -61,7 +61,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     this.createTestTeam = this.createTestTeam.bind(this);
     this.removeTeam = this.removeTeam.bind(this);
     this.importTeamsByCSV = this.importTeamsByCSV.bind(this);
-    this.importByTOA = this.importByTOA.bind(this);
+    this.importOnline = this.importOnline.bind(this);
     this.createTeamList = this.createTeamList.bind(this);
   }
 
@@ -109,7 +109,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
             <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importTeamsByCSV}>Import By CSV</Button>
             {
               toaConfig.enabled &&
-              <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importByTOA}>Import From TOA</Button>
+              <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importOnline}>Import From TOA</Button>
             }
           </div>
           <div>
@@ -130,13 +130,8 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
       updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + this.props.teams[i].teamKey;
     }
     if (this.props.toaConfig.enabled) {
-      // TOAUploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
-      //   console.log(`${updatedTeams.length} teams have been posted to TOA`);
-      // }).catch((error: HttpError) => {
-      //   DialogManager.showErrorBox(error);
-      // });
-      FGCUploadedManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
-        console.log(`${updatedTeams.length} teams have been posted to TOA`);
+      UploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
+        console.log(`${updatedTeams.length} teams have been posted online.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);
       });
@@ -198,33 +193,14 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     });
   }
 
-  private importByTOA() {
+  private importOnline() {
     this.setState({loadingTeams: true});
     this.props.setNavigationDisabled(true);
-    TOAProvider.getTeams(this.props.event.eventKey).then((toaParticipants: TOAEventParticipant[]) => {
-      const teams: Team[] = [];
-      const failedImports: number[] = [];
-      for (const toaParticipant of toaParticipants) {
-        if (typeof toaParticipant.team !== "undefined") {
-          const team: Team = new EMSTeamAdapter(toaParticipant.team).get();
-          team.participantKey = toaParticipant.eventParticipantKey;
-          const validator: TeamValidator = new TeamValidator(team);
-          validator.update(team);
-          if (validator.isValid) {
-            teams.push(team);
-          } else {
-            failedImports.push(team.teamKey);
-          }
-        } else {
-          failedImports.push(toaParticipant.teamKey);
-        }
-      }
+    UploadManager.getTeams(this.props.event.eventKey).then((teams: Team[]) => {
       this.setState({loadingTeams: false});
       this.props.setNavigationDisabled(false);
       this.props.setTeamList(teams);
-      setTimeout(() => {
-        DialogManager.showInfoBox("Team Import Result", "Imported " + teams.length + " of original " + toaParticipants.length + ". The following teams were not imported due to parsing errors: " + failedImports.toString());
-      }, 250);
+      DialogManager.showInfoBox("Team Import Result", "Imported " + teams.length + " teams from online.");
     }).catch((error: HttpError) => {
       this.setState({loadingTeams: false});
       this.props.setNavigationDisabled(false);

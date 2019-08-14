@@ -12,9 +12,9 @@ import {Dispatch} from "redux";
 import {disableNavigation, setPracticeMatches} from "../../../stores/internal/actions";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
-import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
 import SetupScheduleParticipants from "../../../components/SetupScheduleParticipants";
+import UploadManager from "../../../managers/UploadManager";
 
 interface IProps {
   onComplete: () => void,
@@ -95,8 +95,8 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
   private onPublishSchedule(postOnline: boolean) {
     this.props.setNavigationDisabled(true);
     if (postOnline && this.props.toaConfig.enabled) {
-      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.practiceMatches).then(() => {
-        console.log(`${this.props.practiceMatches.length} matches have been posted to TOA.`);
+      UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.practiceMatches).then(() => {
+        console.log(`${this.props.practiceMatches.length} matches have been posted online.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);
       });

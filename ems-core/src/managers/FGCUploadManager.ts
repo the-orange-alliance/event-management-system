@@ -1,4 +1,7 @@
-import {EMSProvider, FGCProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team} from "@the-orange-alliance/lib-ems";
+import {
+  EMSProvider, Event, FGCProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team
+} from "@the-orange-alliance/lib-ems";
+import TeamValidator from "../validators/TeamValidator";
 
 class FGCUploadedManager {
   private static _instance: FGCUploadedManager;
@@ -11,6 +14,39 @@ class FGCUploadedManager {
   }
 
   private constructor() {}
+
+  public getEvent(eventKey: string): Promise<Event> {
+    return new Promise<Event>((resolve, reject) => {
+      FGCProvider.getEvent(eventKey).then((event: Event) => {
+        if (event && event.eventKey && event.eventKey.length > 0) {
+          resolve(event);
+        } else {
+          reject();
+        }
+      }).catch((error: HttpError) => {
+        reject(error);
+      });
+
+    });
+  }
+
+  public getTeams(eventKey: string): Promise<Team[]> {
+    return new Promise<Team[]>((resolve, reject) => {
+      FGCProvider.getTeams(eventKey).then((participants: Team[]) => {
+        const teams: Team[] = [];
+        for (const participant of participants) {
+          const validator: TeamValidator = new TeamValidator(participant);
+          validator.update(participant);
+          if (validator.isValid) {
+            teams.push(participant);
+          }
+        }
+        resolve(teams);
+      }).catch((error: HttpError) => {
+        reject(error);
+      });
+    });
+  }
 
   public postEventParticipants(eventKey: string, teams: Team[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
@@ -33,7 +69,7 @@ class FGCUploadedManager {
       FGCProvider.deleteMatchData(eventKey, matches[0].tournamentLevel).then(() => {
         setTimeout(() => {
           const fgcMatches: Match[] = matches.map((m: Match) => m);
-          const fgcDetails: MatchDetails[] = matches.map((m: Match) => m.matchDetails);
+          const fgcDetails: MatchDetails[] = matches.map((m: Match) => new MatchDetails().fromJSON({match_key: m.matchKey, match_detail_key: m.matchDetailKey}));
           const fgcParticipants: MatchParticipant[] = [];
           for (const match of matches) {
             for (const participant of match.participants) {

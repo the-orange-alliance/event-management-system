@@ -412,7 +412,7 @@ class MatchManager {
     match.matchDetails.matchKey = match.matchKey;
     match.matchDetails.matchDetailKey = match.matchDetailKey;
     for (const participant of match.participants) {
-      if (typeof participant.cardStatus === "undefined") {
+      if (typeof participant.cardStatus === "undefined" || (participant.cardStatus as any) === "null") {
         participant.cardStatus = 0;
       }
     }

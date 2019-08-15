@@ -1,10 +1,10 @@
 {
   "name": "ems-core",
-  "version": "2.12.2",
+  "version": "2.13.0",
   "private": true,
   "main": "build/electron.js",
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.5.12",
+    "@the-orange-alliance/lib-ems": "^0.5.18",
     "axios": "^0.19.0",
     "dotenv": "^8.0.0",
     "local-ipv4-address": "0.0.2",

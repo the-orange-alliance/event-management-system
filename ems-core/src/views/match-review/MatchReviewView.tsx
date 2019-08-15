@@ -13,11 +13,11 @@ import DialogManager from "../../managers/DialogManager";
 import {IDisableNavigation} from "../../stores/internal/types";
 import {disableNavigation} from "../../stores/internal/actions";
 import ConfirmActionModal from "../../components/ConfirmActionModal";
-import TOAUploadManager from "../../managers/TOAUploadManager";
 import {
   Event, EventConfiguration, HttpError, Match, MatchDetails, MatchParticipant,
   TournamentType, TOAConfig, EliminationMatchesFormat
 } from "@the-orange-alliance/lib-ems";
+import UploadManager from "../../managers/UploadManager";
 
 interface IProps {
   event?: Event,
@@ -207,15 +207,16 @@ class MatchReviewView extends React.Component<IProps, IState> {
     this.setState({updatingScores: true, confirmModalOpen: false});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
-    if (this.props.toaConfig.enabled) {
-      TOAUploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
-        console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
-      }).catch((error: HttpError) => {
-        DialogManager.showErrorBox(error);
-      });
-    }
     const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
+      if (this.props.toaConfig.enabled) {
+        UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
+          console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
+        }).catch((error: HttpError) => {
+          DialogManager.showErrorBox(error);
+        });
+      }
+
       this.props.setNavigationDisabled(false);
       this.setState({updatingScores: false});
       if (this.props.activeMatch.tournamentLevel >= 10) {

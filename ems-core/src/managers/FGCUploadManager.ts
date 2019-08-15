@@ -1,5 +1,6 @@
 import {
-  EMSProvider, Event, FGCProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking, Team
+  EMSProvider, Event, EventType, FGCProvider, HttpError, Match, MatchDetails, MatchParticipant, Ranking,
+  Team
 } from "@the-orange-alliance/lib-ems";
 import TeamValidator from "../validators/TeamValidator";
 
@@ -98,13 +99,14 @@ class FGCUploadedManager {
       promises.push(FGCProvider.putMatchResults(eventKey, match));
       promises.push(FGCProvider.putMatchDetails(eventKey, match.matchDetails));
       promises.push(FGCProvider.putMatchParticipants(eventKey, match.participants));
+      const seasonKey: string = match.matchKey.split("-")[0];
       Promise.all(promises).then(() => {
         if (match.tournamentLevel > 0 && match.tournamentLevel < 10) {
-          FGCProvider.deleteRankings(eventKey).then(() => {
+          FGCProvider.deleteRankingsByLevel(eventKey, match.tournamentLevel).then(() => {
             setTimeout(() => {
-              EMSProvider.getRankings().then((rankings: Ranking[]) => {
+              EMSProvider.getRankings(getEventTypeFromKey(seasonKey)).then((rankings: Ranking[]) => {
                 if (rankings.length > 0) {
-                  FGCProvider.postRankings(eventKey, rankings).then(() => {
+                  FGCProvider.postRankingsByLevel(eventKey, rankings, match.tournamentLevel).then(() => {
                     resolve();
                   }).catch((postError: HttpError) => {
                     reject(postError);
@@ -129,17 +131,16 @@ class FGCUploadedManager {
   }
 
 }
-//
-// function getPartialFromLevel(tournamentLevel: number): string {
-//   if (tournamentLevel === 0) {
-//     return "P";
-//   } else if (tournamentLevel === 1) {
-//     return "Q";
-//   } else if (tournamentLevel >= 10) {
-//     return "E";
-//   } else {
-//     return "";
-//   }
-// }
+
+function getEventTypeFromKey(seasonKey: string): EventType | undefined {
+  switch (seasonKey) {
+    case "2018":
+      return "fgc_2018";
+    case "2019":
+      return "fgc_2019";
+    default:
+      return undefined;
+  }
+}
 
 export default FGCUploadedManager.getInstance();

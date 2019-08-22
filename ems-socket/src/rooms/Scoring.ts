@@ -4,7 +4,7 @@ import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import {MatchMode} from "../scoring/MatchMode";
 import ScoreManager from "../scoring/ScoreManager";
-import {EMSProvider, Match} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, IFieldControlPacket, Match} from "@the-orange-alliance/lib-ems";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
@@ -203,6 +203,9 @@ export default class ScoringRoom implements IRoom {
         logger.warn(`TOTAL TIME: ${config.totalTime}`);
         logger.warn("-------- TIMER CONFIGURATION UPDATED --------")
       }
+    });
+    client.on("control-update", (controlPacket: IFieldControlPacket) => {
+      this._server.to("scoring").emit("control-update", controlPacket);
     });
   }
 

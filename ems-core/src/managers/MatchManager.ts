@@ -421,6 +421,14 @@ class MatchManager {
       this.assignTeamCards(match.participants);
     }
 
+    if (match.blueScore > match.redScore) {
+      match.result = Match.RESULT_BLUE_WIN;
+    } else if (match.blueScore === match.redScore) {
+      match.result = Match.RESULT_TIE;
+    } else {
+      match.result = Match.RESULT_RED_WIN;
+    }
+
     const promises: Array<Promise<any>> = [];
     promises.push(EMSProvider.putMatchResult(match));
     promises.push(EMSProvider.putMatchDetails(match.matchDetails));

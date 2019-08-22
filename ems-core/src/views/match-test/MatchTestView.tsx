@@ -1,10 +1,21 @@
 import * as React from "react";
-import {Button, Card, Grid} from "semantic-ui-react";
+import {Button, Card, DropdownProps, Form, Grid} from "semantic-ui-react";
 import {getTheme} from "../../AppTheme";
 import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import DialogManager from "../../managers/DialogManager";
-import {EMSProvider, HttpError, SocketProvider, TOAConfig, TOAProvider, WebProvider} from "@the-orange-alliance/lib-ems";
+import {
+  EMSProvider,
+  HttpError,
+  DropdownData,
+  SocketProvider,
+  TOAConfig,
+  TOAProvider,
+  WebProvider,
+  IFieldControlPacket, IHubMessage, HubFunctions
+} from "@the-orange-alliance/lib-ems";
+import ExplanationIcon from "../../components/ExplanationIcon";
+import NumericInput from "../../components/NumericInput";
 
 interface IProps {
   slaveModeEnabled?: boolean,
@@ -26,7 +37,8 @@ interface IState {
   sckConnected: boolean,
   webConnected: boolean,
   toaConnected: boolean,
-  audConnected: boolean
+  audConnected: boolean,
+  fieldPackets: IFieldControlPacket;
 }
 
 class MatchTestView extends React.Component<IProps, IState> {
@@ -47,7 +59,8 @@ class MatchTestView extends React.Component<IProps, IState> {
       sckConnected: false,
       webConnected: false,
       toaConnected: false,
-      audConnected: false
+      audConnected: false,
+      fieldPackets: {messages: [{hub: 0, function: "motor", parameters: {port: 0, setpoint: 1}}]}
     };
     this.updateSocketStatus = this.updateSocketStatus.bind(this);
     this.updateAudStatus = this.updateAudStatus.bind(this);
@@ -56,6 +69,10 @@ class MatchTestView extends React.Component<IProps, IState> {
     this.testWeb = this.testWeb.bind(this);
     this.testTOA = this.testTOA.bind(this);
     this.testAudience = this.testAudience.bind(this);
+
+    this.sendAllMessages = this.sendAllMessages.bind(this);
+    this.addMessage = this.addMessage.bind(this);
+    this.removeMessage = this.removeMessage.bind(this);
   }
 
   public componentDidMount() {
@@ -73,9 +90,31 @@ class MatchTestView extends React.Component<IProps, IState> {
 
   public render() {
     const {apiTested, sckTested, audTested, webTested, toaTested, apiTesting, sckTesting, webTesting, toaTesting,
-      audTesting, apiConnected, sckConnected, webConnected, audConnected, toaConnected
+      audTesting, apiConnected, sckConnected, webConnected, audConnected, toaConnected, fieldPackets
     } = this.state;
     const {slaveModeEnabled} = this.props;
+
+    const messagesView = fieldPackets.messages.map((m: IHubMessage, index: number) => {
+      return (
+        <Grid.Row key={index} columns={5}>
+          <Grid.Column><NumericInput label={'Hub ID'} value={m.hub} onUpdate={this.changeHubID.bind(this, index)}/></Grid.Column>
+          <Grid.Column><Form.Dropdown fluid={true} label={'Function'} selection={true} options={DropdownData.HubFunctionItems} value={m.function} onChange={this.changeFunction.bind(this, index)}/></Grid.Column>
+          <Grid.Column><NumericInput label={'Port'} value={m.parameters.port} onUpdate={this.changePortID.bind(this, index)}/></Grid.Column>
+          <Grid.Column>
+            {
+              m.function === 'motor' &&
+              <NumericInput label={'Setpoint'} value={m.parameters.setpoint} onUpdate={this.changeMotorSetpoint.bind(this, index)}/>
+            }
+            {
+              m.function === 'servo' &&
+              <NumericInput label={'Pulsewidth'} value={m.parameters.pulsewidth} onUpdate={this.changeServoPulsewidth.bind(this, index)}/>
+            }
+          </Grid.Column>
+          <Grid.Column><Form.Button fluid={true} label={<ExplanationIcon title={'Send it'} content={'This sends the individual message. This is mainly here so the button aligns on the bottom with the rest of the row.'}/>} color={getTheme().primary} onClick={this.sendMessage.bind(this, index)}>Send Message</Form.Button></Grid.Column>
+        </Grid.Row>
+      );
+    });
+
     return (
       <div className="view">
         <Card fluid={true} color={getTheme().secondary}>
@@ -134,8 +173,96 @@ class MatchTestView extends React.Component<IProps, IState> {
             </Grid>
           </Card.Content>
         </Card>
+        <Card fluid={true} color={getTheme().secondary}>
+          <Card.Content className="card-header">
+            <Card.Header>Field Test</Card.Header>
+          </Card.Content>
+          <Card.Content>
+            <Grid>
+              {messagesView}
+              <Grid.Row columns={5}>
+                <Grid.Column><Form.Button fluid={true} color={'green'} onClick={this.addMessage}>Add Message</Form.Button></Grid.Column>
+                <Grid.Column><Form.Button fluid={true} color={'red'} onClick={this.removeMessage}>Remove Message</Form.Button></Grid.Column>
+                <Grid.Column floated={'right'}><Form.Button fluid={true} color={getTheme().primary} onClick={this.sendAllMessages}>Send All Messages</Form.Button></Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Card.Content>
+        </Card>
       </div>
     );
+  }
+
+  private sendMessage(mIndex: number) {
+    const {fieldPackets} = this.state;
+    const packet: IFieldControlPacket = {messages: [fieldPackets.messages[mIndex]]};
+    SocketProvider.send("control-update", packet);
+  }
+
+  private sendAllMessages() {
+    const {fieldPackets} = this.state;
+    SocketProvider.send("control-update", fieldPackets);
+  }
+
+  private addMessage() {
+    const {fieldPackets} = this.state;
+    this.setState({
+      fieldPackets: {messages: [...fieldPackets.messages, {hub: 0, function: "motor", parameters: {port: 0, setpoint: 1}}]}
+    });
+  }
+
+  private removeMessage() {
+    const {fieldPackets} = this.state;
+    if (fieldPackets.messages.length > 1) {
+      this.setState({
+        fieldPackets: {messages: fieldPackets.messages.filter((m: IHubMessage, i: number) => i !== fieldPackets.messages.length - 1)}
+      });
+    }
+  }
+
+  private changeHubID(mIndex: number, value: number) {
+    const {fieldPackets} = this.state;
+    fieldPackets.messages[mIndex].hub = value;
+    this.forceUpdate();
+  }
+
+  private changeFunction(mIndex: number, event: React.SyntheticEvent, props: DropdownProps) {
+    const {fieldPackets} = this.state;
+    fieldPackets.messages[mIndex].function = props.value as HubFunctions;
+    this.normalizeMessage(mIndex);
+    this.forceUpdate();
+  }
+
+  private changePortID(mIndex: number, value: number) {
+    const {fieldPackets} = this.state;
+    fieldPackets.messages[mIndex].parameters.port = value;
+    this.forceUpdate();
+  }
+
+  private normalizeMessage(mIndex: number) {
+    const {fieldPackets} = this.state;
+    if (fieldPackets.messages[mIndex].function === "servo") {
+      if (typeof fieldPackets.messages[mIndex].parameters.pulsewidth === "undefined") {
+        fieldPackets.messages[mIndex].parameters.pulsewidth = 1;
+      }
+      delete fieldPackets.messages[mIndex].parameters.setpoint;
+    } else if (fieldPackets.messages[mIndex].function === "motor") {
+      if (typeof fieldPackets.messages[mIndex].parameters.setpoint === "undefined") {
+        fieldPackets.messages[mIndex].parameters.setpoint = 0;
+      }
+      delete fieldPackets.messages[mIndex].parameters.pulsewidth;
+    }
+  }
+
+  private changeMotorSetpoint(mIndex: number, value: number) {
+    const {fieldPackets} = this.state;
+    fieldPackets.messages[mIndex].parameters.setpoint = value;
+    this.forceUpdate();
+  }
+
+  private changeServoPulsewidth(mIndex: number, value: number) {
+    const {fieldPackets} = this.state;
+    fieldPackets.messages[mIndex].parameters.pulsewidth = value;
+    this.forceUpdate();
   }
 
   private updateSocketStatus() {

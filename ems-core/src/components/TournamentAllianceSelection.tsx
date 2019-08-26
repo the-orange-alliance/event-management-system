@@ -18,6 +18,7 @@ import {CONFIG_STORE} from "../AppStore";
 
 interface IProps {
   activeRound: TournamentRound,
+  allianceMembers: AllianceMember[],
   eventConfig?: EventConfiguration,
   event?: Event,
   playoffsSchedule?: Schedule[],
@@ -39,10 +40,14 @@ interface IState {
 class EventAllianceSelection extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
-    const initialValues: number[] = [];
+    let initialValues: number[] = [];
 
-    for (let i = 0; i < (this.getAlliances() * this.props.activeRound.format.teamsPerAlliance); i++) {
-      initialValues.push(0);
+    if (props.allianceMembers.length === (this.getAlliances() * props.activeRound.format.teamsPerAlliance)) {
+      initialValues = props.allianceMembers.map((member: AllianceMember) => member.teamKey);
+    } else {
+      for (let i = 0; i < (this.getAlliances() * props.activeRound.format.teamsPerAlliance); i++) {
+        initialValues.push(-1);
+      }
     }
     this.state = {
       availableTeams: [],
@@ -280,6 +285,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
 
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
+    allianceMembers: internalState.allianceMembers,
     eventConfig: configState.eventConfiguration,
     event: configState.event,
     playoffsSchedule: configState.playoffsSchedule,

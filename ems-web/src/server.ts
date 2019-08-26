@@ -28,8 +28,18 @@ app.use(cookieParser());
 const isProd: boolean = process.env.NODE_ENV === "production";
 let staticPath: string = "../../*/build";
 if (isProd) staticPath = "../../../public/*";
+app.use(express.static(path.join(__dirname, staticPath.replace("*", "ems-home"))));
 app.use(express.static(path.join(__dirname, staticPath.replace("*", "audience-display"))));
 app.use(express.static(path.join(__dirname, staticPath.replace("*", "ref-tablet"))));
+
+app.use("/", (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (req.path.length > 1) {
+    next();
+  } else {
+    // res.cookie("host", host, {secure: false, httpOnly: false, maxAge: 600000});
+    res.sendFile(path.join(__dirname, staticPath.replace("*", "ems-home") + "/index.html"));
+  }
+});
 
 app.use("/audience", (req: express.Request, res: express.Response) => {
   res.cookie("host", host, {secure: false, httpOnly: false, maxAge: 600000});

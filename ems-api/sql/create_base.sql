@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS "alliance" (
     alliance_key VARCHAR(25) PRIMARY KEY NOT NULL,
     alliance_rank INT NOT NULL,
     team_key INT NOT NULL,
+    tournament_level INT,
     alliance_name_short VARCHAR(5),
     alliance_name_long VARCHAR(50),
     is_captain INT,
@@ -59,7 +60,8 @@ CREATE TABLE IF NOT EXISTS "schedule" (
     schedule_day INT NOT NULL,
     start_time VARCHAR(255) NOT NULL,
     duration INT NOT NULL,
-    is_match INT NOT NULL
+    is_match INT NOT NULL,
+    tournament_id INT
 );
 
 CREATE TABLE IF NOT EXISTS "match" (

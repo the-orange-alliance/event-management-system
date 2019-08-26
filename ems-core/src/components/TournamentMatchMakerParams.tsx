@@ -3,6 +3,7 @@ import {EventConfiguration, TournamentRound} from "@the-orange-alliance/lib-ems"
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Tab} from "semantic-ui-react";
+import SetupRoundRobinMatchMakerParams from "./SetupRoundRobinMatchMakerParams";
 
 interface IProps {
   eventConfig?: EventConfiguration
@@ -39,15 +40,17 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
         </Tab.Pane>
       );
     } else {
-      view = (<i>hi</i>);
-      // switch (activeTournament.type) {
-      //   case "rr":
-      //     view = ();
-      //   case "elims":
-      //     view = ();
-      //   case "ranking":
-      //     view = ();
-      // }
+      switch (activeTournament.type) {
+        case "rr":
+          view = (<SetupRoundRobinMatchMakerParams activeRound={activeTournament}/>);
+          break;
+        case "elims":
+          view = (<span>NYI</span>);
+          break;
+        case "ranking":
+          view = (<span>NYI</span>);
+          break;
+      }
     }
 
     return (view);

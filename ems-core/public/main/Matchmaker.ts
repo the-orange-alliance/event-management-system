@@ -7,6 +7,7 @@ import {execFile} from "child_process";
 import {Match, TournamentType} from "@the-orange-alliance/lib-ems";
 
 const appDataPath = app.getPath("appData") + path.sep + app.getName();
+const isProd = process.env.NODE_ENV === "production";
 
 interface IMatchMakerOptions {
   teams: number,
@@ -19,11 +20,18 @@ interface IMatchMakerOptions {
 }
 
 let matchMakerPath = "";
-
 if (os.type() === "Windows_NT") {
-  matchMakerPath = path.join(__dirname, "../../match-maker/windows/MatchMaker.exe");
+  if (isProd) {
+    matchMakerPath = path.join(__dirname, "../match-maker/macOS/MatchMaker");
+  } else {
+    matchMakerPath = path.join(__dirname, "../../match-maker/windows/MatchMaker.exe");
+  }
 } else {
-  matchMakerPath = path.join(__dirname, "../../match-maker/macOS/MatchMaker");
+  if (isProd) {
+    matchMakerPath = path.join(__dirname, "../match-maker/macOS/MatchMaker");
+  } else {
+    matchMakerPath = path.join(__dirname, "../../match-maker/macOS/MatchMaker");
+  }
 }
 
 ipcMain.on("match-maker-teams", (event: IpcMessageEvent, scheduleType: TournamentType, teams: number[]) => {

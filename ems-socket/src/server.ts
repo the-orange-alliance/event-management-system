@@ -49,18 +49,22 @@ socket.on("connection", (client: Socket) => {
   logger.info(`Client connection (${client.id})`);
   client.on("identify", (clientStr: string, rooms: string[]) => {
     logger.info(`Identified client ${client.id} [${clientStr} joining (${rooms})].`);
-    clients.set(client.id, rooms);
-    for (const room of rooms) {
-      client.join(room);
-      if (room === "scoring") {
-        scoringRoom.addClient(client);
+    if (Array.isArray(rooms)) {
+      clients.set(client.id, rooms);
+      for (const room of rooms) {
+        client.join(room);
+        if (room === "scoring") {
+          scoringRoom.addClient(client);
+        }
+        if (room === "event") {
+          eventRoom.addClient(client);
+        }
+        if (room === "referee") {
+          refereeRoom.addClient(client);
+        }
       }
-      if (room === "event") {
-        eventRoom.addClient(client);
-      }
-      if (room === "referee") {
-        refereeRoom.addClient(client);
-      }
+    } else {
+      logger.warn("Denied previous client from joining rooms (incorrect parameters).");
     }
   });
   client.on("disconnect", () => {

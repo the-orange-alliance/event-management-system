@@ -205,6 +205,7 @@ export default class ScoringRoom implements IRoom {
       }
     });
     client.on("control-update", (controlPacket: IFieldControlPacket) => {
+      logger.info(`Sending field control packet with ${controlPacket.messages.length} messages.`);
       this._server.to("scoring").emit("control-update", controlPacket);
     });
   }

@@ -20,6 +20,7 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps> {
   }
 
   public render() {
+    const {navigationDisabled} = this.props;
     return (
       <Tab.Pane className="step-view-tab">
         <Card fluid={true} color={getTheme().secondary}>
@@ -27,7 +28,7 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps> {
             <Card.Header>Round Robin Parameters</Card.Header>
           </Card.Content>
           <Card.Content>
-            <Form.Button color={getTheme().primary}>Generate Matches</Form.Button>
+            <Form.Button color={getTheme().primary} disabled={navigationDisabled} loading={navigationDisabled}>Generate Matches</Form.Button>
           </Card.Content>
         </Card>
       </Tab.Pane>

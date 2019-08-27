@@ -272,6 +272,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
     const {activeRound, event, playoffsSchedule, onScheduleParamsComplete} = this.props;
     const schedule = playoffsSchedule[activeRound.id] as RoundRobinSchedule;
     schedule.totalMatches = schedule.maxTotalMatches;
+    schedule.tournamentId = activeRound.id;
     CONFIG_STORE.getAll().then((config: any) => {
       let configSchedule: any = {};
       if (typeof config.schedule !== "undefined") {

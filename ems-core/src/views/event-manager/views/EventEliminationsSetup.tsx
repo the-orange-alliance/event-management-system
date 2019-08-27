@@ -85,7 +85,6 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 
   private onMatchMakerComplete(matches: Match[]) {
     this.props.addPlayoffsMatches(matches);
-    console.log(matches);
     this.setState({activeIndex: 3});
   }
 

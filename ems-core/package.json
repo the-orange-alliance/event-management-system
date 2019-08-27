@@ -4,7 +4,7 @@
   "private": true,
   "main": "build/electron.js",
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.7.5",
+    "@the-orange-alliance/lib-ems": "^0.7.7",
     "axios": "^0.19.0",
     "dotenv": "^8.0.0",
     "local-ipv4-address": "0.0.2",

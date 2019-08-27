@@ -18,7 +18,7 @@ import TournamentParticipantSelection from "../../../components/TournamentPartic
 import TournamentScheduleSetup from "../../../components/TournamentScheduleSetup";
 import {IAddPlayoffsSchedule} from "../../../stores/config/types";
 import {addPlayoffsSchedule} from "../../../stores/config/actions";
-import TournamentScheduleOverview from "../../../TournamentScheduleOverview";
+import TournamentScheduleOverview from "../../../components/TournamentScheduleOverview";
 import TournamentMatchMakerParams from "../../../components/TournamentMatchMakerParams";
 
 interface IProps {

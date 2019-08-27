@@ -260,6 +260,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
   private generateSchedule() { // TODO - Check to see if an online schedule has already been posted.
     this.closeWarningModal();
     this.props.schedule.totalMatches = this.props.schedule.maxTotalMatches;
+    // this.props.schedule.tournamentId = this.props.activeRound.id;
     CONFIG_STORE.getAll().then((config: any) => {
       let schedule: any = {};
       if (typeof config.schedule !== "undefined") {

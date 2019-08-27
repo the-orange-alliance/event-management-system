@@ -1,9 +1,9 @@
 import * as React from "react";
 import {EventConfiguration, TournamentRound} from "@the-orange-alliance/lib-ems";
-import {IApplicationState} from "./stores";
+import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Tab} from "semantic-ui-react";
-import SetupScheduleOverview from "./components/SetupScheduleOverview";
+import SetupScheduleOverview from "./SetupScheduleOverview";
 
 interface IProps {
   eventConfig?: EventConfiguration

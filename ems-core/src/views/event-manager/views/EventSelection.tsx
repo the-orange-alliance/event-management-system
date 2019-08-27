@@ -415,6 +415,7 @@ class EventSelection extends React.Component<IProps, IState> {
     this.props.selectConfigPreset(this.props.eventConfig);
     this._validator.update(this.props.eventConfig, this.props.event);
     this._tournamentValidator.update(this.props.eventConfig);
+    this.forceUpdate();
   }
 
   /* Event Information Methods */

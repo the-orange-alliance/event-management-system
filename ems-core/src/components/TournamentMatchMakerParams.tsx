@@ -1,5 +1,5 @@
 import * as React from "react";
-import {EventConfiguration, TournamentRound} from "@the-orange-alliance/lib-ems";
+import {EventConfiguration, Match, TournamentRound} from "@the-orange-alliance/lib-ems";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Tab} from "semantic-ui-react";
@@ -12,6 +12,8 @@ interface IProps {
 class TournamentMatchMakerParams extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
+
+    this.onMatchGenerationComplete = this.onMatchGenerationComplete.bind(this);
   }
 
   public render() {
@@ -42,7 +44,7 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
     } else {
       switch (activeTournament.type) {
         case "rr":
-          view = (<SetupRoundRobinMatchMakerParams activeRound={activeTournament}/>);
+          view = (<SetupRoundRobinMatchMakerParams activeRound={activeTournament} onComplete={this.onMatchGenerationComplete}/>);
           break;
         case "elims":
           view = (<span>NYI</span>);
@@ -54,6 +56,10 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
     }
 
     return (view);
+  }
+
+  private onMatchGenerationComplete(matches: Match[]) {
+    console.log(matches);
   }
 }
 

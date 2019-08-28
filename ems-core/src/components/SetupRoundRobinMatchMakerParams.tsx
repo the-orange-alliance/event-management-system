@@ -1,6 +1,6 @@
 import * as React from "react";
 import {AllianceMember, Event, EventConfiguration, Match, RoundRobinFormat, TournamentRound} from "@the-orange-alliance/lib-ems";
-import {Card, Form, Tab} from "semantic-ui-react";
+import {Card, Form, Grid, Tab} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
 import {IDisableNavigation} from "../stores/internal/types";
 import {ApplicationActions, IApplicationState} from "../stores";
@@ -8,6 +8,7 @@ import {Dispatch} from "redux";
 import {disableNavigation} from "../stores/internal/actions";
 import {connect} from "react-redux";
 import RoundRobinManager from "../managers/playoffs/RoundRobinManager";
+import NumericInput from "./NumericInput";
 
 interface IProps {
   activeRound: TournamentRound,
@@ -15,17 +16,28 @@ interface IProps {
   event: Event,
   eventConfig: EventConfiguration,
   navigationDisabled?: boolean,
-  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
+  setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  onComplete: (match: Match[]) => void
 }
 
-class SetupRoundRobinMatchMakerParams extends React.Component<IProps> {
+interface IState {
+  fields: number;
+}
+
+class SetupRoundRobinMatchMakerParams extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    this.state = {
+      fields: props.event.fieldCount
+    };
     this.generateMatches = this.generateMatches.bind(this);
+    this.updateFields = this.updateFields.bind(this);
   }
 
   public render() {
-    const {navigationDisabled} = this.props;
+    const {event, navigationDisabled} = this.props;
+    const {fields} = this.state;
+    const fieldsError: boolean = fields > event.fieldCount || fields === 0;
     return (
       <Tab.Pane className="step-view-tab">
         <Card fluid={true} color={getTheme().secondary}>
@@ -33,7 +45,14 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps> {
             <Card.Header>Round Robin Parameters</Card.Header>
           </Card.Content>
           <Card.Content>
-            <Form.Button color={getTheme().primary} disabled={navigationDisabled} loading={navigationDisabled} onClick={this.generateMatches}>Generate Matches</Form.Button>
+            <Grid>
+              <Grid.Row columns={6}>
+                <Grid.Column><NumericInput label={`Field Count`} value={fields} error={fieldsError} onUpdate={this.updateFields}/></Grid.Column>
+              </Grid.Row>
+              <Grid.Row columns={6}>
+                <Grid.Column><Form.Button fluid={true} color={getTheme().primary} disabled={navigationDisabled || fieldsError} loading={navigationDisabled} onClick={this.generateMatches}>Generate Matches</Form.Button></Grid.Column>
+              </Grid.Row>
+            </Grid>
           </Card.Content>
         </Card>
       </Tab.Pane>
@@ -41,18 +60,23 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps> {
   }
 
   private generateMatches() {
-    const {allianceMembers, activeRound, event, setNavigationDisabled} = this.props;
+    const {allianceMembers, activeRound, event, setNavigationDisabled, onComplete} = this.props;
     const format: RoundRobinFormat = activeRound.format as RoundRobinFormat;
     setNavigationDisabled(true);
-    RoundRobinManager.generateMatches(0, {
+    RoundRobinManager.generateMatches({
       allianceCaptains: format.alliances,
       allianceMembers: allianceMembers,
       eventKey: event.eventKey,
-      fields: event.fieldCount
+      fields: event.fieldCount,
+      tournamentId: activeRound.id
     }).then((matches: Match[]) => {
-      console.log(matches);
+      onComplete(matches);
       setNavigationDisabled(false);
     });
+  }
+
+  private updateFields(value: number) {
+    this.setState({fields: value});
   }
 }
 

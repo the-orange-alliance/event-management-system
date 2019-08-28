@@ -6,6 +6,7 @@ export interface IRoundRobinOptions {
   allianceMembers: AllianceMember[];
   eventKey: string;
   fields: number;
+  tournamentId: number;
 }
 
 class RoundRobinManager {
@@ -20,7 +21,7 @@ class RoundRobinManager {
 
   private constructor() {}
 
-  public generateMatches(playoffsMatchesLength: number, options: IRoundRobinOptions): Promise<Match[]> {
+  public generateMatches(options: IRoundRobinOptions): Promise<Match[]> {
     return new Promise<Match[]>((resolve, reject) => {
       const alliances: Map<number, AllianceMember[]> = PlayoffsMatchManager.getAllianceMap(options.allianceMembers);
       const rounds: number = options.allianceCaptains - 1;
@@ -38,8 +39,8 @@ class RoundRobinManager {
       for (let i = 0; i < options.allianceCaptains - 1; i++) {
         // console.log(upperTeams.map((a: AllianceMember[]) => a[0].allianceRank), lowerTeams.map((a: AllianceMember[]) => a[0].allianceRank)); // DEBUG - Makes sure each cycle was successful.
         for (let j = 0; j < matchesPerRound; j++) {
-          const num: number = playoffsMatchesLength + matches.length + 1;
-          const key: string = `${options.eventKey}-E${num.toString().padStart(3, '0')}`;
+          const num: number = matches.length;
+          const key: string = `${options.eventKey}-${options.tournamentId}E${num.toString().padStart(3, '0')}`;
           const match: Match = new Match();
           const participants: MatchParticipant[] = [];
           let station: number = 0;

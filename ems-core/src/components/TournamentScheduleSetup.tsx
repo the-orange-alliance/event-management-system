@@ -72,7 +72,6 @@ class TournamentScheduleOverview extends React.Component<IProps> {
     this.props.setNavigationDisabled(true);
     EventCreationManager.createSchedule(scheduleItems[0].type, scheduleItems).then(() => {
       this.props.setNavigationDisabled(false);
-      this.setState({activeIndex: 1});
     }).catch((error: HttpError) => {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {AllianceMember, RoundRobinFormat, TournamentRound} from "@the-orange-alliance/lib-ems";
+import {AllianceMember, Event, EventConfiguration, Match, RoundRobinFormat, TournamentRound} from "@the-orange-alliance/lib-ems";
 import {Card, Form, Tab} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
 import {IDisableNavigation} from "../stores/internal/types";
@@ -12,6 +12,8 @@ import RoundRobinManager from "../managers/playoffs/RoundRobinManager";
 interface IProps {
   activeRound: TournamentRound,
   allianceMembers: AllianceMember[],
+  event: Event,
+  eventConfig: EventConfiguration,
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation
 }
@@ -39,18 +41,26 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps> {
   }
 
   private generateMatches() {
-    const {allianceMembers, activeRound, setNavigationDisabled} = this.props;
+    const {allianceMembers, activeRound, event, setNavigationDisabled} = this.props;
     const format: RoundRobinFormat = activeRound.format as RoundRobinFormat;
     setNavigationDisabled(true);
-    RoundRobinManager.generateMatches(0, {allianceCaptains: format.alliances, allianceMembers: allianceMembers}).then(() => {
+    RoundRobinManager.generateMatches(0, {
+      allianceCaptains: format.alliances,
+      allianceMembers: allianceMembers,
+      eventKey: event.eventKey,
+      fields: event.fieldCount
+    }).then((matches: Match[]) => {
+      console.log(matches);
       setNavigationDisabled(false);
     });
   }
 }
 
-export function mapStateToProps({internalState}: IApplicationState) {
+export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     allianceMembers: internalState.allianceMembers,
+    event: configState.event,
+    eventConfig: configState.eventConfiguration,
     navigationDisabled: internalState.navigationDisabled
   };
 }

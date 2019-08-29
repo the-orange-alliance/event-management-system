@@ -1,12 +1,17 @@
 import * as React from "react";
 import {EventConfiguration, Match, TournamentRound} from "@the-orange-alliance/lib-ems";
-import {IApplicationState} from "../stores";
+import {ApplicationActions, IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Tab} from "semantic-ui-react";
 import SetupRoundRobinMatchMakerParams from "./SetupRoundRobinMatchMakerParams";
+import {IAddPlayoffsMatches} from "../stores/internal/types";
+import {Dispatch} from "redux";
+import {addPlayoffsMatches} from "../stores/internal/actions";
 
 interface IProps {
-  eventConfig?: EventConfiguration
+  eventConfig?: EventConfiguration,
+  playoffsMatches: Match[],
+  addPlayoffsMatches: (matches: Match[], tournamentId: number) => IAddPlayoffsMatches
 }
 
 class TournamentMatchMakerParams extends React.Component<IProps> {
@@ -44,7 +49,7 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
     } else {
       switch (activeTournament.type) {
         case "rr":
-          view = (<SetupRoundRobinMatchMakerParams activeRound={activeTournament} onComplete={this.onMatchGenerationComplete}/>);
+          view = (<SetupRoundRobinMatchMakerParams activeRound={activeTournament} onComplete={this.onMatchGenerationComplete.bind(this, activeTournament.id)}/>);
           break;
         case "elims":
           view = (<span>NYI</span>);
@@ -58,16 +63,23 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
     return (view);
   }
 
-  private onMatchGenerationComplete(matches: Match[]) {
-    console.log(matches);
+  private onMatchGenerationComplete(tournamentId: number, matches: Match[]) {
+    this.props.addPlayoffsMatches(matches, tournamentId);
   }
 }
 
-export function mapStateToProps({configState}: IApplicationState) {
+export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
-    eventConfig: configState.eventConfiguration
+    eventConfig: configState.eventConfiguration,
+    playoffsMatches: internalState.playoffsMatches
   };
 }
 
-export default connect(mapStateToProps)(TournamentMatchMakerParams);
+export function mapStateToDispatch(dispatch: Dispatch<ApplicationActions>) {
+  return {
+    addPlayoffsMatches: (matches: Match[], tournamentId: number) => dispatch(addPlayoffsMatches(matches, tournamentId))
+  };
+}
+
+export default connect(mapStateToProps, mapStateToDispatch)(TournamentMatchMakerParams);
 

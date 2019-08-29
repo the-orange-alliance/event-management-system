@@ -17,6 +17,8 @@ import {
 import {IInternalState} from "./models";
 import {InternalActions} from "./types";
 
+import {Match} from "@the-orange-alliance/lib-ems";
+
 export const initialState: IInternalState = {
   processingActionsDisabled: false,
   processList: [],
@@ -76,7 +78,15 @@ const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, 
     case SET_PLAYOFFS_MATCHES:
       return {...state, playoffsMatches: action.payload.matches};
     case ADD_PLAYOFFS_MATCHES:
-      return {...state, playoffsMatches: [...state.playoffsMatches, action.payload.matches]};
+      return {...state, playoffsMatches: [...state.playoffsMatches.filter((m: Match) => {
+        const partialKey: string = m.matchKey.split("-")[3];
+        if (partialKey.length > 4) {
+          const id: number = parseInt(partialKey.substring(1, 2), 10);
+          return id !== action.payload.tournamentId;
+        } else {
+          return true;
+        }
+      }), ...action.payload.matches]};
     case SET_ALLIANCE_MEMBERS:
       return {...state, allianceMembers: action.payload.members};
     case SET_SOCKET_CONNECTED:

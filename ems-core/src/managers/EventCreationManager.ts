@@ -138,7 +138,7 @@ class EventCreationManager {
     });
   }
 
-  public createElimsSchedule(matches: Match[]): Promise<any> {
+  public createPlayoffsSchedule(matches: Match[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.postMatchSchedule(matches).then(() => {
         const participants: MatchParticipant[] = [];

@@ -27,7 +27,6 @@ class RoundRobinManager {
       const rounds: number = options.allianceCaptains - 1;
       const totalMatches: number = (options.allianceCaptains / 2) * (options.allianceCaptains - 1);
       const matchesPerRound: number = totalMatches / rounds;
-
       // Teams
       const upperTeams: AllianceMember[][] = [];
       const lowerTeams: AllianceMember[][] = [];
@@ -40,7 +39,7 @@ class RoundRobinManager {
         // console.log(upperTeams.map((a: AllianceMember[]) => a[0].allianceRank), lowerTeams.map((a: AllianceMember[]) => a[0].allianceRank)); // DEBUG - Makes sure each cycle was successful.
         for (let j = 0; j < matchesPerRound; j++) {
           const num: number = matches.length;
-          const key: string = `${options.eventKey}-${options.tournamentId}E${num.toString().padStart(3, '0')}`;
+          const key: string = `${options.eventKey}-E${options.tournamentId}${num.toString().padStart(3, '0')}`;
           const match: Match = new Match();
           const participants: MatchParticipant[] = [];
           let station: number = 0;

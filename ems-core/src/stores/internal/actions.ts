@@ -115,10 +115,11 @@ export const setPlayoffsMatches: ActionCreator<ISetPlayoffsMatches> = (matches: 
   }
 });
 
-export const addPlayoffsMatches: ActionCreator<IAddPlayoffsMatches> = (matches: Match[]) => ({
+export const addPlayoffsMatches: ActionCreator<IAddPlayoffsMatches> = (matches: Match[], tournamentId) => ({
   type: ADD_PLAYOFFS_MATCHES,
   payload: {
-    matches: matches
+    matches: matches,
+    tournamentId: tournamentId
   }
 });
 

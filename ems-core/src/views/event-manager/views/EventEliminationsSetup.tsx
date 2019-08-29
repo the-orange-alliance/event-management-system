@@ -12,11 +12,11 @@ import {disableNavigation, addPlayoffsMatches} from "../../../stores/internal/ac
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
-import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {
   EliminationMatchesFormat, EliminationsSchedule, Event, EventConfiguration, HttpError, Match, ScheduleItem,
   TOAConfig
 } from "@the-orange-alliance/lib-ems";
+import UploadManager from "../../../managers/UploadManager";
 
 interface IProps {
   onComplete: () => void,
@@ -91,13 +91,13 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
     if (this.props.toaConfig.enabled) {
-      TOAUploadManager.postMatchSchedule(this.props.event.eventKey, this.props.playoffsMatches).then(() => {
+      UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.playoffsMatches).then(() => {
         console.log(`${this.props.playoffsMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);
       });
     }
-    EventCreationManager.createElimsSchedule(this.props.playoffsMatches).then(() => {
+    EventCreationManager.createPlayoffsSchedule(this.props.playoffsMatches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {

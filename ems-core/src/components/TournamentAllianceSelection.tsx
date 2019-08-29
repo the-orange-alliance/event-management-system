@@ -225,7 +225,7 @@ class EventAllianceSelection extends React.Component<IProps, IState> {
         member.isCaptain = true;
         allianceIndex++;
       }
-      member.allianceKey = this.props.event.eventKey + "-A" + allianceIndex + "-M" + memberIndex;
+      member.allianceKey = `${this.props.event.eventKey}-${activeRound.id}A${allianceIndex}-M${memberIndex}`;
       member.allianceRank = allianceIndex;
       member.allianceNameShort = allianceIndex.toString();
       member.teamKey = this.state.inputValues[i];

@@ -104,7 +104,8 @@ export interface ISetPlayoffsMatches extends Action {
 export interface IAddPlayoffsMatches extends Action {
   type: ADD_PLAYOFFS_MATCHES,
   payload: {
-    matches: Match[]
+    matches: Match[],
+    tournamentId: number
   }
 }
 

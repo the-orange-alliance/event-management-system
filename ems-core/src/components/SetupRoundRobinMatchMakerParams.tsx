@@ -61,13 +61,14 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps, IState> {
 
   private generateMatches() {
     const {allianceMembers, activeRound, event, setNavigationDisabled, onComplete} = this.props;
+    const {fields} = this.state;
     const format: RoundRobinFormat = activeRound.format as RoundRobinFormat;
     setNavigationDisabled(true);
     RoundRobinManager.generateMatches({
       allianceCaptains: format.alliances,
       allianceMembers: allianceMembers,
       eventKey: event.eventKey,
-      fields: event.fieldCount,
+      fields: fields,
       tournamentId: activeRound.id
     }).then((matches: Match[]) => {
       onComplete(matches);

@@ -1,8 +1,8 @@
 import * as React from "react";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {
-  AppError, Event, EventConfiguration, EliminationsSchedule, RoundRobinSchedule, Schedule,
-  PlayoffsType
+  AppError, Event, EventConfiguration, EliminationsSchedule, HttpError, RoundRobinSchedule, Schedule,
+  PlayoffsType, TOAConfig, Match, TournamentType
 } from "@the-orange-alliance/lib-ems";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {disableNavigation} from "../../../stores/internal/actions";
@@ -20,12 +20,17 @@ import {IAddPlayoffsSchedule} from "../../../stores/config/types";
 import {addPlayoffsSchedule} from "../../../stores/config/actions";
 import TournamentScheduleOverview from "../../../components/TournamentScheduleOverview";
 import TournamentMatchMakerParams from "../../../components/TournamentMatchMakerParams";
+import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
+import UploadManager from "../../../managers/UploadManager";
+import EventCreationManager from "../../../managers/EventCreationManager";
 
 interface IProps {
   onComplete: () => void,
   playoffsSchedule: Schedule[],
+  playoffsMatches: Match[],
   eventConfig?: EventConfiguration,
   event?: Event,
+  toaConfig?: TOAConfig,
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   addSchedule?: (schedule: Schedule) => IAddPlayoffsSchedule
@@ -45,6 +50,7 @@ class EventAdvancementView extends React.Component<IProps, IState> {
 
     this.renderTournamentOverview  = this.renderTournamentOverview.bind(this);
     this.onTabChange = this.onTabChange.bind(this);
+    this.onPublishSchedule = this.onPublishSchedule.bind(this);
   }
 
   public componentDidMount() {
@@ -52,7 +58,20 @@ class EventAdvancementView extends React.Component<IProps, IState> {
   }
 
   public render() {
+    const {eventConfig, playoffsMatches} = this.props;
     const {activeIndex} = this.state;
+
+    let activeTournament: TournamentRound;
+    if (Array.isArray(eventConfig.tournament)) {
+      const rounds = eventConfig.tournament.filter((r: TournamentRound) => r.id === eventConfig.activeTournamentID);
+      if (rounds.length > 0) {
+        activeTournament = rounds[0];
+      }
+    } else {
+      if (eventConfig.tournament.id === eventConfig.activeTournamentID) {
+        activeTournament = eventConfig.tournament;
+      }
+    }
 
     return (
       <div className={"step-view no-overflow"}>
@@ -62,7 +81,7 @@ class EventAdvancementView extends React.Component<IProps, IState> {
           { menuItem: "Schedule Parameters", render: ()=> <TournamentScheduleSetup/> },
           { menuItem: "Schedule Overview", render: ()=> <TournamentScheduleOverview/> },
           { menuItem: "Match Maker Parameters", render: () => <TournamentMatchMakerParams/> },
-          { menuItem: "Match Schedule Overview", render: this.renderTournamentOverview }
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type={this.getTypeFromTournament(activeTournament.type)} matchList={playoffsMatches} onComplete={this.onPublishSchedule}/> }
         ]}/>
       </div>
     );
@@ -72,7 +91,6 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     const {eventConfig} = this.props;
 
     let roundsView: any[] = [];
-
     if (Array.isArray(eventConfig.tournament)) {
       roundsView = eventConfig.tournament.map((r: TournamentRound) => {
         return (
@@ -142,13 +160,46 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     }
   }
 
+  private onPublishSchedule() {
+    this.props.setNavigationDisabled(true);
+    if (this.props.toaConfig.enabled) {
+      UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.playoffsMatches).then(() => {
+        console.log(`${this.props.playoffsMatches.length} matches have been posted to TOA.`);
+      }).catch((error: HttpError) => {
+        DialogManager.showErrorBox(error);
+      });
+    }
+    EventCreationManager.createPlayoffsSchedule(this.props.playoffsMatches).then(() => {
+      this.props.setNavigationDisabled(false);
+      this.props.onComplete();
+    }).catch((error: HttpError) => {
+      console.log(error);
+      this.props.setNavigationDisabled(false);
+      DialogManager.showErrorBox(error);
+    });
+  }
+
+  private getTypeFromTournament(type: PlayoffsType): TournamentType {
+    switch(type) {
+      case "elims":
+        return "Eliminations";
+      case "ranking":
+        return "Ranking";
+      case "rr":
+        return "Round Robin";
+      default:
+        return "Eliminations";
+    }
+  }
 }
 
-function mapStateToProps({configState}: IApplicationState) {
+function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     event: configState.event,
     eventConfig: configState.eventConfiguration,
-    playoffsSchedule: configState.playoffsSchedule
+    toaConfig: configState.toaConfig,
+    playoffsSchedule: configState.playoffsSchedule,
+    playoffsMatches: internalState.playoffsMatches
   };
 }
 

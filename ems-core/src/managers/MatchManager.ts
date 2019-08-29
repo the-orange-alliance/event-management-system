@@ -112,7 +112,7 @@ class MatchManager {
   public commitScores(match: Match, config: EventConfiguration): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.postMatchResults(match).then(() => {
-        if (match.tournamentLevel > 0 && match.tournamentLevel < 10) {
+        if (match.tournamentLevel > Match.PRACTICE_LEVEL) {
           setTimeout(() => {
             EMSProvider.calculateRankings(match.tournamentLevel, config.eventType).then(() => {
               SocketProvider.once("commit-scores-response", (err: any, data: any) => {

@@ -5,6 +5,7 @@ import DialogManager from "../managers/DialogManager";
 import {EMSProvider, HttpError, ScheduleItem, TournamentType} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
+  eventKey?: string;
   type: TournamentType;
   tournamentId?: number;
 }
@@ -22,11 +23,21 @@ class SetupScheduleOverview extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getScheduleItems(this.props.type).then((scheduleItems: ScheduleItem[]) => {
-      this.setState({scheduleItems});
-    }).catch((err: HttpError) => {
-      DialogManager.showErrorBox(err);
-    });
+    const {eventKey, tournamentId, type} = this.props;
+    if (tournamentId) {
+      const matchType: string = type.substring(0, 1).toUpperCase();
+      EMSProvider.getPlayoffsScheduleItems(type, `${eventKey}-${matchType}`, tournamentId).then((scheduleItems: ScheduleItem[]) => {
+        this.setState({scheduleItems});
+      }).catch((err: HttpError) => {
+        DialogManager.showErrorBox(err);
+      });
+    } else {
+      EMSProvider.getScheduleItems(this.props.type).then((scheduleItems: ScheduleItem[]) => {
+        this.setState({scheduleItems});
+      }).catch((err: HttpError) => {
+        DialogManager.showErrorBox(err);
+      });
+    }
   }
 
   public render() {

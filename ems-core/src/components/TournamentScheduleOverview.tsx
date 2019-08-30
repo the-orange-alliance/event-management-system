@@ -1,12 +1,13 @@
 import * as React from "react";
-import {EventConfiguration, TournamentRound} from "@the-orange-alliance/lib-ems";
+import {Event, EventConfiguration, TournamentRound} from "@the-orange-alliance/lib-ems";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {Tab} from "semantic-ui-react";
 import SetupScheduleOverview from "./SetupScheduleOverview";
 
 interface IProps {
-  eventConfig?: EventConfiguration
+  event?: Event;
+  eventConfig?: EventConfiguration;
 }
 
 class TournamentScheduleOverview extends React.Component<IProps> {
@@ -15,7 +16,7 @@ class TournamentScheduleOverview extends React.Component<IProps> {
   }
 
   public render() {
-    const {eventConfig} = this.props;
+    const {event, eventConfig} = this.props;
     let activeTournament: TournamentRound;
 
     if (Array.isArray(eventConfig.tournament)) {
@@ -42,13 +43,13 @@ class TournamentScheduleOverview extends React.Component<IProps> {
     } else {
       switch (activeTournament.type) {
         case "rr":
-          view = <SetupScheduleOverview type={"Round Robin"}/>;
+          view = <SetupScheduleOverview eventKey={event.eventKey} tournamentId={activeTournament.id} type={"Round Robin"}/>;
           break;
         case "elims":
-          view = <SetupScheduleOverview type={"Eliminations"}/>;
+          view = <SetupScheduleOverview eventKey={event.eventKey} tournamentId={activeTournament.id} type={"Eliminations"}/>;
           break;
         case "ranking":
-          view = <SetupScheduleOverview type={"Ranking"}/>;
+          view = <SetupScheduleOverview eventKey={event.eventKey} tournamentId={activeTournament.id} type={"Ranking"}/>;
           break;
       }
     }
@@ -59,6 +60,7 @@ class TournamentScheduleOverview extends React.Component<IProps> {
 
 export function mapStateToProps({configState}: IApplicationState) {
   return {
+    event: configState.event,
     eventConfig: configState.eventConfiguration
   };
 }

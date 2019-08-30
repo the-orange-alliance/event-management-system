@@ -3,14 +3,12 @@ import {Tab, TabProps} from "semantic-ui-react";
 import {SyntheticEvent} from "react";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
-import SetupElimsScheduleParams from "../../../components/SetupElimsScheduleParams";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation, IAddPlayoffsMatches} from "../../../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation, addPlayoffsMatches} from "../../../stores/internal/actions";
 import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
-import SetupElimsRunMatchMaker from "../../../components/SetupElimsRunMatchMaker";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
 import {
   EliminationMatchesFormat, EliminationsSchedule, Event, EventConfiguration, HttpError, Match, ScheduleItem,
@@ -52,13 +50,13 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 
   public render() {
     const {activeIndex} = this.state;
-    const {schedule, playoffsMatches} = this.props;
+    const {playoffsMatches} = this.props;
     return (
       <div className="step-view no-overflow">
         <Tab menu={{secondary: true}} activeIndex={activeIndex} onTabChange={this.onTabChange} panes={[
-          { menuItem: "Schedule Parameters", render: () => <SetupElimsScheduleParams onComplete={this.onParamsComplete} schedule={schedule}/>},
+          // { menuItem: "Schedule Parameters", render: () => <SetupElimsScheduleParams onComplete={this.onParamsComplete} schedule={schedule}/>},
           { menuItem: "Schedule Overview", render: () => <SetupScheduleOverview type={"Eliminations"}/>},
-          { menuItem: "Match Maker Parameters", render: () => <SetupElimsRunMatchMaker schedule={schedule} onComplete={this.onMatchMakerComplete}/>},
+          // { menuItem: "Match Maker Parameters", render: () => <SetupElimsRunMatchMaker schedule={schedule} onComplete={this.onMatchMakerComplete}/>},
           { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type="Eliminations" matchList={playoffsMatches} onComplete={this.onPublishSchedule}/>},
         ]}
         />

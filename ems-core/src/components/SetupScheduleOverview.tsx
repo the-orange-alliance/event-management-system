@@ -5,7 +5,8 @@ import DialogManager from "../managers/DialogManager";
 import {EMSProvider, HttpError, ScheduleItem, TournamentType} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
-  type: TournamentType
+  type: TournamentType;
+  tournamentId?: number;
 }
 
 interface IState {

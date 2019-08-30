@@ -1,11 +1,13 @@
 import {AllianceMember, SeriesType, Match, MatchParticipant} from "@the-orange-alliance/lib-ems";
+import PlayoffsMatchManager from "./PlayoffsMatchManager";
 
 interface IBracketOptions {
-  allianceCaptains: number,
-  allianceMembers: AllianceMember[],
-  format: SeriesType,
-  eventKey: string,
-  fields: number
+  allianceCaptains: number;
+  allianceMembers: AllianceMember[];
+  format: SeriesType;
+  eventKey: string;
+  fields: number;
+  tournamentId: number;
 }
 
 class AllianceBracketManager {
@@ -22,7 +24,7 @@ class AllianceBracketManager {
 
   public generateBracket(options: IBracketOptions): Promise<Match[]> {
     return new Promise<Match[]>((resolve, reject) => {
-      const alliances: Map<number, AllianceMember[]> = this.getAllianceMap(options.allianceMembers);
+      const alliances: Map<number, AllianceMember[]> = PlayoffsMatchManager.getAllianceMap(options.allianceMembers);
       const results: Match[] = [];
       // Octofinal matches
       if (options.allianceCaptains >= 16) {
@@ -35,8 +37,9 @@ class AllianceBracketManager {
               matchStr = this.getMatchesFromFormat(options.format) > 1 ? "Match " + (i + 1) : "";
             }
             const match: Match = new Match();
-            match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
-            match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
+            const key: string = `${options.eventKey}-E${options.tournamentId}${(results.length + 1).toString().padStart(3, '0')}`;
+            match.matchKey = key;
+            match.matchDetailKey = `${key}D`;
             match.matchName = `Octofinal ${j + 1} ${matchStr}`;
             match.tournamentLevel = j + 10;
             match.fieldNumber = (j + 1) % options.fields === 0 ? options.fields : (j + 1) % options.fields;
@@ -62,8 +65,9 @@ class AllianceBracketManager {
               matchStr = this.getMatchesFromFormat(options.format) > 1 ? "Match " + (i + 1) : "";
             }
             const match: Match = new Match();
-            match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
-            match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
+            const key: string = `${options.eventKey}-E${options.tournamentId}${(results.length + 1).toString().padStart(3, '0')}`;
+            match.matchKey = key;
+            match.matchDetailKey = `${key}D`;
             match.matchName = `Quarterfinal ${j + 1} ${matchStr}`;
             match.tournamentLevel = j + 20;
             match.fieldNumber = (j + 1) % options.fields === 0 ? options.fields : (j + 1) % options.fields;
@@ -89,8 +93,9 @@ class AllianceBracketManager {
               matchStr = this.getMatchesFromFormat(options.format) > 1 ? "Match " + (i + 1) : "";
             }
             const match: Match = new Match();
-            match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
-            match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
+            const key: string = `${options.eventKey}-E${options.tournamentId}${(results.length + 1).toString().padStart(3, '0')}`;
+            match.matchKey = key;
+            match.matchDetailKey = `${key}`;
             match.matchName = `Semifinal ${j + 1} ${matchStr}`;
             match.tournamentLevel = j + 30;
             match.fieldNumber = (j + 1) % options.fields === 0 ? options.fields : (j + 1) % options.fields;
@@ -109,8 +114,9 @@ class AllianceBracketManager {
       for (let i = 0; i < this.getMatchesFromFormat(options.format); i++) { // Matches
         const matchStr = this.getMatchesFromFormat(options.format) > 1 ? "Match " + (i + 1) : "";
         const match: Match = new Match();
-        match.matchKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1));
-        match.matchDetailKey = options.eventKey + "-E0" + (results.length < 9 ? "0" + (results.length + 1) : (results.length + 1)) + "D";
+        const key: string = `${options.eventKey}-E${options.tournamentId}${(results.length + 1).toString().padStart(3, '0')}`;
+        match.matchKey = key;
+        match.matchDetailKey = `${key}D`;
         match.matchName = `Finals ${matchStr}`;
         match.tournamentLevel = 40;
         match.fieldNumber = 1;
@@ -230,17 +236,6 @@ class AllianceBracketManager {
       participants.push(participant);
     }
     return participants;
-  }
-
-  private getAllianceMap(allianceMembers: AllianceMember[]): Map<number, AllianceMember[]> {
-    const alliances: Map<number, AllianceMember[]> = new Map<number, AllianceMember[]>();
-    for (const member of allianceMembers) {
-      if (typeof alliances.get(member.allianceRank) === "undefined") {
-        alliances.set(member.allianceRank, []);
-      }
-      alliances.get(member.allianceRank).push(member);
-    }
-    return alliances;
   }
 
   private getMatchesFromFormat(format: SeriesType): number {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, Card, Form, InputProps, Tab} from "semantic-ui-react";
+import {Card, Form, Grid, Tab} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
 import {ApplicationActions, IApplicationState} from "../stores";
 import DialogManager from "../managers/DialogManager";
@@ -7,47 +7,40 @@ import {connect} from "react-redux";
 import {IDisableNavigation} from "../stores/internal/types";
 import {Dispatch} from "redux";
 import {disableNavigation} from "../stores/internal/actions";
-import {SyntheticEvent} from "react";
-import AllianceBracketManager from "../managers/AllianceBracketManager";
-import {AllianceMember, AppError, EliminationsSchedule, EMSProvider, Event, Match, ScheduleItem} from "@the-orange-alliance/lib-ems";
+import EliminationsManager from "../managers/playoffs/EliminationsManager";
+import {AllianceMember, AppError, EliminationMatchesFormat, Event, Match} from "@the-orange-alliance/lib-ems";
+import TournamentRound from "@the-orange-alliance/lib-ems/dist/models/ems/TournamentRound";
+import EventConfiguration from "@the-orange-alliance/lib-ems/dist/models/ems/EventConfiguration";
+import NumericInput from "./NumericInput";
 
 interface IProps {
-  onComplete: (matches: Match[]) => void,
-  schedule: EliminationsSchedule,
-  allianceMembers?: AllianceMember[],
-  event?: Event,
+  activeRound: TournamentRound,
+  allianceMembers: AllianceMember[],
+  event: Event,
+  eventConfig: EventConfiguration,
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
+  onComplete: (match: Match[]) => void
 }
 
 interface IState {
-  scheduleItems: ScheduleItem[],
-  requestingData: boolean,
-  fieldCount: number
+  fields: number;
 }
 
 class SetupElimsRunMatchMaker extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      scheduleItems: [],
-      requestingData: true,
-      fieldCount: this.props.event.fieldCount
+      fields: props.event.fieldCount
     };
-    this.updateFieldCount = this.updateFieldCount.bind(this);
-    this.runMatchMaker = this.runMatchMaker.bind(this);
-  }
-
-  public componentDidMount() {
-    EMSProvider.getScheduleItems(this.props.schedule.type).then((scheduleItems: ScheduleItem[]) => {
-      this.setState({scheduleItems, requestingData: false});
-    }).catch(() => {
-      this.setState({requestingData: false});
-    });
+    this.generateMatches = this.generateMatches.bind(this);
+    this.updateFields = this.updateFields.bind(this);
   }
 
   public render() {
-    const {scheduleItems, requestingData, fieldCount} = this.state;
+    const {event, navigationDisabled} = this.props;
+    const {fields} = this.state;
+    const fieldsError: boolean = fields > event.fieldCount || fields === 0;
     return (
       <Tab.Pane className="step-view-tab">
         <Card fluid={true} color={getTheme().secondary}>
@@ -55,61 +48,54 @@ class SetupElimsRunMatchMaker extends React.Component<IProps, IState> {
             <Card.Header>Match Maker Parameters</Card.Header>
           </Card.Content>
           <Card.Content>
-            <Form>
-              <Form.Field>
-                <Form.Input label="Fields" value={fieldCount} onChange={this.updateFieldCount}/>
-              </Form.Field>
-              <Form.Field>
-                <Button color={getTheme().primary} disabled={this.props.navigationDisabled || scheduleItems.length === 0} loading={this.props.navigationDisabled} onClick={this.runMatchMaker}>Run Match Maker</Button>
-                {
-                  scheduleItems.length === 0 && !requestingData &&
-                  <span className="error-text"><i>There is currently no generated {this.props.schedule.type.toString().toLowerCase()} schedule. Head over to the 'Schedule Parameters' tab to generate one.</i></span>
-                }
-              </Form.Field>
-            </Form>
+            <Grid>
+              <Grid.Row columns={6}>
+                <Grid.Column><NumericInput label={`Field Count`} value={fields} error={fieldsError} onUpdate={this.updateFields}/></Grid.Column>
+              </Grid.Row>
+              <Grid.Row columns={6}>
+                <Grid.Column><Form.Button fluid={true} color={getTheme().primary} disabled={navigationDisabled || fieldsError} loading={navigationDisabled} onClick={this.generateMatches}>Generate Matches</Form.Button></Grid.Column>
+              </Grid.Row>
+            </Grid>
           </Card.Content>
         </Card>
       </Tab.Pane>
     );
   }
 
-  private updateFieldCount(event: SyntheticEvent, props: InputProps) {
-    if (!isNaN(props.value)) {
-      this.setState({fieldCount: props.value as number});
-    }
-  }
+  private generateMatches() {
+    const {allianceMembers, activeRound, event, setNavigationDisabled, onComplete} = this.props;
+    const {fields} = this.state;
+    const format: EliminationMatchesFormat = activeRound.format as EliminationMatchesFormat;
 
-  private runMatchMaker() {
-    this.props.setNavigationDisabled(true);
-    AllianceBracketManager.generateBracket({
-      allianceCaptains: this.props.schedule.allianceCaptains,
-      format: this.props.schedule.eliminationsFormat,
-      allianceMembers: this.props.allianceMembers,
-      eventKey: this.props.event.eventKey,
-      fields: this.state.fieldCount
+    setNavigationDisabled(true);
+    EliminationsManager.generateBracket({
+      allianceCaptains: format.alliances,
+      format: format.seriesType,
+      allianceMembers: allianceMembers,
+      eventKey: event.eventKey,
+      fields: fields,
+      tournamentId: activeRound.id
     }).then((matches: Match[]) => {
-      let matchNumber: number = 0;
-      for (const item of this.state.scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
-        if (item.isMatch) {
-          matches[matchNumber].scheduledStartTime = item.startTime;
-          matchNumber++;
-        }
-      }
-      this.props.setNavigationDisabled(false);
-      this.props.onComplete(matches);
+      onComplete(matches);
+      setNavigationDisabled(false);
     }).catch((error: AppError) => {
       console.log(error);
-      this.props.setNavigationDisabled(false);
+      setNavigationDisabled(false);
       DialogManager.showErrorBox(error);
     });
   }
+
+  private updateFields(value: number) {
+    this.setState({fields: value});
+  }
 }
 
-export function mapStateToProps({internalState, configState}: IApplicationState) {
+export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
+    allianceMembers: internalState.allianceMembers,
     event: configState.event,
-    navigationDisabled: internalState.navigationDisabled,
-    allianceMembers: internalState.allianceMembers
+    eventConfig: configState.eventConfiguration,
+    navigationDisabled: internalState.navigationDisabled
   };
 }
 

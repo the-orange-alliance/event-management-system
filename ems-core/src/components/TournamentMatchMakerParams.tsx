@@ -7,6 +7,7 @@ import SetupRoundRobinMatchMakerParams from "./SetupRoundRobinMatchMakerParams";
 import {IAddPlayoffsMatches} from "../stores/internal/types";
 import {Dispatch} from "redux";
 import {addPlayoffsMatches} from "../stores/internal/actions";
+import SetupElimsRunMatchMaker from "./SetupElimsRunMatchMaker";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -52,7 +53,7 @@ class TournamentMatchMakerParams extends React.Component<IProps> {
           view = (<SetupRoundRobinMatchMakerParams activeRound={activeTournament} onComplete={this.onMatchGenerationComplete.bind(this, activeTournament.id)}/>);
           break;
         case "elims":
-          view = (<span>NYI</span>);
+          view = (<SetupElimsRunMatchMaker activeRound={activeTournament} onComplete={this.onMatchGenerationComplete.bind(this, activeTournament.id)}/>);
           break;
         case "ranking":
           view = (<span>NYI</span>);

@@ -34,6 +34,13 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
   public componentDidMount() {
     const {activeRound, playoffsSchedule} = this.props;
     if (playoffsSchedule.length > 0) {
+      console.log(playoffsSchedule);
+      if (playoffsSchedule[activeRound.id].type !== "Round Robin") {
+        const teams: number[] = playoffsSchedule[activeRound.id].teams;
+        playoffsSchedule[activeRound.id] = new RoundRobinSchedule();
+        playoffsSchedule[activeRound.id].teamsParticipating = teams.length;
+        playoffsSchedule[activeRound.id].teams = teams;
+      }
       const format: RoundRobinFormat = activeRound.format as RoundRobinFormat;
       (playoffsSchedule[activeRound.id] as RoundRobinSchedule).alliances = format.alliances;
       (playoffsSchedule[activeRound.id] as RoundRobinSchedule).teamsPerAlliance = format.teamsPerAlliance;

@@ -11,6 +11,7 @@ import DialogManager from "../managers/DialogManager";
 import EventCreationManager from "../managers/EventCreationManager";
 import {IDisableNavigation} from "../stores/internal/types";
 import {disableNavigation} from "../stores/internal/actions";
+import SetupElimsScheduleParams from "./SetupElimsScheduleParams";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -57,7 +58,7 @@ class TournamentScheduleOverview extends React.Component<IProps> {
           view = <SetupRoundRobinScheduleParams activeRound={activeTournament} onScheduleParamsComplete={this.onScheduleParamsComplete}/>;
           break;
         case "elims":
-          view = <SetupRoundRobinScheduleParams activeRound={activeTournament} onScheduleParamsComplete={this.onScheduleParamsComplete}/>;
+          view = <SetupElimsScheduleParams activeRound={activeTournament} onScheduleParamsComplete={this.onScheduleParamsComplete}/>;
           break;
         case "ranking":
           view = <span>Nope.</span>;

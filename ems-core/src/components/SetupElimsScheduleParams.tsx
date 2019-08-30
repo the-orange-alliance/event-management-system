@@ -10,13 +10,23 @@ import {connect} from "react-redux";
 import {CONFIG_STORE} from "../AppStore";
 import DialogManager from "../managers/DialogManager";
 import ConfirmActionModal from "./ConfirmActionModal";
-import {EliminationsSchedule, Event, ScheduleItem} from "@the-orange-alliance/lib-ems";
-
+import {
+  EliminationMatchesFormat,
+  EliminationsSchedule,
+  Event,
+  EventConfiguration,
+  Schedule,
+  ScheduleItem,
+  TournamentRound
+} from "@the-orange-alliance/lib-ems";
+import * as moment from "moment";
 interface IProps {
-  onComplete: (scheduleItems: ScheduleItem[]) => void
-  schedule: EliminationsSchedule,
+  activeRound: TournamentRound,
   event?: Event,
-  navigationDisabled?: boolean
+  eventConfig?: EventConfiguration,
+  navigationDisabled?: boolean,
+  playoffsSchedule?: Schedule[],
+  onScheduleParamsComplete: (scheduleItems: ScheduleItem[]) => void
 }
 
 interface IState {
@@ -39,10 +49,34 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
     this.generateSchedule = this.generateSchedule.bind(this);
   }
 
+  public componentDidMount() {
+    const {activeRound, playoffsSchedule} = this.props;
+    if (playoffsSchedule.length > 0) {
+      if (playoffsSchedule[activeRound.id].type !== "Eliminations") {
+        const teams: number[] = playoffsSchedule[activeRound.id].teams;
+        playoffsSchedule[activeRound.id] = new EliminationsSchedule();
+        playoffsSchedule[activeRound.id].teamsParticipating = teams.length;
+        playoffsSchedule[activeRound.id].teams = teams;
+        playoffsSchedule[activeRound.id].tournamentId = activeRound.id;
+      }
+      const format: EliminationMatchesFormat = activeRound.format as EliminationMatchesFormat;
+      (playoffsSchedule[activeRound.id] as EliminationsSchedule).allianceCaptains = format.alliances;
+      (playoffsSchedule[activeRound.id] as EliminationsSchedule).teamsPerAlliance = format.teamsPerAlliance;
+      (playoffsSchedule[activeRound.id] as EliminationsSchedule).eliminationsFormat = format.seriesType;
+      (playoffsSchedule[activeRound.id] as EliminationsSchedule).totalMatches = (playoffsSchedule[activeRound.id] as EliminationsSchedule).maxTotalMatches;
+      console.log(playoffsSchedule[activeRound.id]);
+      this.forceUpdate();
+    }
+  }
+
   public render() {
+    const {activeRound, navigationDisabled, playoffsSchedule} = this.props;
     const {warningModalOpen} = this.state;
-    const days = this.props.schedule.days.map(day => {
-      const dayBreaks = this.props.schedule.days[day.id].breaks.map(dayBreak => {
+    const format: EliminationMatchesFormat = activeRound.format as EliminationMatchesFormat;
+    const schedule: EliminationsSchedule = playoffsSchedule.length > 0 ? playoffsSchedule[activeRound.id] as EliminationsSchedule : new EliminationsSchedule();
+
+    const days = schedule.days.map(day => {
+      const dayBreaks = schedule.days[day.id].breaks.map(dayBreak => {
         return (
           <Grid.Row key={"day-" + day.id + "-break-" + dayBreak.id}>
             <Grid.Column width={2} className="center-items"><span>{dayBreak.name}</span></Grid.Column>
@@ -65,7 +99,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
                   customInput={<Input fluid={true}/>}
                   showTimeSelect={true}
                   timeIntervals={15}
-                  dateFormat="dddd, MMMM Do YYYY, h:mm a"
+                  dateFormat="EEEE, MMMM d YYYY, h:mm a"
                   onChange={this.updateDayStartTime.bind(this, day.id)}
                   selected={day.startTime.toDate()}
                 />
@@ -87,19 +121,20 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
       <Tab.Pane className="step-view-tab">
         <ConfirmActionModal open={warningModalOpen} onClose={this.closeWarningModal} onConfirm={this.generateSchedule} innerText={"You are about to generate a schedule that plans to run more than 1 match at a time. Are you sure you want to proceed?"}/>
         <Card fluid={true} color={getTheme().secondary}>
-          <Dimmer active={this.props.navigationDisabled}>
+          <Dimmer active={navigationDisabled}>
             <Loader/>
           </Dimmer>
           <Card.Content>
-            <Card.Header>{this.props.schedule.type} Schedule Parameters</Card.Header>
+            <Card.Header>{schedule.type} Schedule Parameters</Card.Header>
           </Card.Content>
           <Card.Content>
             <Form widths="equal">
               <Form.Group>
-                <Form.Input label="Alliance Captains" value={this.props.schedule.allianceCaptains}/>
-                <Form.Input label="Cycle Time" value={this.props.schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
-                <Form.Input value={this.props.schedule.matchConcurrency} error={!this.isValidMatchConcurrency()} onChange={this.updateMatchConcurrency} label={<ExplanationIcon title={"Match Concurrency"} content={"Sets the number of matches that will be run at any given time. Leave this at 1 unless you have special clearence for your event."}/>}/>
-                <Form.Input value={this.props.schedule.maxTotalMatches} label="Total Matches"/>
+                <Form.Input label="Alliance Captains" value={format.alliances} disabled={true}/>
+                <Form.Input label="Series Type" value={format.seriesType} disabled={true}/>
+                <Form.Input label="Cycle Time" value={schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
+                <Form.Input value={schedule.matchConcurrency} error={!this.isValidMatchConcurrency()} onChange={this.updateMatchConcurrency} label={<ExplanationIcon title={"Match Concurrency"} content={"Sets the number of matches that will be run at any given time. Leave this at 1 unless you have special clearence for your event."}/>}/>
+                <Form.Input value={schedule.maxTotalMatches} label="Total Matches" disabled={true}/>
               </Form.Group>
             </Form>
           </Card.Content>
@@ -109,7 +144,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
             <Loader/>
           </Dimmer>
           <Card.Content>
-            <Card.Header>{this.props.schedule.type} Schedule Outline</Card.Header>
+            <Card.Header>{schedule.type} Schedule Outline</Card.Header>
           </Card.Content>
           <Card.Content>
             <Form>
@@ -126,16 +161,16 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
         </Card>
         <Card fluid={true} color={getTheme().secondary}>
           <Card.Content>
-            <Card.Header>{this.props.schedule.type} Schedule Generation</Card.Header>
+            <Card.Header>{schedule.type} Schedule Generation</Card.Header>
           </Card.Content>
           <Card.Content>
             <Grid>
               <Grid.Row columns={16}>
-                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} loading={this.props.navigationDisabled} disabled={!this.props.schedule.isValid() || this.props.navigationDisabled} onClick={this.openWarningModal}>Generate Schedule</Button></Grid.Column>
+                <Grid.Column width={4}><Button color={getTheme().primary} fluid={true} loading={navigationDisabled} disabled={!schedule.isValid() || navigationDisabled} onClick={this.openWarningModal}>Generate Schedule</Button></Grid.Column>
                 <Grid.Column width={12} className="center-left-items">
                   {
-                    this.props.schedule.validationMessage.length > 0 &&
-                    <span className="error-text">{this.props.schedule.validationMessage}</span>
+                    schedule.validationMessage.length > 0 &&
+                    <span className="error-text">{schedule.validationMessage}</span>
                   }
                 </Grid.Column>
               </Grid.Row>
@@ -147,7 +182,9 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
   }
 
   private openWarningModal() {
-    if (this.props.schedule.containsWarnings()) {
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    if (schedule.containsWarnings()) {
       this.setState({warningModalOpen: true});
     } else {
       this.generateSchedule();
@@ -159,116 +196,150 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
   }
 
   private updateMatchesPerTeam(event: SyntheticEvent, props: InputProps) {
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     if (!isNaN(props.value)) {
-      this.props.schedule.matchesPerTeam = parseInt(props.value, 10);
-      this.props.schedule.totalMatches = this.props.schedule.maxTotalMatches;
+      schedule.matchesPerTeam = parseInt(props.value, 10);
+      schedule.totalMatches = schedule.maxTotalMatches;
       this.forceUpdate();
     }
   }
 
   private updateCycleTime(event: SyntheticEvent, props: InputProps) {
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     if (!isNaN(props.value)) {
-      this.props.schedule.cycleTime = parseInt(props.value, 10);
-      this.props.schedule.forceUpdate();
+      schedule.cycleTime = parseInt(props.value, 10);
+      schedule.forceUpdate();
       this.forceUpdate();
     }
   }
 
   private updateMatchConcurrency(event: SyntheticEvent, props: InputProps) {
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     if (!isNaN(props.value)) {
-      this.props.schedule.matchConcurrency = parseInt(props.value, 10);
-      this.props.schedule.forceUpdate();
+      schedule.matchConcurrency = parseInt(props.value, 10);
+      schedule.forceUpdate();
       this.forceUpdate();
     }
   }
 
   private isValidMatchConcurrency(): boolean {
-    return !isNaN(this.props.schedule.matchConcurrency) && this.props.schedule.matchConcurrency  > 0;
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    return !isNaN(schedule.matchConcurrency) && schedule.matchConcurrency  > 0;
   }
 
   private isValidCycleTime(): boolean {
-    return !isNaN(this.props.schedule.cycleTime) && this.props.schedule.cycleTime <= 15 && this.props.schedule.cycleTime > 0;
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    return !isNaN(schedule.cycleTime) && schedule.cycleTime <= 15 && schedule.cycleTime > 0;
   }
 
   private canRemoveDay(): boolean {
-    return this.props.schedule.days.length > 1;
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    return schedule.days.length > 1;
   }
 
   private canRemoveBreak(day: number) {
-    return this.props.schedule.days[day].breaks.length > 0;
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    return schedule.days[day].breaks.length > 0;
   }
 
   private addDay(event: SyntheticEvent) {
-    this.props.schedule.addDay();
-    this.props.schedule.forceUpdate();
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    schedule.addDay();
+    schedule.forceUpdate();
     this.forceUpdate();
   }
 
   private removeDay(event: SyntheticEvent) {
-    this.props.schedule.removeDay();
-    this.props.schedule.forceUpdate();
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    schedule.removeDay();
+    schedule.forceUpdate();
     this.forceUpdate();
   }
 
   private addBreak(day: number) {
-    this.props.schedule.days[day].addBreak();
-    this.props.schedule.forceUpdate();
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    schedule.days[day].addBreak();
+    schedule.forceUpdate();
     this.forceUpdate();
   }
 
   private removeBreak(day: number) {
-    this.props.schedule.days[day].removeBreak();
-    this.props.schedule.forceUpdate();
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    schedule.days[day].removeBreak();
+    schedule.forceUpdate();
     this.forceUpdate();
   }
 
   private updateDayStartTime(day: number, time: Moment) {
-    this.props.schedule.days[day].startTime = time;
-    this.props.schedule.forceUpdate();
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    schedule.days[day].startTime = moment(time);
+    schedule.forceUpdate();
     this.forceUpdate();
   }
 
   private updateDayMatches(day: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
-      this.props.schedule.days[day].matchesScheduled = parseInt(props.value, 10) || 0;
-      this.props.schedule.forceUpdate();
+      const {activeRound, playoffsSchedule} = this.props;
+      const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+      schedule.days[day].matchesScheduled = parseInt(props.value, 10) || 0;
+      schedule.forceUpdate();
       this.forceUpdate();
     }
   }
 
   private updateBreakName(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
-    this.props.schedule.days[day].breaks[dayBreak].name = props.value;
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
+    schedule.days[day].breaks[dayBreak].name = props.value;
     this.forceUpdate();
   }
 
   private updateBreakStart(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     if (!isNaN(props.value)) {
-      this.props.schedule.days[day].breaks[dayBreak].match = parseInt(props.value, 10) || 0;
-      this.props.schedule.forceUpdate();
+      schedule.days[day].breaks[dayBreak].match = parseInt(props.value, 10) || 0;
+      schedule.forceUpdate();
       this.forceUpdate();
     }
   }
 
   private updateBreakDuration(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
+    const {activeRound, playoffsSchedule} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     if (!isNaN(props.value)) {
-      this.props.schedule.days[day].breaks[dayBreak].duration = parseInt(props.value, 10) || 0;
-      this.props.schedule.forceUpdate();
+      schedule.days[day].breaks[dayBreak].duration = parseInt(props.value, 10) || 0;
+      schedule.forceUpdate();
       this.forceUpdate();
     }
   }
 
   private generateSchedule() { // TODO - Check to see if an online schedule has already been posted.
+    const {activeRound, event, playoffsSchedule, onScheduleParamsComplete} = this.props;
+    const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     this.closeWarningModal();
-    this.props.schedule.totalMatches = this.props.schedule.maxTotalMatches;
-    // this.props.schedule.tournamentId = this.props.activeRound.id;
+    schedule.totalMatches = schedule.maxTotalMatches;
+    schedule.tournamentId = activeRound.id;
     CONFIG_STORE.getAll().then((config: any) => {
-      let schedule: any = {};
+      let configSchedule: any = {};
       if (typeof config.schedule !== "undefined") {
-        schedule = config.schedule;
+        configSchedule = config.schedule;
       }
-      schedule[this.props.schedule.type] = this.props.schedule.toJSON();
-      CONFIG_STORE.set("schedule", schedule).then(() => {
-        this.props.onComplete(this.props.schedule.generateSchedule(this.props.event));
+      configSchedule.Playoffs = playoffsSchedule.map((s: Schedule) => s.toJSON());
+      CONFIG_STORE.set("schedule", configSchedule).then(() => {
+        onScheduleParamsComplete(schedule.generateSchedule(event));
       }).catch((err) => {
         console.log(err);
         DialogManager.showErrorBox(err);
@@ -282,8 +353,9 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     event: configState.event,
-    navigationDisabled: internalState.navigationDisabled
+    eventConfig: configState.eventConfiguration,
+    navigationDisabled: internalState.navigationDisabled,
+    playoffsSchedule: configState.playoffsSchedule
   };
 }
-
 export default connect(mapStateToProps)(SetupElimsScheduleParams);

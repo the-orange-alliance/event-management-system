@@ -9,6 +9,8 @@ import {disableNavigation} from "../stores/internal/actions";
 import {connect} from "react-redux";
 import RoundRobinManager from "../managers/playoffs/RoundRobinManager";
 import NumericInput from "./NumericInput";
+import AppError from "@the-orange-alliance/lib-ems/dist/models/ems/AppError";
+import DialogManager from "../managers/DialogManager";
 
 interface IProps {
   activeRound: TournamentRound,
@@ -73,6 +75,10 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps, IState> {
     }).then((matches: Match[]) => {
       onComplete(matches);
       setNavigationDisabled(false);
+    }).catch((error: AppError) => {
+      console.log(error);
+      setNavigationDisabled(false);
+      DialogManager.showErrorBox(error);
     });
   }
 

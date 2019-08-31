@@ -68,6 +68,7 @@ gulp.task("post-build", () => {
   gulp.src(["ems-core/match-maker/**/*"]).pipe(gulp.dest("build/ems/public/desktop/match-maker"));
   gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
   gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
+  gulp.src(["ems-home/build/**/*"]).pipe(gulp.dest("build/ems/public/ems-home"));
   gulp.src(["ecosystem.config.js"]).pipe(gulp.dest("build/ems/server/"));
 
   gulp.src(["ems-core/.env"]).pipe(gulp.dest("build/ems/public/desktop"));

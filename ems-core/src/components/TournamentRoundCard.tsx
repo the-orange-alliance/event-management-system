@@ -5,15 +5,27 @@ import {
 } from "@the-orange-alliance/lib-ems";
 import {Button, Card, Grid, Input} from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
+import TournamentResultsModal from "./TournamentResultsModal";
 
 interface IProps {
   round: TournamentRound
   onActivate?: () => void
 }
 
-class TournamentRoundCard extends React.Component<IProps> {
+interface IState {
+  resultsModalOpen: boolean;
+}
+
+class TournamentRoundCard extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+
+    this.state = {
+      resultsModalOpen: false
+    };
+
+    this.openResultsModal = this.openResultsModal.bind(this);
+    this.closeResultsModal = this.closeResultsModal.bind(this);
   }
 
   public render() {
@@ -125,17 +137,27 @@ class TournamentRoundCard extends React.Component<IProps> {
   }
 
   private renderBottomButtons() {
-    const {onActivate} = this.props;
+    const {onActivate, round} = this.props;
+    const {resultsModalOpen} = this.state;
     return (
       <Card.Content>
+        <TournamentResultsModal open={resultsModalOpen} tournament={round} onClose={this.closeResultsModal}/>
         <Grid columns={2}>
           <Grid.Row>
             <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={onActivate}>Activate</Button></Grid.Column>
-            <Grid.Column><Button fluid={true} color={getTheme().primary}>View Results</Button></Grid.Column>
+            <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.openResultsModal}>View Results</Button></Grid.Column>
           </Grid.Row>
         </Grid>
       </Card.Content>
     );
+  }
+
+  private openResultsModal() {
+    this.setState({resultsModalOpen: true});
+  }
+
+  private closeResultsModal() {
+    this.setState({resultsModalOpen: false});
   }
 }
 

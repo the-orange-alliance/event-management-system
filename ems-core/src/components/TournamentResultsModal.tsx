@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Grid, Modal} from "semantic-ui-react";
+import {Button, Grid, Modal} from "semantic-ui-react";
 import {
   EventConfiguration,
   PlayoffsType,
@@ -11,12 +11,14 @@ import {
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import TournamentResultsTable from "./TournamentResultsTable";
+import {getTheme} from "../AppTheme";
 
 interface IProps {
   eventConfig: EventConfiguration;
   open: boolean;
   tournament: TournamentRound;
   onClose: () => void;
+  onTeamsAdvance: (teamKeys: number[]) => void;
 }
 
 interface IState {
@@ -33,6 +35,7 @@ class TournamentResultsModal extends React.Component<IProps, IState> {
       loading: true,
       rankings: []
     };
+    this.handleTeamsAdvance = this.handleTeamsAdvance.bind(this);
     this.updateAdvancingTeams = this.updateAdvancingTeams.bind(this);
   }
 
@@ -45,7 +48,13 @@ class TournamentResultsModal extends React.Component<IProps, IState> {
 
   public render() {
     const {eventConfig, open, tournament, onClose} = this.props;
-    const {rankings} = this.state;
+    const {advancingTeams, rankings} = this.state;
+    const tournaments: number = Array.isArray(eventConfig.tournament) ? eventConfig.tournament.length : 1;
+    let nextTournament: TournamentRound = tournament;
+    if (tournaments > 1) {
+      nextTournament = tournaments >= tournament.id ? tournament : (eventConfig.tournament as TournamentRound[])[tournament.id + 1];
+    }
+    const canAdvance = advancingTeams.length >= nextTournament.format.teamsPerAlliance;
     return (
       <Modal open={open} onClose={onClose} size={'fullscreen'}>
         <Modal.Header>
@@ -55,7 +64,7 @@ class TournamentResultsModal extends React.Component<IProps, IState> {
           <Grid>
             <Grid.Row columns={16}>
               <Grid.Column width={4}>
-                Hello World!
+                <Button fluid={true} color={getTheme().primary} disabled={!canAdvance} onClick={this.handleTeamsAdvance}>Advance Teams</Button>
               </Grid.Column>
               <Grid.Column width={12}>
                 <TournamentResultsTable identifier={eventConfig.teamIdentifier} rankings={rankings} onChange={this.updateAdvancingTeams}/>
@@ -65,6 +74,12 @@ class TournamentResultsModal extends React.Component<IProps, IState> {
         </Modal.Content>
       </Modal>
     );
+  }
+
+  private handleTeamsAdvance() {
+    const {onTeamsAdvance} = this.props;
+    const {advancingTeams} = this.state;
+    onTeamsAdvance(advancingTeams);
   }
 
   private getTypeFromTournament(type: PlayoffsType): TournamentType {

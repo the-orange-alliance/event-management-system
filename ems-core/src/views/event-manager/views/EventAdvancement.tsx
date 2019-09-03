@@ -51,6 +51,7 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     this.renderTournamentOverview  = this.renderTournamentOverview.bind(this);
     this.onTabChange = this.onTabChange.bind(this);
     this.onPublishSchedule = this.onPublishSchedule.bind(this);
+    this.onAdvanceTeams = this.onAdvanceTeams.bind(this);
   }
 
   public componentDidMount() {
@@ -94,13 +95,13 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     if (Array.isArray(eventConfig.tournament)) {
       roundsView = eventConfig.tournament.map((r: TournamentRound) => {
         return (
-          <TournamentRoundCard key={r.id} round={r} onActivate={this.onRoundActivate.bind(this, r.id)}/>
+          <TournamentRoundCard key={r.id} round={r} onActivate={this.onRoundActivate.bind(this, r.id)} onAdvanceTeams={this.onAdvanceTeams}/>
         );
       });
     } else {
       const r = eventConfig.tournament;
       roundsView.push(
-        <TournamentRoundCard key={r.id} round={r} onActivate={this.onRoundActivate.bind(this, r.id)}/>
+        <TournamentRoundCard key={r.id} round={r} onActivate={this.onRoundActivate.bind(this, r.id)} onAdvanceTeams={this.onAdvanceTeams}/>
       );
     }
 
@@ -177,6 +178,35 @@ class EventAdvancementView extends React.Component<IProps, IState> {
       this.props.setNavigationDisabled(false);
       DialogManager.showErrorBox(error);
     });
+  }
+
+  private onAdvanceTeams(keys: number[]) {
+    console.log(keys);
+    const {eventConfig, playoffsSchedule} = this.props;
+    let tournament: TournamentRound;
+    let rounds: TournamentRound[] = [];
+    if (Array.isArray(eventConfig.tournament)) {
+      rounds = eventConfig.tournament.filter((r: TournamentRound) => r.id === eventConfig.activeTournamentID);
+      if (rounds.length > 0) {
+        tournament = rounds[0];
+      }
+    } else {
+      if (eventConfig.tournament.id === eventConfig.activeTournamentID) {
+        tournament = eventConfig.tournament;
+        rounds = [tournament];
+      }
+    }
+    if (rounds.length > 1) {
+      const tournaments: number = rounds.length;
+      let nextTournament: TournamentRound = tournament;
+      if (tournaments > 1) {
+        nextTournament = tournaments >= tournament.id ? tournament : (eventConfig.tournament as TournamentRound[])[tournament.id + 1];
+      }
+      playoffsSchedule[nextTournament.id].teams = keys;
+      playoffsSchedule[nextTournament.id].teamsParticipating = keys.length;
+    } else {
+      console.log("ALL DONE");
+    }
   }
 
   private getTypeFromTournament(type: PlayoffsType): TournamentType {

@@ -10,6 +10,7 @@ import TournamentResultsModal from "./TournamentResultsModal";
 interface IProps {
   round: TournamentRound
   onActivate?: () => void
+  onAdvanceTeams?: (teamKeys: number[]) => void;
 }
 
 interface IState {
@@ -137,11 +138,11 @@ class TournamentRoundCard extends React.Component<IProps, IState> {
   }
 
   private renderBottomButtons() {
-    const {onActivate, round} = this.props;
+    const {onActivate, onAdvanceTeams, round} = this.props;
     const {resultsModalOpen} = this.state;
     return (
       <Card.Content>
-        <TournamentResultsModal open={resultsModalOpen} tournament={round} onClose={this.closeResultsModal}/>
+        <TournamentResultsModal open={resultsModalOpen} tournament={round} onClose={this.closeResultsModal} onTeamsAdvance={onAdvanceTeams}/>
         <Grid columns={2}>
           <Grid.Row>
             <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={onActivate}>Activate</Button></Grid.Column>

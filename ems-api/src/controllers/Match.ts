@@ -15,7 +15,8 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
     });
   } else if (req.query.match_key_partial) {
     const promises: Array<Promise<any>> = [];
-    promises.push(DatabaseManager.selectAllWhere("match", `match_key LIKE "${req.query.match_key_partial}%"`));
+    const tournamentClause: string = req.query.tournament_level ? ` AND tournament_level=${req.query.tournament_level}` : ``;
+    promises.push(DatabaseManager.selectAllWhere("match", `match_key LIKE "${req.query.match_key_partial}%"${tournamentClause}`));
     promises.push(DatabaseManager.selectAllWhere("match_participant", `match_key LIKE "${req.query.match_key_partial}%"`));
     Promise.all(promises).then((values: any) => {
       const participantMap: Map<string, object[]> = new Map<string, object[]>();

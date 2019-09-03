@@ -242,15 +242,15 @@ class MatchManager {
     return states;
   }
 
-  public checkForAdvancements(tournamentLevel: number, format: SeriesType): Promise<Match[]> {
+  public checkForAdvancements(eventKey: string, tournamentId: number, tournamentLevel: number, format: SeriesType): Promise<Match[]> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getMatchesByTournamentLevel(tournamentLevel).then((matches: Match[]) => {
+      EMSProvider.getMatchesAndParticipants(`${eventKey}-E${tournamentId}`, tournamentLevel).then((matches: Match[]) => {
         if (matches.length > 0) {
           const advancementWins = this.getWinsFromFormat(format);
           let redWins: number = 0;
           let blueWins: number = 0;
           for (const match of matches) {
-            if (match.redScore !== null && match.blueScore !== null) {
+            if (match.redScore !== null && match.blueScore !== null) { // TODO - Use match.result
               if (match.redScore > match.blueScore) {
                 redWins++;
               } else if (match.redScore < match.blueScore) {
@@ -344,7 +344,10 @@ class MatchManager {
 
   private makeAndPostParticipants(advancementLevel: number, alliance: MatchParticipant[], allianceColor: AllianceColor): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getMatchesByTournamentLevel(advancementLevel).then((matches: Match[]) => {
+      const keyArgs: string[] = alliance[0].matchKey.split("-");
+      const tournament: string = keyArgs[3].substring(0, 2);
+      const keyPartial: string = `${keyArgs[0]}-${keyArgs[1]}-${keyArgs[2]}-${tournament}`;
+      EMSProvider.getMatchesAndParticipants(keyPartial, advancementLevel).then((matches: Match[]) => {
         if (matches.length > 0) {
           const participants: MatchParticipant[] = [];
           for (const match of matches) {

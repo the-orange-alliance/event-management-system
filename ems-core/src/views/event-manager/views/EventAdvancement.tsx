@@ -181,7 +181,6 @@ class EventAdvancementView extends React.Component<IProps, IState> {
   }
 
   private onAdvanceTeams(keys: number[]) {
-    console.log(keys);
     const {eventConfig, playoffsSchedule} = this.props;
     let tournament: TournamentRound;
     let rounds: TournamentRound[] = [];

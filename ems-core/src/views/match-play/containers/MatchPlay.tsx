@@ -312,14 +312,15 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private commitScores() {
+    const {activeMatch, event, eventConfig} = this.props;
     // Make sure all of our 'active' objects are on the same page.
     this.setState({committingScores: true});
-    this.props.activeMatch.matchDetails = this.props.activeDetails;
-    this.props.activeMatch.participants = this.props.activeParticipants;
-    MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
+    activeMatch.matchDetails = this.props.activeDetails;
+    activeMatch.participants = this.props.activeParticipants;
+    MatchManager.commitScores(activeMatch, eventConfig).then(() => {
       if (this.props.toaConfig.enabled) {
-        UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
-          console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
+        UploadManager.postMatchResults(event.eventKey, activeMatch).then(() => {
+          console.log(`Uploaded match results for ${activeMatch.matchKey}`);
         }).catch((error: HttpError) => {
           DialogManager.showErrorBox(error);
         });
@@ -330,14 +331,14 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.setState({committingScores: false});
       const tournamentMatches: Match[] = this.getMatchesByTournamentLevel(this.state.selectedLevel);
       for (let i = 0; i < tournamentMatches.length; i++) {
-        if (tournamentMatches[i].matchKey === this.props.activeMatch.matchKey && typeof tournamentMatches[i + 1] !== "undefined") {
+        if (tournamentMatches[i].matchKey === activeMatch.matchKey && typeof tournamentMatches[i + 1] !== "undefined") {
           this.changeSelectedMatch(null, {value: tournamentMatches[i + 1].matchKey});
           break;
         }
       }
-      const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
-      if (this.props.activeMatch.tournamentLevel >= 10) {
-        MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, (tournamentRound.format as EliminationMatchesFormat).seriesType).then((matches: Match[]) => {
+      if (this.props.activeMatch.tournamentLevel >= 10 && eventConfig.activeTournamentID >= 0) {
+        const tournamentRound = Array.isArray(eventConfig.tournament) ? eventConfig.tournament[eventConfig.activeTournamentID] : eventConfig.tournament;
+        MatchManager.checkForAdvancements(event.eventKey, tournamentRound.id, activeMatch.tournamentLevel, (tournamentRound.format as EliminationMatchesFormat).seriesType).then((matches: Match[]) => {
           // if (this.props.elimsMatches.length < matches.length) { // TODO - This NEEDS to change!
           //   this.props.setEliminationsMatches(matches);
           // }

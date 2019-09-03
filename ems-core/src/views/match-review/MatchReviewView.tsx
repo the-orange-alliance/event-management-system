@@ -203,11 +203,11 @@ class MatchReviewView extends React.Component<IProps, IState> {
   }
 
   private updateScores() {
+    const {activeMatch, event, eventConfig} = this.props;
     // Make sure all of our 'active' objects are on the same page.
     this.setState({updatingScores: true, confirmModalOpen: false});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
-    const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
       if (this.props.toaConfig.enabled) {
         UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
@@ -219,8 +219,9 @@ class MatchReviewView extends React.Component<IProps, IState> {
 
       this.props.setNavigationDisabled(false);
       this.setState({updatingScores: false});
-      if (this.props.activeMatch.tournamentLevel >= 10) {
-        MatchManager.checkForAdvancements(this.props.activeMatch.tournamentLevel, (tournamentRound.format as EliminationMatchesFormat).seriesType).then((matches: Match[]) => {
+      if (this.props.activeMatch.tournamentLevel >= 10 && eventConfig.activeTournamentID >= 0) {
+        const tournamentRound = Array.isArray(eventConfig.tournament) ? eventConfig.tournament[eventConfig.activeTournamentID] : eventConfig.tournament;
+        MatchManager.checkForAdvancements(event.eventKey, tournamentRound.id, activeMatch.tournamentLevel, (tournamentRound.format as EliminationMatchesFormat).seriesType).then((matches: Match[]) => {
           // if (this.props.elimsMatches.length < matches.length) { // TODO - This needs to change.
           //   this.props.setEliminationsMatches(matches);
           // }

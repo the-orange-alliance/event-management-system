@@ -1,21 +1,16 @@
 import * as React from "react";
-import {Modal} from "semantic-ui-react";
+import {Grid, Modal} from "semantic-ui-react";
 import {
   EventConfiguration,
-  EventType,
   PlayoffsType,
   TournamentRound,
   TournamentType,
   Ranking,
-  EnergyImpactRanking,
-  OceanOpportunitiesRank,
-  RoverRuckusRank, EMSProvider
+  EMSProvider
 } from "@the-orange-alliance/lib-ems";
 import {IApplicationState} from "../stores";
-import EnergyImpactRankTable from "./game-specifics/energy-impact/EnergyImpactRankTable";
-import OceanOpportunitiesRankTable from "./game-specifics/ocean-opportunities/OceanOpportunitiesRankTable";
-import RoverRuckusRankTable from "./game-specifics/rover-ruckus/RoverRuckusRankTable";
 import {connect} from "react-redux";
+import TournamentResultsTable from "./TournamentResultsTable";
 
 interface IProps {
   eventConfig: EventConfiguration;
@@ -25,6 +20,7 @@ interface IProps {
 }
 
 interface IState {
+  advancingTeams: number[];
   loading: boolean;
   rankings: Ranking[];
 }
@@ -33,46 +29,42 @@ class TournamentResultsModal extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
+      advancingTeams: [],
       loading: true,
       rankings: []
     };
+    this.updateAdvancingTeams = this.updateAdvancingTeams.bind(this);
   }
 
   public componentDidMount(): void {
     const {eventConfig} = this.props;
     EMSProvider.getRankingTeams(eventConfig.eventType).then((rankings: Ranking[]) => {
-      console.log(rankings);
       this.setState({rankings: rankings});
     });
   }
 
   public render() {
     const {eventConfig, open, tournament, onClose} = this.props;
+    const {rankings} = this.state;
     return (
       <Modal open={open} onClose={onClose} size={'fullscreen'}>
         <Modal.Header>
           (ID: {tournament.id}) {this.getTypeFromTournament(tournament.type)} Tournament Results
         </Modal.Header>
         <Modal.Content>
-          {this.getRankingTable(eventConfig.eventType)}
+          <Grid>
+            <Grid.Row columns={16}>
+              <Grid.Column width={4}>
+                Hello World!
+              </Grid.Column>
+              <Grid.Column width={12}>
+                <TournamentResultsTable identifier={eventConfig.teamIdentifier} rankings={rankings} onChange={this.updateAdvancingTeams}/>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
         </Modal.Content>
       </Modal>
     );
-  }
-
-  private getRankingTable(eventType: EventType) {
-    const {eventConfig} = this.props;
-    const {rankings} = this.state;
-    switch (eventType) {
-      case "fgc_2018":
-        return <EnergyImpactRankTable rankings={rankings as EnergyImpactRanking[]} identifier={eventConfig.teamIdentifier}/>;
-      case "fgc_2019":
-        return <OceanOpportunitiesRankTable rankings={rankings as OceanOpportunitiesRank[]} identifier={eventConfig.teamIdentifier}/>;
-      case "ftc_1819":
-        return <RoverRuckusRankTable rankings={rankings as RoverRuckusRank[]} identifier={eventConfig.teamIdentifier}/>;
-      default:
-        return <EnergyImpactRankTable rankings={rankings as EnergyImpactRanking[]}/>;
-    }
   }
 
   private getTypeFromTournament(type: PlayoffsType): TournamentType {
@@ -86,6 +78,10 @@ class TournamentResultsModal extends React.Component<IProps, IState> {
       default:
         return "Eliminations";
     }
+  }
+
+  private updateAdvancingTeams(keys: number[]) {
+    this.setState({advancingTeams: keys});
   }
 }
 

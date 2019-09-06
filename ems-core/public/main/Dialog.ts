@@ -9,9 +9,10 @@ const open = require("opn");
 interface IOpenDialogProps {
   title?: string,
   files?: boolean,
-  directories?: boolean
+  directories?: boolean,
   filters?: FileFilter[],
-  parse?: boolean
+  parse?: boolean,
+  sendData?: boolean
 }
 
 ipcMain.on("parse-csv", (event: IpcMessageEvent, file: string) => {
@@ -32,7 +33,13 @@ ipcMain.on("open-dialog", (event: IpcMessageEvent, openProperties: IOpenDialogPr
     title: openProperties.title || "Open Dialog"
   }, (paths: string[]) => {
     if (paths && paths[0]) {
-      event.sender.send("open-dialog-response", undefined, paths);
+      if (openProperties.sendData) {
+        fs.readFile(paths[0], (err: any, data: any) => {
+          event.sender.send("open-dialog-response", undefined, data);
+        });
+      } else {
+        event.sender.send("open-dialog-response", undefined, paths);
+      }
     } else {
       event.sender.send("open-dialog-response", "No file was selected.", null);
     }

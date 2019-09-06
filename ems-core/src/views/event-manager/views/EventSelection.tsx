@@ -25,7 +25,7 @@ import {
   SeasonData,
   TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, SeriesType, ROUND_ROBIN_PRESET, RANKING_PRESET,
-  ELIMINATIONS_PRESET
+  ELIMINATIONS_PRESET, AppError, TournamentRound
 } from "@the-orange-alliance/lib-ems";
 import NumericInput from "../../../components/NumericInput";
 import MatchManager from "../../../managers/MatchManager";
@@ -74,6 +74,8 @@ class EventSelection extends React.Component<IProps, IState> {
     this.setEventFields = this.setEventFields.bind(this);
     this.createEvent = this.createEvent.bind(this);
     this.downloadTOAData = this.downloadTOAData.bind(this);
+
+    this.openFileChooser = this.openFileChooser.bind(this);
 
     this.state = {
       creatingEvent: false,
@@ -257,7 +259,7 @@ class EventSelection extends React.Component<IProps, IState> {
         case "custom":
           advancementView = (
             <Grid.Column width={4}>
-              <Form.Dropdown fluid={true} selection={true} options={[]} error={true} label="Coming Soon!"/>
+              <Form.Button fluid={true} label="Upload Config" color={getTheme().secondary} onClick={this.openFileChooser}>Choose Config</Form.Button>
             </Grid.Column>
           );
       }
@@ -269,7 +271,10 @@ class EventSelection extends React.Component<IProps, IState> {
           <Grid.Row columns={16}>
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.PostQualItems} value={eventConfig.tournamentConfig} error={!tournamentValidator.isValidConfig()} onChange={this.setAdvancementConfig} label="Advancement Config"/></Grid.Column>
             {advancementView}
-            <Grid.Column width={4}><NumericInput value={tournamentRound.format.teamsPerAlliance} onUpdate={this.setAdvancementTeamsPerAlliance} error={!tournamentValidator.isValidRounds()} label={"Advancement Teams Per Alliance"}/></Grid.Column>
+            {
+              eventConfig.tournamentConfig !== 'custom' &&
+              <Grid.Column width={4}><NumericInput value={tournamentRound.format.teamsPerAlliance} onUpdate={this.setAdvancementTeamsPerAlliance} error={!tournamentValidator.isValidRounds()} label={"Advancement Teams Per Alliance"}/></Grid.Column>
+            }
           </Grid.Row>
         </Grid>
       </Form>
@@ -288,6 +293,24 @@ class EventSelection extends React.Component<IProps, IState> {
         </Grid.Row>
       </Grid>
     );
+  }
+
+  /* Tournament config methods */
+  private openFileChooser() {
+    DialogManager.showOpenDialog({
+      files: true,
+      title: "EMS Tournament Config",
+      filters: [{name: "JSON Files", extensions: ["json"]}],
+      sendData: true
+    }).then((data: any) => {
+      try {
+        this.props.eventConfig.tournament = JSON.parse(data.toString()).tournament.map((tJSON: any) => new TournamentRound().fromJSON(tJSON));
+        this._validator.update(this.props.eventConfig, this.props.event);
+        DialogManager.showInfoBox("EMS Tournament Manager", "Successfully imported tournament configuration.");
+      } catch (e) {
+        DialogManager.showErrorBox(new AppError(200, "Error while parsing JSON file.", e));
+      }
+    });
   }
 
   /* Online Download Methods */

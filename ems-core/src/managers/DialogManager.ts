@@ -6,7 +6,8 @@ interface IOpenDialogProps {
   files?: boolean,
   directories?: boolean
   filters?: FileFilter[],
-  parse?: boolean
+  parse?: boolean,
+  sendData?: boolean
 }
 
 const ipcRenderer = (window as any).require("electron").ipcRenderer;

@@ -40,6 +40,16 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
     this.generateSchedule = this.generateSchedule.bind(this);
   }
 
+  public componentDidMount(): void {
+    if (this.props.event.eventType.includes("fgc") && this.props.schedule.matchConcurrency % 2 === 1) {
+      this.props.schedule.hasPremiereField = true;
+      this.props.schedule.forceUpdate();
+    } else {
+      this.props.schedule.hasPremiereField = false;
+      this.props.schedule.forceUpdate();
+    }
+  }
+
   public render() {
     const {warningModalOpen} = this.state;
     const days = this.props.schedule.days.map(day => {
@@ -97,11 +107,11 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
           <Card.Content>
             <Form widths="equal">
               <Form.Group>
-                <Form.Input label="Number Of Teams" value={this.props.schedule.teamsParticipating}/>
-                <Form.Input label="Matches Per Team" value={this.props.schedule.matchesPerTeam} error={!this.isValidMatchesPerTeam()} onChange={this.updateMatchesPerTeam}/>
+                <Form.Input label="Number Of Teams" value={this.props.schedule.teamsParticipating} disabled={true}/>
+                <Form.Input label="Matches Per Team" value={this.props.schedule.matchesPerTeam} error={!this.isValidMatchesPerTeam()} onChange={this.updateMatchesPerTeam} disabled={true}/>
                 <Form.Input label="Cycle Time" value={this.props.schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
                 <Form.Input value={this.props.schedule.matchConcurrency} error={!this.isValidMatchConcurrency()} onChange={this.updateMatchConcurrency} label={<ExplanationIcon title={"Match Concurrency"} content={"Sets the number of matches that will be run at any given time. Leave this at 1 unless you have special clearence for your event."}/>}/>
-                <Form.Input value={this.props.schedule.maxTotalMatches} label="Total Matches"/>
+                <Form.Input value={this.props.schedule.maxTotalMatches} label="Total Matches" disabled={true}/>
               </Form.Group>
             </Form>
           </Card.Content>
@@ -171,7 +181,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateCycleTime(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.cycleTime = parseInt(props.value, 10);
-      this.props.schedule.forceUpdate();
+      // this.props.schedule.forceUpdate();
+      this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -179,7 +190,9 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateMatchConcurrency(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.matchConcurrency = parseInt(props.value, 10);
-      this.props.schedule.forceUpdate();
+      this.props.schedule.hasPremiereField = this.props.event.eventType.includes("fgc") && this.props.schedule.matchConcurrency % 2 === 1;
+      // this.props.schedule.forceUpdate();
+      this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -206,38 +219,44 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
 
   private addDay(event: SyntheticEvent) {
     this.props.schedule.addDay();
-    this.props.schedule.forceUpdate();
+    // this.props.schedule.forceUpdate();
+    this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private removeDay(event: SyntheticEvent) {
     this.props.schedule.removeDay();
-    this.props.schedule.forceUpdate();
+    // this.props.schedule.forceUpdate();
+    this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private addBreak(day: number) {
     this.props.schedule.days[day].addBreak();
-    this.props.schedule.forceUpdate();
+    // this.props.schedule.forceUpdate();
+    this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private removeBreak(day: number) {
     this.props.schedule.days[day].removeBreak();
-    this.props.schedule.forceUpdate();
+    // this.props.schedule.forceUpdate();
+    this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private updateDayStartTime(day: number, time: Date) {
     this.props.schedule.days[day].startTime = moment(time);
-    this.props.schedule.forceUpdate();
+    // this.props.schedule.forceUpdate();
+    this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private updateDayMatches(day: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].matchesScheduled = parseInt(props.value, 10) || 0;
-      this.props.schedule.forceUpdate();
+      // this.props.schedule.forceUpdate();
+      this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -250,7 +269,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateBreakStart(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].breaks[dayBreak].match = parseInt(props.value, 10) || 0;
-      this.props.schedule.forceUpdate();
+      // this.props.schedule.forceUpdate();
+      this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -258,8 +278,50 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateBreakDuration(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].breaks[dayBreak].duration = parseInt(props.value, 10) || 0;
-      this.props.schedule.forceUpdate();
+      // this.props.schedule.forceUpdate();
+      this.updateFGCSchedule();
       this.forceUpdate();
+    }
+  }
+
+  /* FIRST GLOBAL SPECIFIC CODE THAT MIGHT NEED TO BE REMOVED ONE DAY */
+  public updateFGCSchedule(): ScheduleItem[] {
+    const {event, schedule} = this.props;
+    if (schedule.hasPremiereField) {
+      // const items: ScheduleItem[] = schedule.generateSchedule(event);
+      const items: ScheduleItem[] = schedule.generateSchedule(event);
+      let index: number = 1;
+      let normalIndex: number = 0;
+      let premiereIndex: number = 0;
+      let prevItem: ScheduleItem = items[0];
+      for (const item of items) {
+        if (prevItem.day !== item.day) {
+          schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+          premiereIndex = 0;
+          normalIndex = 0;
+          index = 1;
+        }
+
+        if (index % (schedule.matchConcurrency + 1) === 0 || index % (schedule.matchConcurrency + 1) === 3) {
+          item.duration = schedule.cycleTime;
+          item.startTime = moment(schedule.days[item.day].startTime).add(schedule.cycleTime * premiereIndex, "minutes");
+          premiereIndex++;
+          if (index % (schedule.matchConcurrency + 1) === 0) {
+            normalIndex++;
+          }
+        } else {
+          item.duration = schedule.cycleTime * 2;
+          item.startTime = moment(schedule.days[item.day].startTime).add((schedule.cycleTime * 2) * normalIndex, "minutes");
+        }
+
+        index++;
+        prevItem = item;
+      }
+      schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+      this.forceUpdate();
+      return items;
+    } else {
+      return [];
     }
   }
 
@@ -273,7 +335,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
       }
       schedule[this.props.schedule.type] = this.props.schedule.toJSON();
       CONFIG_STORE.set("schedule", schedule).then(() => {
-        this.props.onComplete(this.props.schedule.generateSchedule(this.props.event));
+        this.props.onComplete(this.updateFGCSchedule());
       }).catch((err) => {
         DialogManager.showErrorBox(err);
       });

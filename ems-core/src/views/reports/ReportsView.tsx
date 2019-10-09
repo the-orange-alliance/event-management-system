@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, Card, Grid, Tab, TabProps} from "semantic-ui-react";
+import {Button, Card, Checkbox, CheckboxProps, Grid, Tab, TabProps} from "semantic-ui-react";
 import {SyntheticEvent} from "react";
 import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
@@ -19,6 +19,15 @@ import QualificationMatchResults from "./reports/QualificationMatchResults";
 import QualificationAnnouncers from "./reports/QualificationAnnouncers";
 // import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
 import {EventConfiguration} from "@the-orange-alliance/lib-ems";
+import NumericInput from "../../components/NumericInput";
+import PracticeScheduleQueueing from "./reports/PracticeScheduleQueueing";
+import QualificationScheduleQueueing from "./reports/QualificationScheduleQueueing";
+import PracticeScheduleByTeamQueueing from "./reports/PracticeScheduleByTeamQueueing";
+import QualificationScheduleByTeamQueueing from "./reports/QualificationScheduleByTeamQueueing";
+import PlayoffsSchedule from "./reports/PlayoffsSchedule";
+import PlayoffsScheduleQueueing from "./reports/PlayoffsScheduleQueueing";
+import PlayoffsScheduleByTeam from "./reports/PlayoffsScheduleByTeam";
+import PlayoffsScheduleByTeamQueueing from "./reports/PlayoffsScheduleByTeamQueueing";
 
 interface IProps {
   eventConfig?: EventConfiguration,
@@ -29,7 +38,9 @@ interface IState {
   activeIndex: number,
   generatedReport: JSX.Element,
   hasGeneratedReport: boolean,
-  htmlString: string
+  htmlString: string,
+  queueingTime: number,
+  useUTC: boolean
 }
 
 class ReportsView extends React.Component<IProps, IState> {
@@ -39,7 +50,9 @@ class ReportsView extends React.Component<IProps, IState> {
       activeIndex: 0,
       generatedReport: <span><i>There is currently no generated report.</i></span>,
       hasGeneratedReport: false,
-      htmlString: ""
+      htmlString: "",
+      queueingTime: 5,
+      useUTC: false
     };
     this.onTabChange = this.onTabChange.bind(this);
     this.openReportInBrowser = this.openReportInBrowser.bind(this);
@@ -49,16 +62,25 @@ class ReportsView extends React.Component<IProps, IState> {
     this.generateReport = this.generateReport.bind(this);
     this.updateHTML = this.updateHTML.bind(this);
     this.generatePracticeSchedule = this.generatePracticeSchedule.bind(this);
+    this.generatePracticeQueueingSchedule = this.generatePracticeQueueingSchedule.bind(this);
     this.generateQualificationSchedule = this.generateQualificationSchedule.bind(this);
+    this.generateQualificationQueueingSchedule = this.generateQualificationQueueingSchedule.bind(this);
     this.generatePostQualSchedule = this.generatePostQualSchedule.bind(this);
+    this.generatePostQualScheduleQueueing = this.generatePostQualScheduleQueueing.bind(this);
     this.generatePracticeScheduleByTeam = this.generatePracticeScheduleByTeam.bind(this);
+    this.generatePracticeScheduleByTeamQueueing = this.generatePracticeScheduleByTeamQueueing.bind(this);
     this.generateQualificationScheduleByTeam = this.generateQualificationScheduleByTeam.bind(this);
+    this.generateQualificationScheduleByTeamQueueing = this.generateQualificationScheduleByTeamQueueing.bind(this);
     this.generatePostQualScheduleByTeam = this.generatePostQualScheduleByTeam.bind(this);
+    this.generatePostQualScheduleByTeamQueueing = this.generatePostQualScheduleByTeamQueueing.bind(this);
     this.generateQualificationRankings = this.generateQualificationRankings.bind(this);
     this.generateCompetingTeams = this.generateCompetingTeams.bind(this);
     this.generateQualificationMatchResults = this.generateQualificationMatchResults.bind(this);
     this.generateQualificationAnnouncers = this.generateQualificationAnnouncers.bind(this);
     this.generateEliminationsAnnouncers = this.generateEliminationsAnnouncers.bind(this);
+
+    this.updateQueueingTime = this.updateQueueingTime.bind(this);
+    this.updateUsingUTC = this.updateUsingUTC.bind(this);
   }
 
   public render() {
@@ -74,6 +96,7 @@ class ReportsView extends React.Component<IProps, IState> {
 
   private renderReports() {
     const {eventConfig} = this.props;
+    const {queueingTime, useUTC} = this.state;
     return (
       <Tab.Pane className="tab-subview">
         <Card.Group itemsPerRow={3}>
@@ -83,11 +106,11 @@ class ReportsView extends React.Component<IProps, IState> {
               <Grid columns="equal">
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePracticeSchedule}>Schedule Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Cycle Time Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePracticeQueueingSchedule}>Schedule Report (w/ Queueing)</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePracticeScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
-                  <Grid.Column/>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePracticeScheduleByTeamQueueing}>Schedule By Team Report (w/ Queueing)</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -98,48 +121,36 @@ class ReportsView extends React.Component<IProps, IState> {
               <Grid columns="equal">
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationSchedule}>Schedule Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Cycle Time Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationQueueingSchedule}>Schedule Report (w/ Queueing)</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationRankings}>Rankings Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationScheduleByTeamQueueing}>Schedule By Team Report (w/ Queueing)</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationMatchResults}>Match Results Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationAnnouncers}>Announcers Report</Button></Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateQualificationRankings}>Rankings Report</Button></Grid.Column>
+                  <Grid.Column/>
                 </Grid.Row>
               </Grid>
             </Card.Content>
           </Card>
           <Card fluid={true} color={getTheme().secondary}>
             <Card.Content textAlign="center" className="card-header">
-              <Card.Header>
-                {
-                  eventConfig.tournamentConfig === "elims" &&
-                  <h4>Eliminations Matches</h4>
-                }
-                {
-                  eventConfig.tournamentConfig === "ranking" &&
-                  <h4>Finals Matches</h4>
-                }
-              </Card.Header>
+              <Card.Header><h4>Playoffs Matches</h4></Card.Header>
             </Card.Content>
             <Card.Content>
               <Grid columns="equal">
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualSchedule}>Schedule Report</Button></Grid.Column>
-                  <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Cycle Time Report</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualScheduleQueueing}>Schedule Report (w/ Queueing))</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualScheduleByTeam}>Schedule By Team Report</Button></Grid.Column>
-                  {
-                    eventConfig.tournamentConfig === "elims" &&
-                    <Grid.Column><Button fluid={true} color={getTheme().primary}>Bracket Report</Button></Grid.Column>
-                  }
-                  {
-                    eventConfig.tournamentConfig === "ranking" &&
-                    <Grid.Column><Button fluid={true} color={getTheme().primary}>Rankings Report</Button></Grid.Column>
-                  }
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generatePostQualScheduleByTeamQueueing}>Schedule By Team Report (w/ Queueing)</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column><Button disabled={true} fluid={true} color={getTheme().primary}>Match Results Report</Button></Grid.Column>
@@ -149,7 +160,7 @@ class ReportsView extends React.Component<IProps, IState> {
             </Card.Content>
           </Card>
         </Card.Group>
-        <Card.Group itemsPerRow={2}>
+        <Card.Group itemsPerRow={3}>
           <Card fluid={true} color={getTheme().secondary}>
             <Card.Content textAlign="center" className="card-header"><Card.Header><h4>Head Referee Reports</h4></Card.Header></Card.Content>
             <Card.Content>
@@ -175,6 +186,21 @@ class ReportsView extends React.Component<IProps, IState> {
                 <Grid.Row>
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateCompetingTeams}>Competing Team List Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Awards Report</Button></Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Card.Content>
+          </Card>
+          <Card fluid={true} color={getTheme().secondary}>
+            <Card.Content textAlign={'center'} className={'card-header'}><h4>Report Options</h4></Card.Content>
+            <Card.Content>
+              <Grid>
+                <Grid.Row columns={2}>
+                  <Grid.Column>
+                    <NumericInput label={`Queueing Time`} value={queueingTime} error={false}  onUpdate={this.updateQueueingTime}/>
+                  </Grid.Column>
+                  <Grid.Column>
+                    <Checkbox fluid={true} label={'Use UTC Time'} checked={useUTC} onChange={this.updateUsingUTC}/>
+                  </Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -244,8 +270,18 @@ class ReportsView extends React.Component<IProps, IState> {
     this.generateReport(<PracticeSchedule onHTMLUpdate={this.updateHTML}/>);
   }
 
+  private generatePracticeQueueingSchedule() {
+    const {queueingTime, useUTC} = this.state;
+    this.generateReport(<PracticeScheduleQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+  }
+
   private generateQualificationSchedule() {
     this.generateReport(<QualificationSchedule onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generateQualificationQueueingSchedule() {
+    const {queueingTime, useUTC} = this.state;
+    this.generateReport(<QualificationScheduleQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationAnnouncers() {
@@ -253,30 +289,41 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generatePostQualSchedule() {
-    // if (this.props.eventConfig.tournamentConfig === "elims") {
-    //   this.generateReport(<EliminationsSchedule onHTMLUpdate={this.updateHTML}/>);
-    // } else {
-    //   this.generateReport(<FinalsSchedule onHTMLUpdate={this.updateHTML}/>);
-    // }
-    this.generateReport(<span>Will be implemented again soon.</span>);
+    this.generateReport(<PlayoffsSchedule onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generatePostQualScheduleQueueing() {
+    const {queueingTime, useUTC} = this.state;
+    this.generateReport(<PlayoffsScheduleQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePracticeScheduleByTeam() {
     this.generateReport(<PracticeScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
   }
 
+  private generatePracticeScheduleByTeamQueueing() {
+    const {queueingTime, useUTC} = this.state;
+    this.generateReport(<PracticeScheduleByTeamQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+  }
+
   private generateQualificationScheduleByTeam() {
     this.generateReport(<QualificationScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
   }
 
-  private generatePostQualScheduleByTeam() {
-    // if (this.props.eventConfig.tournamentConfig === "elims") {
-    //   this.generateReport(<EliminationsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
-    // } else {
-    //   this.generateReport(<FinalsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
-    // }
-    this.generateReport(<span>Will be implemented again soon.</span>);
+  private generateQualificationScheduleByTeamQueueing() {
+    const {queueingTime, useUTC} = this.state;
+    this.generateReport(<QualificationScheduleByTeamQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
+
+  private generatePostQualScheduleByTeam() {
+    this.generateReport(<PlayoffsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private generatePostQualScheduleByTeamQueueing() {
+    const {queueingTime, useUTC} = this.state;
+    this.generateReport(<PlayoffsScheduleByTeamQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+  }
+
   private generateQualificationRankings() {
     this.generateReport(<QualificationRankings onHTMLUpdate={this.updateHTML}/>);
   }
@@ -292,6 +339,14 @@ class ReportsView extends React.Component<IProps, IState> {
   private generateEliminationsAnnouncers() {
     // this.generateReport(<EliminationsAnnouncers onHTMLUpdate={this.updateHTML}/>);
     this.generateReport(<span>Will be implemented again soon.</span>);
+  }
+
+  private updateQueueingTime(value: number) {
+    this.setState({queueingTime: value});
+  }
+
+  private updateUsingUTC(event: SyntheticEvent, props: CheckboxProps) {
+    this.setState({useUTC: props.checked});
   }
 }
 

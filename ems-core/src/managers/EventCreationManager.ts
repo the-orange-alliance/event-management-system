@@ -221,22 +221,10 @@ class EventCreationManager {
 
   public postAlliances(members: AllianceMember[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      EMSProvider.getAlliances().then((emsMembers: AllianceMember[]) => {
-        if (emsMembers.length > 0) {
-          resolve();
-        } else {
-          EMSProvider.postAllianceMembers(members).then(() => {
-            resolve();
-          }).catch((error: HttpError) => {
-            reject(error);
-          });
-        }
-      }).catch(() => {
-        EMSProvider.postAllianceMembers(members).then(() => {
-          resolve();
-        }).catch((error: HttpError) => {
-          reject(error);
-        });
+      EMSProvider.postAllianceMembers(members).then(() => {
+        resolve();
+      }).catch((error: HttpError) => {
+        reject(error);
       });
     });
   }

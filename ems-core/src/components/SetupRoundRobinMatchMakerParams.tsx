@@ -11,6 +11,9 @@ import RoundRobinManager from "../managers/playoffs/RoundRobinManager";
 import NumericInput from "./NumericInput";
 import AppError from "@the-orange-alliance/lib-ems/dist/models/ems/AppError";
 import DialogManager from "../managers/DialogManager";
+import EMSProvider from "@the-orange-alliance/lib-ems/dist/providers/EMSProvider";
+import ScheduleItem from "@the-orange-alliance/lib-ems/dist/models/ems/ScheduleItem";
+import HttpError from "@the-orange-alliance/lib-ems/dist/models/ems/HttpError";
 
 interface IProps {
   activeRound: TournamentRound,
@@ -24,16 +27,28 @@ interface IProps {
 
 interface IState {
   fields: number;
+  scheduleItems: ScheduleItem[];
 }
 
 class SetupRoundRobinMatchMakerParams extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      fields: props.event.fieldCount
+      fields: props.event.fieldCount,
+      scheduleItems: []
     };
     this.generateMatches = this.generateMatches.bind(this);
     this.updateFields = this.updateFields.bind(this);
+  }
+
+  public componentDidMount(): void {
+    const {activeRound, event} = this.props;
+    const matchType: string = "r";
+    EMSProvider.getPlayoffsScheduleItems("Round Robin", `${event.eventKey}-${matchType}`, activeRound.id).then((scheduleItems: ScheduleItem[]) => {
+      this.setState({scheduleItems});
+    }).catch((err: HttpError) => {
+      DialogManager.showErrorBox(err);
+    });
   }
 
   public render() {
@@ -62,24 +77,76 @@ class SetupRoundRobinMatchMakerParams extends React.Component<IProps, IState> {
   }
 
   private generateMatches() {
+    const {scheduleItems} = this.state;
     const {allianceMembers, activeRound, event, setNavigationDisabled, onComplete} = this.props;
     const {fields} = this.state;
     const format: RoundRobinFormat = activeRound.format as RoundRobinFormat;
     setNavigationDisabled(true);
-    RoundRobinManager.generateMatches({
-      allianceCaptains: format.alliances,
-      allianceMembers: allianceMembers,
-      eventKey: event.eventKey,
-      fields: fields,
-      tournamentId: activeRound.id
-    }).then((matches: Match[]) => {
-      onComplete(matches);
-      setNavigationDisabled(false);
-    }).catch((error: AppError) => {
-      console.log(error);
-      setNavigationDisabled(false);
-      DialogManager.showErrorBox(error);
-    });
+    if (activeRound.id === 0) {
+      RoundRobinManager.generateFirstRoundFGCMatches({
+        allianceCaptains: format.alliances,
+        allianceMembers: allianceMembers.filter((a: AllianceMember) => a.allianceKey.split("-")[3].substring(1, 2) === (activeRound.id + "")),
+        eventKey: event.eventKey,
+        fields: fields,
+        tournamentId: activeRound.id
+      }).then((matches: Match[]) => {
+        if (scheduleItems.length > 0) {
+          let count = 0;
+          for (const item of scheduleItems) {
+            if (item.isMatch) {
+              matches[count].scheduledStartTime = item.startTime;
+              count++;
+            }
+          }
+        }
+        onComplete(matches);
+        setNavigationDisabled(false);
+      }).catch((error: AppError) => {
+        console.log(error);
+        setNavigationDisabled(false);
+        DialogManager.showErrorBox(error);
+      });
+    } else if (activeRound.id === 1) {
+      RoundRobinManager.generateSecondRoundFGCMatches({
+        allianceCaptains: format.alliances,
+        allianceMembers: allianceMembers.filter((a: AllianceMember) => a.allianceKey.split("-")[3].substring(1, 2) === (activeRound.id + "")),
+        eventKey: event.eventKey,
+        fields: fields,
+        tournamentId: activeRound.id
+      }).then((matches: Match[]) => {
+        if (scheduleItems.length > 0) {
+          let count = 0;
+          for (const item of scheduleItems) {
+            if (item.isMatch) {
+              matches[count].scheduledStartTime = item.startTime;
+              count++;
+            }
+          }
+        }
+        console.log(matches, allianceMembers);
+        onComplete(matches);
+        setNavigationDisabled(false);
+      }).catch((error: AppError) => {
+        console.log(error);
+        setNavigationDisabled(false);
+        DialogManager.showErrorBox(error);
+      });
+    }
+    // TODO - Add back in after FIRST Global
+    // RoundRobinManager.generateMatches({
+    //   allianceCaptains: format.alliances,
+    //   allianceMembers: allianceMembers,
+    //   eventKey: event.eventKey,
+    //   fields: fields,
+    //   tournamentId: activeRound.id
+    // }).then((matches: Match[]) => {
+    //   onComplete(matches);
+    //   setNavigationDisabled(false);
+    // }).catch((error: AppError) => {
+    //   console.log(error);
+    //   setNavigationDisabled(false);
+    //   DialogManager.showErrorBox(error);
+    // });
   }
 
   private updateFields(value: number) {

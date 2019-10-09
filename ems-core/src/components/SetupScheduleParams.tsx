@@ -108,7 +108,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
             <Form widths="equal">
               <Form.Group>
                 <Form.Input label="Number Of Teams" value={this.props.schedule.teamsParticipating} disabled={true}/>
-                <Form.Input label="Matches Per Team" value={this.props.schedule.matchesPerTeam} error={!this.isValidMatchesPerTeam()} onChange={this.updateMatchesPerTeam} disabled={true}/>
+                <Form.Input label="Matches Per Team" value={this.props.schedule.matchesPerTeam} error={!this.isValidMatchesPerTeam()} onChange={this.updateMatchesPerTeam}/>
                 <Form.Input label="Cycle Time" value={this.props.schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
                 <Form.Input value={this.props.schedule.matchConcurrency} error={!this.isValidMatchConcurrency()} onChange={this.updateMatchConcurrency} label={<ExplanationIcon title={"Match Concurrency"} content={"Sets the number of matches that will be run at any given time. Leave this at 1 unless you have special clearence for your event."}/>}/>
                 <Form.Input value={this.props.schedule.maxTotalMatches} label="Total Matches" disabled={true}/>
@@ -290,34 +290,93 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
     if (schedule.hasPremiereField) {
       // const items: ScheduleItem[] = schedule.generateSchedule(event);
       const items: ScheduleItem[] = schedule.generateSchedule(event);
-      let index: number = 1;
+      let index: number = 0;
       let normalIndex: number = 0;
       let premiereIndex: number = 0;
       let prevItem: ScheduleItem = items[0];
+      let breakPadding: number = 0;
+      let breakIndex: number = 0;
+
+      let needsBufferMatch: boolean = false;
+      let bufferCount: number = 0;
+      let dayPremiereTime: number = 0;
+      let dayNormalTime: number = 0;
       for (const item of items) {
         if (prevItem.day !== item.day) {
           schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
           premiereIndex = 0;
           normalIndex = 0;
-          index = 1;
+          index = 0;
+          breakPadding = 0;
+          breakIndex = 0;
+          dayPremiereTime = 0;
+          dayNormalTime = 0;
+          needsBufferMatch = false;
         }
 
-        if (index % (schedule.matchConcurrency + 1) === 0 || index % (schedule.matchConcurrency + 1) === 3) {
-          item.duration = schedule.cycleTime;
-          item.startTime = moment(schedule.days[item.day].startTime).add(schedule.cycleTime * premiereIndex, "minutes");
-          premiereIndex++;
-          if (index % (schedule.matchConcurrency + 1) === 0) {
-            normalIndex++;
+        if (item.isMatch) {
+          if (!needsBufferMatch) {
+            if (index % 7 < 4) {
+              item.duration = 10;
+              item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
+              dayNormalTime += item.duration / 2;
+              // console.log("CREATING NORMAL MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
+            } else {
+              item.duration = 7;
+              item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
+              dayPremiereTime += 7;
+              premiereIndex++;
+              // console.log("CREATING PREMIERE MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
+            }
+            if (index % 7 === 1) {
+              normalIndex++;
+            }
+            if (index % 7 === 6) {
+              // console.log("NEW MATCH PAIRS");
+              index = 0;
+              normalIndex++;
+              bufferCount = 0;
+              needsBufferMatch = (dayPremiereTime - dayNormalTime) === 10;
+            } else {
+              index++;
+            }
+          } else {
+            // console.log("BUFFER MATCH");
+            item.duration = 10;
+            item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
+            dayPremiereTime = 0;
+            dayNormalTime = 0;
+            bufferCount++;
+            needsBufferMatch = bufferCount < 2;
+            if (!needsBufferMatch) {
+              normalIndex++;
+            }
           }
-        } else {
-          item.duration = schedule.cycleTime * 2;
-          item.startTime = moment(schedule.days[item.day].startTime).add((schedule.cycleTime * 2) * normalIndex, "minutes");
-        }
 
-        index++;
+          // if (index % (schedule.matchConcurrency + 1) === 0 || index % (schedule.matchConcurrency + 1) === 3) {
+          //   item.duration = 7;
+          //   item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
+          //   premiereIndex++;
+          //   if (index % (schedule.matchConcurrency + 1) === 0) {
+          //     normalIndex++;
+          //   }
+          // } else {
+          //   item.duration = 10;
+          //   item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
+          // }
+          // index++;
+        } else {
+          const thisBreak = schedule.days[item.day].breaks[breakIndex];
+          schedule.days[item.day].breaks[breakIndex].startTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+          schedule.days[item.day].breaks[breakIndex].endTime = moment(thisBreak.startTime).add(thisBreak.duration, "minutes");
+          breakPadding += item.duration;
+          breakIndex++;
+        }
         prevItem = item;
       }
-      schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+      if (items.length > 0) {
+        schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+      }
       this.forceUpdate();
       return items;
     } else {

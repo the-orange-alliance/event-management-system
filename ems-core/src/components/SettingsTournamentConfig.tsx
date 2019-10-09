@@ -15,7 +15,7 @@ import {incrementCompletedStep} from "../stores/internal/actions";
 import {
   AppError, SeriesType, EventConfiguration, Team, DropdownData, PlayoffsType,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, RANKING_PRESET, ROUND_ROBIN_PRESET,
-  ELIMINATIONS_PRESET
+  ELIMINATIONS_PRESET, TournamentRound
 } from "@the-orange-alliance/lib-ems";
 import NumericInput from "./NumericInput";
 
@@ -41,6 +41,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     };
     this.openConfirmModal = this.openConfirmModal.bind(this);
     this.closeConfirmModal = this.closeConfirmModal.bind(this);
+    this.openFileChooser = this.openFileChooser.bind(this);
     this.setAdvancementConfig = this.setAdvancementConfig.bind(this);
     this.setAllianceCaptainConfig = this.setAllianceCaptainConfig.bind(this);
     this.setElimsSeriesConfig = this.setElimsSeriesConfig.bind(this);
@@ -57,7 +58,7 @@ class SettingsPostQual extends React.Component<IProps, IState> {
     return (
       <Card fluid={true} color={getTheme().secondary}>
         <ConfirmActionModal open={confirmModalOpen} onClose={this.closeConfirmModal} onConfirm={this.updateConfig} innerText={"Are you sure you want to update this event's post-qualification config?"}/>
-        <Card.Content className="card-header"><h3>Post-Qualification Configuration</h3></Card.Content>
+        <Card.Content className="card-header"><h3>Tournament Configuration</h3></Card.Content>
         <Card.Content>
           <Grid columns="equal">
             <Grid.Row>
@@ -75,10 +76,13 @@ class SettingsPostQual extends React.Component<IProps, IState> {
               </Grid.Column>
             </Grid.Row>
             {this.renderAdvancementView()}
-            <Grid.Row>
-              <Grid.Column className="center-left-items"><span>Teams Per Alliance</span></Grid.Column>
-              <Grid.Column><NumericInput value={tournamentRound.format.teamsPerAlliance} onUpdate={this.setTeamsPerAlliance}/></Grid.Column>
-            </Grid.Row>
+            {
+              eventConfig.tournamentConfig !== "custom" &&
+              <Grid.Row>
+                <Grid.Column className="center-left-items"><span>Teams Per Alliance</span></Grid.Column>
+                <Grid.Column><NumericInput value={tournamentRound.format.teamsPerAlliance} onUpdate={this.setTeamsPerAlliance}/></Grid.Column>
+              </Grid.Row>
+            }
             <Grid.Row width={16} centered={true}>
               <Grid.Column width={6}><Button fluid={true} color={getTheme().primary} onClick={this.openConfirmModal}>Save &amp; Update</Button></Grid.Column>
             </Grid.Row>
@@ -138,13 +142,32 @@ class SettingsPostQual extends React.Component<IProps, IState> {
         break;
       case "custom":
         advancementView = (
-          <Grid.Column width={4}>
-            <Dropdown fluid={true} selection={true} options={[]} error={true} label="Coming Soon!"/>
-          </Grid.Column>
+          <Grid.Row width={4}>
+            <Grid.Column className={"center-left-items"}><span>Config File</span></Grid.Column>
+            <Grid.Column><Button fluid={true} color={getTheme().secondary} onClick={this.openFileChooser}>Choose Config</Button></Grid.Column>
+          </Grid.Row>
         );
     }
 
     return (advancementView);
+  }
+
+  /* Tournament config methods */
+  private openFileChooser() {
+    DialogManager.showOpenDialog({
+      files: true,
+      title: "EMS Tournament Config",
+      filters: [{name: "JSON Files", extensions: ["json"]}],
+      sendData: true
+    }).then((data: any) => {
+      try {
+        this.state.configCopy.tournament = JSON.parse(data.toString()).tournament.map((tJSON: any) => new TournamentRound().fromJSON(tJSON));
+        DialogManager.showInfoBox("EMS Tournament Manager", "Successfully imported tournament configuration.");
+      } catch (e) {
+        console.error(e);
+        DialogManager.showErrorBox(new AppError(200, "Error while parsing JSON file.", e));
+      }
+    });
   }
 
   private openConfirmModal() {

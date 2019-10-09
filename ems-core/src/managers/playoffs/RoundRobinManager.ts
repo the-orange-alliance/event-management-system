@@ -79,6 +79,70 @@ class RoundRobinManager {
       resolve(matches);
     });
   }
+
+  public generateFirstRoundFGCMatches(options: IRoundRobinOptions): Promise<Match[]> {
+    return new Promise<Match[]>((resolve, reject) => {
+      const alliances: Map<number, AllianceMember[]> = PlayoffsMatchManager.getAllianceMap(options.allianceMembers);
+      const matches: Match[] = [];
+      matches.push(this.createMatch(1, 1, options, alliances.get(1), alliances.get(5)));
+      matches.push(this.createMatch(1, 2, options, alliances.get(2), alliances.get(6)));
+      matches.push(this.createMatch(1, 3, options, alliances.get(3), alliances.get(7)));
+      matches.push(this.createMatch(1, 4, options, alliances.get(4), alliances.get(8)));
+
+      matches.push(this.createMatch(1, 5, options, alliances.get(5), alliances.get(4)));
+      matches.push(this.createMatch(1, 6, options, alliances.get(6), alliances.get(3)));
+      matches.push(this.createMatch(1, 7, options, alliances.get(7), alliances.get(2)));
+      matches.push(this.createMatch(1, 8, options, alliances.get(8), alliances.get(1)));
+      resolve(matches);
+    });
+  }
+
+  public generateSecondRoundFGCMatches(options: IRoundRobinOptions): Promise<Match[]> {
+    return new Promise<Match[]>((resolve, reject) => {
+      const alliances: Map<number, AllianceMember[]> = PlayoffsMatchManager.getAllianceMap(options.allianceMembers);
+      const matches: Match[] = [];
+      matches.push(this.createMatch(2, 1, options, alliances.get(1), alliances.get(4)));
+      matches.push(this.createMatch(2, 2, options, alliances.get(2), alliances.get(3)));
+      matches.push(this.createMatch(2, 3, options, alliances.get(1), alliances.get(2)));
+      matches.push(this.createMatch(2, 4, options, alliances.get(3), alliances.get(4)));
+      matches.push(this.createMatch(2, 5, options, alliances.get(1), alliances.get(3)));
+      matches.push(this.createMatch(2, 6, options, alliances.get(2), alliances.get(4)));
+      resolve(matches);
+    });
+  }
+
+  private createMatch(roundNumber: number, matchNumber: number, options: IRoundRobinOptions, redAlliance: AllianceMember[], blueAlliance: AllianceMember[]): Match {
+    const key: string = `${options.eventKey}-E${options.tournamentId}${matchNumber.toString().padStart(3, '0')}`;
+    let station: number = 0;
+    const match: Match = new Match();
+    const participants: MatchParticipant[] = [];
+    for (const member of redAlliance) {
+      const participant: MatchParticipant = new MatchParticipant();
+      participant.teamKey = member.teamKey;
+      participant.matchKey = key;
+      participant.matchParticipantKey = `${key}-T${participants.length + 1}`;
+      participant.station = MatchParticipant.RED_ALLIANCE_ONE + station;
+      participants.push(participant);
+      station++;
+    }
+    station = 0;
+    for (const member of blueAlliance) {
+      const participant: MatchParticipant = new MatchParticipant();
+      participant.teamKey = member.teamKey;
+      participant.matchKey = key;
+      participant.matchParticipantKey = `${key}-T${participants.length + 1}`;
+      participant.station = MatchParticipant.BLUE_ALLIANCE_ONE + station;
+      participants.push(participant);
+      station++;
+    }
+    match.matchKey = key;
+    match.matchDetailKey = `${key}D`;
+    match.tournamentLevel = Match.ROUND_ROBIN_LEVEL;
+    match.matchName = `Round ${roundNumber} Match ${matchNumber}`;
+    match.fieldNumber = matchNumber % options.fields === 0 ? options.fields : matchNumber % options.fields;
+    match.participants = participants;
+    return match;
+  }
 }
 
 export default RoundRobinManager.getInstance();

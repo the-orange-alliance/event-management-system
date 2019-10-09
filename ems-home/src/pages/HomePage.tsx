@@ -5,6 +5,7 @@ import AUDIENCE_DISPLAY from "../res/audience_display.png";
 import SCORING_APPLICATION from "../res/scoring_application.png";
 import DOWNLOAD_ICON from "../res/download_icon.png";
 import DOCUMENTATION_ICON from "../res/documentation_icon.png";
+import DownloadsPage from "./DownloadsPage";
 
 const styles = {
   container: {
@@ -21,17 +22,47 @@ const styles = {
   }
 };
 
-class HomePage extends React.Component<RouteComponentProps> {
+interface IState {
+  page: string;
+}
+
+class HomePage extends React.Component<RouteComponentProps, IState> {
   constructor(props: RouteComponentProps) {
     super(props);
+
+    this.state = {
+      page: "home"
+    };
+
     this.navigateToAudienceDisplay = this.navigateToAudienceDisplay.bind(this);
     this.navigateToScoringApp = this.navigateToScoringApp.bind(this);
+    this.navigateToDownloads = this.navigateToDownloads.bind(this);
   }
 
   public render() {
     return (
       <Container style={styles.container}>
         <Typography variant={'h3'} component={'h1'}>Event Management Hub</Typography>
+        {this.renderPage()}
+      </Container>
+    );
+  }
+
+  private renderPage() {
+    const {page} = this.state;
+    switch (page) {
+      case "home":
+        return this.renderHomePage();
+      case "downloads":
+        return <DownloadsPage/>;
+      default:
+        return this.renderHomePage();
+    }
+  }
+
+  private renderHomePage() {
+    return (
+      <div>
         <Typography gutterBottom={true} variant={'body1'} component={'p'}>
           This is the hub website for extra pages within EMS. Click on a card to access the content it describes.
         </Typography>
@@ -78,7 +109,7 @@ class HomePage extends React.Component<RouteComponentProps> {
           {/* DOWNLOADS */}
           <Grid item={true} xs={12} sm={12} md={6} lg={4}>
             <Card raised={true}>
-              <CardActionArea>
+              <CardActionArea onClick={this.navigateToDownloads}>
                 <CardMedia
                   style={styles.cardImage}
                   component={'img'}
@@ -114,7 +145,7 @@ class HomePage extends React.Component<RouteComponentProps> {
             </Card>
           </Grid>
         </Grid>
-      </Container>
+      </div>
     );
   }
 
@@ -124,6 +155,10 @@ class HomePage extends React.Component<RouteComponentProps> {
 
   public navigateToScoringApp() {
     window.location.href = window.location.href = "/ref";
+  }
+
+  public navigateToDownloads() {
+    this.setState({page: "downloads"});
   }
 }
 

@@ -82,7 +82,7 @@ class EventAdvancementView extends React.Component<IProps, IState> {
           { menuItem: "Schedule Parameters", render: ()=> <TournamentScheduleSetup/> },
           { menuItem: "Schedule Overview", render: ()=> <TournamentScheduleOverview/> },
           { menuItem: "Match Maker Parameters", render: () => <TournamentMatchMakerParams/> },
-          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type={this.getTypeFromTournament(activeTournament.type)} matchList={playoffsMatches} onComplete={this.onPublishSchedule}/> }
+          { menuItem: "Match Schedule Overview", render: () => <SetupMatchScheduleOverview type={this.getTypeFromTournament(activeTournament ? activeTournament.type : "elims")} matchList={playoffsMatches} tournamentRound={activeTournament} onComplete={this.onPublishSchedule}/> }
         ]}/>
       </div>
     );
@@ -163,14 +163,15 @@ class EventAdvancementView extends React.Component<IProps, IState> {
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
+    const matches: Match[] = this.props.playoffsMatches.filter((m: Match) => m.matchKey.split("-")[3].substring(1, 2) === (this.props.eventConfig.activeTournamentID + ""));
     if (this.props.toaConfig.enabled) {
-      UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.playoffsMatches).then(() => {
-        console.log(`${this.props.playoffsMatches.length} matches have been posted to TOA.`);
+      UploadManager.postMatchSchedule(this.props.event.eventKey, matches).then(() => {
+        console.log(`${matches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);
       });
     }
-    EventCreationManager.createPlayoffsSchedule(this.props.playoffsMatches).then(() => {
+    EventCreationManager.createPlayoffsSchedule(matches).then(() => {
       this.props.setNavigationDisabled(false);
       this.props.onComplete();
     }).catch((error: HttpError) => {

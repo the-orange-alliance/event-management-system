@@ -34,7 +34,6 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
   public componentDidMount() {
     const {activeRound, playoffsSchedule} = this.props;
     if (playoffsSchedule.length > 0) {
-      console.log(playoffsSchedule);
       if (playoffsSchedule[activeRound.id].type !== "Round Robin") {
         const teams: number[] = playoffsSchedule[activeRound.id].teams;
         playoffsSchedule[activeRound.id] = new RoundRobinSchedule();
@@ -111,7 +110,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
                 <Form.Input label={"Total Rounds"} disabled={true} value={schedule.maxTotalRounds}/>
                 <Form.Input label={"Matches Per Round"} disabled={true} value={schedule.maxMatchesPerRound}/>
                 <Form.Input label={"Total Matches"} disabled={true} value={schedule.maxTotalMatches}/>
-                <Form.Input label={<ExplanationIcon title={"Round Break Time"} content={"This will set a default duration between rounds of the tournament."}/>} value={schedule.roundBreakTime} error={schedule.roundBreakTime < 0} onChange={this.updateRoundBreakTime}/>
+                <Form.Input label={<ExplanationIcon title={"Round Break Time"} content={"This will set a default duration between rounds of the tournament (disabled for now)."}/>} disabled={true} value={schedule.roundBreakTime} error={schedule.roundBreakTime < 0} onChange={this.updateRoundBreakTime}/>
                 <Form.Input label="Cycle Time" value={schedule.cycleTime} error={!this.isValidCycleTime()} onChange={this.updateCycleTime}/>
               </Form.Group>
             </Form>
@@ -139,7 +138,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
         </Card>
         <Card fluid={true} color={getTheme().secondary}>
           <Card.Content>
-            <Card.Header>{schedule.type} Schedule Generation</Card.Header>
+            <Card.Header>{schedule.type} Schedule Generation - For FIRST Global 2019, EMS will <i>NOT</i> generate the params shown, but their proper, fixed ones</Card.Header>
           </Card.Content>
           <Card.Content>
             <Grid>
@@ -287,7 +286,17 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
       }
       configSchedule.Playoffs = playoffsSchedule.map((s: Schedule) => s.toJSON());
       CONFIG_STORE.set("schedule", configSchedule).then(() => {
-        onScheduleParamsComplete(schedule.generateSchedule(event));
+        let items: ScheduleItem[] = schedule.generateSchedule(event);
+        if (activeRound.id === 0) {
+          if (items.length >= 8) { // TODO - Remove after FIRST Global
+            items = items.slice(0, 8);
+          }
+        } else if (activeRound.id === 1) {
+          if (items.length >= 6) { // TODO - Remove after FIRST Global
+            items = items.slice(0, 6);
+          }
+        }
+        onScheduleParamsComplete(items);
       }).catch((err) => {
         console.log(err);
         DialogManager.showErrorBox(err);

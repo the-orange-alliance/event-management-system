@@ -15,9 +15,9 @@ import MATCH_PRE_TELE from "../res/sounds/match_tele_pre_start.wav";
 import MATCH_ENDGAME from "../res/sounds/match_end_start.wav";
 import MATCH_END from "../res/sounds/match_end.wav";
 import MATCH_ABORT from "../res/sounds/match_estop.wav";
-import VerticalBar from "./VerticalBar";
-import OceanOpportunitiesMatchDetails from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesMatchDetails";
-import CoopertitionBar from "./CoopertitionBar";
+// import VerticalBar from "./VerticalBar";
+// import OceanOpportunitiesMatchDetails from "@the-orange-alliance/lib-ems/dist/models/ems/games/ocean-opportunities/OceanOpportunitiesMatchDetails";
+// import CoopertitionBar from "./CoopertitionBar";
 
 const START_AUDIO = initAudio(MATCH_START);
 const END_AUTO = initAudio(MATCH_AUTO);
@@ -123,51 +123,51 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
   public render() {
     const {match} = this.state;
     const {timeLeft} = this.state;
-    const details = match.matchDetails as OceanOpportunitiesMatchDetails || new OceanOpportunitiesMatchDetails();
+    // const details = match.matchDetails as OceanOpportunitiesMatchDetails || new OceanOpportunitiesMatchDetails();
     const time = moment.duration(timeLeft, "seconds");
     const disMin = time.minutes() < 10 ? "0" + time.minutes().toString() : time.minutes().toString();
     const disSec = time.seconds() < 10 ? "0" + time.seconds().toString() : time.seconds().toString();
 
-    const redReductionHeight = details.redReductionProcessing / details.getRedTeleScore();
-    const redRecoveryHeight = (details.redProcessingBargeRecovery * 2) / details.getRedTeleScore();
-    const redRecycleHeight = (details.redProcessingBargeRecycle * 3) / details.getRedTeleScore();
-    const redReuseHeight = (details.redProcessingBargeReuse * 6) / details.getRedTeleScore();
+    // const redReductionHeight = details.redReductionProcessing / details.getRedTeleScore();
+    // const redRecoveryHeight = (details.redProcessingBargeRecovery * 2) / details.getRedTeleScore();
+    // const redRecycleHeight = (details.redProcessingBargeRecycle * 3) / details.getRedTeleScore();
+    // const redReuseHeight = (details.redProcessingBargeReuse * 6) / details.getRedTeleScore();
 
-    const blueReductionHeight = details.blueReductionProcessing / details.getBlueTeleScore();
-    const blueRecoveryHeight = (details.blueProcessingBargeRecovery * 2) / details.getBlueTeleScore();
-    const blueRecycleHeight = (details.blueProcessingBargeRecycle * 3) / details.getBlueTeleScore();
-    const blueReuseHeight = (details.blueProcessingBargeReuse * 6) / details.getBlueTeleScore();
+    // const blueReductionHeight = details.blueReductionProcessing / details.getBlueTeleScore();
+    // const blueRecoveryHeight = (details.blueProcessingBargeRecovery * 2) / details.getBlueTeleScore();
+    // const blueRecycleHeight = (details.blueProcessingBargeRecycle * 3) / details.getBlueTeleScore();
+    // const blueReuseHeight = (details.blueProcessingBargeReuse * 6) / details.getBlueTeleScore();
 
     // 25 for practice/qualifications, 30 for finals/round robin.
     // 15 for practice/qualifications, ?? for finals/round robin
     // 25 * 2 + 15 * 2 = 80 total pollutants.
-    const totalPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS; // TODO - May be changed.
-    const pollutantsScored =
-      details.redReductionProcessing +
-      details.redProcessingBargeRecovery +
-      details.redProcessingBargeRecycle +
-      details.redProcessingBargeReuse +
-      details.blueReductionProcessing +
-      details.blueProcessingBargeRecovery +
-      details.blueProcessingBargeRecycle +
-      details.blueProcessingBargeReuse;
-    const coopertitionCompletion = pollutantsScored / totalPollutants;
+    // const totalPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS; // TODO - May be changed.
+    // const pollutantsScored =
+    //   details.redReductionProcessing +
+    //   details.redProcessingBargeRecovery +
+    //   details.redProcessingBargeRecycle +
+    //   details.redProcessingBargeReuse +
+    //   details.blueReductionProcessing +
+    //   details.blueProcessingBargeRecovery +
+    //   details.blueProcessingBargeRecycle +
+    //   details.blueProcessingBargeReuse;
+    // const coopertitionCompletion = pollutantsScored / totalPollutants;
 
     return (
       <div>
         <div id="play-display-base">
           <div id="play-display-base-top">
-            <div id="play-display-left-details">
+            {/* <div id="play-display-left-details">
               <div className="top-details">
                 <VerticalBar alliance={"Red"} label={"1P"} fillHeight={redReductionHeight}/>
                 <VerticalBar alliance={"Red"} label={"2P"} fillHeight={redRecoveryHeight}/>
                 <VerticalBar alliance={"Red"} label={"3P"} fillHeight={redRecycleHeight}/>
                 <VerticalBar alliance={"Red"} label={"6P"} fillHeight={redReuseHeight}/>
               </div>
-              {/*<div className="bottom-details"/>*/}
-            </div>
+              <div className="bottom-details"/>
+            </div> */}
             <div id="play-display-left-score">
-              <CoopertitionBar alliance={"Red"} fillWidth={coopertitionCompletion}/>
+              {/* <CoopertitionBar alliance={"Red"} fillWidth={coopertitionCompletion}/> */}
               <div className="teams red-bg left-score">
                 {this.displayRedAlliance()}
               </div>
@@ -193,27 +193,26 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
               </div>
             </div>
             <div id="play-display-right-score">
-              <CoopertitionBar alliance={"Blue"} fillWidth={coopertitionCompletion}/>
+              {/* <CoopertitionBar alliance={"Blue"} fillWidth={coopertitionCompletion}/> */}
               <div className="teams blue-bg right-score">
                 {this.displayBlueAlliance()}
               </div>
             </div>
-            <div id="play-display-right-details">
+            {/* <div id="play-display-right-details">
               <div className="top-details">
                 <VerticalBar alliance={"Blue"} label={"1P"} fillHeight={blueReductionHeight}/>
                 <VerticalBar alliance={"Blue"} label={"2P"} fillHeight={blueRecoveryHeight}/>
                 <VerticalBar alliance={"Blue"} label={"3P"} fillHeight={blueRecycleHeight}/>
                 <VerticalBar alliance={"Blue"} label={"6P"} fillHeight={blueReuseHeight}/>
               </div>
-            </div>
+            </div> */}
           </div>
           <div id="play-display-base-bottom">
             <div className="info-col">
               <span className="info-field">MATCH: {match.matchName}</span>
-              <span className="info-field">FIELD: {match.fieldNumber}</span>
             </div>
             <div className="info-col">
-              <span className="info-field">FIRST Global 2018</span>
+              <span className="info-field">FIRST Global 2019</span>
             </div>
           </div>
         </div>

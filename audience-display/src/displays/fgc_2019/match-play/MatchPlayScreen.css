@@ -2,9 +2,9 @@
   background-color: #141414;
   position: absolute;
   bottom: 0;
-  left: 15vw;
+  left: 30vw;
   height: 20vh;
-  width: 70vw;
+  width: 40vw;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 }
@@ -31,14 +31,14 @@
 
 #play-display-left-details {
   position: relative;
-  width: 17.5%;
+  /*width: 17.5%;*/
   height: 100%;
   padding: 10px 0 10px 10px;
 }
 
 #play-display-left-score {
   position: relative;
-  width: 20%;
+  width: 12.5vw;
   height: 100%;
   padding: 10px 0 10px 10px;
   display: flex;
@@ -46,7 +46,7 @@
 
 #play-display-center {
   position: relative;
-  width: 25%;
+  width: 15vw;
   height: 175%;
   bottom: 11vh;
   background-color: #141414;
@@ -57,14 +57,14 @@
 
 #play-display-right-details {
   position: relative;
-  width: 17.5%;
+  /*width: 17.5%;*/
   height: 100%;
   padding: 10px 10px 10px 0;
 }
 
 #play-display-right-score {
   position: relative;
-  width: 20%;
+  width: 12.5vw;
   height: 100%;
   padding: 10px 10px 10px 0;
   display: flex;

@@ -29,7 +29,8 @@ class RobotButtonGroup extends React.Component<IProps> {
     return(
       <div className="state-switcher-container">
         <div className="state-switcher-team-container">
-          {participant.team.teamNameShort}
+          {participant.team && <span>{participant.team.teamNameShort}</span>}
+          {!participant.team && <span>{participant.teamKey}</span>}
         </div>
         <ButtonGroup>
           {statesView}

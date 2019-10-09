@@ -1,0 +1,32 @@
+{
+	"tournament": [
+		{
+			"id": 0,
+			"type": "rr",
+			"format": {
+				"alliances": 8,
+				"type": "rr",
+				"teams_per_alliance": 4
+			}
+		},
+		{
+			"id": 1,
+			"type": "rr",
+			"format": {
+				"alliances": 4,
+				"type": "rr",
+				"teams_per_alliance": 4
+			}
+		},
+		{
+			"id": 2,
+			"type": "elims",
+			"format": {
+				"type": "elims",
+				"teams_per_alliance": 4,
+				"alliances": 2,
+				"series_type": "bo3"
+			}
+		}
+	]
+}

@@ -25,7 +25,7 @@ class UploadManager {
       TOAProvider.initialize(toaConfig);
     }
     if (this._type === UploadManager.FGC) {
-      FGCProvider.initialize("127.0.0.1", 8088); // DEBUG
+      FGCProvider.initialize("173.231.247.208", 8088); // DEBUG
     }
   }
 
@@ -77,6 +77,20 @@ class UploadManager {
     } else {
       return new Promise<any>((resolve, reject) => reject());
     }
+  }
+
+  public testConnection(): Promise<any> {
+    if (this._type === UploadManager.TOA) {
+      return TOAProvider.ping();
+    } else if (this._type === UploadManager.FGC) {
+      return FGCProvider.ping();
+    } else {
+      return new Promise<any>((resolve, reject) => reject());
+    }
+  }
+
+  public get type(): number {
+    return this._type;
   }
 
 }

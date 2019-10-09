@@ -28,9 +28,7 @@ class App extends React.Component<IProps> {
   }
 
   public componentDidMount() {
-    if (this.props.toaConfig.enabled) {
-      UploadManager.initialize(1, this.props.toaConfig);
-    }
+    UploadManager.initialize(1, this.props.toaConfig);
 
     this.initializeSocket(this.props.networkHost);
     WebProvider.initialize(this.props.networkHost);

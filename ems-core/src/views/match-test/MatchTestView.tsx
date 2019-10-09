@@ -16,6 +16,7 @@ import {
 } from "@the-orange-alliance/lib-ems";
 import ExplanationIcon from "../../components/ExplanationIcon";
 import NumericInput from "../../components/NumericInput";
+import UploadManager from "../../managers/UploadManager";
 
 interface IProps {
   slaveModeEnabled?: boolean,
@@ -128,7 +129,7 @@ class MatchTestView extends React.Component<IProps, IState> {
                 <Grid.Column width={2}><h3>REST API {slaveModeEnabled ? "(MASTER)" : ""}</h3></Grid.Column>
                 <Grid.Column width={2}><h3>SocketIO Server</h3></Grid.Column>
                 <Grid.Column width={2}><h3>Web Server</h3></Grid.Column>
-                <Grid.Column width={2}><h3>TheOrangeAlliance</h3></Grid.Column>
+                <Grid.Column width={2}><h3>{UploadManager.type === 0 ? "TheOrangeAlliance" : "TheGlobalAlliance"}</h3></Grid.Column>
                 <Grid.Column width={2}><h3>Audience Display</h3></Grid.Column>
                 <Grid.Column width={3}/>
               </Grid.Row>
@@ -305,7 +306,7 @@ class MatchTestView extends React.Component<IProps, IState> {
 
   private testTOA() {
     this.setState({toaTesting: true});
-    TOAProvider.ping().then(() => {
+    UploadManager.testConnection().then(() => {
       this.setState({toaConnected: true, toaTested: true, toaTesting: false});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);

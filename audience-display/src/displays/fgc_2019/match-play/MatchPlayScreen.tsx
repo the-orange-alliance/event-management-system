@@ -38,11 +38,13 @@ interface IState {
 
 class MatchPlayScreen extends React.Component<IProps, IState> {
   private _timer: MatchTimer;
+  private _matchEnded: boolean;
 
   constructor(props: IProps) {
     super(props);
 
     this._timer = new MatchTimer();
+    this._matchEnded = false;
 
     this.state = {
       match: this.props.match,
@@ -68,6 +70,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         this._timer.removeAllListeners("match-tele");
         this._timer.removeAllListeners("match-endgame");
         this._timer.removeAllListeners("match-abort");
+        this._matchEnded = true;
       });
       this._timer.start();
       this.updateTimer();
@@ -92,18 +95,20 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       this._timer.removeAllListeners("match-end");
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
-      const oldMatch = this.props.match;
-      const match: Match = new Match().fromJSON(matchJSON);
-      const seasonKey: string = match.matchKey.split("-")[0];
-      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-      match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
-      match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
-      for (let i = 0; i < match.participants.length; i++) {
-        if (typeof oldMatch.participants !== "undefined" && typeof oldMatch.participants[i].team !== "undefined") {
-          match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
+      if (!this._matchEnded) {
+        const oldMatch = this.props.match;
+        const match: Match = new Match().fromJSON(matchJSON);
+        const seasonKey: string = match.matchKey.split("-")[0];
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+        match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+        match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
+        for (let i = 0; i < match.participants.length; i++) {
+          if (typeof oldMatch.participants !== "undefined" && typeof oldMatch.participants[i].team !== "undefined") {
+            match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
+          }
         }
+        this.setState({match: match});
       }
-      this.setState({match: match});
     });
   }
 

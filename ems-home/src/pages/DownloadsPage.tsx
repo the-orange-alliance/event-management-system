@@ -32,7 +32,7 @@ class DownloadsPage extends React.Component {
                 <ListItemText primary={"Node.js"}/>
               </ListItem>
               <ListItem button={true} onClick={this.downloadTournamentConfig}>
-                <ListItemText primary={"Node.js"}/>
+                <ListItemText primary={"FIRST Global 2019 Tournament Configuration"}/>
               </ListItem>
               <ListItem button={true} onClick={this.downloadChromeAPK}>
                 <ListItemText primary={"Google chrome android apk"}/>

@@ -317,6 +317,11 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.setState({committingScores: true});
     activeMatch.matchDetails = this.props.activeDetails;
     activeMatch.participants = this.props.activeParticipants;
+    for (const participant of activeMatch.participants) {
+      if ([0, 1 , 2].indexOf(participant.cardStatus) < 0) {
+        participant.cardStatus = 0;
+      }
+    }
     MatchManager.commitScores(activeMatch, eventConfig).then(() => {
       if (this.props.toaConfig.enabled) {
         UploadManager.postMatchResults(event.eventKey, activeMatch).then(() => {

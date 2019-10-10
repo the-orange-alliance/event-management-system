@@ -10,7 +10,7 @@ import {Dispatch} from "redux";
 import {connect} from "react-redux";
 import {Card, Tab, TabProps} from "semantic-ui-react";
 import {SyntheticEvent} from "react";
-import TournamentRound from "@the-orange-alliance/lib-ems/dist/models/ems/TournamentRound";
+import {Team, TournamentRound} from "@the-orange-alliance/lib-ems";
 import TournamentRoundCard from "../../../components/TournamentRoundCard";
 import {CONFIG_STORE} from "../../../AppStore";
 import DialogManager from "../../../managers/DialogManager";
@@ -30,6 +30,7 @@ interface IProps {
   playoffsMatches: Match[],
   eventConfig?: EventConfiguration,
   event?: Event,
+  teams?: Team[],
   toaConfig?: TOAConfig,
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
@@ -162,22 +163,28 @@ class EventAdvancementView extends React.Component<IProps, IState> {
   }
 
   private onPublishSchedule() {
+    const {eventConfig, teams, playoffsSchedule} = this.props;
     this.props.setNavigationDisabled(true);
     const matches: Match[] = this.props.playoffsMatches.filter((m: Match) => m.matchKey.split("-")[3].substring(1, 2) === (this.props.eventConfig.activeTournamentID + ""));
-    if (this.props.toaConfig.enabled) {
-      UploadManager.postMatchSchedule(this.props.event.eventKey, matches).then(() => {
-        console.log(`${matches.length} matches have been posted to TOA.`);
+    EventCreationManager.createRanks(teams.filter((t: Team) => playoffsSchedule[eventConfig.activeTournamentID].teams.indexOf(t.teamKey) > 0), this.props.event.eventKey).then(() => {
+      if (this.props.toaConfig.enabled) {
+        UploadManager.postMatchSchedule(this.props.event.eventKey, matches).then(() => {
+          console.log(`${matches.length} matches have been posted to TOA.`);
+        }).catch((error: HttpError) => {
+          DialogManager.showErrorBox(error);
+        });
+      }
+      EventCreationManager.createPlayoffsSchedule(matches).then(() => {
+        this.props.setNavigationDisabled(false);
+        this.props.onComplete();
       }).catch((error: HttpError) => {
+        console.log(error);
+        this.props.setNavigationDisabled(false);
         DialogManager.showErrorBox(error);
       });
-    }
-    EventCreationManager.createPlayoffsSchedule(matches).then(() => {
+    }).catch((rankError: HttpError) => {
       this.props.setNavigationDisabled(false);
-      this.props.onComplete();
-    }).catch((error: HttpError) => {
-      console.log(error);
-      this.props.setNavigationDisabled(false);
-      DialogManager.showErrorBox(error);
+      DialogManager.showErrorBox(rankError);
     });
   }
 
@@ -227,6 +234,7 @@ function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     event: configState.event,
     eventConfig: configState.eventConfiguration,
+    team: internalState.teamList,
     toaConfig: configState.toaConfig,
     playoffsSchedule: configState.playoffsSchedule,
     playoffsMatches: internalState.playoffsMatches

@@ -22,7 +22,7 @@ interface IMatchMakerOptions {
 let matchMakerPath = "";
 if (os.type() === "Windows_NT") {
   if (isProd) {
-    matchMakerPath = path.join(__dirname, "../match-maker/macOS/MatchMaker");
+    matchMakerPath = path.join(__dirname, "../match-maker/windows/MatchMaker");
   } else {
     matchMakerPath = path.join(__dirname, "../../match-maker/windows/MatchMaker.exe");
   }

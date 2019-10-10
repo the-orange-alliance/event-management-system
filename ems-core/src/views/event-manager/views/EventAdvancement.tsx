@@ -234,7 +234,7 @@ function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     event: configState.event,
     eventConfig: configState.eventConfiguration,
-    team: internalState.teamList,
+    teams: internalState.teamList,
     toaConfig: configState.toaConfig,
     playoffsSchedule: configState.playoffsSchedule,
     playoffsMatches: internalState.playoffsMatches

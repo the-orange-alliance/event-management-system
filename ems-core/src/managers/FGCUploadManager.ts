@@ -67,7 +67,8 @@ class FGCUploadedManager {
 
   public postMatchSchedule(eventKey: string, matches: Match[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      FGCProvider.deleteMatchData(eventKey, matches[0].tournamentLevel).then(() => {
+      const tournamentKey: string = matches[0].matchKey.split("-")[3].substring(0, 2);
+      FGCProvider.deleteMatchData(eventKey, matches[0].tournamentLevel, matches[0].tournamentLevel > Match.QUALIFICATION_LEVEL ? tournamentKey : undefined).then(() => {
         setTimeout(() => {
           const fgcMatches: Match[] = matches.map((m: Match) => m);
           const fgcDetails: MatchDetails[] = matches.map((m: Match) => new MatchDetails().fromJSON({match_key: m.matchKey, match_detail_key: m.matchDetailKey}));

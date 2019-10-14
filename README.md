@@ -9,7 +9,7 @@ EMS consists of 6 different programs:
 3. [ems-web](https://github.com/orange-alliance/event-management-system/tree/master/ems-web) (Web server for routing applications)
 4. [ems-socket](https://github.com/orange-alliance/event-management-system/tree/master/ems-socket) (Real-time connection interfacing)
 5. [audience-display](https://github.com/orange-alliance/event-management-system/tree/master/audience-display) (Web application to display scoring and match results)
-6. [ref-tablet](https://github.com/orange-alliance/event-management-system/tree/master/audience-display) (Web application for referee scoring)
+6. [ref-tablet](https://github.com/orange-alliance/event-management-system/tree/master/ref-tablet) (Web application for referee scoring)
 
 Details on each program can be found within their prospective sub-folders within this
 repository.  

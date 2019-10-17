@@ -81,6 +81,7 @@ class BlueAllianceView extends React.Component<IProps, IState> {
 
     return (
       <div className={"alliance-view"}>
+        <div className={"alliance-header blue-bg"}>Blue Alliance</div>
         <StatusBar match={match} mode={mode} connected={connected}/>
         <Nav tabs={true}>
           <NavItem>
@@ -119,32 +120,30 @@ class BlueAllianceView extends React.Component<IProps, IState> {
       <div>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueReusePollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeReuse}/>
+            <RobotNumberInput value={blueReusePollutants}  verticalButtons={false} verticalLabel={true} label={"Reuse (6 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeReuse}/>
+          </Col>
+          <Col sm={6}>
+            <RobotNumberInput value={blueRecyclePollutants} verticalButtons={false} verticalLabel={true} label={"Recycle (3 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueRecyclePollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
+            <RobotNumberInput value={blueRecoveryPollutants} verticalButtons={false} verticalLabel={true} label={"Recovery (2 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
           </Col>
           <Col sm={6}>
-            <div>
+            <RobotNumberInput value={blueReductionPollutants} verticalButtons={false} verticalLabel={true} label={"Reduction (1 point)"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={6}>
+            <div className={"center"}>
               TOTAL POLLUTANTS: {totalPollutants}
             </div>
           </Col>
-        </Row>
-        <Row>
           <Col sm={6}>
-            <RobotNumberInput value={blueRecoveryPollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
-          </Col>
-          <Col sm={6}>
-            <div>
+            <div className={"center"}>
               REMAINING POLLUTANTS: {remainingPollutants}
             </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={6}>
-            <RobotNumberInput value={blueReductionPollutants} image={"https://via.placeholder.com/150"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
           </Col>
         </Row>
       </div>

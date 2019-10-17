@@ -504,6 +504,18 @@
   background-color: #000000db;
 }
 
+.green-txt {
+  background-color: #3cff00 !important;
+  color: #000 !important;
+  font-weight: bold !important;
+}
+
+.red-txt {
+  background-color: red !important;
+  color: #000 !important;
+  font-weight: bold !important;
+}
+
 .center {
   text-align: center;
 }
@@ -514,4 +526,21 @@
 
 .right {
   text-align: right;
+}
+
+.alliance-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 2vh;
+}
+
+.horizontal {
+  flex-direction: row;
+}
+
+.vertical {
+  flex-direction: column;
 }

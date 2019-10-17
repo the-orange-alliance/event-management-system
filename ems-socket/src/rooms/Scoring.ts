@@ -178,20 +178,20 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("update-timer", (timerJSON: any) => {
       if (!this._timer.inProgress()) {
-        if (typeof timerJSON[0].delay_time !== "undefined") {
-          this._timer.matchConfig.delayTime = timerJSON[0].delay_time;
+        if (typeof timerJSON.delay_time !== "undefined") {
+          this._timer.matchConfig.delayTime = timerJSON.delay_time;
         }
-        if (typeof timerJSON[0].auto_time !== "undefined") {
-          this._timer.matchConfig.autoTime = timerJSON[0].auto_time;
+        if (typeof timerJSON.auto_time !== "undefined") {
+          this._timer.matchConfig.autoTime = timerJSON.auto_time;
         }
-        if (typeof timerJSON[0].transition_time !== "undefined") {
-          this._timer.matchConfig.transitionTime = timerJSON[0].transition_time;
+        if (typeof timerJSON.transition_time !== "undefined") {
+          this._timer.matchConfig.transitionTime = timerJSON.transition_time;
         }
-        if (typeof timerJSON[0].tele_time !== "undefined") {
-          this._timer.matchConfig.teleTime = timerJSON[0].tele_time;
+        if (typeof timerJSON.tele_time !== "undefined") {
+          this._timer.matchConfig.teleTime = timerJSON.tele_time;
         }
-        if (typeof timerJSON[0].end_time !== "undefined") {
-          this._timer.matchConfig.endTime = timerJSON[0].end_time;
+        if (typeof timerJSON.end_time !== "undefined") {
+          this._timer.matchConfig.endTime = timerJSON.end_time;
         }
         const config = this._timer.matchConfig;
         logger.warn("-------- TIMER CONFIGURATION UPDATED --------");

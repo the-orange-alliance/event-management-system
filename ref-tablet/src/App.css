@@ -544,3 +544,9 @@
 .vertical {
   flex-direction: column;
 }
+
+.center-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -124,15 +124,15 @@ class RedAllianceView extends React.Component<IProps, IState> {
             <RobotNumberInput value={redReusePollutants} verticalButtons={false} verticalLabel={true} label={"Reuse (6 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeReuse}/>
           </Col>
           <Col sm={6}>
-            <RobotNumberInput value={redRecyclePollutants} verticalButtons={false} verticalLabel={true} label={"Recycle (3 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
+            <RobotNumberInput value={redReductionPollutants} verticalButtons={false} verticalLabel={true} label={"Reduction (1 point)"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <RobotNumberInput value={redRecoveryPollutants} verticalButtons={false} verticalLabel={true} label={"Recovery (2 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
+            <RobotNumberInput value={redRecyclePollutants} verticalButtons={false} verticalLabel={true} label={"Recycle (3 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
           </Col>
           <Col sm={6}>
-            <RobotNumberInput value={redReductionPollutants} verticalButtons={false} verticalLabel={true} label={"Reduction (1 point)"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
+            <RobotNumberInput value={redRecoveryPollutants} verticalButtons={false} verticalLabel={true} label={"Recovery (2 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
           </Col>
         </Row>
         <Row>

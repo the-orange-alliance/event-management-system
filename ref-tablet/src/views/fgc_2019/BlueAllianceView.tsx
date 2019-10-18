@@ -123,25 +123,25 @@ class BlueAllianceView extends React.Component<IProps, IState> {
             <RobotNumberInput value={blueReusePollutants}  verticalButtons={false} verticalLabel={true} label={"Reuse (6 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeReuse}/>
           </Col>
           <Col sm={6}>
+            <RobotNumberInput value={blueReductionPollutants} verticalButtons={false} verticalLabel={true} label={"Reduction (1 point)"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={6}>
             <RobotNumberInput value={blueRecyclePollutants} verticalButtons={false} verticalLabel={true} label={"Recycle (3 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
+          </Col>
+          <Col sm={6} className={"center-items"}>
+            <div>
+              TOTAL POLLUTANTS: {totalPollutants}
+            </div>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
             <RobotNumberInput value={blueRecoveryPollutants} verticalButtons={false} verticalLabel={true} label={"Recovery (2 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
           </Col>
-          <Col sm={6}>
-            <RobotNumberInput value={blueReductionPollutants} verticalButtons={false} verticalLabel={true} label={"Reduction (1 point)"} min={0} max={maxPollutants} onChange={this.changeReductionProcessing}/>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={6}>
-            <div className={"center"}>
-              TOTAL POLLUTANTS: {totalPollutants}
-            </div>
-          </Col>
-          <Col sm={6}>
-            <div className={"center"}>
+          <Col sm={6} className={"center-items"}>
+            <div>
               REMAINING POLLUTANTS: {remainingPollutants}
             </div>
           </Col>

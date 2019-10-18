@@ -25,6 +25,7 @@ import {
 import InternalStateManager from "../../../managers/InternalStateManager";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
 import UploadManager from "../../../managers/UploadManager";
+import {PACKET_BALL_DUMP} from "../../../AppConstants";
 
 interface IProps {
   mode: string,
@@ -79,6 +80,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     this.cancelPrestart = this.cancelPrestart.bind(this);
     this.prestart = this.prestart.bind(this);
     this.setAudienceDisplay = this.setAudienceDisplay.bind(this);
+    this.dumpBalls = this.dumpBalls.bind(this);
     this.startMatch = this.startMatch.bind(this);
     this.abortMatch = this.abortMatch.bind(this);
     this.commitScores = this.commitScores.bind(this);
@@ -161,6 +163,7 @@ class MatchPlay extends React.Component<IProps, IState> {
               <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[0] || !canPrestart} color="orange" onClick={this.beginPrestart}>Prestart</Button></Grid.Column>
             }
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[1]} color="blue" onClick={this.setAudienceDisplay}>Set Audience Display</Button></Grid.Column>
+            <Grid.Column width={1}><Button fluid={true} disabled={disabledStates[2]} color="grey" onClick={this.dumpBalls}>Dump</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[2]} color="purple" onClick={this.startMatch}>Start Match</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[3]} color="red" onClick={this.abortMatch}>Abort Match</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4]} loading={committingScores} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
@@ -240,6 +243,10 @@ class MatchPlay extends React.Component<IProps, IState> {
       console.log(this.props.activeMatch.matchKey);
       this.props.setMatchState(MatchState.AUDIENCE_DISPLAY_SET);
     });
+  }
+
+  private dumpBalls() {
+    SocketProvider.emit("control-update", PACKET_BALL_DUMP);
   }
 
   private startMatch() {

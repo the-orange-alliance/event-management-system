@@ -25,7 +25,7 @@ import {
 import InternalStateManager from "../../../managers/InternalStateManager";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
 import UploadManager from "../../../managers/UploadManager";
-import {PACKET_BALL_DUMP} from "../../../AppConstants";
+import {PACKET_BALL_DUMP, PACKET_BALL_RESET} from "../../../AppConstants";
 
 interface IProps {
   mode: string,
@@ -330,6 +330,8 @@ class MatchPlay extends React.Component<IProps, IState> {
       }
     }
     MatchManager.commitScores(activeMatch, eventConfig).then(() => {
+      SocketProvider.emit("control-update", PACKET_BALL_RESET);
+
       if (this.props.toaConfig.enabled) {
         UploadManager.postMatchResults(event.eventKey, activeMatch).then(() => {
           console.log(`Uploaded match results for ${activeMatch.matchKey}`);

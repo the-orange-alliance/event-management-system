@@ -4,18 +4,39 @@ export const PACKET_BALL_DUMP: IFieldControlPacket = {
   messages: [
     {
       hub: 0,
-      function: "servo",
+      function: "motor",
       parameters: {
         port: 0,
-        setpoint: 32000
+        pulsewidth: 0
       }
     },
     {
       hub: 0,
-      function: "servo",
+      function: "motor",
       parameters: {
         port: 1,
-        setpoint: 32000
+        pulsewidth: 0
+      }
+    }
+  ]
+};
+
+export const PACKET_BALL_RESET: IFieldControlPacket = {
+  messages: [
+    {
+      hub: 0,
+      function: "motor",
+      parameters: {
+        port: 0,
+        pulsewidth: 32000
+      }
+    },
+    {
+      hub: 0,
+      function: "motor",
+      parameters: {
+        port: 1,
+        pulsewidth: 32000
       }
     }
   ]

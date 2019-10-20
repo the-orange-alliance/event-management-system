@@ -315,56 +315,58 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
         }
 
         if (item.isMatch) {
-          if (!needsBufferMatch) {
-            if (index % 7 < 4) {
+          // For all matches that are NOT on the final day. FIRST GLOBAL ONLY.
+          if (((item.day + 1) === schedule.days.length) && schedule.type === "Qualification") {
+            item.duration = 7;
+            item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
+            index++;
+            if (index % 3 === 0) {
+              index = 0;
+              premiereIndex++;
+            }
+            // TODO - Test and make sure this reflects on the fields.
+          } else {
+
+            if (!needsBufferMatch) {
+              if (index % 7 < 4) {
+                item.duration = 10;
+                item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
+                dayNormalTime += item.duration / 2;
+                // console.log("CREATING NORMAL MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
+              } else {
+                item.duration = 7;
+                item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
+                dayPremiereTime += 7;
+                premiereIndex++;
+                // console.log("CREATING PREMIERE MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
+              }
+              if (index % 7 === 1) {
+                normalIndex++;
+              }
+              if (index % 7 === 6) {
+                // console.log("NEW MATCH PAIRS");
+                index = 0;
+                normalIndex++;
+                bufferCount = 0;
+                needsBufferMatch = (dayPremiereTime - dayNormalTime) === 10;
+              } else {
+                index++;
+              }
+            } else {
+              // console.log("BUFFER MATCH");
               item.duration = 10;
               item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
-              dayNormalTime += item.duration / 2;
-              // console.log("CREATING NORMAL MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
-            } else {
-              item.duration = 7;
-              item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
-              dayPremiereTime += 7;
-              premiereIndex++;
-              // console.log("CREATING PREMIERE MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
+              dayPremiereTime = 0;
+              dayNormalTime = 0;
+              bufferCount++;
+              needsBufferMatch = bufferCount < 2;
+              if (!needsBufferMatch) {
+                normalIndex++;
+              }
             }
-            if (index % 7 === 1) {
-              normalIndex++;
-            }
-            if (index % 7 === 6) {
-              // console.log("NEW MATCH PAIRS");
-              index = 0;
-              normalIndex++;
-              bufferCount = 0;
-              needsBufferMatch = (dayPremiereTime - dayNormalTime) === 10;
-            } else {
-              index++;
-            }
-          } else {
-            // console.log("BUFFER MATCH");
-            item.duration = 10;
-            item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
-            dayPremiereTime = 0;
-            dayNormalTime = 0;
-            bufferCount++;
-            needsBufferMatch = bufferCount < 2;
-            if (!needsBufferMatch) {
-              normalIndex++;
-            }
+
           }
 
-          // if (index % (schedule.matchConcurrency + 1) === 0 || index % (schedule.matchConcurrency + 1) === 3) {
-          //   item.duration = 7;
-          //   item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
-          //   premiereIndex++;
-          //   if (index % (schedule.matchConcurrency + 1) === 0) {
-          //     normalIndex++;
-          //   }
-          // } else {
-          //   item.duration = 10;
-          //   item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
-          // }
-          // index++;
         } else {
           const thisBreak = schedule.days[item.day].breaks[breakIndex];
           schedule.days[item.day].breaks[breakIndex].startTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");

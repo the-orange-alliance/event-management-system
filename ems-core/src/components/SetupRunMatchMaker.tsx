@@ -81,6 +81,8 @@ class SetupRunMatchMaker extends React.Component<IProps, IState> {
   }
 
   private runMatchMaker() {
+    const {schedule} = this.props;
+    const {scheduleItems} = this.state;
     this.props.setNavigationDisabled(true);
     MatchMakerManager.execute({
       teams: this.props.schedule.teamsParticipating,
@@ -92,9 +94,19 @@ class SetupRunMatchMaker extends React.Component<IProps, IState> {
       type: this.props.schedule.type
     }).then((matches: Match[]) => {
       let matchNumber: number = 0;
-      for (const item of this.state.scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
+      let index: number = 0;
+      for (const item of scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
         if (item.isMatch) {
           matches[matchNumber].scheduledStartTime = item.startTime;
+          // TODO - Only a FIRST Global thing.
+          if (((item.day + 1) === schedule.days.length) && schedule.type === "Qualification") {
+            // This is the last day. Only use fields 3, 4, and 5.
+            matches[matchNumber].fieldNumber = index + 3;
+            index++;
+            if (index % 3 === 0) {
+              index = 0;
+            }
+          }
           matchNumber++;
         }
       }

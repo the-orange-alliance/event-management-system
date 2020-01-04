@@ -3,7 +3,7 @@ import * as net from "net";
 
 export default class DSConn {
     private _teamId:                    number;
-    private _allianceStation:           string;
+    private _allianceStation:           number;
     private _auto:                      boolean;
     private _enabled:                   boolean;
     private _estop:                     boolean;
@@ -14,8 +14,8 @@ export default class DSConn {
     private _dsRobotTripTimeMs:         number;
     private _missedPacketCount:         number;
     private _secondsSinceLastRobotLink: number;
-    private _lastPacketTime:            Date;
-    private _lastRobotLinkedTime:       Date;
+    private _lastPacketTime:            number; // date
+    private _lastRobotLinkedTime:       number; // date
     private _packetCount:               number;
     private _missedPacketOffset:        number;
     private _tcpConn:                   dgram.Socket;
@@ -34,11 +34,11 @@ export default class DSConn {
         this._teamId = value;
     }
 
-    get allianceStation(): string {
+    get allianceStation(): number {
         return this._allianceStation;
     }
 
-    set allianceStation(value: string) {
+    set allianceStation(value: number) {
         this._allianceStation = value;
     }
 

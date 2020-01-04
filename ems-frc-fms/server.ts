@@ -20,10 +20,6 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
     host = process.argv[2];
 }
 
-//Init Timer
-const timer = new MatchTimer();
-timer.matchConfig = FTC_CONFIG;
-
 //Init EMS
 EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
 

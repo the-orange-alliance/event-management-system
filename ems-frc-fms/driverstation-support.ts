@@ -36,12 +36,28 @@ class DriverstationSupport {
             console.log('Listening for DriverStations on UDP ' + address.address + ':' + address.port);
         });
 
+        udpDSListener.on('error', function() {
+            const address = udpDSListener.address();
+            console.log('Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
+        });
+
         // TODO: Handle
-        udpDSListener.on('message', function(message, remote) {
-            logger.info(remote.address + ':' + remote.port +' - ' + message);
+
+        // Listen for New UDP Packets
+        udpDSListener.on('message', (message: Buffer, remote) => {
+            this.parseUDPPacket(message, remote);
         });
 
         udpDSListener.bind(port, host);
+    }
+
+    private parseUDPPacket(message: Buffer, remote: any) {
+        logger.info('UDP Message from ' + remote.address + ':' + remote.port +' - ' + message);
+
+        const teamNum = message[4]<<8 + message[5];
+        // Create a new Driverstation Connection
+        let DSConn;
+
     }
 
     private tcpInit(port: number, host: string) {

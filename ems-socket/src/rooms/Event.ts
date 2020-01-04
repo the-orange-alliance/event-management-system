@@ -4,6 +4,7 @@ import {getAppDataPath} from "appdata-path";
 import {Socket, Server} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
+import {EMSProvider} from "@the-orange-alliance/lib-ems";
 
 export default class EventRoom implements IRoom {
   private readonly _server: Server;
@@ -64,6 +65,8 @@ export default class EventRoom implements IRoom {
       this.masterAddress = masterHost;
       logger.info("Asking all clients to enable slave mode on " + masterHost + ".");
       this._server.to(this._name).emit("enter-slave", masterHost);
+      // Change this EMS provider as well.
+      EMSProvider.initialize(masterHost, parseInt(process.env.API_PORT as string, 10));
     });
     client.on("test-audience", () => {
       this._server.to(this._name).emit("test-audience");

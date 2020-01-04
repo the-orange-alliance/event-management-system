@@ -41,6 +41,23 @@
   display: flex;
   justify-content: center;
 }
+#res-left-side-logo {
+  position: absolute;
+  left: 0;
+  top: 5vh;
+  width: 20vw;
+  text-align: center;
+}
+#res-left-side-logo > img {
+  width: 10vw !important;
+}
+#res-right-side-logo {
+  width: 20vw;
+  position: absolute;
+  left: 80vw;
+  bottom: 5vh;
+  padding: 6px;
+}
 .res-alliance-card {
   width: 45%;
   height: 75vh;
@@ -93,11 +110,10 @@
   height: 100%;
   display: flex;
   align-items: center;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding: 5px 10px 5px 10px;
   font-family: Roboto, sans-serif;
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: #ffffff;
 }
 .res-team-name {

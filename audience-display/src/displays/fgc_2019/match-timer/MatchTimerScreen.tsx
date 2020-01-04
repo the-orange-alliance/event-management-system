@@ -2,10 +2,10 @@ import * as React from "react";
 import {Match, MatchConfiguration, MatchMode, MatchTimer, SocketProvider} from "@the-orange-alliance/lib-ems";
 import * as moment from "moment";
 
-import "./MatchPlayScreen.css";
+import "./MatchTimerScreen.css";
 
-import FGC_LOGO from "../res/Logo-H.png";
-import TeamCardStatus from "./TeamCardStatus";
+import FGC_LEFT_LOGO from "../res/Logo-V.png";
+import FGC_RIGHT_LOGO from "../res/Powered by.png";
 import MatchParticipant from "@the-orange-alliance/lib-ems/dist/models/ems/MatchParticipant";
 
 import MATCH_START from "../res/sounds/match_start.wav";
@@ -36,7 +36,7 @@ interface IState {
   timeLeft: number
 }
 
-class MatchPlayScreen extends React.Component<IProps, IState> {
+class MatchTimerScreen extends React.Component<IProps, IState> {
   private _timer: MatchTimer;
   private _matchEnded: boolean;
 
@@ -132,95 +132,70 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     const time = moment.duration(timeLeft, "seconds");
     const disMin = time.minutes() < 10 ? "0" + time.minutes().toString() : time.minutes().toString();
     const disSec = time.seconds() < 10 ? "0" + time.seconds().toString() : time.seconds().toString();
-
-    // const redReductionHeight = details.redReductionProcessing / details.getRedTeleScore();
-    // const redRecoveryHeight = (details.redProcessingBargeRecovery * 2) / details.getRedTeleScore();
-    // const redRecycleHeight = (details.redProcessingBargeRecycle * 3) / details.getRedTeleScore();
-    // const redReuseHeight = (details.redProcessingBargeReuse * 6) / details.getRedTeleScore();
-
-    // const blueReductionHeight = details.blueReductionProcessing / details.getBlueTeleScore();
-    // const blueRecoveryHeight = (details.blueProcessingBargeRecovery * 2) / details.getBlueTeleScore();
-    // const blueRecycleHeight = (details.blueProcessingBargeRecycle * 3) / details.getBlueTeleScore();
-    // const blueReuseHeight = (details.blueProcessingBargeReuse * 6) / details.getBlueTeleScore();
-
-    // 25 for practice/qualifications, 30 for finals/round robin.
-    // 15 for practice/qualifications, ?? for finals/round robin
-    // 25 * 2 + 15 * 2 = 80 total pollutants.
-    // const totalPollutants = match.tournamentLevel > 1 ? OceanOpportunitiesMatchDetails.MAX_POLLUTANTS_PLAYOFFS : OceanOpportunitiesMatchDetails.MAX_POLLUTANTS; // TODO - May be changed.
-    // const pollutantsScored =
-    //   details.redReductionProcessing +
-    //   details.redProcessingBargeRecovery +
-    //   details.redProcessingBargeRecycle +
-    //   details.redProcessingBargeReuse +
-    //   details.blueReductionProcessing +
-    //   details.blueProcessingBargeRecovery +
-    //   details.blueProcessingBargeRecycle +
-    //   details.blueProcessingBargeReuse;
-    // const coopertitionCompletion = pollutantsScored / totalPollutants;
+    const matchLabel = match.tournamentLevel > -1 ? match.abbreviatedName : "TEST";
 
     return (
-      <div>
-        <div id="play-display-base">
-          <div id="play-display-base-top">
-            {/* <div id="play-display-left-details">
-              <div className="top-details">
-                <VerticalBar alliance={"Red"} label={"1P"} fillHeight={redReductionHeight}/>
-                <VerticalBar alliance={"Red"} label={"2P"} fillHeight={redRecoveryHeight}/>
-                <VerticalBar alliance={"Red"} label={"3P"} fillHeight={redRecycleHeight}/>
-                <VerticalBar alliance={"Red"} label={"6P"} fillHeight={redReuseHeight}/>
-              </div>
-              <div className="bottom-details"/>
-            </div> */}
-            <div id="play-display-left-score">
-              {/* <CoopertitionBar alliance={"Red"} fillWidth={coopertitionCompletion}/> */}
-              <div className="teams red-bg left-score">
-                {this.displayRedAlliance()}
-              </div>
+      <div id={"fgc-body"}>
+
+        <div id="timer-info">
+          <div id="timer-info-left">
+            <div className="timer-info-left center-items">
+              <span>MATCH</span>
             </div>
-            <div id="play-display-center">
-              <div id="score-container-header">
-                <img src={FGC_LOGO} className="fit-h"/>
-              </div>
-              <div id="score-container-timer">
-                <span>{disMin}:{disSec}</span>
-              </div>
-              <div id="score-container-scores">
-                <div id="score-container-red">
-                  <div className="red-bg center-items">
-                    <span>{match.redScore}</span>
-                  </div>
-                </div>
-                <div id="score-container-blue">
-                  <div className="blue-bg center-items">
-                    <span>{match.blueScore}</span>
-                  </div>
-                </div>
-              </div>
+            <div className="timer-info-right center-items">
+              <span>{matchLabel}</span>
             </div>
-            <div id="play-display-right-score">
-              {/* <CoopertitionBar alliance={"Blue"} fillWidth={coopertitionCompletion}/> */}
-              <div className="teams blue-bg right-score">
-                {this.displayBlueAlliance()}
-              </div>
-            </div>
-            {/* <div id="play-display-right-details">
-              <div className="top-details">
-                <VerticalBar alliance={"Blue"} label={"1P"} fillHeight={blueReductionHeight}/>
-                <VerticalBar alliance={"Blue"} label={"2P"} fillHeight={blueRecoveryHeight}/>
-                <VerticalBar alliance={"Blue"} label={"3P"} fillHeight={blueRecycleHeight}/>
-                <VerticalBar alliance={"Blue"} label={"6P"} fillHeight={blueReuseHeight}/>
-              </div>
-            </div> */}
           </div>
-          <div id="play-display-base-bottom">
-            <div className="info-col">
-              <span className="info-field">MATCH: {match.abbreviatedName}</span>
+          <div id="timer-info-left">
+            <div className="timer-info-left center-items">
+              <span>FIELD</span>
             </div>
-            <div className="info-col">
-              <span className="info-field">FIRST Global 2019</span>
+            <div className="timer-info-right center-items">
+              <span>{match.fieldNumber}</span>
             </div>
           </div>
         </div>
+
+        <div id={"fgc-timer-container"}>
+          <div id={"fgc-timer-top"}>
+            <div id={"fgc-timer-display"}>
+              <span>{disMin}:{disSec}</span>
+            </div>
+          </div>
+          <div id={"fgc-timer-bot"}>
+            <div id={"fgc-timer-bot-left"} className={"teams-container teams-container-left"}>
+
+              <div className={"teams red-bg"}>
+                {this.displayRedAlliance()}
+              </div>
+
+            </div>
+            <div id={"fgc-timer-bot-center"}>
+              <div className={"timer-score timer-score-left red-bg"}>
+                <span>{match.redScore}</span>
+              </div>
+              <div className={"timer-score timer-score-right blue-bg"}>
+                <span>{match.blueScore}</span>
+              </div>
+            </div>
+            <div id={"fgc-timer-bot-right"} className={"teams-container teams-container-right"}>
+
+              <div className={"teams blue-bg"}>
+                {this.displayBlueAlliance()}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div id={"timer-left-side-logo"} className={"center-items"}>
+          <img src={FGC_LEFT_LOGO} className={"fit-w"}/>
+        </div>
+
+        <div id={"timer-right-side-logo"} className={"center-items"}>
+          <img src={FGC_RIGHT_LOGO} className={"fit-w"}/>
+        </div>
+
       </div>
     );
   }
@@ -231,8 +206,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     const redAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station < 20);
     const redAllianceView = redAlliance.map((p: MatchParticipant) => {
       return (
-        <div key={p.matchParticipantKey} className="team">
-          <TeamCardStatus cardStatus={p.cardStatus}/>
+        <div key={p.matchParticipantKey} className="team left-team">
           <div className="team-name-left">
             <span>{p.team.country}</span>
           </div>
@@ -251,14 +225,13 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     const blueAlliance: MatchParticipant[] = participants.filter((p: MatchParticipant) => p.station >= 20);
     const blueAllianceView = blueAlliance.map((p: MatchParticipant) => {
       return (
-        <div key={p.matchParticipantKey} className="team">
+        <div key={p.matchParticipantKey} className="team right-team">
           <div className="team-flag">
             <span className={"flag-icon flag-icon-" + p.team.countryCode}/>
           </div>
           <div className="team-name-right">
             <span>{p.team.country}</span>
           </div>
-          <TeamCardStatus cardStatus={p.cardStatus}/>
         </div>
       );
     });
@@ -279,4 +252,4 @@ function initAudio(url: any): any {
   return audio;
 }
 
-export default MatchPlayScreen;
+export default MatchTimerScreen;

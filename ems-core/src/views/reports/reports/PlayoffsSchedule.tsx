@@ -6,6 +6,7 @@ import {Table} from "semantic-ui-react";
 import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
+  fields: number[],
   teamList?: Team[],
   playoffsMatches?: Match[],
   eventConfig?: EventConfiguration,
@@ -42,10 +43,10 @@ class PlayoffsSchedule extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {onHTMLUpdate, eventConfig, playoffsMatches} = this.props;
+    const {onHTMLUpdate, eventConfig, playoffsMatches, fields} = this.props;
     const {generated} = this.state;
     const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
-    const matches = playoffsMatches.map(match => {
+    const matches = playoffsMatches.filter((m: Match) => fields.indexOf(m.fieldNumber) > -1).map(match => {
       const participants = [];
       for (let i = 0; i < (tournamentRound.format.teamsPerAlliance * 2); i++) {
         if (typeof match.participants[i] !== "undefined") {
@@ -53,7 +54,7 @@ class PlayoffsSchedule extends React.Component<IProps, IState> {
           if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
             participants.push(
               <Table.Cell key={participant.matchParticipantKey}>
-                {this._teamMap.get(participant.teamKey).getFromIdentifier(eventConfig.teamIdentifier)}{participant.surrogate ? "*" : ""}
+                {(this._teamMap.get(participant.teamKey).getFromIdentifier(eventConfig.teamIdentifier)).toString()}{participant.surrogate ? "*" : ""}
               </Table.Cell>
             );
           } else {

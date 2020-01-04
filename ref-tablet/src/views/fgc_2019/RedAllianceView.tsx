@@ -131,18 +131,18 @@ class RedAllianceView extends React.Component<IProps, IState> {
           <Col sm={6}>
             <RobotNumberInput value={redRecyclePollutants} verticalButtons={false} verticalLabel={true} label={"Recycle (3 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecycle}/>
           </Col>
-          <Col sm={6}>
-            <RobotNumberInput value={redRecoveryPollutants} verticalButtons={false} verticalLabel={true} label={"Recovery (2 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
+          <Col sm={6} className={"center-items"}>
+            <div>
+              TOTAL POLLUTANTS: {totalPollutants}
+            </div>
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            <div className={"center"}>
-              TOTAL POLLUTANTS: {totalPollutants}
-            </div>
+            <RobotNumberInput value={redRecoveryPollutants} verticalButtons={false} verticalLabel={true} label={"Recovery (2 points)"} min={0} max={maxPollutants} onChange={this.changeProcessingBargeRecovery}/>
           </Col>
-          <Col sm={6}>
-            <div className={"center"}>
+          <Col sm={6} className={"center-items"}>
+            <div>
               REMAINING POLLUTANTS: {remainingPollutants}
             </div>
           </Col>

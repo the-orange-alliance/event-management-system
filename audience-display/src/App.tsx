@@ -41,8 +41,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.0.117"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.0.117"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.1.200"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.1.200"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
@@ -83,19 +83,21 @@ class App extends React.Component<IProps, IState> {
         this.setState({activeMatch: match, videoID: displayID});
       });
     });
-    SocketProvider.on("commit-scores-response", (err: any, matchJSON: any) => {
-      const match: Match = new Match().fromJSON(matchJSON);
-      const seasonKey: string = match.matchKey.split("-")[0];
-      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-      if (typeof matchJSON.participants !== "undefined") {
-        match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
-      }
-      this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
-        if (participants.length > 0) {
-          match.participants = participants;
+    SocketProvider.on("commit-scores-response", (err: any, matchJSON: any, updateDisplay: boolean) => {
+      if (updateDisplay) {
+        const match: Match = new Match().fromJSON(matchJSON);
+        const seasonKey: string = match.matchKey.split("-")[0];
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+        if (typeof matchJSON.participants !== "undefined") {
+          match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
         }
-        this.setState({activeMatch: match, videoID: 3});
-      });
+        this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
+          if (participants.length > 0) {
+            match.participants = participants;
+          }
+          this.setState({activeMatch: match, videoID: 3});
+        });
+      }
     });
 
     this.renderAudienceDisplay = this.renderAudienceDisplay.bind(this);
@@ -122,7 +124,7 @@ class App extends React.Component<IProps, IState> {
         display = <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       case "fgc_2019":
-        display = <OceanOpportunities event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        display = <OceanOpportunities displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       case "ftc_1819":
         display = <RoverRuckus displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;

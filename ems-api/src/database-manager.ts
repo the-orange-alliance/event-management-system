@@ -16,7 +16,8 @@ class DatabaseManager {
   }
 
   private constructor() {
-    const isProd = process.env.NODE_ENV === "production";
+    // const isProd = process.env.NODE_ENV === "production";
+    const isProd = true;
     const fileName = isProd ? "production.db" : "development.db";
     const dbDir = path.join(getAppDataPath(""), "ems-core");
     fs.mkdirSync(dbDir, {recursive: true});

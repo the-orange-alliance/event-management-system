@@ -5,6 +5,16 @@ import MatchTimer from "../scoring/MatchTimer";
 import {MatchMode} from "../scoring/MatchMode";
 import ScoreManager from "../scoring/ScoreManager";
 import {EMSProvider, IFieldControlPacket, Match} from "@the-orange-alliance/lib-ems";
+import {
+  PACKET_ABORT, PACKET_BALL_RESET,
+  PACKET_BLUE_BOT_RESET,
+  PACKET_BLUE_BOT_SCORE, PACKET_BLUE_MID_RESET,
+  PACKET_BLUE_MID_SCORE, PACKET_BLUE_TOP_RESET, PACKET_BLUE_TOP_SCORE, PACKET_COMMIT, PACKET_PRESTART,
+  PACKET_RED_BOT_RESET,
+  PACKET_RED_BOT_SCORE, PACKET_RED_MID_RESET,
+  PACKET_RED_MID_SCORE, PACKET_RED_TOP_RESET,
+  PACKET_RED_TOP_SCORE, PACKET_RESET, PACKET_START
+} from "../packets";
 
 export default class ScoringRoom implements IRoom {
   private readonly _server: Server;
@@ -18,6 +28,9 @@ export default class ScoringRoom implements IRoom {
   private _currentVideoID: number;
   private _mode: string;
 
+  private _ledTimers: any[];
+  private _ledTimes: number[];
+
   constructor(server: Server, matchTimer: MatchTimer) {
     this._server = server;
     this._clients = [];
@@ -29,6 +42,9 @@ export default class ScoringRoom implements IRoom {
     this._currentFieldNumber = -1;
     this._currentVideoID = -1;
     this._mode = "UNDEFINED";
+
+    this._ledTimers = [null, null, null, null, null, null];
+    this._ledTimes = [0, 0, 0, 0, 0, 0];
   }
 
   public addClient(client: Socket) {
@@ -49,8 +65,11 @@ export default class ScoringRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
+    if (!this._hasPrestarted && !this._hasCommittedScore && !this._timer.inProgress()) {
+      this._server.to("scoring").emit("control-update", PACKET_BALL_RESET);
+    }
+
     // Rebroadcast the current videoID.
-    // TODO - This logic needs to be thought out more...
     if (this._currentVideoID !== -1) {
       client.emit("video-switch", this._currentVideoID);
     }
@@ -86,6 +105,31 @@ export default class ScoringRoom implements IRoom {
       if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART || !this._hasCommittedScore) {
         if (matchJSON && typeof matchJSON.match_key !== "undefined" && matchJSON.match_key.length > 0) {
           if (typeof matchJSON.details !== "undefined" && typeof matchJSON.participants !== "undefined") {
+
+            // Before score updates, handle sending package messages.
+            if (matchJSON.details.red_processing_barge_reuse > ScoreManager.getJSON().details.red_processing_barge_reuse) {
+              this._server.to("scoring").emit("control-update", PACKET_RED_TOP_SCORE);
+              this.updateInterval(0, true, 0);
+            } else if (matchJSON.details.red_processing_barge_recycle > ScoreManager.getJSON().details.red_processing_barge_recycle) {
+              this._server.to("scoring").emit("control-update", PACKET_RED_MID_SCORE);
+              this.updateInterval(0, true, 1);
+            } else if (matchJSON.details.red_processing_barge_recovery > ScoreManager.getJSON().details.red_processing_barge_recovery) {
+              this._server.to("scoring").emit("control-update", PACKET_RED_BOT_SCORE);
+              this.updateInterval(0, true, 2);
+            }
+
+            if (matchJSON.details.blue_processing_barge_reuse > ScoreManager.getJSON().details.blue_processing_barge_reuse) {
+              this._server.to("scoring").emit("control-update", PACKET_BLUE_TOP_SCORE);
+              this.updateInterval(3, false, 0);
+            } else if (matchJSON.details.blue_processing_barge_recycle > ScoreManager.getJSON().details.blue_processing_barge_recycle) {
+              this._server.to("scoring").emit("control-update", PACKET_BLUE_MID_SCORE);
+              this.updateInterval(4, false, 1);
+            } else if (matchJSON.details.blue_processing_barge_recovery > ScoreManager.getJSON().details.blue_processing_barge_recovery) {
+              this._server.to("scoring").emit("control-update", PACKET_BLUE_BOT_SCORE);
+              this.updateInterval(5, false, 2);
+            }
+
+            // Finally, handle score updates.
             ScoreManager.updateMatch(matchJSON);
             this._server.to("scoring").emit("score-update", ScoreManager.getJSON());
           }
@@ -99,6 +143,7 @@ export default class ScoringRoom implements IRoom {
       this._server.to("scoring").emit("video-switch", id);
     });
     client.on("prestart", (matchKey: string) => {
+      logger.info(`Initiating prestart sequence for ${matchKey}`);
       this.getMatch(matchKey).then((match: Match) => {
         logger.info(`Successfully prestarted match ${match.matchKey}`);
         this.resetScores(match);
@@ -111,6 +156,7 @@ export default class ScoringRoom implements IRoom {
         this._mode = "PRESTART";
         this._server.to("scoring").emit("prestart-response", null, ScoreManager.getJSON());
         this._server.to("referee").emit("data-update", ScoreManager.matchMetadata.toJSON());
+        this._server.to("scoring").emit("control-update", PACKET_PRESTART);
       }).catch((reason: any) => {
         client.send("prestart-response", reason, null);
       });
@@ -120,20 +166,25 @@ export default class ScoringRoom implements IRoom {
       this._hasPrestarted = false;
       this._mode = "UNDEFINED";
       this._server.to("scoring").emit("prestart-cancel");
+      this._server.to("scoring").emit("control-update", PACKET_RESET);
     });
-    client.on("commit-scores", (matchKey: string) => {
+    client.on("commit-scores", (matchKey: string, updateDisplay?: boolean) => {
+      const updateAudience: boolean = updateDisplay ? updateDisplay : false;
       this.getMatch(matchKey).then((match: Match) => {
         ScoreManager.match = match;
         this._currentVideoID = 3; // Universal Match Results Screen
-        this._server.to("scoring").emit("commit-scores-response", null, ScoreManager.getJSON());
+        this._server.to("scoring").emit("commit-scores-response", null, ScoreManager.getJSON(), updateAudience);
         this._timer.mode = MatchMode.RESET;
         this._hasCommittedScore = true;
+        this._server.to("scoring").emit("control-update", PACKET_COMMIT);
+        logger.info(`Committing scores for ${matchKey}. The audience display ${updateDisplay ? 'will' : 'will not'} be updated.`);
       }).catch((reason: any) => {
         client.send("commit-scores-response", reason, null);
       });
     });
     client.on("start", () => {
       if (!this._timer.inProgress()) {
+        this._server.to("scoring").emit("control-update", PACKET_START);
         this._timer.once("match-start", () => {
           this._server.to("scoring").emit("match-start", this._timer.matchConfig.toJSON());
           this._hasCommittedScore = false;
@@ -173,6 +224,7 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("abort", () => {
       if (this._timer.inProgress()) {
+        this._server.to("scoring").emit("control-update", PACKET_ABORT);
         this._timer.abort();
       }
     });
@@ -253,5 +305,34 @@ export default class ScoringRoom implements IRoom {
 
   get name(): string {
     return this._name;
+  }
+
+  private updateInterval(id: any, red: boolean, scoreType: number): void {
+    if (this._ledTimers[id] === null) {
+      this._ledTimes[id] = 1.0;
+      this._ledTimers[id] = global.setInterval(() => {
+        if (this._ledTimes[id] <= 0.0) {
+          global.clearInterval(this._ledTimers[id]);
+          this._ledTimers[id] = null;
+          if (red && scoreType === 0) {
+            this._server.to("scoring").emit("control-update", PACKET_RED_TOP_RESET);
+          } else if (red && scoreType === 1) {
+            this._server.to("scoring").emit("control-update", PACKET_RED_MID_RESET);
+          } else if (red && scoreType === 2) {
+            this._server.to("scoring").emit("control-update", PACKET_RED_BOT_RESET);
+          } else if (!red && scoreType === 0) {
+            this._server.to("scoring").emit("control-update", PACKET_BLUE_TOP_RESET);
+          } else if (!red && scoreType === 1) {
+            this._server.to("scoring").emit("control-update", PACKET_BLUE_MID_RESET);
+          } else if (!red && scoreType === 2) {
+            this._server.to("scoring").emit("control-update", PACKET_BLUE_BOT_RESET);
+          }
+        } else {
+          this._ledTimes[id] -= 0.25;
+        }
+      }, 250);
+    } else {
+      this._ledTimes[id] = 1.0;
+    }
   }
 }

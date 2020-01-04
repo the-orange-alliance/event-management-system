@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, Card, Dimmer, DropdownProps, Form, Grid, Loader} from "semantic-ui-react";
+import {Button, Card, Checkbox, CheckboxProps, Dimmer, DropdownProps, Form, Grid, Loader} from "semantic-ui-react";
 import GameSpecificScorecard from "../../components/GameSpecificScorecard";
 import {ApplicationActions, IApplicationState} from "../../stores";
 import {connect} from "react-redux";
@@ -39,7 +39,8 @@ interface IState {
   selectedLevel: TournamentType,
   updatingScores: boolean,
   confirmModalOpen: boolean,
-  loadingMatch: boolean
+  loadingMatch: boolean,
+  updateAudience: boolean
 }
 
 class MatchReviewView extends React.Component<IProps, IState> {
@@ -49,13 +50,15 @@ class MatchReviewView extends React.Component<IProps, IState> {
       selectedLevel: "Practice",
       updatingScores: false,
       confirmModalOpen: false,
-      loadingMatch: true
+      loadingMatch: true,
+      updateAudience: false
     };
     this.changeSelectedLevel = this.changeSelectedLevel.bind(this);
     this.changeSelectedMatch = this.changeSelectedMatch.bind(this);
     this.openConfirmModal = this.openConfirmModal.bind(this);
     this.closeConfirmModal = this.closeConfirmModal.bind(this);
     this.updateScores = this.updateScores.bind(this);
+    this.onUpdateAudience = this.onUpdateAudience.bind(this);
   }
 
   public componentDidMount() {
@@ -74,7 +77,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
 
   public render() {
     const {eventConfig, activeMatch} = this.props;
-    const {selectedLevel, updatingScores, confirmModalOpen, loadingMatch} = this.state;
+    const {selectedLevel, updatingScores, confirmModalOpen, loadingMatch, updateAudience} = this.state;
 
     const availableLevels = this.getAvailableTournamentLevels().map(tournamentLevel => {
       return {
@@ -99,7 +102,8 @@ class MatchReviewView extends React.Component<IProps, IState> {
               <Grid.Row>
                 <Grid.Column width={3}><Form.Dropdown fluid={true} selection={true} disabled={updatingScores} value={selectedLevel} options={availableLevels} onChange={this.changeSelectedLevel} label="Tournament Level"/></Grid.Column>
                 <Grid.Column width={3}><Form.Dropdown fluid={true} selection={true} disabled={updatingScores} value={selectedMatch.matchKey} options={availableMatches} onChange={this.changeSelectedMatch} label="Match"/></Grid.Column>
-                <Grid.Column width={7}/>
+                <Grid.Column width={4}/>
+                <Grid.Column width={3} verticalAlign={"bottom"}><Checkbox label={"Update Audience?"} checked={updateAudience} onChange={this.onUpdateAudience}/></Grid.Column>
                 <Grid.Column width={3} verticalAlign={"bottom"}><Button fluid={true} color="red" disabled={selectedMatch === null || typeof selectedMatch === "undefined" || updatingScores} loading={updatingScores} onClick={this.openConfirmModal}>Update Scores</Button></Grid.Column>
               </Grid.Row>
             </Grid>
@@ -204,11 +208,13 @@ class MatchReviewView extends React.Component<IProps, IState> {
 
   private updateScores() {
     const {activeMatch, event, eventConfig} = this.props;
+    const {updateAudience} = this.state;
     // Make sure all of our 'active' objects are on the same page.
     this.setState({updatingScores: true, confirmModalOpen: false});
     this.props.activeMatch.matchDetails = this.props.activeDetails;
     this.props.activeMatch.participants = this.props.activeParticipants;
-    MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig).then(() => {
+    const updateDisplay: boolean = updateAudience ? updateAudience : false;
+    MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig, updateDisplay).then(() => {
       if (this.props.toaConfig.enabled) {
         UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
           console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
@@ -233,6 +239,10 @@ class MatchReviewView extends React.Component<IProps, IState> {
       this.setState({updatingScores: false});
       DialogManager.showErrorBox(error);
     });
+  }
+
+  private onUpdateAudience(event: React.SyntheticEvent, props: CheckboxProps) {
+    this.setState({updateAudience: props.checked});
   }
 }
 

@@ -162,12 +162,12 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     }
   }
 
-  private onPublishSchedule() {
+  private onPublishSchedule(upload: boolean) {
     const {eventConfig, teams, playoffsSchedule} = this.props;
     this.props.setNavigationDisabled(true);
     const matches: Match[] = this.props.playoffsMatches.filter((m: Match) => m.matchKey.split("-")[3].substring(1, 2) === (this.props.eventConfig.activeTournamentID + ""));
     EventCreationManager.createRanks(teams.filter((t: Team) => playoffsSchedule[eventConfig.activeTournamentID].teams.indexOf(t.teamKey) > 0), this.props.event.eventKey).then(() => {
-      if (this.props.toaConfig.enabled) {
+      if (this.props.toaConfig.enabled && upload) {
         UploadManager.postMatchSchedule(this.props.event.eventKey, matches).then(() => {
           console.log(`${matches.length} matches have been posted to TOA.`);
         }).catch((error: HttpError) => {

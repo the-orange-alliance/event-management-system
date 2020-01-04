@@ -1,0 +1,91 @@
+#playoffs-container {
+  width: 70vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  left: 15vw;
+}
+
+#playoffs-table {
+  position: relative;
+  width: 70vw;
+  max-height: 100vh;
+}
+
+#playoffs-table > table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#playoffs-table > table > thead,
+#playoffs-table > table > tbody {
+  text-align: center;
+}
+
+#playoffs-table > table > thead > tr,
+#playoffs-table > table > tbody > tr {
+  height: 2.5em;
+}
+
+#playoffs-table > table > thead > tr {
+  background-color: #141414;
+  color: #FFFFFF;
+}
+
+#playoffs-table > table > tbody > tr:nth-child(even) {
+  background-color: #e6e6e6;
+  color: #000000;
+}
+
+#playoffs-table > table > tbody > tr:nth-child(odd) {
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+.playoffs-d-rank {
+
+}
+
+.playoffs-d-teams {
+
+}
+
+.playoffs-d-record {
+
+}
+
+.playoffs-d-rp {
+
+}
+
+.playoffs-d-tp {
+
+}
+
+.playoffs-d-cp {
+
+}
+
+#playoffs-left-side-logo {
+  position: absolute;
+  left: 0;
+  top: 5vh;
+  width: 15vw;
+  text-align: center;
+}
+#playoffs-left-side-logo > img {
+  width: 10vw !important;
+}
+#playoffs-right-side-logo {
+  width: 20vw;
+  position: absolute;
+  left: 80vw;
+  bottom: 5vh;
+  padding: 6px;
+}
+
+.playoffs-cutoff {
+  border-bottom: 6px solid black;
+}

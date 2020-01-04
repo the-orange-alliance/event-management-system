@@ -7,6 +7,7 @@ import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
 import * as Moment from "moment";
 
 interface IProps {
+  fields: number[],
   queueingTime: number,
   useUTCTime: boolean,
   teamList?: Team[],
@@ -61,12 +62,12 @@ class PlayoffsScheduleByTeamQueueing extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {queueingTime, useUTCTime, onHTMLUpdate, eventConfig} = this.props;
+    const {queueingTime, useUTCTime, onHTMLUpdate, eventConfig, fields} = this.props;
     const {generated} = this.state;
     const reports: JSX.Element[] = [];
     const tournamentRound = Array.isArray(this.props.eventConfig.tournament) ? this.props.eventConfig.tournament[0] : this.props.eventConfig.tournament; // TODO - CHANGE
     this._teamMatches.forEach((teamMatches: Match[], teamNumber: number) => {
-      const matches = teamMatches.map(match => {
+      const matches = teamMatches.filter((m: Match) => fields.indexOf(m.fieldNumber) > -1).map(match => {
         const participants = [];
         for (let i = 0; i < (tournamentRound.format.teamsPerAlliance * 2); i++) {
           if (typeof match.participants[i] !== "undefined") {

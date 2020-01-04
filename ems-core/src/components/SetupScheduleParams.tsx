@@ -382,7 +382,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
       this.forceUpdate();
       return items;
     } else {
-      return [];
+      return schedule.generateSchedule(event);
     }
   }
 

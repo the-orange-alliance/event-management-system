@@ -17,13 +17,15 @@ export default class DSConn {
     private _lastPacketTime:            number; // date
     private _lastRobotLinkedTime:       number; // date
     private _packetCount:               number;
+    private _ipAddress:                 string;
     private _missedPacketOffset:        number;
+    private _recievedFirstPacket:       boolean;
     private _tcpConn:                   net.Socket;
     private _udpConn:                   dgram.Socket;
     // TODO Add Logging functionality
 
     constructor() {
-        // TODO: we may need this
+        this.recievedFirstPacket = false;
     }
 
     get teamId(): number {
@@ -146,12 +148,28 @@ export default class DSConn {
         this._packetCount = value;
     }
 
+    get ipAddress(): string {
+        return this._ipAddress;
+    }
+
+    set ipAddress(value: string) {
+        this._ipAddress = value;
+    }
+
     get missedPacketOffset(): number {
         return this._missedPacketOffset;
     }
 
     set missedPacketOffset(value: number) {
         this._missedPacketOffset = value;
+    }
+
+    get recievedFirstPacket(): boolean {
+        return this._recievedFirstPacket;
+    }
+
+    set recievedFirstPacket(value: boolean) {
+        this._recievedFirstPacket = value;
     }
 
     get tcpConn(): net.Socket {

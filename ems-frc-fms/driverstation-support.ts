@@ -6,7 +6,7 @@ import {EMSProvider, SocketProvider} from "@the-orange-alliance/lib-ems";
 import {EmsFrcFms} from "./server";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
 
-const udpDSListener = dgram.createSocket('udp4');
+const udpDSListener = dgram.createSocket("udp4");
 let tcpListener = net.createServer();
 
 
@@ -42,6 +42,7 @@ export class DriverstationSupport {
         this.tcpInit(this.dsTcpListenPort, host);
     }
 
+    // Init the UDP Server: This listens for new drivers stations
     private udpInit(port: number, host: string) {
         udpDSListener.on('listening', function() {
             const address = udpDSListener.address();
@@ -59,7 +60,7 @@ export class DriverstationSupport {
             if(teamDS != null) {
                 // Close any open connections first
                 if(this.allDriverStations[teamDS.allianceStation]) {
-                    this.closeDsConn(teamDS.allianceStation)
+                    this.closeDsConn(teamDS.allianceStation + '')
                 }
                 this.allDriverStations[teamDS.allianceStation] = teamDS;
             }
@@ -68,6 +69,7 @@ export class DriverstationSupport {
         udpDSListener.bind(port, host);
     }
 
+    // Parse a UDP packet from the Driver Station
     private parseUDPPacket(data: Buffer, remote: any): DSConn {
         logger.info('UDP Message from ' + remote.address + ':' + remote.port +' - ' + data);
 
@@ -75,12 +77,10 @@ export class DriverstationSupport {
         // Create a new Driverstation Connection
         let ds: DSConn = new DSConn();
         ds.teamId = teamNum;
-        const match = EmsFrcFms.getInstance().activeMatch;
         if(ds.teamId) { // if team id is defined
-            for(const t of match.participants) { // run through list of match participants looking for a match
-                if(t.team.teamKey === ds.teamId) { // found team in match participants, lets fill out alliance station
+            for(const t of this.allDriverStations) { // run through current driver staions
+                if(t.teamId === ds.teamId) { // found team in DS list
                     ds.dsLinked = true;
-                    ds.allianceStation = t.station;
                     ds.lastPacketTime = Date.now();
 
                     ds.radioLinked = (data[3]&0x10) !== 0;
@@ -102,41 +102,120 @@ export class DriverstationSupport {
         }
     }
 
+    // Init the TCP server: This create connections to each Driver Station
     private tcpInit(port: number, host: string) {
-        tcpListener = net.createServer((socket) => {
+        tcpListener = net.createServer((socket: net.Socket) => {
+            logger.info('TCP server started on ' + socket.remoteAddress + ':' + socket.remotePort );
             socket.pipe(socket);
         });
 
         tcpListener.listen(port, host);
 
-        tcpListener.addListener("connection", (data) => {
-            logger.info('TCP Connection Established ' + data);
-            data.connect()
+        tcpListener.on("connection", (socket: net.Socket) => {
+            logger.info(`New DS TCP Connection Established for ${socket.remoteAddress}:${socket.remotePort}`);
 
+            // this should read the first packet and assign the TCP connection to the proper alliance member
+            socket.on('data', (chunk: Buffer) => {
+                this.parseTcpPacket(chunk, socket);
+            });
+
+            this.allDriverStations[0].tcpConn = socket;
         });
-
-        tcpListener.addListener("listening", () => {
-            logger.info('TCP Server Listening on ' + host + ':' + port);
-        });
-
-        // TODO: Handle
     }
 
-    private newDSConnection(teamId: number, allianceStation: string, tcpConn: net.Socket): DSConn {
-        // TODO
+    // Parse TCP packet from the Driver STation
+    private parseTcpPacket(chunk: Buffer, socket: net.Socket) {
+        const teamId = (chunk[3]<<8) + (chunk[4]);
+        let station = -1;
+        let recievedFirstPacket = false;
+        for(const ds of this.allDriverStations) {
+            if(ds.teamId === teamId) {
+                station = ds.allianceStation;
+                recievedFirstPacket = ds.recievedFirstPacket;
+                break;
+            }
+        }
+
+        if(station > -1 && !recievedFirstPacket) {
+            this.handleFirstTCP(chunk, socket, teamId, station);
+        } else if (station > -1 && recievedFirstPacket) {
+            this.handleRegularTCP(chunk, socket, teamId, station);
+        } else {
+            logger.info('Rejecting DS Connection from team ' + teamId + ' who is not in the current match.');
+            setTimeout(function(){ // wait before disconnecting
+                socket.end();
+            }, 1000);
+        }
+    }
+
+    // parse a regular TCP packet
+    private handleRegularTCP(chunk: Buffer, socket: net.Socket, teamId: number, station: number) {
+        const packetType = chunk[2];
+        switch (packetType) {
+            case 28: break; // DS KeepAlive Packet, do nothing
+            case 22:
+                this.decodeStatusPacket(chunk.slice(2), station);
+        }
+        // TODO Log packet when match is in progress
+    }
+
+    // Parse the initial packet that the driver station sends
+    private handleFirstTCP(chunk: Buffer, socket: net.Socket, teamId: number, station: number) {
+        // Read the team number from the IP address to check for a station mismatch.
+        let dsStationStatus = 0;
+        const ipAddress = socket.remoteAddress;
+        const teamRegex = new RegExp("\\d+\\.(\\d+)\\.(\\d+)\\.");
+        const teamDigits = teamRegex.exec(ipAddress);
+        const td1 = parseInt(teamDigits[1]);
+        const td2 = parseInt(teamDigits[2]);
+        const stationTeamId = (td1*100) + td2;
+        if(stationTeamId != teamId) {
+            logger.info(`Team ${teamId} is in the incorrect station (Currently at ${stationTeamId}'s Station)`);
+            dsStationStatus = 1;
+        }
+        let returnPacket: Buffer = new Buffer(5);
+        returnPacket[0] = 0; // Packet Size
+        returnPacket[1] = 3; // Packet Size
+        returnPacket[2] = 25; // Packet Type
+        logger.info(`Accepting driver station connection from team ${teamId}`); // TODO: Include Station # and color in log
+        returnPacket[3] = station;
+        returnPacket[4] = dsStationStatus;
+        if(socket.write(returnPacket)) {
+            this.allDriverStations[station] = this.newDSConnection(teamId, station, socket);
+        }
+    }
+
+    // Create a new DS Connection Object
+    private newDSConnection(teamId: number, allianceStation: number, tcpConn: net.Socket): DSConn {
+        const newDs = new DSConn();
+        newDs.recievedFirstPacket = true;
+        newDs.tcpConn = tcpConn;
+        newDs.udpConn = dgram.createSocket("udp4");
+        newDs.ipAddress = tcpConn.remoteAddress;
+        newDs.allianceStation = allianceStation;
         return new DSConn();
     }
 
     // Run all this stuff
-    private runDS() {
-        // TODO
+    private runDriverStations() {
+        for(const i in this.allDriverStations) {
+            this.sendControlPacket(this.allDriverStations[i]);
+            const diff = Date.now() - new Date(this.allDriverStations[i].lastPacketTime).getDate();
+            if(Math.abs(diff/1000) > this.dsTcpLinkTimeoutSec) {
+                this.allDriverStations[i].dsLinked = false;
+                this.allDriverStations[i].radioLinked = false;
+                this.allDriverStations[i].robotLinked = false;
+                this.allDriverStations[i].batteryVoltage = 0;
+            }
+            this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
+        }
     }
 
     // Send Control Packet
     private sendControlPacket(ds: DSConn) {
         const packet = this.constructControlPacket(ds);
         if(ds.udpConn) {
-            ds.udpConn.send(packet, this.dsUdpReceivePort, (err) => {
+            ds.udpConn.send(packet, this.dsUdpReceivePort, ds.ipAddress, (err) => {
                 // Yes?
             });
         }
@@ -150,12 +229,32 @@ export class DriverstationSupport {
     }
 
     // Close all connections to the driver station
-    private closeDsConn(dsNum: number) {
+    private closeDsConn(dsNum: string) {
         if(this.allDriverStations[dsNum].udpConn) {
             this.allDriverStations[dsNum].udpConn.close();
         }
         if(this.allDriverStations[dsNum].tcpConn) {
             this.allDriverStations[dsNum].tcpConn.end();
+        }
+    }
+
+    // Close All DS Connections
+    private closeAllDSConns() {
+        for(const i in this.allDriverStations) {
+            this.closeDsConn(i);
+        }
+    }
+
+    // DriverStation Things to do on prestart
+    public onPrestart(match: Match) {
+        // Close all DS Connections before we overwrite them
+        this.closeAllDSConns();
+        // Init New DriverStation Objects
+        for(const t in match.participants) { // run through list of match participants looking for a match
+            const ds = new DSConn();
+            ds.teamId = match.participants[t].teamKey;
+            ds.allianceStation = match.participants[t].station;
+            this.allDriverStations[t] = ds;
         }
     }
 

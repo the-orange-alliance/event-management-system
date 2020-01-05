@@ -81,6 +81,10 @@ export class EmsFrcFms {
                 if(!match) {
                     logger.info('Received prestart command, but found no active match');
                 }
+                // Call DriverStation Prestart
+                DriverstationSupport.getInstance().onPrestart(this.activeMatch);
+                // Init Field Hardware (AP, Switch)
+                // TODO
             }).catch((err) => {
                 logger.info('Received prestart command, but found no active match');
             });
@@ -88,16 +92,12 @@ export class EmsFrcFms {
     }
 
     private initTimer() {
-
         SocketProvider.on("match-start", (timerJSON: any) => {
             this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
             // Signal DriverStation Start
             DriverstationSupport.getInstance().driverStationMatchStart();
             this._timer.on("match-end", () => {
-                this._timer.removeAllListeners("match-transition");
-                this._timer.removeAllListeners("match-tele");
-                this._timer.removeAllListeners("match-endgame");
-                this._timer.removeAllListeners("match-abort");
+                this.removeMatchlisteners()
             });
             this._timer.start();
             this.updateTimer();
@@ -112,11 +112,15 @@ export class EmsFrcFms {
         SocketProvider.on("match-abort", () => {
             this._timer.abort();
             this.updateTimer();
-            this._timer.removeAllListeners("match-transition");
-            this._timer.removeAllListeners("match-tele");
-            this._timer.removeAllListeners("match-endgame");
-            this._timer.removeAllListeners("match-end");
+            this.removeMatchlisteners();
         });
+    }
+
+    private removeMatchlisteners() {
+        this._timer.removeAllListeners("match-transition");
+        this._timer.removeAllListeners("match-tele");
+        this._timer.removeAllListeners("match-endgame");
+        this._timer.removeAllListeners("match-end");
     }
 
     private updateTimer() {

@@ -18,8 +18,8 @@ export default class DSConn {
     private _lastRobotLinkedTime:       number; // date
     private _packetCount:               number;
     private _missedPacketOffset:        number;
-    private _tcpConn:                   dgram.Socket;
-    private _udpConn:                   net.Socket;
+    private _tcpConn:                   net.Socket;
+    private _udpConn:                   dgram.Socket;
     // TODO Add Logging functionality
 
     constructor() {
@@ -154,19 +154,19 @@ export default class DSConn {
         this._missedPacketOffset = value;
     }
 
-    get tcpConn(): dgram.Socket {
+    get tcpConn(): net.Socket {
         return this._tcpConn;
     }
 
-    set tcpConn(value: dgram.Socket) {
+    set tcpConn(value: net.Socket) {
         this._tcpConn = value;
     }
 
-    get udpConn(): net.Socket {
+    get udpConn(): dgram.Socket {
         return this._udpConn;
     }
 
-    set udpConn(value: net.Socket) {
+    set udpConn(value: dgram.Socket) {
         this._udpConn = value;
     }
 }

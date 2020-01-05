@@ -9,7 +9,7 @@ const logger = Winston.createLogger({
     Winston.format.timestamp({
       format: "YYYY-MM-DD HH:mm:ss"
     }),
-    Winston.format.printf(info => `[${info.level}][${info.timestamp}]: ${info.message}`)
+    Winston.format.printf(info => `[ems-frc-fms][${info.level}][${info.timestamp}]: ${info.message}`)
   ),
   exitOnError: false
 });

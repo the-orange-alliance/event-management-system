@@ -2,15 +2,15 @@ import * as dgram from "dgram";
 import * as net from "net";
 import DSConn from "./models/DSConn"
 import logger from "./logger";
-import {EMSProvider, FGC_CONFIG, FTC_CONFIG, MatchTimer} from "@the-orange-alliance/lib-ems";
-import {error} from "winston";
+import {EMSProvider, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {EmsFrcFms} from "./server";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
 
 const udpDSListener = dgram.createSocket('udp4');
 let tcpListener = net.createServer();
 
 
-class DriverstationSupport {
+export class DriverstationSupport {
 
     private dsTcpListenPort     = 1750;
     private dsUdpSendPort       = 1121;
@@ -18,7 +18,7 @@ class DriverstationSupport {
     private dsTcpLinkTimeoutSec = 5;
     private dsUdpLinkTimeoutSec = 1;
     private maxTcpPacketBytes   = 4096;
-    private allianceStationPositionMap: Map<String, number> = new Map<String, number>([["R1", 0], ["R2", 1], ["R3", 2], ["B1", 3], ["B2", 4], ["B3", 5]]);
+    private connectedToTOASock  = false;
 
     private allDriverStations: Array<DSConn> = new Array(6);
     private currentMatch: Match = new Match(); // TODO: Update via websocket so it doesnt suck (currently updating when DS connects)
@@ -26,7 +26,6 @@ class DriverstationSupport {
     private static _instance: DriverstationSupport;
 
     public constructor() {
-
     }
 
     public static getInstance(): DriverstationSupport {
@@ -37,6 +36,8 @@ class DriverstationSupport {
     }
 
     dsInit(host: string): any {
+        EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
+
         this.udpInit(this.dsUdpReceivePort, host);
         this.tcpInit(this.dsTcpListenPort, host);
     }
@@ -52,12 +53,16 @@ class DriverstationSupport {
             console.log('Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
         });
 
-        // TODO: Handle
-
         // Listen for New UDP Packets
-        udpDSListener.on('message', async (data: Buffer, remote) => {
-            const teamDS = await this.parseUDPPacket(data, remote);
-            this.allDriverStations[teamDS.allianceStation] = teamDS;
+        udpDSListener.on('message', (data: Buffer, remote) => {
+            const teamDS = this.parseUDPPacket(data, remote);
+            if(teamDS != null) {
+                // Close any open connections first
+                if(this.allDriverStations[teamDS.allianceStation]) {
+                    this.closeDsConn(teamDS.allianceStation)
+                }
+                this.allDriverStations[teamDS.allianceStation] = teamDS;
+            }
         });
 
         udpDSListener.bind(port, host);
@@ -70,47 +75,49 @@ class DriverstationSupport {
         // Create a new Driverstation Connection
         let ds: DSConn = new DSConn();
         ds.teamId = teamNum;
+        const match = EmsFrcFms.getInstance().activeMatch;
+        if(ds.teamId) { // if team id is defined
+            for(const t of match.participants) { // run through list of match participants looking for a match
+                if(t.team.teamKey === ds.teamId) { // found team in match participants, lets fill out alliance station
+                    ds.dsLinked = true;
+                    ds.allianceStation = t.station;
+                    ds.lastPacketTime = Date.now();
 
-        // TODO: Get Alliances from API and get alliance station number
-        EMSProvider.getActiveMatch(1).then((match) => {
-            if(ds.teamId) { // if team id is defined
-                for(const t of match.participants) { // run through list of match participants looking for a match
-                    if(t.team.teamKey === ds.teamId) { // found team in match participants, lets fill out alliance station
-                        ds.dsLinked = true;
-                        ds.allianceStation = t.station;
-                        ds.lastPacketTime = Date.now();
-
-                        ds.radioLinked = (data[3]&0x10) !== 0;
-                        ds.robotLinked = (data[3]&0x20) !== 0;
-                        if (ds.robotLinked) {
-                            ds.lastRobotLinkedTime = Date.now();
-                            // Robot battery voltage, stored as volts * 256.
-                            ds.batteryVoltage = data[6] + data[7]/256;
-                        }
-                        return ds;
+                    ds.radioLinked = (data[3]&0x10) !== 0;
+                    ds.robotLinked = (data[3]&0x20) !== 0;
+                    if (ds.robotLinked) {
+                        ds.lastRobotLinkedTime = Date.now();
+                        // Robot battery voltage, stored as volts * 256.
+                        ds.batteryVoltage = data[6] + data[7]/256;
                     }
+                    return ds;
                 }
-                // if for loop exits, we didn't find team in active match
-                logger.info('Not connecting to ' + ds.teamId + '\'s driver station in active match. Refusing connection');
-            } else {
-                // couldn't decipher team key from packet. igonre.
-                return null;
             }
+            // if for loop exits, we didn't find team in active match
+            logger.info('Not connecting to ' + ds.teamId + '\'s driver station in active match. Refusing connection');
             return null;
-        }).catch(error => {
-            logger.info('Error Connecting Driver Station: Could not get active match.');
+        } else {
+            // couldn't decipher team key from packet. igonre.
             return null;
-        });
-        return null;
+        }
     }
 
     private tcpInit(port: number, host: string) {
         tcpListener = net.createServer((socket) => {
-            //socket.write('things');
             socket.pipe(socket);
         });
 
         tcpListener.listen(port, host);
+
+        tcpListener.addListener("connection", (data) => {
+            logger.info('TCP Connection Established ' + data);
+            data.connect()
+
+        });
+
+        tcpListener.addListener("listening", () => {
+            logger.info('TCP Server Listening on ' + host + ':' + port);
+        });
 
         // TODO: Handle
     }
@@ -120,13 +127,42 @@ class DriverstationSupport {
         return new DSConn();
     }
 
-    // Sends a control packet to the Driver Station and checks for timeout conditions.
+    // Run all this stuff
     private runDS() {
-
+        // TODO
     }
 
-    private constructControlPacket (ds: DSConn): number[] {
-        const packet: Array<number> = new Array<number>(22);
+    // Send Control Packet
+    private sendControlPacket(ds: DSConn) {
+        const packet = this.constructControlPacket(ds);
+        if(ds.udpConn) {
+            ds.udpConn.send(packet, this.dsUdpReceivePort, (err) => {
+                // Yes?
+            });
+        }
+    }
+
+    // Things to do on match start
+    public driverStationMatchStart() {
+        for(const ds in this.allDriverStations) {
+            this.allDriverStations[ds].missedPacketOffset = this.allDriverStations[ds].missedPacketCount;
+        }
+    }
+
+    // Close all connections to the driver station
+    private closeDsConn(dsNum: number) {
+        if(this.allDriverStations[dsNum].udpConn) {
+            this.allDriverStations[dsNum].udpConn.close();
+        }
+        if(this.allDriverStations[dsNum].tcpConn) {
+            this.allDriverStations[dsNum].tcpConn.end();
+        }
+    }
+
+    // Construct a control packet for the Driver Station
+    private constructControlPacket (ds: DSConn): Uint8Array {
+        const packet: Uint8Array = new Uint8Array(22);
+        const activeMatch = EmsFrcFms.getInstance().activeMatch;
 
         // Packet number, stored big-endian in two bytes.
         packet[0] = (ds.packetCount >> 8) & 0xff;
@@ -154,30 +190,31 @@ class DriverstationSupport {
         packet[5] = ds.allianceStation;
 
         // Match type
-        const match =  0; // TODO
-        if (match.Type == "practice") {
+        const match = activeMatch.matchName;
+        if (match.toLowerCase().indexOf("prac") > -1) {
             packet[6] = 1
-        } else if (match.Type == "qualification") {
+        } else if (match.toLowerCase().indexOf("qual") > -1) {
             packet[6] = 2
-        } else if (match.Type == "elimination") {
+        } else if (match.toLowerCase().indexOf("elim") > -1) {
             packet[6] = 3
         } else {
             packet[6] = 0
         }
 
         // Match number.
-        if (match.Type == "practice" || match.Type == "qualification") {
-            //matchNumber, _ := strconv.Atoi(match.DisplayName)
-            packet[7] = matchNumber >> 8;
-            packet[8] = matchNumber & 0xff;
-        } else if (match.Type == "elimination") {
-            // E.g. Quarter-final 3, match 1 will be numbered 431.
+        const split = activeMatch.matchKey.split('-');
+        const localMatchNum = parseInt(split[split.length-1].substr(1))
+        if (match.toLowerCase().indexOf("practice") > -1 || match.toLowerCase().indexOf("qual") > -1) {
+            packet[7] = localMatchNum >> 8;
+            packet[8] = localMatchNum & 0xff;
+        } else if (match.toLowerCase().indexOf("elim") > -1 ) {
+            // E.g. Quarter-final 3, match 1 will be numbered 431. TODO: aaaaaaaaaaaa
             //matchNumber := match.ElimRound*100 + match.ElimGroup*10 + match.ElimInstance
-            packet[7] = matchNumber >> 8;
-            packet[8] = matchNumber & 0xff;
+            //packet[7] = matchNumber >> 8;
+            //packet[8] = matchNumber & 0xff;
         } else {
-            packet[7] = 0
-            packet[8] = 1
+            packet[7] = 0;
+            packet[8] = 1;
         }
         // Match repeat number
         packet[9] = 1;
@@ -197,38 +234,8 @@ class DriverstationSupport {
         packet[19] = currentTime.getFullYear() - 1900;
 
         // Remaining number of seconds in match.
-        let matchSecondsRemaining = 0;
-        // Other Important Times to Know:
-        const autoDurationSeconds = 15;
-        const teleopDurationSeconds = 135;
-        const pauseDurationSeconds = 1;
-        // Current Match Timer
-        const currentMatchTimerSeconds = 0; // TODO: Get from Websocket
+        const matchSecondsRemaining = EmsFrcFms.getInstance().timeLeft;
 
-        const matchState = 0; // TODO: Get From API ?Maybe Not?
-        switch (matchState) {
-            case 0: // PreMatch:
-                break;
-            case 1: // TimeoutActive:
-                break;
-            case 2: // PostTimeout:
-                matchSecondsRemaining = autoDurationSeconds;
-                break;
-            case 3: // StartMatch:
-                break;
-            case 4: // AutoPeriod:
-                matchSecondsRemaining = autoDurationSeconds - currentMatchTimerSeconds;
-                break;
-            case 5: // PausePeriod:
-                matchSecondsRemaining = teleopDurationSeconds;
-                break;
-            case 6: // TeleopPeriod:
-                matchSecondsRemaining = autoDurationSeconds + teleopDurationSeconds + pauseDurationSeconds - currentMatchTimerSeconds;
-                break;
-            default:
-                matchSecondsRemaining = 0;
-                break;
-        }
         packet[20] = matchSecondsRemaining >> 8 & 0xff;
         packet[21] = matchSecondsRemaining & 0xff;
 
@@ -236,6 +243,15 @@ class DriverstationSupport {
         ds.packetCount++;
 
         return packet;
+    }
+
+    // Decodes a Driver Station status packet
+    private decodeStatusPacket(data, dsNum: number) {
+        // Average DS-robot trip time in milliseconds.
+        this.allDriverStations[dsNum].dsRobotTripTimeMs = data[1] / 2;
+
+        // Number of missed packets sent from the DS to the robot.
+        this.allDriverStations[dsNum].missedPacketCount = data[2] - this.allDriverStations[dsNum].missedPacketOffset;
     }
 }
 

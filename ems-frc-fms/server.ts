@@ -20,8 +20,6 @@ dotenv.config({path: path.join(__dirname, "../.env")});
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 
-
-const mode = (process.env.NODE_ENV || "development").toUpperCase();
 let host = process.env.HOST || "127.0.0.1";
 
 if (process.argv[2] && process.argv[2].match(ipRegex)) {
@@ -30,14 +28,15 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 
 export class EmsFrcFms {
     private static _instance: EmsFrcFms;
-    public _timer: MatchTimer;
-    public activeMatch: Match;
-    public timeLeft: number;
-    public matchState: number;
+    public _timer: MatchTimer = new MatchTimer();
+    public activeMatch: Match = new Match();
+    public timeLeft: number = 0;
+    public matchState: number = 0;
+    private dsInterval: any;
     public matchStateMap: Map<String, number> = new Map<String, number>([["prestart", 0], ["timeout", 1], ["post-timeout", 2], ["start-match", 3], ["auto", 4], ["transition", 5], ["tele", 5]]);
 
     constructor() {
-
+        this.initFms();
     }
 
     public static getInstance(): EmsFrcFms {
@@ -50,6 +49,7 @@ export class EmsFrcFms {
     public initFms() {
         //Init EMS
         EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
+        process.env.REACT_APP_EMS_SCK_PORT = '8800';
         SocketProvider.initialize((host));
         this.initSocket();
 
@@ -62,16 +62,22 @@ export class EmsFrcFms {
 
         // More Things
         this.timeLeft = this._timer.timeLeft;
+
+        // Start Driver Station Updates
+        this.startDriverStation();
     }
 
     private initSocket() {
         // Setup Socket Connect/Disconnect
         SocketProvider.on("connect", () => {
-            logger.info("Connected to SocketIO.");
+            logger.info("Connected to EMS through SocketIO.");
             SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring"]);
         });
         SocketProvider.on("disconnect", () => {
             logger.info("Disconnected from SocketIO.");
+        });
+        SocketProvider.on("error", () => {
+            logger.info("Error With SocketIO, not connected to EMS");
         });
 
         // Manage Socket Events
@@ -132,6 +138,11 @@ export class EmsFrcFms {
             displayTime = this._timer.timeLeft - this._timer.matchConfig.transitionTime;
         }
         this.timeLeft = this._timer.timeLeft;
+    }
+
+    private startDriverStation() {
+        this.dsInterval = setInterval(()=> { DriverstationSupport.getInstance().runDriverStations() }, 500);
+        logger.info('DriverStation Support Init Complete, Running Loop');
     }
 }
 

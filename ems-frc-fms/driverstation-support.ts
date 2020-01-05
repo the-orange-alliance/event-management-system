@@ -46,12 +46,12 @@ export class DriverstationSupport {
     private udpInit(port: number, host: string) {
         udpDSListener.on('listening', function() {
             const address = udpDSListener.address();
-            console.log('Listening for DriverStations on UDP ' + address.address + ':' + address.port);
+            logger.info('Listening for DriverStations on UDP ' + address.address + ':' + address.port);
         });
 
         udpDSListener.on('error', function() {
             const address = udpDSListener.address();
-            console.log('Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
+            logger.info('Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
         });
 
         // Listen for New UDP Packets
@@ -60,7 +60,7 @@ export class DriverstationSupport {
             if(teamDS != null) {
                 // Close any open connections first
                 if(this.allDriverStations[teamDS.allianceStation]) {
-                    this.closeDsConn(teamDS.allianceStation + '')
+                    this.closeDsConn(teamDS.allianceStation)
                 }
                 this.allDriverStations[teamDS.allianceStation] = teamDS;
             }
@@ -70,7 +70,7 @@ export class DriverstationSupport {
     }
 
     // Parse a UDP packet from the Driver Station
-    private parseUDPPacket(data: Buffer, remote: any): DSConn {
+    private parseUDPPacket(data: Buffer, remote: any): any {
         logger.info('UDP Message from ' + remote.address + ':' + remote.port +' - ' + data);
 
         const teamNum = data[4]<<8 + data[5];
@@ -94,22 +94,25 @@ export class DriverstationSupport {
                 }
             }
             // if for loop exits, we didn't find team in active match
-            logger.info('Not connecting to ' + ds.teamId + '\'s driver station in active match. Refusing connection');
-            return null;
+            logger.info('Not connecting to ' + ds.teamId + '\'s driver station. (Not in active match) Refusing connection');
+            return;
         } else {
-            // couldn't decipher team key from packet. igonre.
-            return null;
+            // couldn't decipher team key from packet. ignore.
+            return;
         }
     }
 
     // Init the TCP server: This create connections to each Driver Station
     private tcpInit(port: number, host: string) {
         tcpListener = net.createServer((socket: net.Socket) => {
-            logger.info('TCP server started on ' + socket.remoteAddress + ':' + socket.remotePort );
             socket.pipe(socket);
         });
 
         tcpListener.listen(port, host);
+
+        tcpListener.on("listening", () => {
+            logger.info('Listening for DriverStations on TCP ' + host + ':' + port);
+        });
 
         tcpListener.on("connection", (socket: net.Socket) => {
             logger.info(`New DS TCP Connection Established for ${socket.remoteAddress}:${socket.remotePort}`);
@@ -164,8 +167,16 @@ export class DriverstationSupport {
         // Read the team number from the IP address to check for a station mismatch.
         let dsStationStatus = 0;
         const ipAddress = socket.remoteAddress;
+        if(!ipAddress) {
+            logger.info('Could not get IP address from first TCP packet. Ignoring.')
+            return;
+        }
         const teamRegex = new RegExp("\\d+\\.(\\d+)\\.(\\d+)\\.");
         const teamDigits = teamRegex.exec(ipAddress);
+        if (!teamDigits) {
+            logger.info('Could not get team number from IP Address. Ignoring.');
+            return;
+        }
         const td1 = parseInt(teamDigits[1]);
         const td2 = parseInt(teamDigits[2]);
         const stationTeamId = (td1*100) + td2;
@@ -191,13 +202,13 @@ export class DriverstationSupport {
         newDs.recievedFirstPacket = true;
         newDs.tcpConn = tcpConn;
         newDs.udpConn = dgram.createSocket("udp4");
-        newDs.ipAddress = tcpConn.remoteAddress;
+        if(tcpConn.remoteAddress) newDs.ipAddress = tcpConn.remoteAddress;
         newDs.allianceStation = allianceStation;
         return new DSConn();
     }
 
     // Run all this stuff
-    private runDriverStations() {
+    public runDriverStations() {
         for(const i in this.allDriverStations) {
             this.sendControlPacket(this.allDriverStations[i]);
             const diff = Date.now() - new Date(this.allDriverStations[i].lastPacketTime).getDate();
@@ -229,7 +240,7 @@ export class DriverstationSupport {
     }
 
     // Close all connections to the driver station
-    private closeDsConn(dsNum: string) {
+    private closeDsConn(dsNum: number) {
         if(this.allDriverStations[dsNum].udpConn) {
             this.allDriverStations[dsNum].udpConn.close();
         }
@@ -240,8 +251,10 @@ export class DriverstationSupport {
 
     // Close All DS Connections
     private closeAllDSConns() {
-        for(const i in this.allDriverStations) {
+        let i = 0;
+        while(i < this.allDriverStations.length) {
             this.closeDsConn(i);
+            i++;
         }
     }
 
@@ -345,7 +358,7 @@ export class DriverstationSupport {
     }
 
     // Decodes a Driver Station status packet
-    private decodeStatusPacket(data, dsNum: number) {
+    private decodeStatusPacket(data: Buffer, dsNum: number) {
         // Average DS-robot trip time in milliseconds.
         this.allDriverStations[dsNum].dsRobotTripTimeMs = data[1] / 2;
 

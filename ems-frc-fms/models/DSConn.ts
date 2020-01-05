@@ -25,7 +25,26 @@ export default class DSConn {
     // TODO Add Logging functionality
 
     constructor() {
-        this.recievedFirstPacket = false;
+        this._teamId = -1;
+        this._allianceStation = -1;
+        this._auto = false;
+        this._enabled = false;
+        this._estop = false;
+        this._dsLinked = false;
+        this._radioLinked = false;
+        this._robotLinked = false;
+        this._batteryVoltage = 0;
+        this._dsRobotTripTimeMs = 0;
+        this._missedPacketCount = 0;
+        this._secondsSinceLastRobotLink = 0;
+        this._lastPacketTime = 0;
+        this._lastRobotLinkedTime = 0;
+        this._packetCount = 0;
+        this._ipAddress = '';
+        this._missedPacketOffset = 0;
+        this._recievedFirstPacket = false;
+        this._tcpConn = new net.Socket();
+        this._udpConn = new dgram.Socket;
     }
 
     get teamId(): number {

@@ -18,10 +18,8 @@ export class DriverstationSupport {
     private dsTcpLinkTimeoutSec = 5;
     private dsUdpLinkTimeoutSec = 1;
     private maxTcpPacketBytes   = 4096;
-    private connectedToTOASock  = false;
 
     private allDriverStations: Array<DSConn> = new Array(6);
-    private currentMatch: Match = new Match(); // TODO: Update via websocket so it doesnt suck (currently updating when DS connects)
 
     private static _instance: DriverstationSupport;
 
@@ -123,6 +121,10 @@ export class DriverstationSupport {
             });
 
             this.allDriverStations[0].tcpConn = socket;
+        });
+
+        tcpListener.on('error', (chunk: Buffer) => {
+            logger.info('Driver Station TCP listener Error.');
         });
     }
 
@@ -226,7 +228,7 @@ export class DriverstationSupport {
     private sendControlPacket(ds: DSConn) {
         const packet = this.constructControlPacket(ds);
         if(ds.udpConn) {
-            ds.udpConn.send(packet, this.dsUdpReceivePort, ds.ipAddress, (err) => {
+            ds.udpConn.send(packet, this.dsUdpSendPort, ds.ipAddress, (err) => {
                 // Yes?
             });
         }

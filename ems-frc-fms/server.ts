@@ -20,7 +20,7 @@ dotenv.config({path: path.join(__dirname, "../.env")});
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 
-let host = process.env.HOST || "127.0.0.1";
+let host = process.env.HOST || "10.0.100.5";
 
 if (process.argv[2] && process.argv[2].match(ipRegex)) {
     host = process.argv[2];

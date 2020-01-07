@@ -59,7 +59,7 @@ export class DriverstationSupport {
 
     // Parse a UDP packet from the Driver Station
     private parseUDPPacket(data: Buffer, remote: any) {
-        const teamNum = data[4]<<8 + data[5];
+        const teamNum = (data[4]<<8) + data[5];
         if(teamNum) { // if team id is defined
             for(const i in this.allDriverStations) { // run through current driver staions
                 if(this.allDriverStations[i].teamId === teamNum) { // found team in DS list
@@ -73,6 +73,7 @@ export class DriverstationSupport {
                         // Robot battery voltage, stored as volts * 256.
                         this.allDriverStations[i].batteryVoltage = data[6] + data[7]/256;
                     }
+                    return;
                 }
             }
             // if for loop exits, we didn't find team in active match
@@ -104,7 +105,7 @@ export class DriverstationSupport {
 
                 socket.on("timeout", (err: Error) => logger.info("Driver Station TCP Timeout"));
                 socket.on("close", (wasError: boolean) => logger.info("Driver Station TCP Closed. Error: " + wasError));
-                socket.on("error", (err: Error) => logger.info('Error occurred on Driver Station TCP socket: ' + err.message));
+                socket.on("error", (err: Error) => logger.alert('Error occurred on Driver Station TCP socket: ' + err.message));
             } else {
                 socket.destroy();
             }
@@ -191,8 +192,11 @@ export class DriverstationSupport {
         returnPacket[0] = 0; // Packet Size
         returnPacket[1] = 3; // Packet Size
         returnPacket[2] = 25; // Packet Type
-        returnPacket[3] = station;
-        returnPacket[4] = dsStationStatus;
+        returnPacket[3] = station; // Station TODO: Investigate why this is wrong
+        returnPacket[4] = dsStationStatus; // Station Status
+        // Station Status:
+        // 1 = "Move to Station"
+        // 2 = "Waiting..."
 
         /*
         const packetStream = new stream.PassThrough();
@@ -222,8 +226,9 @@ export class DriverstationSupport {
     // Run all this stuff
     public runDriverStations() {
         for(const i in this.allDriverStations) {
-            if(this.allDriverStations[i] && this.allDriverStations[i].dsLinked){
+            if(this.allDriverStations[i] && this.allDriverStations[i].recievedFirstPacket){
                 this.sendControlPacket(this.allDriverStations[i]);
+                this.allDriverStations[i].tcpConn.write('');
                 const diff = Date.now() - new Date(this.allDriverStations[i].lastPacketTime).getDate();
                 if(Math.abs(diff/1000) > this.dsTcpLinkTimeoutSec) {
                     this.allDriverStations[i].dsLinked = false;
@@ -241,7 +246,6 @@ export class DriverstationSupport {
     private sendControlPacket(ds: DSConn) {
         const packet = this.constructControlPacket(ds);
         if(ds.udpConn) {
-            ds.udpConn.emit("");
             ds.udpConn.send(packet, this.dsUdpSendPort, ds.ipAddress, (err) => {
                 // Yes?
             });

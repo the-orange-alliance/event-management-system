@@ -1,0 +1,24 @@
+{
+  "name": "ems-frc-fms",
+  "version": "0.0.1",
+  "description": "Module for EMS to integrate with FRC field electronics and robots.",
+  "main": "server.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -- --watch",
+    "start": "tsc && node build/server.js"
+  },
+  "author": "Soren Zaiser, Kyle Flynn",
+  "license": "GPL-2.0",
+  "dependencies": {
+    "@the-orange-alliance/lib-ems": "^0.7.24",
+    "@types/dotenv": "^8.2.0",
+    "dgram": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "net": "^1.0.2",
+    "path": "^0.12.7",
+    "socket.io": "^2.3.0",
+    "typescript": "^3.7.4",
+    "winston": "^3.2.1"
+  }
+}

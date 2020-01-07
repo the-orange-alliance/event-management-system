@@ -7,10 +7,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {reducers} from "./stores";
 import {createStore} from "redux";
 import {CONFIG_STORE} from "./AppStore";
-import {IConfigState} from "./stores/config/models";
 import * as Config from "./stores/config/reducer";
 import * as Internal from "./stores/internal/reducer";
-import {IInternalState} from "./stores/internal/models";
 import ProcessManager from "./managers/ProcessManager";
 import DialogManager from "./managers/DialogManager";
 import {AppError, EliminationsSchedule, EMSProvider, Process, RoundRobinSchedule} from "@the-orange-alliance/lib-ems";
@@ -22,12 +20,12 @@ const {ipcRenderer} = (window as any).require("electron");
 console.log("Preloading application state...");
 
 ProcessManager.performStartupCheck().then((procList: Process[]) => {
-  const internalState: IInternalState = Internal.initialState;
+  const internalState = Internal.initialState;
   internalState.processList = procList;
 
   CONFIG_STORE.getAll().then((configStore: any) => {
 
-    const configState: IConfigState = Config.initialState;
+    const configState = Config.initialState;
 
     configState.networkHost = procList[0].address;
 

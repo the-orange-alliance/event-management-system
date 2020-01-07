@@ -92,9 +92,9 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
     this.setState({activeIndex: 3});
   }
 
-  private onPublishSchedule() {
+  private onPublishSchedule(upload: boolean) {
     this.props.setNavigationDisabled(true);
-    if (this.props.toaConfig.enabled) {
+    if (this.props.toaConfig.enabled && upload) {
       UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.qualificationMatches).then(() => {
         console.log(`${this.props.qualificationMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {

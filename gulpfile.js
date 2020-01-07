@@ -134,6 +134,14 @@ gulp.task("place-resources", () => {
   gulp.src(["ems-core/res/**/*"]).pipe(gulp.dest("build/resources"));
 });
 
+/* Install latest versions of lib-ems */
+gulp.task("install-deps", () => {
+  gulp.src("audience-display/package.json").pipe(install());
+  gulp.src("ems-core/package.json").pipe(install());
+  gulp.src("ems-socket/package.json").pipe(install());
+  gulp.src("ref-tablet/package.json").pipe(install());
+});
+
 /* .env tasks */
 gulp.task("update-env:prod", ["generate-env:prod", "deploy-env"]);
 gulp.task("update-env", ["generate-env", "deploy-env"]);

@@ -31,12 +31,15 @@ router.get("/calculate/:tournament_level", (req: Request, res: Response, next: N
   } else {
     DatabaseManager.getMatchResultsForRankings(req.query.type, req.params.tournament_level).then((rows: any[]) => {
       logger.info(`Re-calculating rankings for ${req.query.type}.`);
+      console.log(rows);
       const ranker: IMatchRanker = getRankerByType(req.query.type);
       const rankJSON: any = ranker.execute(rows).map((rank: IPostableObject) => rank.toJSON());
       if (rankJSON.length > 0) {
         const promises: Array<Promise<any>> = [];
         for (const ranking of rankJSON) {
           delete ranking.team;
+          delete ranking.alliance_key;
+          ranking.rank_key = ranking.rank_key.replace("-ER", "R");
           promises.push(DatabaseManager.updateWhere("ranking", ranking, "rank_key=\"" + ranking.rank_key + "\""));
         }
         Promise.all(promises).then((values: any[]) => {

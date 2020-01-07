@@ -6,6 +6,8 @@ import RED_WIN from "../res/Red_Win_Top.png";
 import RED_LOSE from "../res/Red_Lose_Top.png";
 import BLUE_WIN from "../res/Blue_Win_Top.png";
 import BLUE_LOSE from "../res/Blue_Lose_Top.png";
+import FGC_LEFT_LOGO from "../res/Logo-V.png";
+import FGC_RIGHT_LOGO from "../res/Powered by.png";
 
 interface IProps {
   match: Match
@@ -118,7 +120,7 @@ class MatchResultsScreen extends React.Component<IProps> {
                   <div className="res-detail-row bottom-blue">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>
                     <div className="res-detail-left right-blue">REDUCTION PROCESSING</div>
-                    <div className="res-detail-right">{details.blueProcessingBargeReuse}</div>
+                    <div className="res-detail-right">{details.blueReductionProcessing}</div>
                   </div>
                   <div className="res-detail-row bottom-blue">
                     <div className="res-detail-icon"><img src={""} className="fit-h"/></div>
@@ -148,6 +150,15 @@ class MatchResultsScreen extends React.Component<IProps> {
             </div>
           </div>
         </div>
+
+        <div id={"res-left-side-logo"} className={"center-items"}>
+          <img src={FGC_LEFT_LOGO} className={"fit-w"}/>
+        </div>
+
+        <div id={"res-right-side-logo"} className={"center-items"}>
+          <img src={FGC_RIGHT_LOGO} className={"fit-w"}/>
+        </div>
+
       </div>
     );
   }

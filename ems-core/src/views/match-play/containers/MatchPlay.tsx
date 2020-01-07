@@ -163,7 +163,7 @@ class MatchPlay extends React.Component<IProps, IState> {
               <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[0] || !canPrestart} color="orange" onClick={this.beginPrestart}>Prestart</Button></Grid.Column>
             }
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[1]} color="blue" onClick={this.setAudienceDisplay}>Set Audience Display</Button></Grid.Column>
-            <Grid.Column width={1}><Button fluid={true} disabled={disabledStates[2]} color="grey" onClick={this.dumpBalls}>Dump</Button></Grid.Column>
+            <Grid.Column width={1}><Button className={"center"} fluid={true} disabled={disabledStates[2]} color="brown" onClick={this.dumpBalls}>DMP</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[2]} color="purple" onClick={this.startMatch}>Start Match</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[3]} color="red" onClick={this.abortMatch}>Abort Match</Button></Grid.Column>
             <Grid.Column width={3}><Button fluid={true} disabled={disabledStates[4]} loading={committingScores} color="green" onClick={this.commitScores}>Commit Scores</Button></Grid.Column>
@@ -255,9 +255,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       this.props.timer.start();
     });
     SocketProvider.once("match-end", () => {
-      console.log(this.props.activeMatch.matchKey);
       this.props.setMatchState(MatchState.MATCH_COMPLETE);
-      SocketProvider.off("score-update");
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
       const match: Match = new Match().fromJSON(matchJSON);
@@ -329,7 +327,7 @@ class MatchPlay extends React.Component<IProps, IState> {
         participant.cardStatus = 0;
       }
     }
-    MatchManager.commitScores(activeMatch, eventConfig).then(() => {
+    MatchManager.commitScores(activeMatch, eventConfig, true).then(() => {
       SocketProvider.emit("control-update", PACKET_BALL_RESET);
 
       if (this.props.toaConfig.enabled) {
@@ -356,6 +354,7 @@ class MatchPlay extends React.Component<IProps, IState> {
           // if (this.props.elimsMatches.length < matches.length) { // TODO - This NEEDS to change!
           //   this.props.setEliminationsMatches(matches);
           // }
+          SocketProvider.off("score-update");
           if (this.props.backupDir.length > 0) {
             InternalStateManager.createBackup(this.props.backupDir);
           }
@@ -363,6 +362,7 @@ class MatchPlay extends React.Component<IProps, IState> {
           console.error(error);
         });
       } else {
+        SocketProvider.off("score-update");
         if (this.props.backupDir.length > 0) {
           InternalStateManager.createBackup(this.props.backupDir);
         }
@@ -449,7 +449,7 @@ class MatchPlay extends React.Component<IProps, IState> {
             const participants: MatchParticipant[] = [];
             for (let i = 0; i < match.participants.length; i++) {
               const participant: MatchParticipant = match.participants[i];
-              if (typeof data.participants[i] !== "undefined") {
+              if (typeof data !== "undefined" && typeof data.participants[i] !== "undefined") {
                 if (participant.teamKey !== data.participants[i].teamKey) {
                   participants.push(data.participants[i]);
                 } else {

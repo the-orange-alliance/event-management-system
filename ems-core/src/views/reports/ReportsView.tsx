@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, Card, Checkbox, CheckboxProps, Grid, Tab, TabProps} from "semantic-ui-react";
+import {Button, Card, Checkbox, CheckboxProps, Dropdown, DropdownProps, Grid, Tab, TabProps} from "semantic-ui-react";
 import {SyntheticEvent} from "react";
 import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
@@ -18,7 +18,7 @@ import OtherCompetingTeams from "./reports/OtherCompetingTeams";
 import QualificationMatchResults from "./reports/QualificationMatchResults";
 import QualificationAnnouncers from "./reports/QualificationAnnouncers";
 // import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
-import {EventConfiguration} from "@the-orange-alliance/lib-ems";
+import {Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
 import NumericInput from "../../components/NumericInput";
 import PracticeScheduleQueueing from "./reports/PracticeScheduleQueueing";
 import QualificationScheduleQueueing from "./reports/QualificationScheduleQueueing";
@@ -30,6 +30,7 @@ import PlayoffsScheduleByTeam from "./reports/PlayoffsScheduleByTeam";
 import PlayoffsScheduleByTeamQueueing from "./reports/PlayoffsScheduleByTeamQueueing";
 
 interface IProps {
+  event?: Event,
   eventConfig?: EventConfiguration,
   navigationDisabled?: boolean
 }
@@ -40,7 +41,8 @@ interface IState {
   hasGeneratedReport: boolean,
   htmlString: string,
   queueingTime: number,
-  useUTC: boolean
+  useUTC: boolean,
+  reportFields: number[]
 }
 
 class ReportsView extends React.Component<IProps, IState> {
@@ -52,7 +54,8 @@ class ReportsView extends React.Component<IProps, IState> {
       hasGeneratedReport: false,
       htmlString: "",
       queueingTime: 5,
-      useUTC: false
+      useUTC: false,
+      reportFields: props.eventConfig.fieldsControlled
     };
     this.onTabChange = this.onTabChange.bind(this);
     this.openReportInBrowser = this.openReportInBrowser.bind(this);
@@ -81,6 +84,7 @@ class ReportsView extends React.Component<IProps, IState> {
 
     this.updateQueueingTime = this.updateQueueingTime.bind(this);
     this.updateUsingUTC = this.updateUsingUTC.bind(this);
+    this.setReportFields = this.setReportFields.bind(this);
   }
 
   public render() {
@@ -95,8 +99,15 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private renderReports() {
-    const {eventConfig} = this.props;
-    const {queueingTime, useUTC} = this.state;
+    const {event, eventConfig} = this.props;
+    const {queueingTime, useUTC, reportFields} = this.state;
+
+    const fields = event.fieldCount || 0;
+    const fieldOptions = [];
+    for (let i = 0; i < fields; i++) {
+      fieldOptions.push({text: "Field " + (i + 1), value: i + 1});
+    }
+
     return (
       <Tab.Pane className="tab-subview">
         <Card.Group itemsPerRow={3}>
@@ -202,12 +213,34 @@ class ReportsView extends React.Component<IProps, IState> {
                     <Checkbox fluid={true} label={'Use UTC Time'} checked={useUTC} onChange={this.updateUsingUTC}/>
                   </Grid.Column>
                 </Grid.Row>
+                <Grid.Row columns={4}>
+                  <Grid.Column width={3} className="center-left-items">
+                    <span>Report Fields</span>
+                  </Grid.Column>
+                  <Grid.Column width={13}>
+                    <Dropdown
+                      fluid={true}
+                      selection={true}
+                      multiple={true}
+                      value={reportFields}
+                      options={fieldOptions}
+                      onChange={this.setReportFields}
+                    />
+                  </Grid.Column>
+                </Grid.Row>
               </Grid>
             </Card.Content>
           </Card>
         </Card.Group>
       </Tab.Pane>
     );
+  }
+
+  private setReportFields(event: SyntheticEvent, props: DropdownProps) {
+    if ((props.value as number[]).length > 0) {
+      this.setState({reportFields: (props.value as number[]).sort()});
+      this.forceUpdate();
+    }
   }
 
   private renderGeneratedReport() {
@@ -267,61 +300,68 @@ class ReportsView extends React.Component<IProps, IState> {
   }
 
   private generatePracticeSchedule() {
-    this.generateReport(<PracticeSchedule onHTMLUpdate={this.updateHTML}/>);
+    const {reportFields} = this.state;
+    this.generateReport(<PracticeSchedule fields={reportFields} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePracticeQueueingSchedule() {
-    const {queueingTime, useUTC} = this.state;
-    this.generateReport(<PracticeScheduleQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+    const {queueingTime, useUTC, reportFields} = this.state;
+    this.generateReport(<PracticeScheduleQueueing fields={reportFields} queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationSchedule() {
-    this.generateReport(<QualificationSchedule onHTMLUpdate={this.updateHTML}/>);
+    const {reportFields} = this.state;
+    this.generateReport(<QualificationSchedule fields={reportFields} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationQueueingSchedule() {
-    const {queueingTime, useUTC} = this.state;
-    this.generateReport(<QualificationScheduleQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+    const {queueingTime, useUTC, reportFields} = this.state;
+    this.generateReport(<QualificationScheduleQueueing fields={reportFields} queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationAnnouncers() {
-    this.generateReport(<QualificationAnnouncers onHTMLUpdate={this.updateHTML}/>)
+    const {reportFields} = this.state;
+    this.generateReport(<QualificationAnnouncers fields={reportFields} onHTMLUpdate={this.updateHTML}/>)
   }
 
   private generatePostQualSchedule() {
-    this.generateReport(<PlayoffsSchedule onHTMLUpdate={this.updateHTML}/>);
+    const {reportFields} = this.state;
+    this.generateReport(<PlayoffsSchedule fields={reportFields} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePostQualScheduleQueueing() {
-    const {queueingTime, useUTC} = this.state;
-    this.generateReport(<PlayoffsScheduleQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+    const {queueingTime, useUTC, reportFields} = this.state;
+    this.generateReport(<PlayoffsScheduleQueueing fields={reportFields} queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePracticeScheduleByTeam() {
-    this.generateReport(<PracticeScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    const {reportFields} = this.state;
+    this.generateReport(<PracticeScheduleByTeam fields={reportFields} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePracticeScheduleByTeamQueueing() {
-    const {queueingTime, useUTC} = this.state;
-    this.generateReport(<PracticeScheduleByTeamQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+    const {queueingTime, useUTC, reportFields} = this.state;
+    this.generateReport(<PracticeScheduleByTeamQueueing fields={reportFields} queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationScheduleByTeam() {
-    this.generateReport(<QualificationScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    const {reportFields} = this.state;
+    this.generateReport(<QualificationScheduleByTeam fields={reportFields} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationScheduleByTeamQueueing() {
-    const {queueingTime, useUTC} = this.state;
-    this.generateReport(<QualificationScheduleByTeamQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+    const {queueingTime, useUTC, reportFields} = this.state;
+    this.generateReport(<QualificationScheduleByTeamQueueing fields={reportFields} queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePostQualScheduleByTeam() {
-    this.generateReport(<PlayoffsScheduleByTeam onHTMLUpdate={this.updateHTML}/>);
+    const {reportFields} = this.state;
+    this.generateReport(<PlayoffsScheduleByTeam fields={reportFields} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generatePostQualScheduleByTeamQueueing() {
-    const {queueingTime, useUTC} = this.state;
-    this.generateReport(<PlayoffsScheduleByTeamQueueing queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
+    const {queueingTime, useUTC, reportFields} = this.state;
+    this.generateReport(<PlayoffsScheduleByTeamQueueing fields={reportFields} queueingTime={queueingTime} useUTCTime={useUTC} onHTMLUpdate={this.updateHTML}/>);
   }
 
   private generateQualificationRankings() {
@@ -352,6 +392,7 @@ class ReportsView extends React.Component<IProps, IState> {
 
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
+    event: configState.event,
     eventConfig: configState.eventConfiguration,
     navigationDisabled: internalState.navigationDisabled
   };

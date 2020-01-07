@@ -1,7 +1,8 @@
 import * as React from "react";
 import {Match, MatchParticipant, Ranking, Team} from "@the-orange-alliance/lib-ems";
 import "./MatchPreviewScreen.css";
-import FGC_LOGO from "../res/Before_Screen_Logo.png";
+import FGC_LOGO from "../res/Logo-H.png";
+import FGC_SIDE_LOGO from "../res/Powered by.png";
 import RED_FLAG from "../res/Red_Team_Tag.png";
 import BLUE_FLAG from "../res/Blue_Team_Tag.png";
 
@@ -21,7 +22,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
       <div id="fgc-body">
         <div id="fgc-container">
           <div id="fgc-pre-header">
-            <img id="fgc-pre-logo" src={FGC_LOGO}/>
+            <img id="fgc-pre-logo" className={"fit-h"} src={FGC_LOGO}/>
           </div>
           <div id="fgc-pre-match-info">
             <div id="fgc-pre-match-info-left">
@@ -57,6 +58,10 @@ class MatchPreviewScreen extends React.Component<IProps> {
               {this.renderBlueAlliance()}
             </div>
           </div>
+        </div>
+
+        <div id={"fgc-pre-side-logo-left"} className={"center-items"}>
+          <img src={FGC_SIDE_LOGO} className={"fit-w"}/>
         </div>
       </div>
     );

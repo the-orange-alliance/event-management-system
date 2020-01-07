@@ -72,7 +72,11 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.backupDir = configStore.backupDir;
     }
 
-    EMSProvider.initialize(configState.networkHost);
+    if (configState.slaveModeEnabled) {
+      EMSProvider.initialize(configState.masterHost);
+    } else {
+      EMSProvider.initialize(configState.networkHost);
+    }
 
     InternalStateManager.pollServicesForResponse().then((res: any) => {
       InternalStateManager.refreshInternalProgress(configState.eventConfiguration).then((internalProgress: IInternalProgress) => {

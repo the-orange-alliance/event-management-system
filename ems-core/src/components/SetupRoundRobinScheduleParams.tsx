@@ -289,11 +289,13 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
         let items: ScheduleItem[] = schedule.generateSchedule(event);
         if (activeRound.id === 0) {
           if (items.length >= 8) { // TODO - Remove after FIRST Global
-            items = items.slice(0, 8);
+            const breakNum: number = items.filter((item: ScheduleItem) => !item.isMatch).length;
+            items = items.slice(0, 8 + breakNum);
           }
         } else if (activeRound.id === 1) {
           if (items.length >= 6) { // TODO - Remove after FIRST Global
-            items = items.slice(0, 6);
+            const breakNum: number = items.filter((item: ScheduleItem) => !item.isMatch).length;
+            items = items.slice(0, 6 + breakNum);
           }
         }
         onScheduleParamsComplete(items);

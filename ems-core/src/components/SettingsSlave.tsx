@@ -172,12 +172,14 @@ class SettingsSlave extends React.Component<IProps, IState> {
         reject(new HttpError(1500, "ERR_TIMEOUT", "The server didn't send a response in time."));
       }, 3000);
       masterSocket.on("connect", () => {
-        masterSocket.emit("identify", ["ems-core-slave", "event"]);
+        masterSocket.emit("identify", "ems-core-slave", ["event"]);
         setTimeout(() => {
           masterSocket.emit("request-config");
         }, 250);
       });
       masterSocket.on("config-receive", (config: any) => {
+        console.log("CONFIG RECEIVED", config);
+        masterSocket.close();
         resolve(config);
       });
     });

@@ -7,6 +7,7 @@ import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
 import * as Moment from "moment";
 
 interface IProps {
+  fields: number[],
   queueingTime: number,
   useUTCTime: boolean,
   teamList?: Team[],
@@ -45,9 +46,9 @@ class PracticeScheduleQueueing extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {queueingTime, useUTCTime, onHTMLUpdate, eventConfig, practiceMatches} = this.props;
+    const {queueingTime, useUTCTime, onHTMLUpdate, eventConfig, practiceMatches, fields} = this.props;
     const {generated} = this.state;
-    const matches = practiceMatches.map(match => {
+    const matches = practiceMatches.filter((m: Match) => fields.indexOf(m.fieldNumber) > -1).map(match => {
       const participants = match.participants.map(participant => {
         if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
           return (

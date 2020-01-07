@@ -6,6 +6,7 @@ import {Dimmer, Loader, Table} from "semantic-ui-react";
 import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
+  fields: number[],
   teamList?: Team[],
   practiceMatches?: Match[],
   eventConfig?: EventConfiguration,
@@ -58,11 +59,11 @@ class PracticeScheduleByTeam extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {onHTMLUpdate, eventConfig} = this.props;
+    const {onHTMLUpdate, eventConfig, fields} = this.props;
     const {generated} = this.state;
     const reports: JSX.Element[] = [];
     this._teamMatches.forEach((teamMatches: Match[], teamNumber: number) => {
-      const matches = teamMatches.map(match => {
+      const matches = teamMatches.filter((m: Match) => fields.indexOf(m.fieldNumber) > -1).map(match => {
         const participants = match.participants.map(participant => {
           if (typeof this._teamMap.get(participant.teamKey) !== "undefined") {
             return (

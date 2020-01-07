@@ -109,7 +109,7 @@ class MatchManager {
     });
   }
 
-  public commitScores(match: Match, config: EventConfiguration): Promise<any> {
+  public commitScores(match: Match, config: EventConfiguration, updateDisplay: boolean): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.postMatchResults(match).then(() => {
         if (match.tournamentLevel > Match.PRACTICE_LEVEL) {
@@ -122,7 +122,7 @@ class MatchManager {
                   resolve();
                 }
               });
-              SocketProvider.send("commit-scores", match.matchKey);
+              SocketProvider.emit("commit-scores", match.matchKey, updateDisplay);
               resolve();
             }).catch((rankError: HttpError) => {
               reject(rankError);
@@ -137,7 +137,7 @@ class MatchManager {
                 resolve();
               }
             });
-            SocketProvider.send("commit-scores", match.matchKey);
+            SocketProvider.emit("commit-scores", match.matchKey, updateDisplay);
             resolve();
           }, 250);
         }
@@ -155,10 +155,12 @@ class MatchManager {
       promises.push(EMSProvider.getMatchTeams(matchKey));
       Promise.all(promises).then((values: any[]) => {
         const match: Match = values[0];
-        if (Array.isArray(values[1])) {
+        if (Array.isArray(values[1]) && values[1].length > 0) {
           match.matchDetails = values[1][0];
         }
-        match.participants = values[2];
+        if (Array.isArray(values[2]) && values[2].length > 2) {
+          match.participants = values[2];
+        }
         resolve(match);
       }).catch((error: any) => {
         reject(error);

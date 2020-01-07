@@ -29,7 +29,8 @@ class QualificationRankings extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    EMSProvider.getRankingTeams().then((rankings: any[]) => {
+    const {eventConfig} = this.props;
+    EMSProvider.getRankingTeams(eventConfig.eventType).then((rankings: any[]) => {
       this.setState({generated: true, rankings});
     }).catch((error: HttpError) => {
       DialogManager.showErrorBox(error);

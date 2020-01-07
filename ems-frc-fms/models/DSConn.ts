@@ -44,7 +44,7 @@ export default class DSConn {
         this._missedPacketOffset = 0;
         this._recievedFirstPacket = false;
         this._tcpConn = new net.Socket();
-        this._udpConn = new dgram.Socket;
+        this._udpConn = dgram.createSocket("udp4");
     }
 
     get teamId(): number {

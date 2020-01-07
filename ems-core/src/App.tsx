@@ -48,7 +48,7 @@ class App extends React.Component<IProps> {
   }
 
   private initializeSocket(host: string) {
-    SocketProvider.initialize(host);
+    SocketProvider.initialize('localhost');
     SocketProvider.on("connect", () => {
       SocketProvider.emit("identify", "ems-core", ["scoring", "event"]);
       this.props.setSocketConnected(true);

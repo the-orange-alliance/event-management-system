@@ -50,7 +50,8 @@ export class EmsFrcFms {
         //Init EMS
         EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
         process.env.REACT_APP_EMS_SCK_PORT = '8800';
-        SocketProvider.initialize((host));
+        //SocketProvider.initialize((host));
+        SocketProvider.initialize('localhost');
         this.initSocket();
 
         // Init DriverStation listeners
@@ -71,7 +72,7 @@ export class EmsFrcFms {
         // Setup Socket Connect/Disconnect
         SocketProvider.on("connect", () => {
             logger.info("Connected to EMS through SocketIO.");
-            SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring"]);
+            SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring", "referee"]);
         });
         SocketProvider.on("disconnect", () => {
             logger.info("Disconnected from SocketIO.");
@@ -82,6 +83,7 @@ export class EmsFrcFms {
 
         // Manage Socket Events
         SocketProvider.on("prestart-response", () => {
+            logger.info('Prestart Command Issued');
             EMSProvider.getActiveMatch(1).then((match) => {
                 this.activeMatch = match;
                 if(!match) {

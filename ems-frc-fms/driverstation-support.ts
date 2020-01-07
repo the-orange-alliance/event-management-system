@@ -113,14 +113,15 @@ export class DriverstationSupport {
         });
 
         tcpListener.on("connection", (socket: net.Socket) => {
-            logger.info(`New DS TCP Connection Established for ${socket.remoteAddress}:${socket.remotePort}`);
-
-            // this should read the first packet and assign the TCP connection to the proper alliance member
-            socket.on('data', (chunk: Buffer) => {
-                this.parseTcpPacket(chunk, socket);
-            });
-
-            this.allDriverStations[0].tcpConn = socket;
+            if(this.allDriverStations[0]) {
+                logger.info(`New DS TCP Connection Established for ${socket.remoteAddress}:${socket.remotePort}`);
+                // this should read the first packet and assign the TCP connection to the proper alliance member
+                socket.on('data', (chunk: Buffer) => {
+                    this.parseTcpPacket(chunk, socket);
+                });
+            } else {
+                socket.destroy();
+            }
         });
 
         tcpListener.on('error', (chunk: Buffer) => {
@@ -133,23 +134,28 @@ export class DriverstationSupport {
         const teamId = (chunk[3]<<8) + (chunk[4]);
         let station = -1;
         let recievedFirstPacket = false;
-        for(const ds of this.allDriverStations) {
-            if(ds.teamId === teamId) {
-                station = ds.allianceStation;
-                recievedFirstPacket = ds.recievedFirstPacket;
-                break;
+        if(this.allDriverStations[0]) { // Checks if we have driver stations
+            for(const ds of this.allDriverStations) {
+                if(ds.teamId === teamId) {
+                    station = ds.allianceStation;
+                    recievedFirstPacket = ds.recievedFirstPacket;
+                    break;
+                }
             }
-        }
 
-        if(station > -1 && !recievedFirstPacket) {
-            this.handleFirstTCP(chunk, socket, teamId, station);
-        } else if (station > -1 && recievedFirstPacket) {
-            this.handleRegularTCP(chunk, socket, teamId, station);
+            if(station > -1 && !recievedFirstPacket) {
+                this.handleFirstTCP(chunk, socket, teamId, station);
+            } else if (station > -1 && recievedFirstPacket) {
+                this.handleRegularTCP(chunk, socket, teamId, station);
+            } else {
+                logger.info('Rejecting DS Connection from team ' + teamId + ' who is not in the current match.');
+                setTimeout(function(){ // wait before disconnecting
+                    socket.destroy();
+                }, 1000);
+            }
         } else {
-            logger.info('Rejecting DS Connection from team ' + teamId + ' who is not in the current match.');
-            setTimeout(function(){ // wait before disconnecting
-                socket.end();
-            }, 1000);
+            // logger.info('Driver Station tried connection, but failed due to no active match'); // Clogs u
+            socket.destroy();
         }
     }
 
@@ -247,7 +253,7 @@ export class DriverstationSupport {
             this.allDriverStations[dsNum].udpConn.close();
         }
         if(this.allDriverStations[dsNum].tcpConn) {
-            this.allDriverStations[dsNum].tcpConn.end();
+            this.allDriverStations[dsNum].tcpConn.destroy();
         }
     }
 

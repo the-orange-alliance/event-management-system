@@ -109,6 +109,7 @@ export class EmsFrcFms {
 
     private initTimer() {
         SocketProvider.on("match-start", (timerJSON: any) => {
+            logger.info('Match Started')
             this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
             // Signal DriverStation Start
             DriverstationSupport.getInstance().driverStationMatchStart();

@@ -1,0 +1,15 @@
+language: node_js
+node_js: 10
+
+install: ./install.sh
+script: npm run build
+after_success: package.sh
+
+jobs:
+  include:
+    - os: linux
+      python: 2.7
+    - os: osx
+      before_install: pyenv global 2.7.17
+    - os: windows
+      before_install: choco install python2 && npm install --global --production windows-build-tools

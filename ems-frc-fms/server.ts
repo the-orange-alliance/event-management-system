@@ -72,7 +72,7 @@ export class EmsFrcFms {
         // Setup Socket Connect/Disconnect
         SocketProvider.on("connect", () => {
             logger.info("Connected to EMS through SocketIO.");
-            SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring", "referee"]);
+            SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring", "referee", "ds"]);
         });
         SocketProvider.on("disconnect", () => {
             logger.info("Disconnected from SocketIO.");

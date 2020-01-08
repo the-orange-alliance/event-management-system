@@ -47,6 +47,28 @@ export default class DSConn {
         this._udpConn = dgram.createSocket("udp4");
     }
 
+    toJson(): object {
+        return {
+            "team_id": this.teamId,
+            "alliance_station": this.allianceStation,
+            "enabled": this.enabled,
+            "auto": this.auto,
+            "estop": this.estop,
+            "ds_linked": this.dsLinked,
+            "radio_linked": this.radioLinked,
+            "robot_linked": this.robotLinked,
+            "batt_voltage": this.batteryVoltage,
+            "robot_trip_time_ms": this.dsRobotTripTimeMs,
+            "missed_packet_count": this.missedPacketCount,
+            "sec_since_last_robot_link": this.secondsSinceLastRobotLink,
+            "last_packet_time": this.lastPacketTime,
+            "last_robot_linked_time": this.lastRobotLinkedTime,
+            "packet_count": this.packetCount,
+            "ip_address": this.ipAddress,
+            "missed_packet_offset": this.missedPacketOffset
+        };
+    }
+
     get teamId(): number {
         return this._teamId;
     }

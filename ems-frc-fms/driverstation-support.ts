@@ -4,6 +4,7 @@ import DSConn from "./models/DSConn"
 import logger from "./logger";
 import {EmsFrcFms} from "./server";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
+import {SocketProvider} from "@the-orange-alliance/lib-ems";
 
 const udpDSListener = dgram.createSocket("udp4");
 let tcpListener = net.createServer();
@@ -271,7 +272,18 @@ export class DriverstationSupport {
                 this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
             }
             i++;
+            SocketProvider.emit('ds-update-all', JSON.stringify(this.dsToJsonObj()));
         }
+    }
+
+    private dsToJsonObj(): object[] {
+        const returnObj: object[] = [];
+        let i = 0;
+        while(i < this.allDriverStations.length) {
+            if(this.allDriverStations[i]) returnObj.push(this.allDriverStations[i].toJson());
+            i++;
+        }
+        return returnObj;
     }
 
     // Send Control Packet

@@ -10,6 +10,6 @@ jobs:
     - os: linux
       python: 2.7
     - os: osx
-      before_install: pyenv global 2.7.17
+      before_install: pyenv install 2.7.17 && pyenv global 2.7.17
     - os: windows
       before_install: choco install python2 && npm install --global --production windows-build-tools

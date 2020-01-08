@@ -29,16 +29,19 @@ interface IState {
   webTested: boolean,
   toaTested: boolean,
   audTested: boolean,
+  fmsTested: boolean,
   apiTesting: boolean,
   sckTesting: boolean,
   webTesting: boolean,
   toaTesting: boolean,
   audTesting: boolean,
+  fmsTesting: boolean,
   apiConnected: boolean,
   sckConnected: boolean,
   webConnected: boolean,
   toaConnected: boolean,
   audConnected: boolean,
+  fmsConnected: boolean,
   fieldPackets: IFieldControlPacket;
 }
 
@@ -51,25 +54,30 @@ class MatchTestView extends React.Component<IProps, IState> {
       webTested: false,
       toaTested: false,
       audTested: false,
+      fmsTested: false,
       apiTesting: false,
       sckTesting: false,
       webTesting: false,
       toaTesting: false,
       audTesting: false,
+      fmsTesting: false,
       apiConnected: false,
       sckConnected: false,
       webConnected: false,
       toaConnected: false,
       audConnected: false,
+      fmsConnected: false,
       fieldPackets: {messages: [{hub: 0, function: "motor", parameters: {port: 0, setpoint: 1}}]}
     };
     this.updateSocketStatus = this.updateSocketStatus.bind(this);
     this.updateAudStatus = this.updateAudStatus.bind(this);
+    this.updateFmsStatus = this.updateFmsStatus.bind(this);
     this.testAPI = this.testAPI.bind(this);
     this.testSocketIO = this.testSocketIO.bind(this);
     this.testWeb = this.testWeb.bind(this);
     this.testTOA = this.testTOA.bind(this);
     this.testAudience = this.testAudience.bind(this);
+    this.testFMS = this.testFMS.bind(this);
 
     this.sendAllMessages = this.sendAllMessages.bind(this);
     this.addMessage = this.addMessage.bind(this);
@@ -82,6 +90,7 @@ class MatchTestView extends React.Component<IProps, IState> {
     }
     SocketProvider.on("drop", this.updateSocketStatus);
     SocketProvider.on("test-audience-success", this.updateAudStatus);
+    SocketProvider.on("ds-all", this.updateFmsStatus);
   }
 
   public componentWillUnmount() {
@@ -90,8 +99,8 @@ class MatchTestView extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {apiTested, sckTested, audTested, webTested, toaTested, apiTesting, sckTesting, webTesting, toaTesting,
-      audTesting, apiConnected, sckConnected, webConnected, audConnected, toaConnected, fieldPackets
+    const {apiTested, sckTested, audTested, fmsTested, webTested, toaTested, apiTesting, sckTesting, webTesting, toaTesting,
+      audTesting, fmsTesting, apiConnected, sckConnected, webConnected, audConnected, fmsConnected, toaConnected, fieldPackets
     } = this.state;
     const {slaveModeEnabled} = this.props;
 
@@ -125,16 +134,17 @@ class MatchTestView extends React.Component<IProps, IState> {
           <Card.Content>
             <Grid column={16}>
               <Grid.Row textAlign="center">
-                <Grid.Column width={3}/>
+                <Grid.Column width={2}/>
                 <Grid.Column width={2}><h3>REST API {slaveModeEnabled ? "(MASTER)" : ""}</h3></Grid.Column>
                 <Grid.Column width={2}><h3>SocketIO Server</h3></Grid.Column>
                 <Grid.Column width={2}><h3>Web Server</h3></Grid.Column>
                 <Grid.Column width={2}><h3>{UploadManager.type === 0 ? "TheOrangeAlliance" : "TheGlobalAlliance"}</h3></Grid.Column>
                 <Grid.Column width={2}><h3>Audience Display</h3></Grid.Column>
-                <Grid.Column width={3}/>
+                <Grid.Column width={2}><h3>FRC FMS</h3></Grid.Column>
+                <Grid.Column width={2}/>
               </Grid.Row>
               <Grid.Row textAlign="center">
-                <Grid.Column width={3}/>
+                <Grid.Column width={2}/>
                 <Grid.Column width={2} className={apiConnected ? "success-text" : "error-text"}>
                   {apiTesting ? "TESTING..." :  apiTested ? (apiConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
                 </Grid.Column>
@@ -150,10 +160,13 @@ class MatchTestView extends React.Component<IProps, IState> {
                 <Grid.Column width={2} className={audConnected ? "success-text" : "error-text"}>
                   {audTesting ? "TESTING..." :  audTested ? (audConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
                 </Grid.Column>
-                <Grid.Column width={3}/>
+                <Grid.Column width={2} className={fmsConnected ? "success-text" : "error-text"}>
+                  {fmsTesting ? "TESTING..." :  fmsTested ? (fmsConnected ? "CONNECTED" : "NOT CONNECTED") : "NOT TESTED"}
+                </Grid.Column>
+                <Grid.Column width={2}/>
               </Grid.Row>
               <Grid.Row textAlign="center">
-                <Grid.Column width={3}/>
+                <Grid.Column width={2}/>
                 <Grid.Column width={2}>
                   <Button fluid={true} disabled={apiTesting} loading={apiTesting} color={getTheme().primary} onClick={this.testAPI}>Test</Button>
                 </Grid.Column>
@@ -169,7 +182,10 @@ class MatchTestView extends React.Component<IProps, IState> {
                 <Grid.Column width={2}>
                   <Button fluid={true} disabled={audTesting} loading={audTesting} color={getTheme().primary} onClick={this.testAudience}>Test</Button>
                 </Grid.Column>
-                <Grid.Column width={3}/>
+                <Grid.Column width={2}>
+                  <Button fluid={true} disabled={fmsTesting} loading={fmsTesting} color={getTheme().primary} onClick={this.testFMS}>Test</Button>
+                </Grid.Column>
+                <Grid.Column width={2}/>
               </Grid.Row>
             </Grid>
           </Card.Content>
@@ -273,6 +289,9 @@ class MatchTestView extends React.Component<IProps, IState> {
   private updateAudStatus() {
     this.setState({audConnected: true, audTested: true, audTesting: false});
   }
+  private updateFmsStatus() {
+    this.setState({fmsConnected: true, fmsTested: true, fmsTesting: false});
+  }
 
   private testAPI() {
     this.setState({apiTesting: true});
@@ -320,6 +339,16 @@ class MatchTestView extends React.Component<IProps, IState> {
     setTimeout(() => {
       if (!this.state.audConnected) {
         this.setState({audConnected: false, audTested: true, audTesting: false});
+      }
+    }, 2000);
+  }
+
+  private testFMS() {
+    this.setState({fmsTesting: true});
+    SocketProvider.emit("ds-request-all");
+    setTimeout(() => {
+      if (!this.state.fmsConnected) {
+        this.setState({fmsConnected: false, fmsTested: true, fmsTesting: false});
       }
     }, 2000);
   }

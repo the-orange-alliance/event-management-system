@@ -12,7 +12,7 @@ export default class DriverStationRoom implements IRoom {
   private readonly _server: Server;
   private readonly _clients: Socket[];
   private readonly _name: string;
-  
+
   private allDriverStations: object[];
 
   constructor(server: Server) {
@@ -40,12 +40,13 @@ export default class DriverStationRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
-    client.on("request-all", () => {
-      this._server.to(this._name).emit("ds-all", JSON.stringify(this.allDriverStations));
+    // TODO: Add better check method
+    client.on("ds-request-all", () => {
+      client.emit("ds-all", JSON.stringify(this.allDriverStations));
     });
-    client.on("ds-update-all", (dsData: object[]) => {
-      this.allDriverStations = dsData;
-      this._server.to(this._name).emit("ds-update", JSON.stringify(this.allDriverStations));
+    client.on("ds-update-all", (dsData: string) => {
+      this.allDriverStations = JSON.parse(dsData);
+      this._server.to(this._name).emit("ds-update", dsData);
     });
   }
 

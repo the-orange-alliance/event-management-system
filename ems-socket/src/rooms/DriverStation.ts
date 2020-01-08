@@ -12,17 +12,13 @@ export default class DriverStationRoom implements IRoom {
   private readonly _server: Server;
   private readonly _clients: Socket[];
   private readonly _name: string;
-
-  private isSlaveEnabled: boolean;
-  private masterAddress: string;
+  
   private allDriverStations: object[];
 
   constructor(server: Server) {
     this._server = server;
     this._clients = [];
     this._name = "driverstation";
-    this.isSlaveEnabled = false;
-    this.masterAddress = "";
     this.allDriverStations = [];
   }
 
@@ -44,9 +40,6 @@ export default class DriverStationRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
-    if (this.isSlaveEnabled) {
-      this._server.to(this._name).emit("enter-slave", this.masterAddress);
-    }
     client.on("request-all", () => {
       this._server.to(this._name).emit("ds-all", JSON.stringify(this.allDriverStations));
     });

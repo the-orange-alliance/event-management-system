@@ -2,6 +2,7 @@ import logger from "./logger";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import {DriverstationSupport} from "./driverstation-support"
+import {AccesspointSupport} from "./accesspoint-support"
 import {
     EMSProvider,
     Match,
@@ -34,6 +35,7 @@ export class EmsFrcFms {
     public timeLeft: number = 0;
     public matchState: number = 0;
     private dsInterval: any;
+    private apInterval: any;
     public matchStateMap: Map<String, number> = new Map<String, number>([["prestart", 0], ["timeout", 1], ["post-timeout", 2], ["start-match", 3], ["auto", 4], ["transition", 5], ["tele", 5]]);
 
     constructor() {
@@ -57,15 +59,17 @@ export class EmsFrcFms {
         // Init DriverStation listeners
         DriverstationSupport.getInstance().dsInit(udpTcpListenerIp);
 
+        // Init AccessPoint Settings to default // TODO: Store and get from somewhere
+        AccesspointSupport.getInstance().setSettings('10.0.100.1', 'root', '56Seven', 150, 151, 'SpecialKey', true, [], false);
+
         // Init Timer
         this._timer = new MatchTimer();
         this.initTimer();
-
-        // More Things
         this.timeLeft = this._timer.timeLeft;
 
-        // Start Driver Station Updates
+        // Start FMS Services Updates
         this.startDriverStation();
+        this.startAPLoop();
     }
 
     private initSocket() {
@@ -154,6 +158,11 @@ export class EmsFrcFms {
     private startDriverStation() {
         this.dsInterval = setInterval(()=> { DriverstationSupport.getInstance().runDriverStations() }, 500);
         logger.info('DriverStation Support Init Complete, Running Loop');
+    }
+
+    private startAPLoop() {
+        this.apInterval = setInterval(()=> { AccesspointSupport.getInstance().runAp() }, 500);
+        logger.info('AccessPoint Support Init Complete, Running Loop');
     }
 
     private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {

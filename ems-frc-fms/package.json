@@ -13,11 +13,13 @@
   "dependencies": {
     "@the-orange-alliance/lib-ems": "^0.7.24",
     "@types/dotenv": "^8.2.0",
+    "@types/ssh2-streams": "^0.1.6",
     "dgram": "^1.0.1",
     "dotenv": "^8.2.0",
     "net": "^1.0.2",
     "path": "^0.12.7",
     "socket.io": "^2.3.0",
+    "ssh2-promise": "^0.1.6",
     "typescript": "^3.7.4",
     "winston": "^3.2.1"
   }

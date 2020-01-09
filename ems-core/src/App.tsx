@@ -50,7 +50,7 @@ class App extends React.Component<IProps> {
   private initializeSocket(host: string) {
     SocketProvider.initialize('localhost');
     SocketProvider.on("connect", () => {
-      SocketProvider.emit("identify", "ems-core", ["scoring", "event", "ds"]);
+      SocketProvider.emit("identify", "ems-core", ["scoring", "event", "fms"]);
       this.props.setSocketConnected(true);
       if (this.props.slaveModeEnabled) {
         setTimeout(() => {

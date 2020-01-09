@@ -76,13 +76,16 @@ export class EmsFrcFms {
         // Setup Socket Connect/Disconnect
         SocketProvider.on("connect", () => {
             logger.info("Connected to EMS through SocketIO.");
-            SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring", "referee", "ds"]);
+            SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring", "referee", "fms"]);
         });
         SocketProvider.on("disconnect", () => {
             logger.info("Disconnected from SocketIO.");
         });
         SocketProvider.on("error", () => {
             logger.info("Error With SocketIO, not connected to EMS");
+        });
+        SocketProvider.on("fms-ping", () => {
+            SocketProvider.emit("fms-pong");
         });
 
         // Manage Socket Events
@@ -157,12 +160,12 @@ export class EmsFrcFms {
 
     private startDriverStation() {
         this.dsInterval = setInterval(()=> { DriverstationSupport.getInstance().runDriverStations() }, 500);
-        logger.info('DriverStation Support Init Complete, Running Loop');
+        logger.info('Driver Station Manager Init Complete, Running Loop');
     }
 
     private startAPLoop() {
         this.apInterval = setInterval(()=> { AccesspointSupport.getInstance().runAp() }, 500);
-        logger.info('AccessPoint Support Init Complete, Running Loop');
+        logger.info('Access Point Manager Init Complete, Running Loop');
     }
 
     private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {

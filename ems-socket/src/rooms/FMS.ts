@@ -8,7 +8,7 @@ import {EMSProvider} from "@the-orange-alliance/lib-ems";
 import * as net from "net";
 import * as dgram from "dgram";
 
-export default class DriverStationRoom implements IRoom {
+export default class FmsRoom implements IRoom {
   private readonly _server: Server;
   private readonly _clients: Socket[];
   private readonly _name: string;
@@ -18,7 +18,7 @@ export default class DriverStationRoom implements IRoom {
   constructor(server: Server) {
     this._server = server;
     this._clients = [];
-    this._name = "driverstation";
+    this._name = "fms";
     this.allDriverStations = [];
   }
 
@@ -40,9 +40,14 @@ export default class DriverStationRoom implements IRoom {
   }
 
   private initializeEvents(client: Socket) {
-    // TODO: Add better check method
     client.on("ds-request-all", () => {
       client.emit("ds-all", JSON.stringify(this.allDriverStations));
+    });
+    client.on("fms-ping", () => {
+      this._server.to(this._name).emit("fms-ping");
+    });
+    client.on("fms-pong", () => {
+      this._server.to(this._name).emit("fms-pong");
     });
     client.on("ds-update-all", (dsData: string) => {
       this.allDriverStations = JSON.parse(dsData);

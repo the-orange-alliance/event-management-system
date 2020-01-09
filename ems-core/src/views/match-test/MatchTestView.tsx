@@ -90,7 +90,7 @@ class MatchTestView extends React.Component<IProps, IState> {
     }
     SocketProvider.on("drop", this.updateSocketStatus);
     SocketProvider.on("test-audience-success", this.updateAudStatus);
-    SocketProvider.on("ds-all", this.updateFmsStatus);
+    SocketProvider.on("fms-pong", this.updateFmsStatus);
   }
 
   public componentWillUnmount() {
@@ -345,7 +345,7 @@ class MatchTestView extends React.Component<IProps, IState> {
 
   private testFMS() {
     this.setState({fmsTesting: true});
-    SocketProvider.emit("ds-request-all");
+    SocketProvider.emit("fms-ping");
     setTimeout(() => {
       if (!this.state.fmsConnected) {
         this.setState({fmsConnected: false, fmsTested: true, fmsTesting: false});

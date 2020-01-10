@@ -19,6 +19,9 @@ export class DriverstationSupport {
     private dsUdpLinkTimeoutSec = 1;
     private maxTcpPacketBytes   = 4096;
 
+    // TODO: Figure this out
+    public colorToSend = 0;
+
     private allDriverStations: Array<DSConn> = new Array(6);
 
     private static _instance: DriverstationSupport;
@@ -360,8 +363,8 @@ export class DriverstationSupport {
             packet[3] |= 0x80
         }
 
-        // Unknown or unused.
-        packet[4] = 1;
+        // Unknown or unused. (Possibly Game data?)
+        packet[4] = this.colorToSend;
 
         // Alliance station.
         packet[5] = this.allDriverStations[dsNum].allianceStation;

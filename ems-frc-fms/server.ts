@@ -3,6 +3,7 @@ import * as path from "path";
 import * as dotenv from "dotenv";
 import {DriverstationSupport} from "./driverstation-support"
 import {AccesspointSupport} from "./accesspoint-support"
+import {SwitchSupport} from "./switch-support"
 import {
     EMSProvider,
     Match,
@@ -62,6 +63,9 @@ export class EmsFrcFms {
         // Init AccessPoint Settings to default // TODO: Store and get from somewhere
         AccesspointSupport.getInstance().setSettings('10.0.100.1', 'root', '56Seven', 150, 151, 'SpecialKey', true, [], false);
 
+        // Init Switch Configuration Tools
+        SwitchSupport.getInstance().updateSettings('10.0.100.2', 'cisco', '56Seven');
+
         // Init Timer
         this._timer = new MatchTimer();
         this.initTimer();
@@ -109,8 +113,10 @@ export class EmsFrcFms {
 
             // Call DriverStation Prestart
             DriverstationSupport.getInstance().onPrestart(this.activeMatch);
-            // Init Field Hardware (AP, Switch)
-            // TODO
+            // Configure AP
+            AccesspointSupport.getInstance().handleTeamWifiConfig();
+            // Configure Switch
+            SwitchSupport.getInstance().configTeamEthernet();
         });
     }
 

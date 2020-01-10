@@ -20,6 +20,7 @@
     "path": "^0.12.7",
     "socket.io": "^2.3.0",
     "ssh2-promise": "^0.1.6",
+    "telnet-rxjs": "^2.1.0",
     "typescript": "^3.7.4",
     "winston": "^3.2.1"
   }

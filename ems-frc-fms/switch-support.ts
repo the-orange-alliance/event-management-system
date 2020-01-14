@@ -24,7 +24,7 @@ export class SwitchSupport {
     return SwitchSupport._instance;
   }
 
-  public updateSettings(address: string, username: string, password: string) {
+  public setSettings(address: string, username: string, password: string) {
     this.switch.address = address;
     this.switch.username = username;
     this.switch.password = password;

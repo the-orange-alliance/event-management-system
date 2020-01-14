@@ -16,6 +16,7 @@
     "@types/ssh2-streams": "^0.1.6",
     "dgram": "^1.0.1",
     "dotenv": "^8.2.0",
+    "modbus-serial": "^7.7.4",
     "net": "^1.0.2",
     "path": "^0.12.7",
     "socket.io": "^2.3.0",

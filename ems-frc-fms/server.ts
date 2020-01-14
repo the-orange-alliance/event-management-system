@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import {DriverstationSupport} from "./driverstation-support"
 import {AccesspointSupport} from "./accesspoint-support"
 import {SwitchSupport} from "./switch-support"
+import {PlcSupport} from "./plc-support";
 import {
     EMSProvider,
     Match,
@@ -37,6 +38,7 @@ export class EmsFrcFms {
     public matchState: number = 0;
     private dsInterval: any;
     private apInterval: any;
+    private plcInterval: any;
     public matchStateMap: Map<String, number> = new Map<String, number>([["prestart", 0], ["timeout", 1], ["post-timeout", 2], ["start-match", 3], ["auto", 4], ["transition", 5], ["tele", 5]]);
 
     constructor() {
@@ -51,7 +53,7 @@ export class EmsFrcFms {
     }
 
     public initFms() {
-        //Init EMS
+        // Init EMS
         EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
         process.env.REACT_APP_EMS_SCK_PORT = '8800';
         SocketProvider.initialize(host);
@@ -64,7 +66,10 @@ export class EmsFrcFms {
         AccesspointSupport.getInstance().setSettings('10.0.100.1', 'root', '56Seven', 150, 151, 'SpecialKey', true, [], false);
 
         // Init Switch Configuration Tools
-        SwitchSupport.getInstance().updateSettings('10.0.100.2', 'cisco', '56Seven');
+        SwitchSupport.getInstance().setSettings('10.0.100.2', 'cisco', '56Seven');
+
+        // Init PLC Connection
+        PlcSupport.getInstance().initPlc('10.0.100.10');
 
         // Init Timer
         this._timer = new MatchTimer();
@@ -74,6 +79,8 @@ export class EmsFrcFms {
         // Start FMS Services Updates
         this.startDriverStation();
         this.startAPLoop();
+        this.startPLC();
+        // The Switch manager doesn't have a loop, it runs on prestart.
     }
 
     private initSocket() {
@@ -169,8 +176,13 @@ export class EmsFrcFms {
         logger.info('Driver Station Manager Init Complete, Running Loop');
     }
 
+    private startPLC() {
+        this.plcInterval = setInterval(()=> { PlcSupport.getInstance().runPlc() }, 100);
+        logger.info('PLC Manager Init Complete, Running Loop');
+    }
+
     private startAPLoop() {
-        this.apInterval = setInterval(()=> { AccesspointSupport.getInstance().runAp() }, 500);
+        this.apInterval = setInterval(()=> { AccesspointSupport.getInstance().runAp() }, 3000);
         logger.info('Access Point Manager Init Complete, Running Loop');
     }
 

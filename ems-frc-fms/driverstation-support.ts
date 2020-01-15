@@ -20,7 +20,7 @@ export class DriverstationSupport {
     private dsUdpLinkTimeoutSec = 1;
     private maxTcpPacketBytes   = 4096;
 
-    private soundeBuzzer = false;
+    private soundedBuzzer = false;
 
     // TODO: Figure this out
     public colorToSend = 0;
@@ -71,6 +71,7 @@ export class DriverstationSupport {
             let i = 0;
             while(i < this.allDriverStations.length) { // run through current driver staions
                 if(this.allDriverStations[i] && this.allDriverStations[i].teamId === teamNum) { // found team in DS list
+                    PlcSupport.getInstance().setStationStack(i, STACK_LIGHT_ON);
                     this.allDriverStations[i].dsLinked = true;
                     this.allDriverStations[i].lastPacketTime = Date.now();
 
@@ -260,6 +261,10 @@ export class DriverstationSupport {
         return multiply - 1;
     }
 
+    public setTeamEstopped(station: number) {
+        this.allDriverStations[station].estop = true;
+    }
+
     // Run all this stuff
     public runDriverStations() {
         let i = 0;
@@ -303,16 +308,16 @@ export class DriverstationSupport {
         if(stationStatuses.length > 5) { // 6 teams
             let blueGood = (stationStatuses[0] && stationStatuses[1] && stationStatuses[2]);
             let redGood = (stationStatuses[3] && stationStatuses[4] && stationStatuses[5]);
-            if(!redGood || !blueGood) this.soundeBuzzer = false; // If a team has disconnected, we can sound the buzzer again when we go green
+            if(!redGood || !blueGood) this.soundedBuzzer = false; // If a team has disconnected, we can sound the buzzer again when we go green
             // TODO: GET E-STOPS
             const blue = (blueGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const red = (redGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const green = (redGood && blueGood)? STACK_LIGHT_ON : STACK_LIGHT_OFF;
             const orange = STACK_LIGHT_ON;
             PlcSupport.getInstance().setFieldStack(blue, red, orange, green, STACK_LIGHT_OFF );
-            if (!this.isMatchInProgress() && !this.soundeBuzzer && blueGood && redGood) {
+            if (!this.isMatchInProgress() && !this.soundedBuzzer && blueGood && redGood) {
                 PlcSupport.getInstance().soundBuzzer();
-                this.soundeBuzzer = true;
+                this.soundedBuzzer = true;
             }
         }
 

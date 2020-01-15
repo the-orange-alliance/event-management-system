@@ -3,6 +3,7 @@ import {ReadCoilResult, ReadRegisterResult} from "modbus-serial/ModbusRTU";
 import {EMSProvider, SocketProvider} from "@the-orange-alliance/lib-ems";
 import {PlcInputs} from "./models/PlcInputs";
 import {PlcOutputCoils} from "./models/PlcOutputCoils";
+import {DriverstationSupport} from "./driverstation-support";
 
 // Modbus Crash Course
 // Registers: ?Counters?
@@ -72,6 +73,28 @@ export class PlcSupport {
     }
   }
 
+  public checkEstops() {
+    // Update Driver Stations if E-STOP, Stop Match is Master E-STOP
+    if(this.plc.inputs.fieldEstop) {
+      // Abort Match, Field ESTOP pressed
+      SocketProvider.emit('abort');
+      DriverstationSupport.getInstance().setTeamEstopped(0);
+      DriverstationSupport.getInstance().setTeamEstopped(1);
+      DriverstationSupport.getInstance().setTeamEstopped(2);
+
+      DriverstationSupport.getInstance().setTeamEstopped(3);
+      DriverstationSupport.getInstance().setTeamEstopped(4);
+      DriverstationSupport.getInstance().setTeamEstopped(5);
+    }
+    if(this.plc.inputs.redEstop1) DriverstationSupport.getInstance().setTeamEstopped(0);
+    if(this.plc.inputs.redEstop2) DriverstationSupport.getInstance().setTeamEstopped(1);
+    if(this.plc.inputs.redEstop3) DriverstationSupport.getInstance().setTeamEstopped(2);
+
+    if(this.plc.inputs.blueEstop1) DriverstationSupport.getInstance().setTeamEstopped(3);
+    if(this.plc.inputs.blueEstop2) DriverstationSupport.getInstance().setTeamEstopped(4);
+    if(this.plc.inputs.blueEstop3) DriverstationSupport.getInstance().setTeamEstopped(5);
+  }
+
   public setStationStack(station: number, status: number) {
     switch(station) {
       case 0: this.plc.coils.redOneConn = status === STACK_LIGHT_ON; break;
@@ -94,7 +117,10 @@ export class PlcSupport {
 
   public soundBuzzer() {
     // Sound buzzer for 1.5 seconds
-
+    this.plc.coils.stackLightBuzzer = true;
+    setTimeout(() => {
+      this.plc.coils.stackLightBuzzer = false;
+    }, 1500);
   }
 
   public setFieldStack(blue: number, red: number, orange: number, green: number, buzzer: number) {
@@ -110,8 +136,6 @@ export class PlcSupport {
     this.setFieldStack(STACK_LIGHT_ON, STACK_LIGHT_ON, STACK_LIGHT_OFF, STACK_LIGHT_OFF, STACK_LIGHT_OFF);
   }
 }
-
-
 
 class PlcStatus {
   public isHealthy: boolean;

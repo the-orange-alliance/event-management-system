@@ -60,10 +60,43 @@ export class PlcSupport {
         });
       }
     }
+  }
 
+  public setStationStack(station: number, status: number) {
+    switch(station) {
+      case 0: this.plc.coils.redOneConn = status === STACK_LIGHT_ON; break;
+      case 1: this.plc.coils.redTwoConn = status === STACK_LIGHT_ON; break;
+      case 2: this.plc.coils.redThreeConn = status === STACK_LIGHT_ON; break;
+      case 3: this.plc.coils.blueOneConn = status === STACK_LIGHT_ON; break;
+      case 4: this.plc.coils.blueTwoConn = status === STACK_LIGHT_ON; break;
+      case 5: this.plc.coils.blueThreeConn = status === STACK_LIGHT_ON; break;
+    }
+  }
 
+  public setAllStationStacks(status: number) {
+    this.plc.coils.redOneConn = status === STACK_LIGHT_ON;
+    this.plc.coils.redTwoConn = status === STACK_LIGHT_ON;
+    this.plc.coils.redThreeConn = status === STACK_LIGHT_ON;
+    this.plc.coils.blueOneConn = status === STACK_LIGHT_ON;
+    this.plc.coils.blueTwoConn = status === STACK_LIGHT_ON;
+    this.plc.coils.blueThreeConn = status === STACK_LIGHT_ON;
+  }
+
+  public setFieldStack(blue: number, red: number, orange: number, green: number, buzzer: number) {
+    this.plc.coils.stackLightBlue = blue === STACK_LIGHT_ON;
+    this.plc.coils.stackLightRed = red === STACK_LIGHT_ON;
+    this.plc.coils.stackLightOrange = orange === STACK_LIGHT_ON;
+    this.plc.coils.stackLightGreen = green === STACK_LIGHT_ON;
+    this.plc.coils.stackLightBuzzer = buzzer === STACK_LIGHT_ON;
+  }
+
+  public onPrestart() {
+    this.setAllStationStacks(STACK_LIGHT_ON);
+    this.setFieldStack(STACK_LIGHT_ON, STACK_LIGHT_ON, STACK_LIGHT_OFF, STACK_LIGHT_OFF, STACK_LIGHT_OFF);
   }
 }
+
+
 
 class PlcStatus {
   public isHealthy: boolean;
@@ -262,4 +295,8 @@ class PlcOutputCoils {
       this.blueThreeConn === compare.blueThreeConn);
   }
 }
+
 export default PlcSupport.getInstance();
+
+export const STACK_LIGHT_OFF = 0;
+export const STACK_LIGHT_ON = 1;

@@ -53,7 +53,7 @@ export class PlcSupport {
         this.plc.inputs.fromArray(data.data);
       });
 
-      if(this.plc.oldCoils !== this.plc.coils) {
+      if(this.plc.oldCoils.equals(this.plc.coils)) {
         this.plc.coils.heartbeat = true;
         this.client.writeCoils(0, this.plc.coils.getCoilArray()).catch((err: any) => {
           logger.info('Error writing coils: ' + err);
@@ -234,5 +234,32 @@ class PlcOutputCoils {
     return allCoils;
   }
 
+  public equals(compare: this): boolean {
+    return (this.matchReset === compare.matchReset &&
+      this.stackLightGreen === compare.stackLightGreen &&
+      this.stackLightOrange === compare.stackLightOrange &&
+      this.stackLightRed === compare.stackLightRed &&
+      this.stackLightBlue === compare.stackLightBlue &&
+      this.stackLightBuzzer === compare.stackLightBuzzer &&
+      this.gameElement0 === compare.gameElement0 &&
+      this.gameElement1 === compare.gameElement1 &&
+      this.gameElement2 === compare.gameElement2 &&
+      this.gameElement3 === compare.gameElement3 &&
+      this.gameElement4 === compare.gameElement4 &&
+      this.gameElement5 === compare.gameElement5 &&
+      this.gameElement6 === compare.gameElement6 &&
+      this.gameElement7 === compare.gameElement7 &&
+      this.gameElement8 === compare.gameElement8 &&
+      this.gameElement9 === compare.gameElement9 &&
+      this.gameElement10 === compare.gameElement10 &&
+      this.unused18 === compare.unused18 &&
+      this.unused19 === compare.unused19 &&
+      this.redOneConn === compare.redOneConn &&
+      this.redTwoConn === compare.redTwoConn &&
+      this.redThreeConn === compare.redThreeConn &&
+      this.blueOneConn === compare.blueOneConn &&
+      this.blueTwoConn === compare.blueTwoConn &&
+      this.blueThreeConn === compare.blueThreeConn);
+  }
 }
 export default PlcSupport.getInstance();

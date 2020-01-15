@@ -46,6 +46,9 @@ export default class FmsRoom implements IRoom {
     client.on("fms-ping", () => {
       this._server.to(this._name).emit("fms-ping");
     });
+    client.on("plc-update", (plcData: string) => {
+      this._server.to(this._name).emit("plc-update", plcData);
+    });
     client.on("fms-pong", () => {
       this._server.to(this._name).emit("fms-pong");
     });

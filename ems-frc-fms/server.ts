@@ -102,29 +102,36 @@ export class EmsFrcFms {
         // Manage Socket Events
         SocketProvider.on("prestart-response", (err: any, matchJSON: any) => {
             logger.info('Prestart Command Issued');
-            const match: Match = new Match().fromJSON(matchJSON);
-            const seasonKey: string = match.matchKey.split("-")[0];
-            match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-            if (typeof matchJSON.participants !== "undefined") {
-                match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
-            }
-            this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
-                if (participants.length > 0) {
-                    match.participants = participants;
-                }
-            }).catch(err => logger.info('Error getting participant information: ' + err));
-            this.activeMatch = match;
-            if(!match) {
-                logger.info('Received prestart command, but found no active match');
-            }
-
-            // Call DriverStation Prestart
-            DriverstationSupport.getInstance().onPrestart(this.activeMatch);
-            // Configure AP
-            AccesspointSupport.getInstance().handleTeamWifiConfig();
-            // Configure Switch
-            SwitchSupport.getInstance().configTeamEthernet();
+            this.fmsOnPrestart(matchJSON);
         });
+    }
+
+    private fmsOnPrestart(matchJSON: any) {
+        // Get and Set Local Match Data
+        const match: Match = new Match().fromJSON(matchJSON);
+        const seasonKey: string = match.matchKey.split("-")[0];
+        match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
+        if (typeof matchJSON.participants !== "undefined") {
+            match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
+        }
+        this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
+            if (participants.length > 0) {
+                match.participants = participants;
+            }
+        }).catch(err => logger.info('Error getting participant information: ' + err));
+        this.activeMatch = match;
+        if(!match) {
+            logger.info('Received prestart command, but found no active match');
+        }
+
+        // Call DriverStation Prestart
+        DriverstationSupport.getInstance().onPrestart(this.activeMatch);
+        // Configure AP
+        AccesspointSupport.getInstance().handleTeamWifiConfig();
+        // Configure Switch
+        SwitchSupport.getInstance().configTeamEthernet();
+        // Set Field Lights
+        PlcSupport.getInstance().onPrestart();
     }
 
     private initTimer() {

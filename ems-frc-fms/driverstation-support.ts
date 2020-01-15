@@ -4,7 +4,8 @@ import DSConn from "./models/DSConn"
 import logger from "./logger";
 import {EmsFrcFms} from "./server";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
-import {SocketProvider} from "@the-orange-alliance/lib-ems";
+import {MatchMode, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {PlcSupport, STACK_LIGHT_OFF, STACK_LIGHT_ON} from "./plc-support";
 
 const udpDSListener = dgram.createSocket("udp4");
 let tcpListener = net.createServer();
@@ -18,6 +19,8 @@ export class DriverstationSupport {
     private dsTcpLinkTimeoutSec = 5;
     private dsUdpLinkTimeoutSec = 1;
     private maxTcpPacketBytes   = 4096;
+
+    private soundeBuzzer = false;
 
     // TODO: Figure this out
     public colorToSend = 0;
@@ -260,23 +263,65 @@ export class DriverstationSupport {
     // Run all this stuff
     public runDriverStations() {
         let i = 0;
+        const stationStatuses = []; // This will be used to set field stack light
         while(i < this.allDriverStations.length) {
             if(this.allDriverStations[i]){
                 if(this.allDriverStations[i].udpConn) {
                     this.sendControlPacket(i); // TODO: Don't need to send this every time, unless it's during match
                 }
+                let allIsGood = false;
                 const diff = Date.now() - new Date(this.allDriverStations[i].lastPacketTime).getDate();
                 if(Math.abs(diff/1000) > this.dsTcpLinkTimeoutSec) {
+                    // Driverstaion Timeout
                     this.allDriverStations[i].dsLinked = false;
                     this.allDriverStations[i].radioLinked = false;
                     this.allDriverStations[i].robotLinked = false;
                     this.allDriverStations[i].batteryVoltage = 0;
+                    allIsGood = false;
+                } else {
+                    allIsGood = this.allDriverStations[i].dsLinked && this.allDriverStations[i].radioLinked && this.allDriverStations[i].robotLinked && this.allDriverStations[i].batteryVoltage > 0;
                 }
+                // SET STACK LIGHTS
+                stationStatuses[i] = allIsGood;
+                // If match in progress and Stack Light On, Robot Connection Good
+                // If match in progress and Stack Light Off, Robot Connection Bad
+                if(this.isMatchInProgress()) {
+                    PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_ON : STACK_LIGHT_OFF);
+                } else {
+                    // If No Match in progress and stack lights are on, that means there is a problem with Robot Comms
+                    // If No Match in progress and stack lights are off, that means team is ready to start the match
+                    PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_OFF : STACK_LIGHT_ON);
+                }
+
                 this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
             }
             i++;
             SocketProvider.emit('ds-update-all', JSON.stringify(this.dsToJsonObj()));
         }
+
+
+        if(stationStatuses.length > 5) { // 6 teams
+            let blueGood = (stationStatuses[0] && stationStatuses[1] && stationStatuses[2]);
+            let redGood = (stationStatuses[3] && stationStatuses[4] && stationStatuses[5]);
+            if(!redGood || !blueGood) this.soundeBuzzer = false; // If a team has disconnected, we can sound the buzzer again when we go green
+            // TODO: GET E-STOPS
+            const blue = (blueGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
+            const red = (redGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
+            const green = (redGood && blueGood)? STACK_LIGHT_ON : STACK_LIGHT_OFF;
+            const orange = STACK_LIGHT_ON;
+            PlcSupport.getInstance().setFieldStack(blue, red, orange, green, STACK_LIGHT_OFF );
+            if (!this.isMatchInProgress() && !this.soundeBuzzer && blueGood && redGood) {
+                PlcSupport.getInstance().soundBuzzer();
+                this.soundeBuzzer = true;
+            }
+        }
+
+    }
+
+    private isMatchInProgress():boolean {
+        return (EmsFrcFms.getInstance()._timer.mode === MatchMode.TELEOPERATED ||
+          EmsFrcFms.getInstance()._timer.mode === MatchMode.AUTONOMOUS  ||
+          EmsFrcFms.getInstance()._timer.mode === MatchMode.TRANSITION);
     }
 
     private dsToJsonObj(): object[] {

@@ -157,7 +157,10 @@ export class EmsFrcFms {
         });
         SocketProvider.on("fms-settings-update", (data: string) => {
             this.updateSettings(JSON.parse(data));
-            SocketProvider.emit("fms-settings-update-success", JSON.stringify(this.settings));
+            SocketProvider.emit("fms-settings-update-success", JSON.stringify(this.settings.toJson()));
+        });
+        SocketProvider.on("fms-request-settings", () => {
+            SocketProvider.emit("fms-settings", JSON.stringify(this.settings.toJson()));
         });
 
         // Manage Socket Events

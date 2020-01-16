@@ -7,7 +7,7 @@ import {
     Grid,
     Form,
     GridColumn,
-    Dropdown, Button, Input
+    Dropdown, Button
 } from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
 import {SocketProvider} from "@the-orange-alliance/lib-ems";
@@ -30,7 +30,7 @@ interface IState {
     enablePlc: boolean,
     plcIpAddress: string,
 }
-
+// TODO: Emit fms-request-settings and listen to fms-settings to get settings from FMS
 class FmsConfig extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
@@ -200,7 +200,7 @@ class FmsConfig extends React.Component<IProps, IState> {
                                 <Grid>
                                     <Grid.Row columns={1}>
                                         <GridColumn>
-                                            <h4>AP and Switch Information</h4>
+                                            <h4>Field AP Information</h4>
                                         </GridColumn>
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
@@ -213,8 +213,8 @@ class FmsConfig extends React.Component<IProps, IState> {
                                               placeholder={'Disabled'}
                                               fluid={true}
                                               selection={true}
-                                              defaultValue={'-1'}
-                                              options={adminWifiOpts}
+                                              defaultValue={'157'}
+                                              options={teamWifiOpts}
                                               value={apTeamCh}
                                             />
                                         </GridColumn>
@@ -229,26 +229,38 @@ class FmsConfig extends React.Component<IProps, IState> {
                                               placeholder={'Disabled'}
                                               fluid={true}
                                               selection={true}
-                                              defaultValue={'157'}
-                                              options={teamWifiOpts}
+                                              defaultValue={'-1'}
+                                              options={adminWifiOpts}
                                               value={apAdminCh}
                                             />
                                         </GridColumn>
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>AP Password</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={apPassword}><Input type='password' /></Form.Input></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={apPassword} type={"password"} /></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>AP Admin WPA Key </span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={apAdminWpaKey}><Input type='password' /></Form.Input></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={apAdminWpaKey} type={"password"} /></GridColumn>
                                     </Grid.Row>
-                                    <Grid.Row/>
+                                </Grid>
+                            </Card.Content>
+                        </Card>
+                    }
+                    {(enableFms && enableAdvNet) &&
+                        <Card fluid={true} color={getTheme().secondary}>
+                            <Card.Content>
+                                <Grid>
+                                    <Grid.Row columns={1}>
+                                        <GridColumn>
+                                            <h4>Switch Information</h4>
+                                        </GridColumn>
+                                    </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>Switch Address</span></GridColumn>
                                         <GridColumn><Form.Input fluid={true} value={switchIpAddress}/></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>Switch Password</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={switchPassword}><Input type='password' /></Form.Input></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={switchPassword} type={"password"} /></GridColumn>
                                     </Grid.Row>
                                 </Grid>
                             </Card.Content>
@@ -296,7 +308,7 @@ class FmsConfig extends React.Component<IProps, IState> {
             enable_plc: this.state.enablePlc,
             plc_ip: this.state.plcIpAddress
         };
-        SocketProvider.emit("fms-settings-update", JSON.stringify(json)); // TODO: setTimeout and wait for socket to return success
+        SocketProvider.emit("fms-settings-update", JSON.stringify(json)); // TODO: setTimeout and wait for socket 'fms-settings-update-success'
     }
 }
 

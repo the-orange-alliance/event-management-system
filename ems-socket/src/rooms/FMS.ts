@@ -62,6 +62,12 @@ export default class FmsRoom implements IRoom {
       this.allDriverStations = JSON.parse(dsData);
       this._server.to(this._name).emit("ds-update", dsData);
     });
+    client.on("fms-request-settings", () => {
+      this._server.to(this._name).emit("fms-request-settings");
+    });
+    client.on("fms-settings", (data: string) => {
+      this._server.to(this._name).emit("fms-settings", data);
+    });
   }
 
   get name(): string {

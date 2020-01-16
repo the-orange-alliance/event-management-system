@@ -32,12 +32,12 @@ export class PlcSupport {
   public initPlc(address: string) {
     this.plc.address = address;
     this.client.connectTCP(this.plc.address, { port: this.modBusPort }).then(() => {
-      logger.info('Connected to PLC at ' + this.plc.address + ':' + this.modBusPort);
+      logger.info('✅ Connected to PLC at ' + this.plc.address + ':' + this.modBusPort);
     }).catch((err: any) => {
-      logger.info('Failed to connect to PLC: ' + err);
+      logger.info('❌ Failed to connect to PLC: ' + err);
       this.firstConn = true;
     });
-    logger.info('Attempting to connect to PLC');
+    logger.info('➖ Attempting to connect to PLC');
     this.client.setID(1);
   }
 

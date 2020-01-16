@@ -52,6 +52,12 @@ export default class FmsRoom implements IRoom {
     client.on("fms-pong", () => {
       this._server.to(this._name).emit("fms-pong");
     });
+    client.on("fms-settings-update", (data: string) => {
+      this._server.to(this._name).emit("fms-settings-update", data);
+    });
+    client.on("fms-settings-update-success", (data: string) => {
+      this._server.to(this._name).emit("fms-settings-update-success", data);
+    });
     client.on("ds-update-all", (dsData: string) => {
       this.allDriverStations = JSON.parse(dsData);
       this._server.to(this._name).emit("ds-update", dsData);

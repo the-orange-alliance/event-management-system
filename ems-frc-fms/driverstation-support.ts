@@ -48,12 +48,12 @@ export class DriverstationSupport {
     private udpInit(port: number, host: string) {
         udpDSListener.on('listening', function() {
             const address = udpDSListener.address();
-            logger.info('Listening for DriverStations on UDP ' + address.address + ':' + address.port);
+            logger.info('✅ Listening for DriverStations on UDP ' + address.address + ':' + address.port);
         });
 
         udpDSListener.on('error', function() {
             const address = udpDSListener.address();
-            logger.info('Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
+            logger.info('❌ Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
         });
 
         // Listen for New UDP Packets
@@ -103,7 +103,7 @@ export class DriverstationSupport {
         tcpListener.listen(port, host);
 
         tcpListener.on("listening", () => {
-            logger.info('Listening for DriverStations on TCP ' + host + ':' + port);
+            logger.info('✅ Listening for DriverStations on TCP ' + host + ':' + port);
         });
 
         tcpListener.on("connection", (socket: net.Socket) => {
@@ -124,10 +124,10 @@ export class DriverstationSupport {
             }
         });
 
-        tcpListener.on("close", () => logger.info('DriverStation TCP Listener Closed'));
+        tcpListener.on("close", () => logger.info('❌ DriverStation TCP Listener Closed'));
 
         tcpListener.on('error', (chunk: Buffer) => {
-            logger.info('Driver Station TCP listener Error.');
+            logger.info('❌ Driver Station TCP listener Error.');
         });
     }
 

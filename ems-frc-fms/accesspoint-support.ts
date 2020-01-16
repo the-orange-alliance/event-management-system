@@ -25,7 +25,7 @@ export class AccesspointSupport {
     return AccesspointSupport._instance;
   }
 
-  public setSettings(address: string, username: string, password: string, teamChannel: number, adminChannel: number, adminWpaKey: string, networkSecurityEnabled: boolean, TeamWifiStatuses: TeamWifiStatus[], initialStatusesFetched: boolean) {
+  public setSettings(address: string, username: string, password: string, teamChannel: string, adminChannel: string, adminWpaKey: string, networkSecurityEnabled: boolean, TeamWifiStatuses: TeamWifiStatus[], initialStatusesFetched: boolean) {
       this.ap.address = address;
       this.ap.username = username;
       this.ap.password = password;
@@ -48,7 +48,7 @@ export class AccesspointSupport {
 
   public configAdminWifi() {
     if (!this.ap.networkSecurityEnabled) return;
-    const disabled = (this.ap.adminChannel < 1) ? 1 : 0;
+    const disabled = (parseInt(this.ap.adminChannel) < 1) ? 1 : 0;
     const commands = [
       `set wireless.radio0.channel='${this.ap.teamChannel}'`,
       `set wireless.radio1.disabled'${disabled}'`,
@@ -210,8 +210,8 @@ class AccessPoint {
   public address: string;
   public username: string;
   public password: string;
-  public teamChannel: number;
-  public adminChannel: number;
+  public teamChannel: string;
+  public adminChannel: string;
   public adminWpaKey: string;
   public networkSecurityEnabled: boolean;
   public TeamWifiStatuses: TeamWifiStatus[];
@@ -221,8 +221,8 @@ class AccessPoint {
     this.address = '';
     this.username = '';
     this.password = '';
-    this.teamChannel = -1;
-    this.adminChannel = -1;
+    this.teamChannel = '157';
+    this.adminChannel = '-1';
     this.adminWpaKey = '';
     this.networkSecurityEnabled = true;
     this.TeamWifiStatuses = new Array<TeamWifiStatus>(6);

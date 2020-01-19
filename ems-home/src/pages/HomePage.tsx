@@ -10,7 +10,6 @@ import DownloadsPage from "./DownloadsPage";
 const styles = {
   container: {
     padding: '16px',
-    backgroundColor: '#f5f6f7'
   },
   cardImage: {
     width: '100%',
@@ -42,7 +41,7 @@ class HomePage extends React.Component<RouteComponentProps, IState> {
   public render() {
     return (
       <Container style={styles.container}>
-        <Typography variant={'h3'} component={'h1'}>Event Management Hub</Typography>
+        <Typography variant={'h4'} component={'h1'}>Event Management Hub</Typography>
         {this.renderPage()}
       </Container>
     );

@@ -15,7 +15,7 @@
     "build-ref": "cd ref-tablet/ && npm run build && cd ../",
     "build-pit": "cd pit-display/ && npm run build && cd ../",
     "build-core": "cd ems-core/ && npm run build && cd ../",
-	"build-home": "cd ems-home/ && npm run build && cd ../",
+	  "build-home": "cd ems-home/ && npm run build && cd ../",
     "build-api": "cd ems-api/ && npm run build && cd ../",
     "build-sck": "cd ems-socket/ && npm run build && cd ../",
     "build-web": "cd ems-web/ && npm run build && cd ../",

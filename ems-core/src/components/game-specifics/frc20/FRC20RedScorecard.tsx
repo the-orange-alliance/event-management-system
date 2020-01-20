@@ -31,6 +31,9 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
     this.modifyRobotOneCrossed = this.modifyRobotOneCrossed.bind(this);
     this.modifyRobotTwoCrossed = this.modifyRobotTwoCrossed.bind(this);
     this.modifyRobotThreeCrossed = this.modifyRobotThreeCrossed.bind(this);
+    this.modifyRobotOneEndgame = this.modifyRobotOneEndgame.bind(this);
+    this.modifyRobotTwoEndgame = this.modifyRobotTwoEndgame.bind(this);
+    this.modifyRobotThreeEndgame = this.modifyRobotThreeEndgame.bind(this);
     this.modifyAutoBottomCells = this.modifyAutoBottomCells.bind(this);
     this.modifyAutoOuterCells = this.modifyAutoOuterCells.bind(this);
     this.modifyAutoInnerCells = this.modifyAutoInnerCells.bind(this);
@@ -39,6 +42,13 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
     this.modifyTeleInnerCells = this.modifyTeleInnerCells.bind(this);
     this.modifyRotationControl = this.modifyRotationControl.bind(this);
     this.modifyPositionControl = this.modifyPositionControl.bind(this);
+    this.modifyStageOneCells = this.modifyStageOneCells.bind(this);
+    this.modifyStageTwoCells = this.modifyStageTwoCells.bind(this);
+    this.modifyStageThreeCells = this.modifyStageThreeCells.bind(this);
+    this.modifyStage = this.modifyStage.bind(this);
+    this.modifyBalanced = this.modifyBalanced.bind(this);
+    this.modifyMajorPenalties = this.modifyMajorPenalties.bind(this);
+    this.modifyMinorPenalties = this.modifyMinorPenalties.bind(this);
   }
 
   public render() {
@@ -55,29 +65,14 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
             <Form>
               <Grid className="details">
                 <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 1 Crossed" checked={details.blueAutoRobotOneCrossed} onChange={this.modifyRobotOneCrossed}/></Grid.Column>
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 3 Crossed" checked={details.blueAutoRobotThreeCrossed} onChange={this.modifyRobotTwoCrossed}/></Grid.Column>
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 2 Crossed" checked={details.blueAutoRobotTwoCrossed} onChange={this.modifyRobotThreeCrossed}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 1 Crossed" checked={details.redAutoRobotOneCrossed} onChange={this.modifyRobotOneCrossed}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 3 Crossed" checked={details.redAutoRobotTwoCrossed} onChange={this.modifyRobotTwoCrossed}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 2 Crossed" checked={details.redAutoRobotThreeCrossed} onChange={this.modifyRobotThreeCrossed}/></Grid.Column>
                 </Grid.Row>
                 <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Bottom Cells" value={details.blueAutoBottomCells} onChange={this.modifyAutoBottomCells}/></Grid.Column>
-                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Outer Cells" value={details.blueAutoOuterCells} onChange={this.modifyAutoOuterCells}/></Grid.Column>
-                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Inner Cells" value={details.blueAutoInnerCells} onChange={this.modifyAutoInnerCells}/></Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Form>
-          </Card.Content>
-          <Card.Content>
-            <Form>
-              <Grid className="details">
-                <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Bottom Cells" value={details.blueAutoBottomCells} onChange={this.modifyAutoBottomCells}/></Grid.Column>
-                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Outer Cells" value={details.blueAutoOuterCells} onChange={this.modifyAutoOuterCells}/></Grid.Column>
-                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Inner Cells" value={details.blueAutoInnerCells} onChange={this.modifyAutoInnerCells}/></Grid.Column>
-                </Grid.Row>
-                <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Rotation Control" checked={details.blueRotationControl} onChange={this.modifyRotationControl}/></Grid.Column>
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Position Control" checked={details.bluePositionControl} onChange={this.modifyPositionControl}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Bottom Cells" value={details.redAutoBottomCells} onChange={this.modifyAutoBottomCells}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Outer Cells" value={details.redAutoOuterCells} onChange={this.modifyAutoOuterCells}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Inner Cells" value={details.redAutoInnerCells} onChange={this.modifyAutoInnerCells}/></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>
@@ -86,9 +81,9 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
             <Form>
               <Grid className="details">
                 <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Endgame" value={details.blueEndRobotOneStatus} options={DropdownData.RoverRuckusEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
-                  <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Endgame" value={details.blueEndRobotTwoStatus} options={DropdownData.RoverRuckusEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
-                  <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 3 Endgame" value={details.blueEndRobotThreeStatus} options={DropdownData.RoverRuckusEndItems} onChange={this.modifyRobotThreeEndgame}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Bottom Cells" value={details.redTeleBottomCells} onChange={this.modifyTeleBottomCells}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Outer Cells" value={details.redTeleOuterCells} onChange={this.modifyTeleOuterCells}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Inner Cells" value={details.redTeleInnerCells} onChange={this.modifyTeleInnerCells}/></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>
@@ -97,11 +92,49 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
             <Form>
               <Grid className="details">
                 <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Minor Penalties" value={match.blueMinPen} onChange={this.modifyMinorPenalties}/></Grid.Column>
-                  <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Major Penalties" value={match.blueMajPen} onChange={this.modifyMajorPenalties}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Stage 1 Cells" value={details.redStageOneCells} onChange={this.modifyStageOneCells}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Stage 3 Cells" value={details.redStageTwoCells} onChange={this.modifyStageTwoCells}/></Grid.Column>
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Stage 3 Cells" value={details.redStageThreeCells} onChange={this.modifyStageThreeCells}/></Grid.Column>
+                </Grid.Row>
+                <Grid.Row columns="equal" textAlign="center">
+                  <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Stage" value={details.redStage} onChange={this.modifyStage}/></Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Form>
+          </Card.Content>
+          <Card.Content>
+            <Form>
+              <Grid className="details">
+                <Grid.Row columns="equal" textAlign="center">
+                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Rotation Control" checked={details.redRotationControl} onChange={this.modifyRotationControl}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Position Control" checked={details.redPositionControl} onChange={this.modifyPositionControl}/></Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Form>
+          </Card.Content>
+          <Card.Content>
+            <Form>
+              <Grid className="details">
+                <Grid.Row columns="equal" textAlign="center">
+                  <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Endgame" value={details.redEndRobotOneStatus} options={DropdownData.InfiniteRechargeEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
+                  <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Endgame" value={details.redEndRobotTwoStatus} options={DropdownData.InfiniteRechargeEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
+                  <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 3 Endgame" value={details.redEndRobotThreeStatus} options={DropdownData.InfiniteRechargeEndItems} onChange={this.modifyRobotThreeEndgame}/></Grid.Column>
+                </Grid.Row>
+                <Grid.Row columns="equal" textAlign="center">
+                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Balanced?" checked={details.redEndEqualized} onChange={this.modifyBalanced}/></Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Form>
+          </Card.Content>
+          <Card.Content>
+            <Form>
+              <Grid className="details">
+                <Grid.Row columns="equal" textAlign="center">
+                  <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Minor Penalties" value={match.redMinPen} onChange={this.modifyMinorPenalties}/></Grid.Column>
+                  <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Major Penalties" value={match.redMajPen} onChange={this.modifyMajorPenalties}/></Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
-                  <Grid.Column>Score: {match.blueScore}</Grid.Column>
+                  <Grid.Column>Score: {match.redScore}</Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>
@@ -119,105 +152,135 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
   }
 
   private modifyRobotOneCrossed(event: SyntheticEvent, props: CheckboxProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueAutoRobotOneCrossed = props.checked;
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redAutoRobotOneCrossed = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyRobotTwoCrossed(event: SyntheticEvent, props: CheckboxProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueAutoRobotTwoCrossed = props.checked;
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redAutoRobotTwoCrossed = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyRobotThreeCrossed(event: SyntheticEvent, props: CheckboxProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueAutoRobotThreeCrossed = props.checked;
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redAutoRobotThreeCrossed = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyAutoBottomCells(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as InfiniteRechargeMatchDetails).blueAutoBottomCells = parseInt(props.value, 10);
-      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+      (this.props.details as InfiniteRechargeMatchDetails).redAutoBottomCells = parseInt(props.value, 10);
+      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }
 
   private modifyAutoOuterCells(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as InfiniteRechargeMatchDetails).blueAutoOuterCells = parseInt(props.value, 10);
-      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+      (this.props.details as InfiniteRechargeMatchDetails).redAutoOuterCells = parseInt(props.value, 10);
+      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }
 
   private modifyAutoInnerCells(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as InfiniteRechargeMatchDetails).blueAutoInnerCells = parseInt(props.value, 10);
-      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+      (this.props.details as InfiniteRechargeMatchDetails).redAutoInnerCells = parseInt(props.value, 10);
+      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }
 
   private modifyTeleBottomCells(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as InfiniteRechargeMatchDetails).blueTeleBottomCells = parseInt(props.value, 10);
-      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+      (this.props.details as InfiniteRechargeMatchDetails).redTeleBottomCells = parseInt(props.value, 10);
+      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }
 
   private modifyTeleOuterCells(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as InfiniteRechargeMatchDetails).blueTeleOuterCells = parseInt(props.value, 10);
-      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+      (this.props.details as InfiniteRechargeMatchDetails).redTeleOuterCells = parseInt(props.value, 10);
+      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }
 
   private modifyTeleInnerCells(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      (this.props.details as InfiniteRechargeMatchDetails).blueTeleInnerCells = parseInt(props.value, 10);
-      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+      (this.props.details as InfiniteRechargeMatchDetails).redTeleInnerCells = parseInt(props.value, 10);
+      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
       this.forceUpdate();
     }
   }
 
   private modifyPositionControl(event: SyntheticEvent, props: CheckboxProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).bluePositionControl = props.checked;
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redPositionControl = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyRotationControl(event: SyntheticEvent, props: CheckboxProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueRotationControl = props.checked;
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redRotationControl = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyBalanced(event: SyntheticEvent, props: CheckboxProps) {
+    (this.props.details as InfiniteRechargeMatchDetails).redEndEqualized = props.checked;
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyRobotOneEndgame(event: SyntheticEvent, props: DropdownProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueEndRobotOneStatus = parseInt(props.value + "", 10);
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redEndRobotOneStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyRobotTwoEndgame(event: SyntheticEvent, props: DropdownProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueEndRobotTwoStatus = parseInt(props.value + "", 10);
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redEndRobotTwoStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyRobotThreeEndgame(event: SyntheticEvent, props: DropdownProps) {
-    (this.props.details as InfiniteRechargeMatchDetails).blueEndRobotThreeStatus = parseInt(props.value + "", 10);
-    this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
+    (this.props.details as InfiniteRechargeMatchDetails).redEndRobotThreeStatus = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyStageOneCells(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as InfiniteRechargeMatchDetails).redStageOneCells = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyStageTwoCells(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as InfiniteRechargeMatchDetails).redStageTwoCells = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyStageThreeCells(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as InfiniteRechargeMatchDetails).redStageThreeCells = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+    this.forceUpdate();
+  }
+
+  private modifyStage(event: SyntheticEvent, props: DropdownProps) {
+    (this.props.details as InfiniteRechargeMatchDetails).redStage = parseInt(props.value + "", 10);
+    this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
     this.forceUpdate();
   }
 
   private modifyMinorPenalties(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      this.props.match.blueMinPen = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+      this.props.match.redMinPen = parseInt(props.value, 10);
+      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
       this.props.setActiveDetails(new InfiniteRechargeMatchDetails().fromJSON(this.props.details.toJSON()));
       this.forceUpdate();
     }
@@ -225,8 +288,8 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
 
   private modifyMajorPenalties(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value) && parseInt(props.value, 10) >= 0) {
-      this.props.match.blueMajPen = parseInt(props.value, 10);
-      this.props.match.redScore = this.props.details.getRedScore(this.props.match.blueMinPen, this.props.match.blueMajPen);
+      this.props.match.redMajPen = parseInt(props.value, 10);
+      this.props.match.blueScore = this.props.details.getBlueScore(this.props.match.redMinPen, this.props.match.redMajPen);
       this.props.setActiveDetails(new InfiniteRechargeMatchDetails().fromJSON(this.props.details.toJSON()));
       this.forceUpdate();
     }

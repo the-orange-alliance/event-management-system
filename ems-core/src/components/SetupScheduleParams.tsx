@@ -76,7 +76,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
                   customInput={<Input fluid={true}/>}
                   showTimeSelect={true}
                   timeIntervals={15}
-                  dateFormat="EEEE, MMMM d YYYY, h:mm a"
+                  dateFormat="EEEE, MMMM d yyyy, h:mm a"
                   onChange={this.updateDayStartTime.bind(this, day.id)}
                   selected={day.startTime.toDate()}
                 />

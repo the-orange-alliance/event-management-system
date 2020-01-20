@@ -26,7 +26,8 @@
     "postbuild": "gulp postbuild",
     "start:prod": "electron build/ems/public/desktop/electron.js",
     "predist": "gulp predist",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems && cd ../"
   },
   "dependencies": {
     "concurrently": "^3.6.0",

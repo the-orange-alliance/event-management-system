@@ -45,6 +45,7 @@ class MatchManager {
         match.participants.push(redParticipant);
         match.participants.push(blueParticipant);
       }
+      console.log(match);
 
       EMSProvider.postMatchSchedule([match]).then(() => {
         EMSProvider.postMatchScheduleParticipants(match.participants).then(() => {

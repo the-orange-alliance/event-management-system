@@ -24,7 +24,7 @@ import EventCreationManager from "../../../managers/EventCreationManager";
 import {
   DropdownData, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData,
   SeasonData,
-  TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET,
+  TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET, FRC_PRESET,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, SeriesType, ROUND_ROBIN_PRESET, RANKING_PRESET,
   ELIMINATIONS_PRESET, AppError, TournamentRound
 } from "@the-orange-alliance/lib-ems";
@@ -32,7 +32,6 @@ import NumericInput from "../../../components/NumericInput";
 import MatchManager from "../../../managers/MatchManager";
 import TournamentValidator from "../../../validators/TournamentValidator";
 import UploadManager, {FGC} from "../../../managers/UploadManager";
-import {FRC_PRESET} from "@the-orange-alliance/lib-ems/dist/models/ems/EventConfiguration";
 
 interface IProps {
   onComplete: () => void,
@@ -117,7 +116,7 @@ class EventSelection extends React.Component<IProps, IState> {
           <Grid.Column width={3}>
             <EventConfigurationCard title={"Standard FIRST Tech Challenge Rover Ruckus Event"} color={"orange"} imgUrl={ftc_1819} onClick={this.setConfigurationPreset.bind(this, FTC_ROVER_PRESET)}/>
           </Grid.Column>
-          <Grid.Column width={3}>
+           <Grid.Column width={3}>
             <EventConfigurationCard title={"FRC Infinite Recharge"} color={"black"} imgUrl={frc_ir} onClick={this.setConfigurationPreset.bind(this, FRC_PRESET)}/>
           </Grid.Column>
           <Grid.Column width={3}>
@@ -544,6 +543,8 @@ class EventSelection extends React.Component<IProps, IState> {
     const toaConfig = (this.props.toaConfig.enabled && this.props.eventConfig.requiresTOA) ? this.props.toaConfig.toJSON() : undefined;
     CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), toaConfig: toaConfig}).catch((err) => console.log(err));
     EventCreationManager.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
+      console.log(this.props.event);
+      console.log(this.props.eventConfig);
       MatchManager.createTestMatch(this.props.event, this.props.eventConfig).then((match: Match) => {
         this.setState({creatingEvent: false});
         this.props.setNavigationDisabled(false);

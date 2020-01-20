@@ -42,8 +42,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.1.217"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.1.217"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.0.217"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.0.217"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
@@ -134,8 +134,8 @@ class App extends React.Component<IProps, IState> {
         display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
       default:
-        display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        // display = <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
+        // display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        display = <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
     }
 
     if (!loading) {

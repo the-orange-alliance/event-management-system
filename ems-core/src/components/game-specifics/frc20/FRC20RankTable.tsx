@@ -1,10 +1,10 @@
 import * as React from "react";
 import {getTheme} from "../../../AppTheme";
 import {Table} from "semantic-ui-react";
-import {RoverRuckusRank, TeamIdentifier} from "@the-orange-alliance/lib-ems";
+import {InfiniteRechargeRank, TeamIdentifier} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
-  rankings: RoverRuckusRank[],
+  rankings: InfiniteRechargeRank[],
   identifier?: TeamIdentifier
 }
 
@@ -22,9 +22,12 @@ class FRC20RankTable extends React.Component<IProps> {
           <Table.Cell>{ranking.rank}</Table.Cell>
           <Table.Cell>{displayName}</Table.Cell>
           <Table.Cell>{ranking.rankingPoints}</Table.Cell>
-          <Table.Cell>{ranking.tiebreakerPoints}</Table.Cell>
-          <Table.Cell>{ranking.highScore}</Table.Cell>
+          <Table.Cell>{ranking.rankingScore}</Table.Cell>
+          <Table.Cell>{ranking.autoPoints}</Table.Cell>
+          <Table.Cell>{ranking.telePoints}</Table.Cell>
+          <Table.Cell>{ranking.endPoints}</Table.Cell>
           <Table.Cell>{ranking.played}</Table.Cell>
+          <Table.Cell>{ranking.wins}-{ranking.losses}-{ranking.ties}</Table.Cell>
         </Table.Row>
       );
     });
@@ -35,9 +38,12 @@ class FRC20RankTable extends React.Component<IProps> {
             <Table.HeaderCell width={1}>Rank</Table.HeaderCell>
             <Table.HeaderCell width={1}>Team #</Table.HeaderCell>
             <Table.HeaderCell>Ranking Points</Table.HeaderCell>
-            <Table.HeaderCell>Tiebreaker Points</Table.HeaderCell>
-            <Table.HeaderCell>High Score</Table.HeaderCell>
+            <Table.HeaderCell>Ranking Score</Table.HeaderCell>
+            <Table.HeaderCell>Auto</Table.HeaderCell>
+            <Table.HeaderCell>Tele</Table.HeaderCell>
+            <Table.HeaderCell>End</Table.HeaderCell>
             <Table.HeaderCell>Matches Played</Table.HeaderCell>
+            <Table.HeaderCell>W-L-T</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>

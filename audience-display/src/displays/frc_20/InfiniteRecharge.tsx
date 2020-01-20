@@ -19,10 +19,13 @@ class InfiniteRecharge extends React.Component<IProps> {
 
   public render() {
     // const {displayMode, event, match, videoID} = this.props;
-    const {displayMode, event, match} = this.props;
+    const {videoID, event, match} = this.props;
     let view;
 
-    switch (displayMode) {
+    switch (videoID) {
+      case 0:
+        view = <MatchPlayScreen event={event} match={match}/>;
+        break;
       default:
         view = <MatchPlayScreen event={event} match={match}/>;
     }

@@ -98,7 +98,7 @@ class SetupRunMatchMaker extends React.Component<IProps, IState> {
       // let index: number = 0;
       for (const item of scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
         if (item.isMatch) {
-          matches[matchNumber].startTime = item.startTime;
+          matches[matchNumber].scheduledStartTime = item.startTime;
           matchNumber++;
         }
         // if (item.isMatch && schedule.type === "Qualification") {

@@ -1,0 +1,241 @@
+#ir-play-container {
+  position: absolute;
+  bottom: 0;
+  width: 100vw;
+  height: 22.5vh;
+  background-image: url('../res/rr_bg_2.png');
+  background-size: cover;
+}
+
+#ir-play-top {
+  width: 100vw;
+  height: 6.5vh;
+  background-color: #ECECEC;
+  border-top: 4px solid #C8CDC8;
+  border-bottom: 4px solid #C8CDC8;
+}
+
+#ir-play-top-left {
+  width: 50vw;
+  height: 100%;
+  padding-left: 10px;
+  border-right: 2px solid #C8C8C8;
+}
+
+#ir-play-top-left > div {
+  width: 100%;
+  height: 100%;
+  color: #000000;
+  font-weight: bold;
+  font-size: 1.75vw;
+}
+
+#ir-play-top-right {
+  width: 50vw;
+  height: 100%;
+  padding-right: 10px;
+  border-left: 2px solid #C8C8C8;
+  display: flex;
+  flex-direction: row;
+}
+
+#ir-play-top-right > div {
+  height: 100%;
+  color: #000000;
+  font-weight: bold;
+  font-size: 1.75vw;
+}
+
+#ir-play-bot {
+  width: 100vw;
+  height: 16vh;
+}
+
+#ir-play-base {
+  width: 40vw;
+  height: 14vh;
+  display: flex;
+  flex-direction: row;
+}
+
+#ir-play-blue {
+  width: 20%;
+  height: 14vh;
+  margin-top: 2px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 1.3vw;
+}
+
+#ir-play-blue > div {
+  width: 75%;
+  height: 3vh;
+  margin-bottom: 0.5vh;
+  background-color: #ffffff;
+  padding-right: 5px;
+  padding-left: 15px;
+  font-weight: bold;
+  border: 1px solid #5C88FF;
+  border-right: 0;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+#ir-play-mid {
+  width: 60%;
+}
+
+#ir-play-mid-timer {
+  position: relative;
+  height: 4vh;
+  width: 100%;
+  background-color: #E4CBAD;
+  border: 2px solid #000000;
+  z-index: 1;
+}
+
+#ir-play-mid-timer-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  margin: 0;
+  max-width: 100%;
+  height: 100%;
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  transition: all 1s ease;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  overflow: hidden;
+}
+
+#ir-play-mid-timer-time {
+  z-index: 3;
+  width: 3.5vw;
+  height: 2.75vh;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000000;
+  font-weight: bold;
+  border-radius: 12px;
+  font-size: 1.5vw;
+}
+
+#ir-play-mid-scores {
+  height: 10vh;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 4vw;
+  text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+  border: 2px solid #000000;
+  border-top: 0;
+}
+
+#ir-play-mid-blue {
+  height: 10vh;
+  width: 50%;
+  border-right: 1px solid #000000;
+  border-bottom: 2px solid #000000;
+}
+
+#ir-play-mid-red {
+  height: 10vh;
+  width: 50%;
+  border-left: 1px solid #000000;
+  border-bottom: 2px solid #000000;
+}
+
+#ir-play-red {
+  width: 20%;
+  height: 14vh;
+  margin-top: 2px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 1.3vw;
+}
+
+#ir-play-red > div {
+  width: 75%;
+  height: 3vh;
+  margin-bottom: 0.5vh;
+  background-color: #ffffff;
+  padding-left: 5px;
+  padding-right: 15px;
+  font-weight: bold;
+  border: 1px solid #CE2000;
+  border-left: 0;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.ir-play-event {
+  text-align: center;
+  width: 75%;
+}
+
+.ir-play-logo {
+  width: 25%;
+}
+
+.ir-alliance-box {
+  border: 1px solid #000000 !important;
+  border-radius: 0 !important;
+  width: 60% !important;
+  color: #000000 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+.ir-alliance-box > span {
+  background-color: #ffffff;
+  width: 90%;
+  height: 90%;
+  border-radius: 20px;
+}
+
+.ir-play-team {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.ir-card-status {
+  width: 1.15vw;
+  height: 1.15vw;
+  background-color: #ffffff;
+  border-radius: 100%;
+}
+
+.red-bg {
+  background-color: #CE2000 !important;
+}
+
+.blue-bg {
+  background-color: #5C88FF !important;
+}
+
+.green-bar {
+  background-color: #7fff00;
+}
+
+.yellow-bar {
+  background-color: #ffee0b;
+}
+
+.red-bar {
+  background-color: #ce2000;
+}

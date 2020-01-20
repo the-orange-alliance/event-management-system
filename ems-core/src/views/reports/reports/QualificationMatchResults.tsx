@@ -56,7 +56,7 @@ class QualificationMatchResults extends React.Component<IProps, IState> {
     let view = (
       <div>
         <div className="center-items">
-          <b><i>Report Generated as of {moment().format("dddd, MMMM Do yyyy, h:mm:ss a")}</i></b>
+          <b><i>Report Generated as of {moment().format("dddd, MMMM Do YYYY, h:mm:ss a")}</i></b>
         </div>
         <Table celled={true} structured={true} textAlign="center">
           <Table.Header>

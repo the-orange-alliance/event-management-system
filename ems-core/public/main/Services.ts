@@ -1,7 +1,7 @@
 import {IpcMessageEvent, ipcMain} from "electron";
 import * as path from "path";
 import * as pm2 from "pm2";
-import logger from "./logger";
+import logger from "./Logger";
 
 const localIPv4 = require("local-ipv4-address");
 

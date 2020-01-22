@@ -15,7 +15,7 @@
     "build-ref": "cd ref-tablet/ && npm run build && cd ../",
     "build-pit": "cd pit-display/ && npm run build && cd ../",
     "build-core": "cd ems-core/ && npm run build && cd ../",
-	  "build-home": "cd ems-home/ && npm run build && cd ../",
+    "build-home": "cd ems-home/ && npm run build && cd ../",
     "build-api": "cd ems-api/ && npm run build && cd ../",
     "build-sck": "cd ems-socket/ && npm run build && cd ../",
     "build-web": "cd ems-web/ && npm run build && cd ../",
@@ -30,17 +30,17 @@
     "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems && cd ../"
   },
   "dependencies": {
-    "concurrently": "^3.6.0",
-    "npm": "^6.5.0",
-    "pm2": "^3.0.0",
-    "winston": "^3.0.0"
+    "concurrently": "^5.0.2",
+    "npm": "^6.13.6",
+    "pm2": "^4.2.3",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
-    "del": "^3.0.0",
-    "electron-builder": "20.38.3",
-    "gulp": "3.9.1",
+    "del": "^5.1.0",
+    "electron-builder": "22.2.0",
+    "gulp": "^4.0.2",
     "gulp-install": "^1.1.0",
-    "gulp-rename": "^1.4.0",
+    "gulp-rename": "^2.0.0",
     "gulp-replace": "^1.0.0",
     "gulp-util": "^3.0.8"
   },

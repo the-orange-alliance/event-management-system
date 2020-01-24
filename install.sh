@@ -2,11 +2,19 @@
 
 npm i -g pm2 gulp-cli
 pwd
-cd audience-display && npm install && cd ..
-cd ems-api && npm install && cd ..
-cd ems-core && npm install && cd ..
-cd ems-home && npm install && cd ..
-cd ems-socket && npm install && cd ..
-cd ems-web && npm install && cd ..
-cd ref-tablet && npm install && cd ..
+cd audience-display
 npm install
+cd ../ems-api
+npm install
+cd ../ems-core
+npm install
+cd ../ems-home
+npm install
+cd ../ems-socket
+npm install
+cd ../ems-web
+npm install
+cd ../ref-tablet
+npm install
+cd ..
+npm run build

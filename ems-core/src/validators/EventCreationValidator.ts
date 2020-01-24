@@ -22,8 +22,14 @@ class EventCreationValidator {
     if (typeof this._event.season === "undefined" || typeof this._event.region === "undefined") {
       return false;
     }
-    return typeof key === "string" && this.isSafe(key) && key.length > 8 + (this._event.region.regionKey.length) &&
-      key.length < (6 + (this._event.region.regionKey.length) + 5);
+    if(this._eventConfig.eventType && this._eventConfig.eventType.startsWith("frc_")) {
+      return typeof key === "string" && this.isSafe(key) && key.length > 6 + (this._event.region.regionKey.length) &&
+          key.length < (4 + (this._event.region.regionKey.length) + 5);
+    } else {
+      return typeof key === "string" && this.isSafe(key) && key.length > 8 + (this._event.region.regionKey.length) &&
+          key.length < (6 + (this._event.region.regionKey.length) + 5);
+    }
+
   }
 
   public isValidEventType(): boolean {

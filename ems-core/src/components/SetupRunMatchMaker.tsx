@@ -81,7 +81,7 @@ class SetupRunMatchMaker extends React.Component<IProps, IState> {
   }
 
   private runMatchMaker() {
-    const {schedule} = this.props;
+    // const {schedule} = this.props;
     const {scheduleItems} = this.state;
     this.props.setNavigationDisabled(true);
     MatchMakerManager.execute({
@@ -94,68 +94,72 @@ class SetupRunMatchMaker extends React.Component<IProps, IState> {
       type: this.props.schedule.type
     }).then((matches: Match[]) => {
       let matchNumber: number = 0;
-      let fieldIndex: number = 0;
-      let index: number = 0;
+      // let fieldIndex: number = 0;
+      // let index: number = 0;
       for (const item of scheduleItems) { // This is assuming scheduleItems and matchList have the same lengths...
-        if (item.isMatch && schedule.type === "Qualification") {
+        if (item.isMatch) {
           matches[matchNumber].scheduledStartTime = item.startTime;
-          // TODO - Only a FIRST Global thing.
-          if (((item.day + 1) === schedule.days.length) && schedule.type === "Qualification") {
-            // This is the last day. Only use fields 3, 4, and 5.
-            matches[matchNumber].fieldNumber = index + 3;
-            index++;
-            if (index % 3 === 0) {
-              index = 0;
-            }
-          } else {
-            // TODO - ONLY A FIRST GLOBAL THING.
-            if (item.duration === 7) {
-              matches[matchNumber].fieldNumber = 5; // Premiere field.
-            } else {
-              if (fieldIndex >= 4) {
-                fieldIndex = 1;
-              } else {
-                fieldIndex++;
-              }
-              if (fieldIndex === 1) {
-                matches[matchNumber].fieldNumber = 1; // Normal field.
-              }
-              if (fieldIndex === 2) {
-                matches[matchNumber].fieldNumber = 4; // Normal field.
-              }
-              if (fieldIndex === 3) {
-                matches[matchNumber].fieldNumber = 2; // Normal field.
-              }
-              if (fieldIndex === 4) {
-                matches[matchNumber].fieldNumber = 3; // Normal field.
-              }
-            }
-          }
-          matchNumber++;
-        } else if (item.isMatch) {
-          if (fieldIndex >= 4) {
-            fieldIndex = 1;
-          } else {
-            fieldIndex++;
-          }
-
-          matches[matchNumber].scheduledStartTime = item.startTime;
-
-          if (fieldIndex === 1) {
-            matches[matchNumber].fieldNumber = 1; // Normal field.
-          }
-          if (fieldIndex === 2) {
-            matches[matchNumber].fieldNumber = 4; // Normal field.
-          }
-          if (fieldIndex === 3) {
-            matches[matchNumber].fieldNumber = 2; // Normal field.
-          }
-          if (fieldIndex === 4) {
-            matches[matchNumber].fieldNumber = 3; // Normal field.
-          }
-
           matchNumber++;
         }
+        // if (item.isMatch && schedule.type === "Qualification") {
+        //   matches[matchNumber].scheduledStartTime = item.startTime;
+        //   // TODO - Only a FIRST Global thing.
+        //   if (((item.day + 1) === schedule.days.length) && schedule.type === "Qualification") {
+        //     // This is the last day. Only use fields 3, 4, and 5.
+        //     matches[matchNumber].fieldNumber = index + 3;
+        //     index++;
+        //     if (index % 3 === 0) {
+        //       index = 0;
+        //     }
+        //   } else {
+        //     // TODO - ONLY A FIRST GLOBAL THING.
+        //     if (item.duration === 7) {
+        //       matches[matchNumber].fieldNumber = 5; // Premiere field.
+        //     } else {
+        //       if (fieldIndex >= 4) {
+        //         fieldIndex = 1;
+        //       } else {
+        //         fieldIndex++;
+        //       }
+        //       if (fieldIndex === 1) {
+        //         matches[matchNumber].fieldNumber = 1; // Normal field.
+        //       }
+        //       if (fieldIndex === 2) {
+        //         matches[matchNumber].fieldNumber = 4; // Normal field.
+        //       }
+        //       if (fieldIndex === 3) {
+        //         matches[matchNumber].fieldNumber = 2; // Normal field.
+        //       }
+        //       if (fieldIndex === 4) {
+        //         matches[matchNumber].fieldNumber = 3; // Normal field.
+        //       }
+        //     }
+        //   }
+        //   matchNumber++;
+        // } else if (item.isMatch) {
+        //   if (fieldIndex >= 4) {
+        //     fieldIndex = 1;
+        //   } else {
+        //     fieldIndex++;
+        //   }
+        //
+        //   matches[matchNumber].scheduledStartTime = item.startTime;
+        //
+        //   if (fieldIndex === 1) {
+        //     matches[matchNumber].fieldNumber = 1; // Normal field.
+        //   }
+        //   if (fieldIndex === 2) {
+        //     matches[matchNumber].fieldNumber = 4; // Normal field.
+        //   }
+        //   if (fieldIndex === 3) {
+        //     matches[matchNumber].fieldNumber = 2; // Normal field.
+        //   }
+        //   if (fieldIndex === 4) {
+        //     matches[matchNumber].fieldNumber = 3; // Normal field.
+        //   }
+        //
+        //   matchNumber++;
+        // }
       }
       this.props.setNavigationDisabled(false);
       this.props.onComplete(matches);

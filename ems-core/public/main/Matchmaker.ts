@@ -2,7 +2,7 @@ import {IpcMessageEvent, ipcMain, app} from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
-import logger from "./logger";
+import logger from "./Logger";
 import {execFile} from "child_process";
 import {Match, TournamentType} from "@the-orange-alliance/lib-ems";
 

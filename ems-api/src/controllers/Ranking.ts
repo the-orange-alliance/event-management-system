@@ -2,7 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
 import logger from "../logger";
-import {EnergyImpactRanker, IMatchRanker, IPostableObject, OceanOpportunitiesRanker, RoverRuckusRanker} from "@the-orange-alliance/lib-ems";
+import {EnergyImpactRanker, IMatchRanker, IPostableObject, OceanOpportunitiesRanker, RoverRuckusRanker, InfiniteRechargeRanker} from "@the-orange-alliance/lib-ems";
 
 const router: Router = Router();
 
@@ -84,6 +84,8 @@ function getRankerByType(eventType: string) {
       return OceanOpportunitiesRanker;
     case "ftc_1819":
       return RoverRuckusRanker;
+    case "frc_20":
+      return InfiniteRechargeRanker;
     default:
       return EnergyImpactRanker;
   }

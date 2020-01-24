@@ -1,0 +1,39 @@
+#rr-body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-image: url("./res/rr_bg_2.png");
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+#ir-container {
+  height: 100vh;
+  width: 90vw;
+  margin-left: 5vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.ir-border {
+  background-color: #335550;
+  border: 3px solid #79BDB2;
+  border-radius: 15px;
+}
+
+.ir-pre-match {
+  color: #ffffff;
+  font-size: 2.25vw;
+  font-weight: bold;
+  text-align: center;
+}
+
+.red-card-bg {
+  border: 1px solid #000000;
+  background-color: #CE2000 !important;
+}
+
+.yellow-card-bg {
+  border: 1px solid #000000;
+  background-color: #ffee0b !important;
+}

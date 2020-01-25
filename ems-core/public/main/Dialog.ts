@@ -2,7 +2,7 @@ import {ipcMain, BrowserWindow, dialog, app, IpcMessageEvent, FileFilter} from "
 import * as fs from "fs";
 import * as url from "url";
 import * as path from "path";
-import logger from "./logger";
+import logger from "./Logger";
 
 const open = require("opn");
 

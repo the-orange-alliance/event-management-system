@@ -24,7 +24,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.8.7",
+    "@the-orange-alliance/lib-ems": "^0.8.8",
     "appdata-path": "^0.1.2",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",

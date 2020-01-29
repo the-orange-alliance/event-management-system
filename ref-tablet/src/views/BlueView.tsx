@@ -1,7 +1,7 @@
 import * as React from 'react';
 import RoverRuckusBlueView from "./ftc_1819/BlueAllianceView";
 import OceanOpportunitiesBlueView from "./fgc_2019/BlueAllianceView";
-import InfiniteRechargeBlueView from "./fgc_2019/BlueAllianceView";
+import InfiniteRechargeBlueView from "./frc_20/BlueAllianceView";
 import {Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {

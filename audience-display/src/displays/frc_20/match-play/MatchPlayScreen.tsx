@@ -145,37 +145,37 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
 
     return (
       <div>
-        <div id="rr-play-container">
-          <div id="rr-play-top" className="center-items">
-            <div id="rr-play-top-left" className="center-items">
+        <div id="ir-play-container">
+          <div id="ir-play-top" className="center-items">
+            <div id="ir-play-top-left" className="center-items">
               <div className="center-left-items"><img src={FIRST_LOGO} className="fit-h"/></div>
               <div className="center-left-items">{match.matchName}</div>
             </div>
-            <div id="rr-play-top-right">
-              <div className="rr-play-event center-items">{event.eventName}</div>
-              <div className="rr-play-logo center-right-items"><img src={RR_LOGO} className="fit-h"/></div>
+            <div id="ir-play-top-right">
+              <div className="ir-play-event center-items">{event.eventName}</div>
+              <div className="ir-play-logo center-right-items"><img src={RR_LOGO} className="fit-h"/></div>
             </div>
           </div>
-          <div id="rr-play-bot" className="center-items">
-            <div id="rr-play-base">
-              <div id="rr-play-blue">
+          <div id="ir-play-bot" className="center-items">
+            <div id="ir-play-base">
+              <div id="ir-play-blue">
                 {this.displayBlueAlliance()}
               </div>
-              <div id="rr-play-mid">
-                <div id="rr-play-mid-timer" className="center-items">
-                  <div id="rr-play-mid-timer-bar" style={barStyle} className={this._timerStyle}/>
-                  <div id="rr-play-mid-timer-time" className="center-items">{displayTime}</div>
+              <div id="ir-play-mid">
+                <div id="ir-play-mid-timer" className="center-items">
+                  <div id="ir-play-mid-timer-bar" style={barStyle} className={this._timerStyle}/>
+                  <div id="ir-play-mid-timer-time" className="center-items">{displayTime}</div>
                 </div>
-                <div id="rr-play-mid-scores">
-                  <div id="rr-play-mid-blue" className="center-items blue-bg">
+                <div id="ir-play-mid-scores">
+                  <div id="ir-play-mid-blue" className="center-items blue-bg">
                     {match.blueScore}
                   </div>
-                  <div id="rr-play-mid-red" className="center-items red-bg">
+                  <div id="ir-play-mid-red" className="center-items red-bg">
                     {match.redScore}
                   </div>
                 </div>
               </div>
-              <div id="rr-play-red">
+              <div id="ir-play-red">
                 {this.displayRedAlliance()}
               </div>
             </div>
@@ -198,9 +198,9 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         cardStyle = "red-card-bg";
       }
       return (
-        <div key={p.matchParticipantKey} className="rr-play-team">
+        <div key={p.matchParticipantKey} className="ir-play-team">
           <span>{p.teamKey}</span>
-          <span className={"rr-card-status " + cardStyle}/>
+          <span className={"ir-card-status " + cardStyle}/>
         </div>
       );
     });
@@ -220,8 +220,8 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         cardStyle = "red-card-bg";
       }
       return (
-        <div key={p.matchParticipantKey} className="rr-play-team">
-          <span className={"rr-card-status " + cardStyle}/>
+        <div key={p.matchParticipantKey} className="ir-play-team">
+          <span className={"ir-card-status " + cardStyle}/>
           <span>{p.teamKey}</span>
         </div>
       );

@@ -42,8 +42,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("192.168.0.217"); // Debug/local IPv4
-      EMSProvider.initialize("192.168.0.217"); // Debug/local IPv4
+      SocketProvider.initialize("10.33.3.154"); // Debug/local IPv4
+      EMSProvider.initialize("10.33.3.154"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");

@@ -3,6 +3,10 @@ import Event from "@the-orange-alliance/lib-ems/dist/models/ems/Event";
 import Team from "@the-orange-alliance/lib-ems/dist/models/ems/Team";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
 import MatchPlayScreen from "./match-play/MatchPlayScreen";
+import MatchPreviewScreen from "./match-preview/MatchPreviewScreen";
+
+import "./InfiniteRecharge.css";
+import MatchResultsScreen from "./match-results/MatchResultsScreen";
 
 interface IProps {
   event: Event,
@@ -24,7 +28,16 @@ class InfiniteRecharge extends React.Component<IProps> {
 
     switch (videoID) {
       case 0:
+        view = <span/>; // Blank screen
+        break;
+      case 1:
+        view = <MatchPreviewScreen event={event} match={match}/>;
+        break;
+      case 2:
         view = <MatchPlayScreen event={event} match={match}/>;
+        break;
+      case 3:
+        view = <MatchResultsScreen event={event} match={match}/>;
         break;
       default:
         view = <MatchPlayScreen event={event} match={match}/>;

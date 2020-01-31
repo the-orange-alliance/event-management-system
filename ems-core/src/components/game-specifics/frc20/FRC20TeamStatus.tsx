@@ -1,19 +1,22 @@
 import * as React from "react";
-import {Button, Grid, SemanticCOLORS} from "semantic-ui-react";
+import {Button, DropdownProps, Form, Grid, SemanticCOLORS} from "semantic-ui-react";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {IUpdateParticipantStatus} from "../../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {updateParticipantStatus} from "../../../stores/scoring/actions";
-import {AllianceColor, EventConfiguration, Match, MatchParticipant, MatchState} from "@the-orange-alliance/lib-ems";
+import {AllianceColor, EventConfiguration, Team, MatchDetails, Match, MatchParticipant, MatchState} from "@the-orange-alliance/lib-ems";
+import {SyntheticEvent} from "react";
 
 interface IProps {
   alliance: AllianceColor,
-  eventConfig?: EventConfiguration,
-  activeMatch?: Match,
-  activeParticipants?: MatchParticipant[],
+  eventConfig?: EventConfiguration
+  match?: Match,
+  details?: MatchDetails,
+  matchParticipants?: MatchParticipant[]
   matchState?: MatchState,
-  updateParticipantStatus?: (index: number, status: number) => IUpdateParticipantStatus
+  teams?: Team[],
+  updateParticipantStatus?: (participant: MatchParticipant, status: number) => IUpdateParticipantStatus
 }
 
 class FRC20TeamStatus extends React.Component<IProps> {
@@ -22,18 +25,15 @@ class FRC20TeamStatus extends React.Component<IProps> {
   }
 
   public render() {
-    const teams = this.getTeams();
+    const {alliance, matchParticipants} = this.props;
+    const canChangeTeam = this.props.matchState === MatchState.PRESTART_READY;
     const disabled = this.props.matchState === MatchState.MATCH_IN_PROGRESS;
-
-    const teamsView = teams.map((team, index) => {
-      let displayName: any = team.teamKey;
-      if (typeof team.team !== "undefined") {
-        displayName = team.team.getFromIdentifier(this.props.eventConfig.teamIdentifier);
-      }
+    const participants = matchParticipants.filter((p: MatchParticipant) => alliance === "Red" ? (p.station < 20) : (p.station >= 20));
+    const teamsView = participants.map((p: MatchParticipant) => {
       return (
-        <Grid.Row key={index} className="no-margin">
-          <Grid.Column width={10} className="center-left-items">{displayName}</Grid.Column>
-          <Grid.Column width={6}><Button onClick={this.changeCardStatus.bind(this, index)} disabled={disabled} color={this.getButtonColor(team.cardStatus)} fluid={true}>{this.getButtonText(team.cardStatus)}</Button></Grid.Column>
+        <Grid.Row key={p.matchParticipantKey} className="match-play-team">
+          <Grid.Column largeScreen={7} widescreen={9} className="center-left-items"><Form.Dropdown disabled={!canChangeTeam || disabled} fluid={true} search={true} selection={true} value={p.teamKey} options={this.getTeamOptions()} onChange={this.updateParticipant.bind(this, p)}/></Grid.Column>
+          <Grid.Column largeScreen={8} widescreen={6}><Button onClick={this.changeCardStatus.bind(this, p)} disabled={disabled} color={this.getButtonColor(p.cardStatus)} fluid={true}>{this.getButtonText(p.cardStatus)}</Button></Grid.Column>
         </Grid.Row>
       );
     });
@@ -45,22 +45,26 @@ class FRC20TeamStatus extends React.Component<IProps> {
     );
   }
 
-  private changeCardStatus(index: number) {
-    if (this.props.activeParticipants !== null && typeof this.props.activeParticipants !== "undefined" && this.props.activeParticipants.length > 0) {
-      index = this.props.alliance === "Red" ? index : index + (this.props.activeParticipants.length / 2);
-      const participant: MatchParticipant = this.props.activeParticipants[index];
+  private updateParticipant(participant: MatchParticipant, event: SyntheticEvent, props: DropdownProps) {
+    participant.teamKey = props.value as number;
+    participant.team = this.props.teams.filter((t: Team) => t.teamKey === props.value as number)[0];
+    this.forceUpdate();
+  }
+
+  private changeCardStatus(participant: MatchParticipant) {
+    if (this.props.matchParticipants !== null && typeof this.props.matchParticipants !== "undefined" && this.props.matchParticipants.length > 0) {
       switch (participant.cardStatus) {
         case 0:
-          this.props.updateParticipantStatus(index, 1);
+          this.props.updateParticipantStatus(participant, 1);
           break;
         case 1:
-          this.props.updateParticipantStatus(index, 2);
+          this.props.updateParticipantStatus(participant, 2);
           break;
         case 2:
-          this.props.updateParticipantStatus(index, 0);
+          this.props.updateParticipantStatus(participant, 0);
           break;
         default:
-          this.props.updateParticipantStatus(index, 0);
+          this.props.updateParticipantStatus(participant, 0);
       }
     }
   }
@@ -91,38 +95,40 @@ class FRC20TeamStatus extends React.Component<IProps> {
     }
   }
 
-  private getTeams(): MatchParticipant[] {
-    if (this.props.activeParticipants === null || typeof this.props.activeParticipants === "undefined" || this.props.activeParticipants.length === 0) {
-      const participants: MatchParticipant[] = [];
-      for (let i = 0; i < 3; i++) {
-        const participant: MatchParticipant = new MatchParticipant();
-        participant.teamKey = (i + 1);
-        participant.cardStatus = 0;
-        participants.push(participant);
-      }
-      return participants;
-    } else {
-      if (this.props.alliance === "Red") {
-        return this.props.activeParticipants.filter((participant) => participant.station < 20);
-      } else {
-        return this.props.activeParticipants.filter((participant) => participant.station >= 20);
-      }
-    }
+  private getTeamOptions() {
+    const testTeam: Team = new Team();
+    testTeam.teamKey = -1;
+    testTeam.countryCode = "us";
+    testTeam.country = "USA";
+    testTeam.teamNameShort = "Test Team";
+
+    const teamsCopy: Team[] = [testTeam, ...this.props.teams];
+
+    return teamsCopy.map((t: Team) => {
+      const displayName: any = t.getFromIdentifier(this.props.eventConfig.teamIdentifier);
+      return {
+        key: t.teamKey,
+        value: t.teamKey,
+        text: displayName
+      };
+    });
   }
 }
 
-export function mapStateToProps({configState, scoringState}: IApplicationState) {
+export function mapStateToProps({configState, scoringState, internalState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
-    activeMatch: scoringState.activeMatch,
-    activeParticipants: scoringState.activeParticipants,
-    matchState: scoringState.matchState
+    match: scoringState.activeMatch,
+    details: scoringState.activeDetails,
+    matchParticipants: scoringState.activeParticipants,
+    matchState: scoringState.matchState,
+    teams: internalState.teamList
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ApplicationActions>) {
   return {
-    updateParticipantStatus: (index: number, status: number) => dispatch(updateParticipantStatus(index, status))
+    updateParticipantStatus: (participant: MatchParticipant, status: number) => dispatch(updateParticipantStatus(participant, status)),
   };
 }
 

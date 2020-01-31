@@ -1,4 +1,5 @@
 ALTER TABLE "ranking" ADD ranking_score INT;
+ALTER TABLE "ranking" ADD ranking_points INT;
 ALTER TABLE "ranking" ADD auto_points INT;
 ALTER TABLE "ranking" ADD end_points INT;
 ALTER TABLE "ranking" ADD tele_points INT;

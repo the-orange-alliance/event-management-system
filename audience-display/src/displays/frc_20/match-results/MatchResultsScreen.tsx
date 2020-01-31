@@ -1,9 +1,9 @@
 import * as React from 'react';
 import "./MatchResultsScreen.css";
 import {Event, Match, MatchParticipant, Ranking, InfiniteRechargeMatchDetails, Team} from "@the-orange-alliance/lib-ems";
-import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
-import RR_LOGO from "../res/rr_logo_transparent.png";
-import FTC_LOGO from "../res/FTC_logo_transparent.png";
+import FACC_LOGO from "../res/facc-large-bg-dark.png";
+import FACC_LOGO_TEXT from "../res/facc-large-text-underneath-bg-dark.png";
+import TOA_LOGO from "../res/toa-generic-lol.png";
 
 interface IProps {
   event: Event;
@@ -16,17 +16,29 @@ class MatchResultsScreen extends React.Component<IProps> {
   }
 
   public render() {
-    const {match} = this.props;
+    const {event, match} = this.props;
     const details: InfiniteRechargeMatchDetails = (match.matchDetails as InfiniteRechargeMatchDetails) || new InfiniteRechargeMatchDetails();
     const redAuto = details.getRedAutoScore();
     const redTele = details.getRedTeleScore();
     const redEnd = details.getRedEndScore();
-    const redPen = (match.blueMinPen * 10) + (match.blueMajPen * 40);
+    const redPen = details.getRedPenalty(match.blueMinPen ? match.blueMinPen : 0, match.blueMajPen ? match.blueMajPen : 0);
+    const redAutoCells: number = (details.redAutoInnerCells * 6) + (details.redAutoOuterCells * 4) + (details.redAutoBottomCells * 2);
+    const redAutoLine: number = (details.redAutoRobotOneCrossed ? 5 : 0) + (details.redAutoRobotTwoCrossed ? 5 : 0) + (details.redAutoRobotThreeCrossed ? 5 : 0);
+    const redTeleCells: number = (details.redTeleInnerCells * 3) + (details.redTeleOuterCells * 2) + details.redTeleBottomCells;
+    const redControl: number = (details.redRotationControl ? 10 : 0) + (details.redPositionControl ? 20 : 0);
+    const redEqualized: number = details.redEndEqualized ? 15 : 0;
+    const redHangs: number = redEnd - redEqualized;
 
     const blueAuto = details.getBlueAutoScore();
     const blueTele = details.getBlueTeleScore();
     const blueEnd = details.getBlueEndScore();
-    const bluePen = (match.redMinPen * 10) + (match.redMajPen * 40);
+    const bluePen = details.getBluePenalty(match.redMinPen ? match.redMinPen : 0, match.redMajPen ? match.redMajPen : 0);
+    const blueAutoCells: number = (details.blueAutoInnerCells * 6) + (details.blueAutoOuterCells * 4) + (details.blueAutoBottomCells * 2);
+    const blueAutoLine: number = (details.blueAutoRobotOneCrossed ? 5 : 0) + (details.blueAutoRobotTwoCrossed ? 5 : 0) + (details.blueAutoRobotThreeCrossed ? 5 : 0);
+    const blueTeleCells: number = (details.blueTeleInnerCells * 3) + (details.blueTeleOuterCells * 2) + details.blueTeleBottomCells;
+    const blueControl: number = (details.blueRotationControl ? 10 : 0) + (details.bluePositionControl ? 20 : 0);
+    const blueEqualized: number = details.blueEndEqualized ? 15 : 0;
+    const blueHangs: number = blueEnd - blueEqualized;
 
     const redWin: boolean = match.redScore > match.blueScore;
     const tie: boolean = match.redScore === match.blueScore;
@@ -49,9 +61,9 @@ class MatchResultsScreen extends React.Component<IProps> {
       <div id="ir-body">
         <div id="ir-container">
           <div id="ir-result-top" className="ir-border">
-            <div className="col-left"><img src={FIRST_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img src={TOA_LOGO} className="fit-h"/></div>
             <div className="center-items ir-pre-match">{match.matchName}</div>
-            <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img src={FACC_LOGO} className="fit-h"/></div>
           </div>
           <div id="ir-result-mid" className="ir-border">
             <div className="ir-result-alliance">
@@ -63,13 +75,37 @@ class MatchResultsScreen extends React.Component<IProps> {
                   <span>Autonomous</span>
                   <span>{blueAuto}</span>
                 </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Power Cell</span>
+                  <span>{blueAutoCells}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Initiation Line</span>
+                  <span>{blueAutoLine}</span>
+                </div>
                 <div className="ir-result-alliance-score">
                   <span>Teleop</span>
                   <span>{blueTele}</span>
                 </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Power Cell</span>
+                  <span>{blueTeleCells}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Control Panel</span>
+                  <span>{blueControl}</span>
+                </div>
                 <div className="ir-result-alliance-score">
                   <span>End Game</span>
                   <span>{blueEnd}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Equalization</span>
+                  <span>{blueEqualized}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Hanging</span>
+                  <span>{blueHangs}</span>
                 </div>
                 <div className="ir-result-alliance-score">
                   <span>Red Penalty</span>
@@ -90,13 +126,37 @@ class MatchResultsScreen extends React.Component<IProps> {
                   <span>Autonomous</span>
                   <span>{redAuto}</span>
                 </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Power Cell</span>
+                  <span>{redAutoCells}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Initiation Line</span>
+                  <span>{redAutoLine}</span>
+                </div>
                 <div className="ir-result-alliance-score">
                   <span>Teleop</span>
                   <span>{redTele}</span>
                 </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Power Cell</span>
+                  <span>{redTeleCells}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Control Panel</span>
+                  <span>{redControl}</span>
+                </div>
                 <div className="ir-result-alliance-score">
                   <span>End Game</span>
                   <span>{redEnd}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Equalization</span>
+                  <span>{redEqualized}</span>
+                </div>
+                <div className="ir-result-alliance-score-sub">
+                  <span>Hanging</span>
+                  <span>{redHangs}</span>
                 </div>
                 <div className="ir-result-alliance-score">
                   <span>Blue Penalty</span>
@@ -110,7 +170,11 @@ class MatchResultsScreen extends React.Component<IProps> {
             </div>
           </div>
           <div id="ir-result-bot" className="ir-border">
-            <div className="col-left"><img src={FTC_LOGO} className="fit-h"/></div>
+            <div className="ir-bot-logo"><img src={FACC_LOGO_TEXT} className="fit-h"/></div>
+            <div className="ir-bot-text">
+              <span>{event.eventName}</span>
+              <span>Watch live! https://twitch.tv/FIRSTUpdatesNow</span>
+            </div>
           </div>
         </div>
       </div>

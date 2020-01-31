@@ -272,6 +272,8 @@ class DatabaseManager {
         query = GenericRankingQuery;
       } else if (eventType === "fgc_2019") {
         query = OceanicOpportunitiesRankingQuery;
+      } else if (eventType === "frc_20") {
+        query = InfiniteRechargeQuery;
       } else {
         reject(`There is currently no existing ranking query for ${eventType}.`);
       }

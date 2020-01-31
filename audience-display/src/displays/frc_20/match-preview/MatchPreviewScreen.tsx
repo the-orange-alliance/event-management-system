@@ -1,9 +1,9 @@
 import * as React from 'react';
 import "./MatchPreviewScreen.css";
 import {Event, Match, MatchParticipant, Ranking, Team} from "@the-orange-alliance/lib-ems";
-import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
-import RR_LOGO from "../res/rr_logo_transparent.png";
-import FTC_LOGO from "../res/FTC_logo_transparent.png";
+import FACC_LOGO from "../res/facc-large-bg-dark.png";
+import FACC_LOGO_TEXT from "../res/facc-large-text-underneath-bg-dark.png";
+import TOA_LOGO from "../res/toa-generic-lol.png";
 
 interface IProps {
   event: Event;
@@ -16,14 +16,14 @@ class MatchPreviewScreen extends React.Component<IProps> {
   }
 
   public render() {
-    const {match} = this.props;
+    const {event, match} = this.props;
     return (
       <div id="ir-body">
         <div id="ir-container">
           <div id="ir-pre-top" className="ir-border">
-            <div className="col-left"><img src={FIRST_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img src={TOA_LOGO} className="fit-h"/></div>
             <div className="center-items ir-pre-match">{match.matchName}</div>
-            <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img src={FACC_LOGO} className="fit-h"/></div>
           </div>
           <div id="ir-pre-mid" className="ir-border">
             <div id="ir-pre-mid-labels" className="center-items">
@@ -39,7 +39,11 @@ class MatchPreviewScreen extends React.Component<IProps> {
             </div>
           </div>
           <div id="ir-pre-bot" className="ir-border">
-            <div className="col-left"><img src={FTC_LOGO} className="fit-h"/></div>
+            <div className="ir-bot-logo"><img src={FACC_LOGO_TEXT} className="fit-h"/></div>
+            <div className="ir-bot-text">
+              <span>{event.eventName}</span>
+              <span>Watch live! https://twitch.tv/FIRSTUpdatesNow</span>
+            </div>
           </div>
         </div>
       </div>

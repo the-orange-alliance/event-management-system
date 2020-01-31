@@ -61,18 +61,29 @@
 }
 
 #ir-pre-bot {
+  position: relative;
   width: 100%;
   margin-top: 5vh;
   height: 15vh;
   padding: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-#ir-pre-bot > div {
+#ir-pre-bot > .ir-bot-logo {
+  position: absolute;
+  width: 5vw;
+  height: 100%;
+}
+
+#ir-pre-bot > .ir-bot-text {
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  color: #FFFFFF;
+  font-size: 2vw;
+  font-weight: bold;
 }
 
 .blue-border {

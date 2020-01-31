@@ -15,8 +15,8 @@
 
 #ir-result-mid {
   width: 100%;
-  margin-top: 5vh;
-  height: 60vh;
+  margin-top: 2.5vh;
+  height: 65vh;
   padding: 2.5vh 6px 6px 6px;
   display: flex;
   justify-content: flex-start;
@@ -70,7 +70,7 @@
 
 .ir-result-alliance-breakdown {
   width: 100%;
-  height: 20vh;
+  height: 34vh;
   padding-left: 4vw;
   padding-right: 2vw;
 }
@@ -85,6 +85,21 @@
 }
 
 .ir-result-alliance-score > span:nth-child(2) {
+  width: 15vh;
+  text-align: center;
+}
+
+.ir-result-alliance-score-sub {
+  width: 100%;
+  height: 2.5vh;
+  font-size: 1.1vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: normal;
+}
+
+.ir-result-alliance-score-sub > span:nth-child(2) {
   width: 15vh;
   text-align: center;
 }
@@ -117,18 +132,29 @@
 }
 
 #ir-result-bot {
+  position: relative;
   width: 100%;
-  margin-top: 5vh;
+  margin-top: 2.5vh;
   height: 15vh;
   padding: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-#ir-result-bot > div {
+#ir-result-bot > .ir-bot-logo {
+  position: absolute;
+  width: 5vw;
+  height: 100%;
+}
+
+#ir-result-bot > .ir-bot-text {
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  color: #FFFFFF;
+  font-size: 2vw;
+  font-weight: bold;
 }
 
 .blue-border {

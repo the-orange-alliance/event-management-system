@@ -9,8 +9,8 @@ import {
   MatchTimer,
   SocketProvider
 } from "@the-orange-alliance/lib-ems";
-import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
-import RR_LOGO from "../res/rr_logo_transparent.png";
+import FACC_LOGO from "../res/facc-med-bg-light.png";
+import TOA_LOGO from "../res/toa-generic-lol.png";
 
 import MATCH_START from "../res/sounds/match_start.wav";
 import MATCH_AUTO from "../res/sounds/match_auto_end_warning.wav";
@@ -77,6 +77,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         this._timer.removeAllListeners("match-abort");
         this._timerStyle = "red-bar";
         this._matchEnded = true;
+        this.forceUpdate();
       });
       this._timer.start();
       this.updateTimer();
@@ -100,6 +101,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       this._timer.removeAllListeners("match-endgame");
       this._timer.removeAllListeners("match-end");
       this._timerStyle = "red-bar";
+      this.forceUpdate();
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
       if (!this._matchEnded) {
@@ -148,12 +150,12 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         <div id="ir-play-container">
           <div id="ir-play-top" className="center-items">
             <div id="ir-play-top-left" className="center-items">
-              <div className="center-left-items"><img src={FIRST_LOGO} className="fit-h"/></div>
+              <div className="center-left-items"><img src={TOA_LOGO} className="fit-h"/></div>
               <div className="center-left-items">{match.matchName}</div>
             </div>
             <div id="ir-play-top-right">
               <div className="ir-play-event center-items">{event.eventName}</div>
-              <div className="ir-play-logo center-right-items"><img src={RR_LOGO} className="fit-h"/></div>
+              <div className="ir-play-logo center-right-items"><img src={FACC_LOGO} className="fit-h"/></div>
             </div>
           </div>
           <div id="ir-play-bot" className="center-items">

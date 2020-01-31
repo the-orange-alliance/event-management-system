@@ -208,7 +208,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
                 <RobotButtonGroup value={details.redRotationControl ? 1 : 0} label={"Rotation Control"} states={["Not Done", "Completed"]} onChange={this.updateRotationControl}/>
               </Col>
               <Col sm={12}>
-                <RobotButtonGroup value={details.redRotationControl ? 1 : 0} label={"Position Control"} states={["Not Done", "Completed"]} onChange={this.updatePositionControl}/>
+                <RobotButtonGroup value={details.redPositionControl ? 1 : 0} label={"Position Control"} states={["Not Done", "Completed"]} onChange={this.updatePositionControl}/>
               </Col>
             </Row>
           </Col>

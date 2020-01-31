@@ -42,7 +42,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
             <div className="ir-bot-logo"><img src={FACC_LOGO_TEXT} className="fit-h"/></div>
             <div className="ir-bot-text">
               <span>{event.eventName}</span>
-              <span>Watch live! https://twitch.tv/FIRSTUpdatesNow</span>
+              <span>Watch live! https://twitch.tv/FirstUpdatesNow</span>
             </div>
           </div>
         </div>

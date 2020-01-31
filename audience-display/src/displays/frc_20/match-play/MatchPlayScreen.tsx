@@ -10,7 +10,7 @@ import {
   SocketProvider
 } from "@the-orange-alliance/lib-ems";
 import FACC_LOGO from "../res/facc-med-bg-light.png";
-import TOA_LOGO from "../res/toa-generic-lol.png";
+import TOA_LOGO from "../res/toa-generic-lol-black.png";
 
 import MATCH_START from "../res/sounds/match_start.wav";
 import MATCH_AUTO from "../res/sounds/match_auto_end_warning.wav";

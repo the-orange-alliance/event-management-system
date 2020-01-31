@@ -78,7 +78,7 @@ gulp.task("post-build", (done) => {
   gulp.src(["ems-core/.env"]).pipe(gulp.dest("build/ems/public/desktop"));
   gulp.src(["ems-api/.env"]).pipe(gulp.dest("build/ems/server/ems-api"));
   gulp.src(["ems-web/.env"]).pipe(gulp.dest("build/ems/server/ems-web"));
-  gulp.src(["ems-sck/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
+  gulp.src(["ems-socket/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
   // del.sync(["build/ems/node_modules/**", "build/ems/src/**"]);
   done();
 });
@@ -140,15 +140,6 @@ gulp.task("place-binary", (done) => {
 gulp.task("place-resources", (done) => {
   gulp.src(["ems-core/public/favicon.ico"]).pipe(rename("icon.ico")).pipe(gulp.dest("build/resources"));
   gulp.src(["ems-core/res/**/*"]).pipe(gulp.dest("build/resources"));
-  done();
-});
-
-/* Install latest versions of lib-ems */
-gulp.task("install-deps", (done) => {
-  gulp.src("audience-display/package.json").pipe(install());
-  gulp.src("ems-core/package.json").pipe(install());
-  gulp.src("ems-socket/package.json").pipe(install());
-  gulp.src("ref-tablet/package.json").pipe(install());
   done();
 });
 

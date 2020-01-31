@@ -248,5 +248,4 @@ function initAudio(url: any): any {
   return audio;
 }
 
-
 export default MatchPlayScreen;

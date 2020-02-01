@@ -140,6 +140,8 @@ function getEventTypeFromKey(seasonKey: string): EventType | undefined {
       return "fgc_2018";
     case "2019":
       return "fgc_2019";
+    case "20":
+      return "frc_20";
     default:
       return undefined;
   }

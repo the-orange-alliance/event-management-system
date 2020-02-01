@@ -201,7 +201,8 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       }
       return (
         <div key={p.matchParticipantKey} className="ir-play-team">
-          <span>{p.teamKey}</span>
+          {!p.team && <span>{p.teamKey}</span>}
+          {p.team && <span>{p.team.robotName}</span>}
           <span className={"ir-card-status " + cardStyle}/>
         </div>
       );
@@ -224,7 +225,8 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       return (
         <div key={p.matchParticipantKey} className="ir-play-team">
           <span className={"ir-card-status " + cardStyle}/>
-          <span>{p.teamKey}</span>
+          {!p.team && <span>{p.teamKey}</span>}
+          {p.team && <span>{p.team.robotName}</span>}
         </div>
       );
     });

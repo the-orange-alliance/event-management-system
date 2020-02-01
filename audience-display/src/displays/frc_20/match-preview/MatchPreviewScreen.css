@@ -52,6 +52,11 @@
 .ir-pre-mid-alliance {
   width: 85%;
   min-height: 25vh;
+  text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
 }
 
 .ir-pre-mid-alliance > div {

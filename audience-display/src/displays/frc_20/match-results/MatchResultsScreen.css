@@ -52,6 +52,11 @@
   align-items: center;
   flex-direction: row;
   font-size: 1.5vw;
+  text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
 }
 
 .ir-result-team {
@@ -113,6 +118,12 @@
   margin-top: 2vh;
   padding-left: 4vw;
   padding-right: 2vw;
+  position: relative;
+  text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
 }
 
 .ir-result-text {
@@ -122,13 +133,19 @@
 
 .ir-result-score {
   width: 15vh;
-  text-shadow:
-          -1px -1px 0 #000,
-          1px -1px 0 #000,
-          -1px 1px 0 #000,
-          1px 1px 0 #000;
   font-size: 2vw;
   border: 2px solid #000000;
+}
+
+.ir-result-score-rp {
+  position: absolute;
+  right: 10vw;
+  width: 15vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+  border-left: 1px solid black;
 }
 
 #ir-result-bot {

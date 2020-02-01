@@ -43,6 +43,13 @@ class MatchResultsScreen extends React.Component<IProps> {
     const redWin: boolean = match.redScore > match.blueScore;
     const tie: boolean = match.redScore === match.blueScore;
 
+    const redEnergizedRp = (details.redStageOneCells >= 9 && details.redStageTwoCells >= 20 && details.redStageThreeCells >= 20 && details.redRotationControl && details.redPositionControl && details.redStage === 3) ? 1 : 0;
+    const redOperationalRp = (details.getRedEndScore() >= 65 && details.redEndEqualized) ? 1 : 0;
+    const blueEnergizedRp = (details.blueStageOneCells >= 9 && details.blueStageTwoCells >= 20 && details.blueStageThreeCells >= 20 && details.blueRotationControl && details.bluePositionControl && details.blueStage === 3) ? 1 : 0;
+    const blueOperationalRp = (details.getBlueEndScore() >= 65 && details.blueEndEqualized) ? 1 : 0;
+    const redRP: number = redEnergizedRp + redOperationalRp + (tie ? 1 : redWin ? 2 : 0);
+    const blueRP: number = blueEnergizedRp + blueOperationalRp + (tie ? 1 : !redWin ? 2 : 0);
+
     let redResultView;
     let blueResultView;
 
@@ -115,6 +122,9 @@ class MatchResultsScreen extends React.Component<IProps> {
               <div className="ir-result-alliance-scores">
                 {blueResultView}
                 <div className="ir-result-score center-items blue-bg">{match.blueScore}</div>
+                <div className="ir-result-score-rp blue-bg">
+                  +{redRP} RP
+                </div>
               </div>
             </div>
             <div className="ir-result-alliance">
@@ -166,6 +176,9 @@ class MatchResultsScreen extends React.Component<IProps> {
               <div className="ir-result-alliance-scores">
                 {redResultView}
                 <div className="ir-result-score center-items red-bg">{match.redScore}</div>
+                <div className="ir-result-score-rp red-bg">
+                  +{blueRP} RP
+                </div>
               </div>
             </div>
           </div>

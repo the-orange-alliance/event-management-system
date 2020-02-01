@@ -36,6 +36,7 @@ class FGCUploadedManager {
       FGCProvider.getTeams(eventKey).then((participants: Team[]) => {
         const teams: Team[] = [];
         for (const participant of participants) {
+          console.log(participant);
           const validator: TeamValidator = new TeamValidator(participant);
           validator.update(participant);
           if (validator.isValid) {

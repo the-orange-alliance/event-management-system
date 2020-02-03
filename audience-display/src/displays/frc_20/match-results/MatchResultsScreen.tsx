@@ -123,7 +123,7 @@ class MatchResultsScreen extends React.Component<IProps> {
                 {blueResultView}
                 <div className="ir-result-score center-items blue-bg">{match.blueScore}</div>
                 <div className="ir-result-score-rp blue-bg">
-                  +{redRP} RP
+                  +{blueRP} RP
                 </div>
               </div>
             </div>
@@ -177,7 +177,7 @@ class MatchResultsScreen extends React.Component<IProps> {
                 {redResultView}
                 <div className="ir-result-score center-items red-bg">{match.redScore}</div>
                 <div className="ir-result-score-rp red-bg">
-                  +{blueRP} RP
+                  +{redRP} RP
                 </div>
               </div>
             </div>

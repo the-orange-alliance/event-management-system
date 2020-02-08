@@ -197,6 +197,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     this.setState({loadingTeams: true});
     this.props.setNavigationDisabled(true);
     UploadManager.getTeams(this.props.event.eventKey).then((teams: Team[]) => {
+      console.log(teams);
       this.setState({loadingTeams: false});
       this.props.setNavigationDisabled(false);
       this.props.setTeamList(teams);

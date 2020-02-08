@@ -1,8 +1,8 @@
-#rr-body {
+#ir-body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-image: url("./res/rr_bg_2.png");
+  background-image: url("./res/background.jpg");
   -webkit-background-size: cover;
   background-size: cover;
 }
@@ -16,8 +16,8 @@
 }
 
 .ir-border {
-  background-color: #335550;
-  border: 3px solid #79BDB2;
+  background-color: #131313;
+  border: 3px solid #dedede;
   border-radius: 15px;
 }
 

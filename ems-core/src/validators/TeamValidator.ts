@@ -63,8 +63,7 @@ class TeamValidator {
 
   public checkIfValid(): void {
     this._isValid = this.isValidTeamKey() && this.isValidTeamNameShort() && this.isValidTeamNameLong()
-    && this.isValidCountryCode() && this.isValidCity() && this.isValidStateProv() && this.isValidCountry()
-    && this.isValidRobotName();
+    && this.isValidCountryCode() && this.isValidCity() && this.isValidStateProv() && this.isValidCountry();
   }
 
   private isSafe(str: string): boolean {

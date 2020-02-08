@@ -9,8 +9,8 @@ import {
   MatchTimer,
   SocketProvider
 } from "@the-orange-alliance/lib-ems";
-import FIRST_LOGO from "../res/FIRST_logo_transparent.png";
-import RR_LOGO from "../res/rr_logo_transparent.png";
+import FACC_LOGO from "../res/facc-med-bg-light.png";
+import TOA_LOGO from "../res/toa-generic-lol-black.png";
 
 import MATCH_START from "../res/sounds/match_start.wav";
 import MATCH_AUTO from "../res/sounds/match_auto_end_warning.wav";
@@ -77,6 +77,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         this._timer.removeAllListeners("match-abort");
         this._timerStyle = "red-bar";
         this._matchEnded = true;
+        this.forceUpdate();
       });
       this._timer.start();
       this.updateTimer();
@@ -100,6 +101,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       this._timer.removeAllListeners("match-endgame");
       this._timer.removeAllListeners("match-end");
       this._timerStyle = "red-bar";
+      this.forceUpdate();
     });
     SocketProvider.on("score-update", (matchJSON: any) => {
       if (!this._matchEnded) {
@@ -145,37 +147,37 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
 
     return (
       <div>
-        <div id="rr-play-container">
-          <div id="rr-play-top" className="center-items">
-            <div id="rr-play-top-left" className="center-items">
-              <div className="center-left-items"><img src={FIRST_LOGO} className="fit-h"/></div>
+        <div id="ir-play-container">
+          <div id="ir-play-top" className="center-items">
+            <div id="ir-play-top-left" className="center-items">
+              <div className="center-left-items"><img src={TOA_LOGO} className="fit-h"/></div>
               <div className="center-left-items">{match.matchName}</div>
             </div>
-            <div id="rr-play-top-right">
-              <div className="rr-play-event center-items">{event.eventName}</div>
-              <div className="rr-play-logo center-right-items"><img src={RR_LOGO} className="fit-h"/></div>
+            <div id="ir-play-top-right">
+              <div className="ir-play-event center-items">{event.eventName}</div>
+              <div className="ir-play-logo center-right-items"><img src={FACC_LOGO} className="fit-h"/></div>
             </div>
           </div>
-          <div id="rr-play-bot" className="center-items">
-            <div id="rr-play-base">
-              <div id="rr-play-blue">
+          <div id="ir-play-bot" className="center-items">
+            <div id="ir-play-base">
+              <div id="ir-play-blue">
                 {this.displayBlueAlliance()}
               </div>
-              <div id="rr-play-mid">
-                <div id="rr-play-mid-timer" className="center-items">
-                  <div id="rr-play-mid-timer-bar" style={barStyle} className={this._timerStyle}/>
-                  <div id="rr-play-mid-timer-time" className="center-items">{displayTime}</div>
+              <div id="ir-play-mid">
+                <div id="ir-play-mid-timer" className="center-items">
+                  <div id="ir-play-mid-timer-bar" style={barStyle} className={this._timerStyle}/>
+                  <div id="ir-play-mid-timer-time" className="center-items">{displayTime}</div>
                 </div>
-                <div id="rr-play-mid-scores">
-                  <div id="rr-play-mid-blue" className="center-items blue-bg">
+                <div id="ir-play-mid-scores">
+                  <div id="ir-play-mid-blue" className="center-items blue-bg">
                     {match.blueScore}
                   </div>
-                  <div id="rr-play-mid-red" className="center-items red-bg">
+                  <div id="ir-play-mid-red" className="center-items red-bg">
                     {match.redScore}
                   </div>
                 </div>
               </div>
-              <div id="rr-play-red">
+              <div id="ir-play-red">
                 {this.displayRedAlliance()}
               </div>
             </div>
@@ -198,9 +200,10 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         cardStyle = "red-card-bg";
       }
       return (
-        <div key={p.matchParticipantKey} className="rr-play-team">
-          <span>{p.teamKey}</span>
-          <span className={"rr-card-status " + cardStyle}/>
+        <div key={p.matchParticipantKey} className="ir-play-team">
+          {!p.team && <span>{p.teamKey}</span>}
+          {p.team && <span>{p.team.robotName}</span>}
+          <span className={"ir-card-status " + cardStyle}/>
         </div>
       );
     });
@@ -220,9 +223,10 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         cardStyle = "red-card-bg";
       }
       return (
-        <div key={p.matchParticipantKey} className="rr-play-team">
-          <span className={"rr-card-status " + cardStyle}/>
-          <span>{p.teamKey}</span>
+        <div key={p.matchParticipantKey} className="ir-play-team">
+          <span className={"ir-card-status " + cardStyle}/>
+          {!p.team && <span>{p.teamKey}</span>}
+          {p.team && <span>{p.team.robotName}</span>}
         </div>
       );
     });
@@ -245,6 +249,5 @@ function initAudio(url: any): any {
   audio.volume = 0.5;
   return audio;
 }
-
 
 export default MatchPlayScreen;

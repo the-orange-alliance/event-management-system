@@ -28,9 +28,9 @@ class RobotPenaltyInput extends React.Component<IProps> {
           {label}
         </div>
         <div className="robot-penalty-bottom">
-          <Button className="robot-penalty-item" onClick={this.decrementValue}>-</Button>
-          <Input value={value} readOnly={true} className="robot-penalty-item" type="number"/>
           <Button className="robot-penalty-item" onClick={this.incrementValue}>+</Button>
+          <Input value={value} readOnly={true} className="robot-penalty-item" type="number"/>
+          <Button className="robot-penalty-item" onClick={this.decrementValue}>-</Button>
         </div>
       </div>
     );

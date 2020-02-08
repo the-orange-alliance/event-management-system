@@ -81,9 +81,9 @@ class FRC20BlueScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Bottom Cells" value={details.blueAutoBottomCells} onChange={this.modifyTeleBottomCells}/></Grid.Column>
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Outer Cells" value={details.blueAutoOuterCells} onChange={this.modifyTeleOuterCells}/></Grid.Column>
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Inner Cells" value={details.blueAutoInnerCells} onChange={this.modifyTeleInnerCells}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Bottom Cells" value={details.blueTeleBottomCells} onChange={this.modifyTeleBottomCells}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Outer Cells" value={details.blueTeleOuterCells} onChange={this.modifyTeleOuterCells}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Inner Cells" value={details.blueTeleInnerCells} onChange={this.modifyTeleInnerCells}/></Grid.Column>
               </Grid.Row>
             </Grid>
           </Form>

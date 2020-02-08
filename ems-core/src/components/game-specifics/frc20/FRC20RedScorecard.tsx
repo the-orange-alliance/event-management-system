@@ -59,7 +59,7 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
         <Card fluid={true} className="scorecard red-bg">
           <Card.Content className="center-items card-header"><Card.Header>Red Alliance Scorecard</Card.Header></Card.Content>
           <Card.Content>
-            <FRC20TeamStatus alliance={"Blue"} />
+            <FRC20TeamStatus alliance={"Red"} />
           </Card.Content>
           <Card.Content>
             <Form>

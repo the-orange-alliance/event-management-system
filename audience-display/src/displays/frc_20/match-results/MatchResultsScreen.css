@@ -1,0 +1,187 @@
+#ir-result-top {
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 10vh;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#ir-result-top > div {
+  width: 100%;
+  height: 100%;
+}
+
+#ir-result-mid {
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 65vh;
+  padding: 2.5vh 6px 6px 6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.5vw;
+}
+
+.ir-result-alliance {
+  width: 50%;
+  height: 100%;
+  margin: 2.5vh 1vw 0 2vw;
+}
+
+.ir-result-alliance-teams {
+  width: 100%;
+  height: 15vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.ir-result-team-container {
+  width: 100%;
+  height: 4.5vh;
+  margin-bottom: 0.5vh;
+  padding-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  font-size: 1.5vw;
+  text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
+}
+
+.ir-result-team {
+  width: 15%;
+}
+
+.ir-result-name {
+  width: 70%;
+  overflow: hidden;
+  font-size: 1.25vw;
+}
+
+.ir-result-rank {
+  width: 15%;
+}
+
+.ir-result-alliance-breakdown {
+  width: 100%;
+  height: 34vh;
+  padding-left: 4vw;
+  padding-right: 2vw;
+}
+
+.ir-result-alliance-score {
+  width: 100%;
+  height: 5vh;
+  font-size: 1.75vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ir-result-alliance-score > span:nth-child(2) {
+  width: 15vh;
+  text-align: center;
+}
+
+.ir-result-alliance-score-sub {
+  width: 100%;
+  height: 2.5vh;
+  font-size: 1.1vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: normal;
+}
+
+.ir-result-alliance-score-sub > span:nth-child(2) {
+  width: 15vh;
+  text-align: center;
+}
+
+.ir-result-alliance-scores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 7vh;
+  width: 100%;
+  margin-top: 2vh;
+  padding-left: 4vw;
+  padding-right: 2vw;
+  position: relative;
+  text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
+}
+
+.ir-result-text {
+  width: 15vw;
+  height: 75%;
+}
+
+.ir-result-score {
+  width: 15vh;
+  font-size: 2vw;
+  border: 2px solid #000000;
+}
+
+.ir-result-score-rp {
+  position: absolute;
+  right: 10vw;
+  width: 15vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+  border-left: 1px solid black;
+}
+
+#ir-result-bot {
+  position: relative;
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 15vh;
+  padding: 6px;
+}
+
+#ir-result-bot > .ir-bot-logo {
+  position: absolute;
+  width: 5vw;
+  height: 100%;
+}
+
+#ir-result-bot > .ir-bot-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  color: #FFFFFF;
+  font-size: 2vw;
+  font-weight: bold;
+}
+
+.blue-border {
+  background-color: #5C88FF;
+  border: 3px solid #000000;
+  border-radius: 15px;
+}
+
+.red-border {
+  background-color: #CE2000;
+  border: 3px solid #000000;
+  border-radius: 15px;
+}

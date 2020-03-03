@@ -32,7 +32,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.put("/:team_key", (req: Request, res: Response, next: NextFunction) => {
-  if (isNaN(parseInt(req.params.team_key)) || !parseInt(req.params.team_key)) {
+  if (!req.params.team_key || !parseInt(req.params.team_key)) {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY("Unable to parse team key as a number."));
   }
   DatabaseManager.updateWhere("team", req.body.records[0], `team_key=${req.params.team_key}`).then((data: any) => {

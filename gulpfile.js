@@ -6,7 +6,7 @@ const del = require("del");
 
 const ecosystemConfig = require("./ecosystem.config");
 
-gulp.task("generate-env:prod", () => {
+gulp.task("generate-env:prod", (done) => {
   let reactAppContents = "NODE_ENV=production\n";
   for (let app of ecosystemConfig.apps) {
     let contents = "NODE_ENV=production\n";
@@ -22,9 +22,10 @@ gulp.task("generate-env:prod", () => {
     fs.writeFileSync(app.name + ".env", contents);
   }
   fs.writeFileSync("ems-core.env", reactAppContents);
+  done();
 });
 
-gulp.task("generate-env", () => {
+gulp.task("generate-env", (done) => {
   let reactAppContents = "NODE_ENV=development\n";
   for (let app of ecosystemConfig.apps) {
     let contents = "NODE_ENV=development\n";
@@ -40,14 +41,16 @@ gulp.task("generate-env", () => {
     fs.writeFileSync(app.name + ".env", contents);
   }
   fs.writeFileSync("ems-core.env", reactAppContents);
+  done();
 });
 
-gulp.task("clean-build", () => {
+gulp.task("clean-build", (done) => {
   del.sync(["build/dist/*/**"]);
   del.sync(["build/ems/*/**"]);
+  done();
 });
 
-gulp.task("deploy-env", () => {
+gulp.task("deploy-env", (done) => {
   // gulp.src([".env"]).pipe(gulp.dest("audience-display"));
   // gulp.src([".env"]).pipe(gulp.dest("ref-tablet"));
   // gulp.src([".env"]).pipe(gulp.dest("pit-display"));
@@ -57,9 +60,10 @@ gulp.task("deploy-env", () => {
   gulp.src(["ems-api.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-api"));
   gulp.src(["ems-web.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-web"));
   gulp.src(["ems-sck.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-socket"));
+  done();
 });
 
-gulp.task("post-build", () => {
+gulp.task("post-build", (done) => {
   gulp.src(["ems-api/**/*", "!ems-api/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-api"));
   gulp.src(["ems-web/**/*", "!ems-web/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
   gulp.src(["ems-socket/**/*", "!ems-socket/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));
@@ -74,11 +78,12 @@ gulp.task("post-build", () => {
   gulp.src(["ems-core/.env"]).pipe(gulp.dest("build/ems/public/desktop"));
   gulp.src(["ems-api/.env"]).pipe(gulp.dest("build/ems/server/ems-api"));
   gulp.src(["ems-web/.env"]).pipe(gulp.dest("build/ems/server/ems-web"));
-  gulp.src(["ems-sck/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
+  gulp.src(["ems-socket/.env"]).pipe(gulp.dest("build/ems/server/ems-socket"));
   // del.sync(["build/ems/node_modules/**", "build/ems/src/**"]);
+  done();
 });
 
-gulp.task("update-pkg", () => {
+gulp.task("update-pkg", (done) => {
   let mainContents = JSON.parse(fs.readFileSync("ems-core/package.electron.json"));
   let newDeps = {};
   let coreDeps = JSON.parse(fs.readFileSync("ems-core/package.json")).dependencies;
@@ -119,40 +124,38 @@ gulp.task("update-pkg", () => {
   }
   mainContents.dependencies = newDeps;
   fs.writeFileSync("build/ems/package.json", JSON.stringify(mainContents));
+  done();
 });
 
-gulp.task("install-deps", () => {
+gulp.task("install-deps", (done) => {
   gulp.src("build/ems/package.json").pipe(install({npm: "--production"}));
+  done();
 });
 
-gulp.task("place-binary", () => {
+gulp.task("place-binary", (done) => {
   gulp.src(["ems-api/node_modules/sqlite3/lib/binding/**/*"]).pipe(gulp.dest("build/ems/node_modules/sqlite3/lib/binding"));
+  done();
 });
 
-gulp.task("place-resources", () => {
+gulp.task("place-resources", (done) => {
   gulp.src(["ems-core/public/favicon.ico"]).pipe(rename("icon.ico")).pipe(gulp.dest("build/resources"));
   gulp.src(["ems-core/res/**/*"]).pipe(gulp.dest("build/resources"));
-});
-
-/* Install latest versions of lib-ems */
-gulp.task("install-deps", () => {
-  gulp.src("audience-display/package.json").pipe(install());
-  gulp.src("ems-core/package.json").pipe(install());
-  gulp.src("ems-socket/package.json").pipe(install());
-  gulp.src("ref-tablet/package.json").pipe(install());
+  done();
 });
 
 /* .env tasks */
-gulp.task("update-env:prod", ["generate-env:prod", "deploy-env"]);
-gulp.task("update-env", ["generate-env", "deploy-env"]);
+gulp.task("update-env:prod", gulp.series("generate-env:prod", "deploy-env"));
+gulp.task("update-env", gulp.series("generate-env", "deploy-env"));
+
+// exports.updateEnv = gulp.series("generate-env", "deploy-env");
 
 /* Prebuild tasks - TODO add more tasks... */
-gulp.task("prebuild:prod", ["generate-env:prod", "deploy-env"]);
-gulp.task("prebuild", ["generate-env", "deploy-env"]);
+gulp.task("prebuild:prod", gulp.series("generate-env:prod", "deploy-env"));
+gulp.task("prebuild", gulp.series("generate-env", "deploy-env"));
 /* Inbetween these tasks, run `npm run build` */
 
 /* Postbuild tasks */
-gulp.task("postbuild", ["clean-build", "post-build", "update-pkg"]);
+gulp.task("postbuild", gulp.series("clean-build", "post-build", "update-pkg"));
 
 /* Predist tasks */
-gulp.task("predist", ["install-deps", "place-binary", "place-resources"]);
+gulp.task("predist", gulp.series("install-deps", "place-binary", "place-resources"));

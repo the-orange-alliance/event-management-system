@@ -6,9 +6,18 @@ import {connect} from "react-redux";
 import EnergyImpactRankTable from "../../../components/game-specifics/energy-impact/EnergyImpactRankTable";
 import RoverRuckusRankTable from "../../../components/game-specifics/rover-ruckus/RoverRuckusRankTable";
 import OceanOpportunitiesRankTable from "../../../components/game-specifics/ocean-opportunities/OceanOpportunitiesRankTable";
-import {EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, OceanOpportunitiesRank, Ranking,
+import {
+  EMSProvider,
+  EnergyImpactRanking,
+  EventConfiguration,
+  EventType,
+  HttpError,
+  InfiniteRechargeRank,
+  OceanOpportunitiesRank,
+  Ranking,
   RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
+import FRC20RankTable from "../../../components/game-specifics/frc20/FRC20RankTable";
 interface IProps {
   eventConfig?: EventConfiguration,
   onHTMLUpdate: (htmlStr: string) => void
@@ -64,6 +73,8 @@ class QualificationRankings extends React.Component<IProps, IState> {
         return <OceanOpportunitiesRankTable rankings={this.state.rankings as OceanOpportunitiesRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
       case "ftc_1819":
         return <RoverRuckusRankTable rankings={this.state.rankings as RoverRuckusRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
+      case "frc_20":
+        return <FRC20RankTable rankings={this.state.rankings as InfiniteRechargeRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
       default:
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]}/>;
     }

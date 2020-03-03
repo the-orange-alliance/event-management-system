@@ -1,7 +1,7 @@
 import {ipcMain, app, IpcMessageEvent} from "electron";
 import * as path from "path";
 import * as fs from "fs";
-import logger from "./logger";
+import logger from "./Logger";
 const appDataPath = app.getPath("userData");
 
 logger.info("Using application data path " + appDataPath);
@@ -74,4 +74,14 @@ ipcMain.on("create-backup", (event: IpcMessageEvent, backupDir: string, filename
   } else {
     event.sender.send("create-backup-response", "Backup location is not correctly set.", null);
   }
+});
+
+ipcMain.on("check-existance", (event: IpcMessageEvent, filename: string) => {
+  fs.open(path.join(appDataPath, filename), 'r', (err, file) => {
+    if (err) {
+      logger.error(err);
+      fs.writeFileSync(path.join(appDataPath, filename), "{}");
+    }
+    event.returnValue = err ? false : true;
+  });
 });

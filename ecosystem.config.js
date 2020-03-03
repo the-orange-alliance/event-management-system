@@ -22,7 +22,7 @@ module.exports = {
       watch       : true,
       env: {
         "NODE_ENV": "development",
-        "PORT": "80"
+        "PORT": "8000"
       },
       env_staging : {
         "NODE_ENV": "staging",

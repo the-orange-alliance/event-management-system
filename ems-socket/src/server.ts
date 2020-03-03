@@ -34,7 +34,7 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 app.use(cors());
 
 const timer = new MatchTimer();
-timer.matchConfig = FGC_CONFIG;
+timer.matchConfig = FRC_CONFIG;
 const clients: Map<string, string[]> = new Map<string, string[]>();
 const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);

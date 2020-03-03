@@ -9,6 +9,8 @@ import {createStore} from "redux";
 import {CONFIG_STORE} from "./AppStore";
 import * as Config from "./stores/config/reducer";
 import * as Internal from "./stores/internal/reducer";
+import {initialState} from "./stores/scoring/reducer";
+import {IInternalState} from "./stores/internal/models";
 import ProcessManager from "./managers/ProcessManager";
 import DialogManager from "./managers/DialogManager";
 import {AppError, EliminationsSchedule, EMSProvider, Process, RoundRobinSchedule} from "@the-orange-alliance/lib-ems";
@@ -23,12 +25,12 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
   const internalState = Internal.initialState;
   internalState.processList = procList;
 
+  CONFIG_STORE.createIfNotExists();
   CONFIG_STORE.getAll().then((configStore: any) => {
 
     const configState = Config.initialState;
 
     configState.networkHost = procList[0].address;
-
     if (typeof configStore.event !== "undefined" && typeof configStore.eventConfig !== "undefined") {
       configState.event = configState.event.fromJSON(configStore.event);
       configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);
@@ -72,6 +74,7 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.backupDir = configStore.backupDir;
     }
 
+    console.log(configState.networkHost);
     if (configState.slaveModeEnabled) {
       EMSProvider.initialize(configState.masterHost);
     } else {
@@ -101,7 +104,8 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
         }
         const applicationStore = createStore(reducers, {
           configState: configState,
-          internalState: internalState
+          internalState: internalState,
+          scoringState: initialState
         });
 
         console.log("Preloaded application state.");

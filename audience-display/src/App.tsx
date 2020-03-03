@@ -11,6 +11,7 @@ import RoverRuckus from "./displays/ftc_1819/RoverRuckus";
 import {Route, RouteComponentProps} from "react-router";
 import OceanOpportunities from "./displays/fgc_2019/OceanOpportunities";
 import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
+import InfiniteRecharge from "./displays/frc_20/InfiniteRecharge";
 
 interface IProps {
   cookies: Cookies
@@ -41,8 +42,8 @@ class App extends React.Component<IProps, IState> {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
     } else {
-      SocketProvider.initialize("localhost"); // Debug/local IPv4
-      EMSProvider.initialize("localhost"); // Debug/local IPv4
+      SocketProvider.initialize("192.168.0.175"); // Debug/local IPv4
+      EMSProvider.initialize("192.168.0.175"); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
@@ -129,7 +130,11 @@ class App extends React.Component<IProps, IState> {
       case "ftc_1819":
         display = <RoverRuckus displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
+      case "frc_20":
+        display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        break;
       default:
+        // display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         display = <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
     }
 

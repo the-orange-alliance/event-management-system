@@ -4,8 +4,8 @@ import HomePage from "./pages/HomePage";
 
 const styles = {
   wrapper: {
-    backgroundColor: '#F89808',
-    width: '100vw',
+    backgroundColor: '#F5F5F5',
+    width: '100%',
     minHeight: '100vh'
   }
 };

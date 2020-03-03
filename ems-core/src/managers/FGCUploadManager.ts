@@ -36,6 +36,7 @@ class FGCUploadedManager {
       FGCProvider.getTeams(eventKey).then((participants: Team[]) => {
         const teams: Team[] = [];
         for (const participant of participants) {
+          console.log(participant);
           const validator: TeamValidator = new TeamValidator(participant);
           validator.update(participant);
           if (validator.isValid) {
@@ -139,6 +140,8 @@ function getEventTypeFromKey(seasonKey: string): EventType | undefined {
       return "fgc_2018";
     case "2019":
       return "fgc_2019";
+    case "20":
+      return "frc_20";
     default:
       return undefined;
   }

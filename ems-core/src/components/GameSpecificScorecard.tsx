@@ -6,6 +6,8 @@ import RoverRuckusRedScorecard from "./game-specifics/rover-ruckus/RoverRuckusRe
 import RoverRuckusBlueScorecard from "./game-specifics/rover-ruckus/RoverRuckusBlueScorecard";
 import OceanOpportunitiesRedScorecard from "./game-specifics/ocean-opportunities/OceanOpportunitiesRedScorecard";
 import OceanOpportunitiesBlueScorecard from "./game-specifics/ocean-opportunities/OceanOpportunitiesBlueScorecard";
+import FRC20RedScorecard from "./game-specifics/frc20/FRC20RedScorecard";
+import FRC20BlueScorecard from "./game-specifics/frc20/FRC20BlueScorecard";
 
 interface IProps {
   type: EventType,
@@ -22,6 +24,13 @@ class GameSpecificScorecard extends React.Component<IProps> {
     const {type, alliance, loading} = this.props;
     let display;
     switch (type) {
+      case "frc_20":
+        if (alliance === "Red") {
+          display = <FRC20RedScorecard/>;
+        } else {
+          display = <FRC20BlueScorecard/>
+        }
+        break;
       case "fgc_2018":
         if (alliance === "Red") {
           display = <EnergyImpactRedScorecard/>;

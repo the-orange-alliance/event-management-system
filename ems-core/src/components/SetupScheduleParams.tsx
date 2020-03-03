@@ -181,8 +181,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateCycleTime(event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.cycleTime = parseInt(props.value, 10);
-      // this.props.schedule.forceUpdate();
-      this.updateFGCSchedule();
+      this.props.schedule.forceUpdate();
+      // this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -191,8 +191,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
     if (!isNaN(props.value)) {
       this.props.schedule.matchConcurrency = parseInt(props.value, 10);
       this.props.schedule.hasPremiereField = this.props.event.eventType.includes("fgc") && this.props.schedule.matchConcurrency % 2 === 1;
-      // this.props.schedule.forceUpdate();
-      this.updateFGCSchedule();
+      this.props.schedule.forceUpdate();
+      // this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -219,44 +219,44 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
 
   private addDay(event: SyntheticEvent) {
     this.props.schedule.addDay();
-    // this.props.schedule.forceUpdate();
-    this.updateFGCSchedule();
+    this.props.schedule.forceUpdate();
+    // this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private removeDay(event: SyntheticEvent) {
     this.props.schedule.removeDay();
-    // this.props.schedule.forceUpdate();
-    this.updateFGCSchedule();
+    this.props.schedule.forceUpdate();
+    // this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private addBreak(day: number) {
     this.props.schedule.days[day].addBreak();
-    // this.props.schedule.forceUpdate();
-    this.updateFGCSchedule();
+    this.props.schedule.forceUpdate();
+    // this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private removeBreak(day: number) {
     this.props.schedule.days[day].removeBreak();
-    // this.props.schedule.forceUpdate();
-    this.updateFGCSchedule();
+    this.props.schedule.forceUpdate();
+    // this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private updateDayStartTime(day: number, time: Date) {
     this.props.schedule.days[day].startTime = moment(time);
-    // this.props.schedule.forceUpdate();
-    this.updateFGCSchedule();
+    this.props.schedule.forceUpdate();
+    // this.updateFGCSchedule();
     this.forceUpdate();
   }
 
   private updateDayMatches(day: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].matchesScheduled = parseInt(props.value, 10) || 0;
-      // this.props.schedule.forceUpdate();
-      this.updateFGCSchedule();
+      this.props.schedule.forceUpdate();
+      // this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -269,8 +269,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateBreakStart(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].breaks[dayBreak].match = parseInt(props.value, 10) || 0;
-      // this.props.schedule.forceUpdate();
-      this.updateFGCSchedule();
+      this.props.schedule.forceUpdate();
+      // this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -278,8 +278,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
   private updateBreakDuration(day: number, dayBreak: number, event: SyntheticEvent, props: InputProps) {
     if (!isNaN(props.value)) {
       this.props.schedule.days[day].breaks[dayBreak].duration = parseInt(props.value, 10) || 0;
-      // this.props.schedule.forceUpdate();
-      this.updateFGCSchedule();
+      this.props.schedule.forceUpdate();
+      // this.updateFGCSchedule();
       this.forceUpdate();
     }
   }
@@ -396,7 +396,8 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
       }
       schedule[this.props.schedule.type] = this.props.schedule.toJSON();
       CONFIG_STORE.set("schedule", schedule).then(() => {
-        this.props.onComplete(this.updateFGCSchedule());
+        // this.props.onComplete(this.updateFGCSchedule());
+        this.props.onComplete(this.props.schedule.generateSchedule(this.props.event));
       }).catch((err) => {
         DialogManager.showErrorBox(err);
       });

@@ -1,4 +1,11 @@
-import {IPostableObject, Match, MatchParticipant, OceanOpportunitiesMatchDetails, RoverRuckusRefereeData} from "@the-orange-alliance/lib-ems";
+import {
+  InfiniteRechargeMatchDetails,
+  IPostableObject,
+  Match,
+  MatchParticipant,
+  OceanOpportunitiesMatchDetails,
+  RoverRuckusRefereeData
+} from "@the-orange-alliance/lib-ems";
 
 class ScoreManager {
   private static _instance: ScoreManager;
@@ -52,6 +59,104 @@ class ScoreManager {
           this._match.redScore += details.coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
           this._match.blueScore += details.coopertitionBonus ? OceanOpportunitiesMatchDetails.COOPERTITION_PLAYOFFS_POINTS : 0;
         }
+        break;
+      case "20":
+        const details: InfiniteRechargeMatchDetails = this._match.matchDetails as InfiniteRechargeMatchDetails;
+        const redAutoCells: number = details.redAutoInnerCells + details.redAutoOuterCells + details.redAutoBottomCells;
+        const redTeleCells: number = details.redTeleInnerCells + details.redTeleOuterCells + details.redTeleBottomCells;
+
+        if (details.redStage === 0) {
+          details.redStageOneCells = redAutoCells + redTeleCells;
+          details.redStageTwoCells = 0;
+          details.redStageThreeCells = 0;
+        } else if (details.redStage === 1) {
+          details.redStageTwoCells = redAutoCells + redTeleCells - details.redStageOneCells;
+          details.redStageThreeCells = 0;
+        } else if (details.redStage === 2) {
+          details.redStageThreeCells = redAutoCells + redTeleCells - details.redStageTwoCells - details.redStageOneCells;
+        }
+
+        details.redStage = 0;
+
+        if (details.redStageThreeCells >= 20 && details.redPositionControl) {
+          details.redStage = 3;
+        } else if (details.redStageTwoCells >= 20 && details.redRotationControl) {
+          details.redStage = 2;
+        } else if (details.redStageOneCells >= 9 && redTeleCells > 0) {
+          details.redStage = 1;
+        } else {
+          details.redStage = 0;
+        }
+
+        // if (redAutoCells + redTeleCells >= 9) {
+        //   details.redStage = 1;
+        // }
+        // if (details.redStage === 1 && (redAutoCells + redTeleCells) >= details.redStageOneCells && details.redRotationControl) {
+        //   details.redStage = 2;
+        // }
+        // if (details.redStage === 2 && (redAutoCells + redTeleCells) >= 49 && details.redPositionControl) {
+        //   details.redStage = 3;
+        // }
+        // if (details.redStage === 1) {
+        //   details.redStageOneCells = redAutoCells + redTeleCells;
+        //   details.redStageTwoCells = 0;
+        //   details.redStageThreeCells = 0;
+        // }
+        // if (details.redStage === 2) {
+        //   details.redStageTwoCells = redTeleCells - details.redStageOneCells;
+        //   details.redStageThreeCells = 0;
+        // }
+        // if (details.redStage === 3) {
+        //   details.redStageThreeCells = redTeleCells - details.redStageTwoCells - details.redStageOneCells;
+        // }
+
+        const blueAutoCells: number = details.blueAutoInnerCells + details.blueAutoOuterCells + details.blueAutoBottomCells;
+        const blueTeleCells: number = details.blueTeleInnerCells + details.blueTeleOuterCells + details.blueTeleBottomCells;
+
+        if (details.blueStage === 0) {
+          details.blueStageOneCells = blueAutoCells + blueTeleCells;
+          details.blueStageTwoCells = 0;
+          details.blueStageThreeCells = 0;
+        } else if (details.blueStage === 1) {
+          details.blueStageTwoCells = blueAutoCells + blueTeleCells - details.blueStageOneCells;
+          details.blueStageThreeCells = 0;
+        } else if (details.blueStage === 2) {
+          details.blueStageThreeCells = blueAutoCells + blueTeleCells - details.blueStageTwoCells - details.blueStageOneCells;
+        }
+
+        details.blueStage = 0;
+
+        if (details.blueStageThreeCells >= 20 && details.bluePositionControl) {
+          details.blueStage = 3;
+        } else if (details.blueStageTwoCells >= 20 && details.blueRotationControl) {
+          details.blueStage = 2;
+        } else if (details.blueStageOneCells >= 9 && blueTeleCells > 0) {
+          details.blueStage = 1;
+        } else {
+          details.blueStage = 0;
+        }
+
+        // if (blueAutoCells + blueTeleCells >= 9) {
+        //   details.blueStage = 1;
+        // }
+        // if (details.blueStage === 1 && (blueAutoCells + blueTeleCells) >= 29 && details.blueRotationControl) {
+        //   details.blueStage = 2;
+        // }
+        // if (details.blueStage === 2 && (blueAutoCells + blueTeleCells) >= 49 && details.bluePositionControl) {
+        //   details.blueStage = 3;
+        // }
+        // if (details.blueStage === 1) {
+        //   details.blueStageOneCells = blueAutoCells + blueTeleCells;
+        //   details.blueStageTwoCells = 0;
+        //   details.blueStageThreeCells = 0;
+        // }
+        // if (details.blueStage === 2) {
+        //   details.blueStageTwoCells = blueTeleCells - details.blueStageOneCells;
+        //   details.blueStageThreeCells = 0;
+        // }
+        // if (details.blueStage === 3) {
+        //   details.blueStageThreeCells = blueTeleCells - details.blueStageTwoCells - details.blueStageOneCells;
+        // }
         break;
     }
   }

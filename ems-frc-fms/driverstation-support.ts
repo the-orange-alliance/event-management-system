@@ -52,8 +52,8 @@ export class DriverstationSupport {
         });
 
         udpDSListener.on('error', function() {
-            const address = udpDSListener.address();
-            logger.info('❌ Error Listening for DriverStations on UDP ' + address.address + ':' + address.port + '. Please make sure you IP Address is set correctly.');
+            //const address = udpDSListener.address();
+            logger.info('❌ Error Listening for DriverStations on UDP. Please make sure you IP Address is set correctly. Should be set to 10.0.100.5');
         });
 
         // Listen for New UDP Packets
@@ -61,7 +61,11 @@ export class DriverstationSupport {
             this.parseUDPPacket(data, remote);
         });
 
-        udpDSListener.bind(port, host);
+        try {
+            udpDSListener.bind(port, host);
+        } catch {
+            logger.info('❌ Error Listening for DriverStations UDP. Please make sure you IP Address is set correctly.');
+        }
     }
 
     // Parse a UDP packet from the Driver Station
@@ -286,14 +290,14 @@ export class DriverstationSupport {
                 } else {
                     allIsGood = this.allDriverStations[i].dsLinked && this.allDriverStations[i].radioLinked && this.allDriverStations[i].robotLinked && this.allDriverStations[i].batteryVoltage > 0;
                 }
-                // SET STACK LIGHTS
+                // SET STACK LIGHTS // TODO: Is this proper? Who knows ️
                 stationStatuses[i] = allIsGood;
                 // If match in progress and Stack Light On, Robot Connection Good
                 // If match in progress and Stack Light Off, Robot Connection Bad
                 if(this.isMatchInProgress()) {
                     PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_ON : STACK_LIGHT_OFF);
                 } else {
-                    // If No Match in progress and stack lights are on, that means there is a problem with Robot Comms
+                    // If No Match in progress and stack lights are on, that means there is a problem with Robot Comms // TODO Should flash at some point
                     // If No Match in progress and stack lights are off, that means team is ready to start the match
                     PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_OFF : STACK_LIGHT_ON);
                 }
@@ -309,7 +313,7 @@ export class DriverstationSupport {
             let blueGood = (stationStatuses[0] && stationStatuses[1] && stationStatuses[2]);
             let redGood = (stationStatuses[3] && stationStatuses[4] && stationStatuses[5]);
             if(!redGood || !blueGood) this.soundedBuzzer = false; // If a team has disconnected, we can sound the buzzer again when we go green
-            // TODO: GET E-STOPS
+            // TODO: GET E-STOPS (oh no)
             const blue = (blueGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const red = (redGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const green = (redGood && blueGood)? STACK_LIGHT_ON : STACK_LIGHT_OFF;

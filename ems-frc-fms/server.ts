@@ -67,7 +67,7 @@ export class EmsFrcFms {
         // Init DriverStation listeners
         DriverstationSupport.getInstance().dsInit(udpTcpListenerIp);
 
-        // Init AccessPoint Settings to default // TODO: Store and get from somewhere
+        // Init AccessPoint Settings to default
         if(this.settings.enableAdvNet) AccesspointSupport.getInstance().setSettings(this.settings.apIp, this.settings.apUsername, this.settings.apPassword, this.settings.apTeamCh, this.settings.apAdminCh, this.settings.apAdminWpa, this.settings.enableAdvNet, [], false);
 
         // Init Switch Configuration Tools

@@ -25,7 +25,7 @@ class UploadManager {
       TOAProvider.initialize(toaConfig);
     }
     if (this._type === UploadManager.FGC) {
-      FGCProvider.initialize("live.firstalumnicollegiatecomp.org", 8443, "https"); // DEBUG
+      FGCProvider.initialize("live.firstalumnicollegiatecomp.org", 8443);// , "https"); // DEBUG
     }
   }
 

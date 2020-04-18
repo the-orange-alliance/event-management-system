@@ -64,6 +64,7 @@ gulp.task("deploy-env", (done) => {
 });
 
 gulp.task("post-build", (done) => {
+  // TODO transfer FMS files to prod build
   gulp.src(["ems-api/**/*", "!ems-api/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-api"));
   gulp.src(["ems-web/**/*", "!ems-web/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
   gulp.src(["ems-socket/**/*", "!ems-socket/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));

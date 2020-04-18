@@ -22,17 +22,19 @@
     "build-sck": "cd ems-socket/ && npm run build && cd ../",
     "build-web": "cd ems-web/ && npm run build && cd ../",
     "build-webapps": "npm run build-audience && npm run build-ref && npm run build-core && npm run build-home",
-    "build-services": "npm run build-api && npm run build-sck && npm run build-web",
+    "build-services": "npm run build-api && npm run build-sck && npm run build-web && npm run build-fms",
     "prebuild": "gulp prebuild:prod",
     "build": "npm run build-services && npm run build-webapps",
     "postbuild": "gulp postbuild",
     "start:prod": "electron build/ems/public/desktop/electron.js",
     "predist": "gulp predist",
     "dist": "electron-builder",
+    "generate-binary": "gulp update-env:prod && gulp prebuild:prod && npm run build && gulp post-build && gulp update-pkg && npm run predist && npm run dist",
     "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems && cd ../"
   },
   "dependencies": {
     "concurrently": "^5.0.2",
+    "node-gyp": "^6.1.0",
     "npm": "^6.13.6",
     "pm2": "^4.2.3",
     "winston": "^3.2.1"

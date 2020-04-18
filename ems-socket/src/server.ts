@@ -9,7 +9,7 @@ import ScoringRoom from "./rooms/Scoring";
 import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
-import {EMSProvider, FGC_CONFIG, FTC_CONFIG} from "@the-orange-alliance/lib-ems";
+import { EMSProvider, FGC_CONFIG, FTC_CONFIG, FRC_CONFIG } from "@the-orange-alliance/lib-ems";
 import FmsRoom from "./rooms/FMS";
 
 /* Load our environment variables. The .env file is not included in the repository.

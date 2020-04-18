@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-npm i -g pm2 gulp-cli
+npm i -g pm2 gulp-cli gulp
 pwd
 cd audience-display
 npm install

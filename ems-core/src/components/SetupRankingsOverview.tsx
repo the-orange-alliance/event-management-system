@@ -7,9 +7,18 @@ import EnergyImpactRankTable from "./game-specifics/energy-impact/EnergyImpactRa
 import {connect} from "react-redux";
 import RoverRuckusRankTable from "./game-specifics/rover-ruckus/RoverRuckusRankTable";
 import {
-  EMSProvider, EnergyImpactRanking, EventConfiguration, EventType, HttpError, Ranking, RankingMatchesFormat,
+  EMSProvider,
+  EnergyImpactRanking,
+  EventConfiguration,
+  EventType,
+  HttpError,
+  InfiniteRechargeRank, OceanOpportunitiesRank,
+  Ranking,
+  RankingMatchesFormat,
   RoverRuckusRank
 } from "@the-orange-alliance/lib-ems";
+import FRC20RankTable from "./game-specifics/frc20/FRC20RankTable";
+import OceanOpportunitiesRankTable from "./game-specifics/ocean-opportunities/OceanOpportunitiesRankTable";
 
 interface IProps {
   eventConfig?: EventConfiguration
@@ -65,8 +74,12 @@ class SetupRankingsOverview extends React.Component<IProps, IState> {
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]} identifier={this.props.eventConfig.teamIdentifier}/>;
       case "ftc_1819":
         return <RoverRuckusRankTable rankings={this.state.rankings as RoverRuckusRank[]} identifier={this.props.eventConfig.teamIdentifier}/>;
-      default:
+      case "fgc_2019":
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]}/>;
+      case "frc_20":
+        return <FRC20RankTable rankings={this.state.rankings as InfiniteRechargeRank[]}/>;
+      default:
+        return <OceanOpportunitiesRankTable rankings={this.state.rankings as OceanOpportunitiesRank[]}/>;
     }
   }
 }

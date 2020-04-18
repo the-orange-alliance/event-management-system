@@ -76,7 +76,7 @@ class SetupRoundRobinScheduleParams extends React.Component<IProps> {
                   customInput={<Input fluid={true}/>}
                   showTimeSelect={true}
                   timeIntervals={15}
-                  dateFormat="EEEE, MMMM d YYYY, h:mm a"
+                  dateFormat="EEEE, MMMM d yyyy, h:mm a"
                   onChange={this.updateDayStartTime.bind(this, day.id)}
                   selected={day.startTime.toDate()}
                 />

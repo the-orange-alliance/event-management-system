@@ -449,7 +449,7 @@ class MatchPlay extends React.Component<IProps, IState> {
             const participants: MatchParticipant[] = [];
             for (let i = 0; i < match.participants.length; i++) {
               const participant: MatchParticipant = match.participants[i];
-              if (typeof data !== "undefined" && typeof data.participants[i] !== "undefined") {
+              if (typeof data !== "undefined" && typeof data.participants !== "undefined" && typeof data.participants[i] !== "undefined") {
                 if (participant.teamKey !== data.participants[i].teamKey) {
                   participants.push(data.participants[i]);
                 } else {

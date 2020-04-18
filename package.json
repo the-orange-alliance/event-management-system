@@ -1,7 +1,7 @@
 {
   "name": "event-management-system",
   "description": "Hub for all programs in the EMS suite.",
-  "version": "2.16.14",
+  "version": "2.17.0",
   "private": true,
   "scripts": {
     "api": "cd ems-api/ && npm start",
@@ -10,12 +10,14 @@
     "audience": "cd audience-display/ && npm start",
     "ref": "cd ref-tablet/ && npm start",
     "pit": "cd pit-display/ && npm start",
+    "fms": "cd ems-frc-fms/ && npm start",
     "ems": "concurrently --kill-others \"cd ems-core/ && npm run desktop\" \"cd ems-core/ && npm run react\"",
     "build-audience": "cd audience-display/ && npm run build && cd ../",
     "build-ref": "cd ref-tablet/ && npm run build && cd ../",
     "build-pit": "cd pit-display/ && npm run build && cd ../",
+    "build-fms": "cd ems-frc-fms/ && npm run build && cd ../",
     "build-core": "cd ems-core/ && npm run build && cd ../",
-	"build-home": "cd ems-home/ && npm run build && cd ../",
+    "build-home": "cd ems-home/ && npm run build && cd ../",
     "build-api": "cd ems-api/ && npm run build && cd ../",
     "build-sck": "cd ems-socket/ && npm run build && cd ../",
     "build-web": "cd ems-web/ && npm run build && cd ../",
@@ -26,20 +28,21 @@
     "postbuild": "gulp postbuild",
     "start:prod": "electron build/ems/public/desktop/electron.js",
     "predist": "gulp predist",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems && cd ../"
   },
   "dependencies": {
-    "concurrently": "^3.6.0",
-    "npm": "^6.5.0",
-    "pm2": "^3.0.0",
-    "winston": "^3.0.0"
+    "concurrently": "^5.0.2",
+    "npm": "^6.13.6",
+    "pm2": "^4.2.3",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
-    "del": "^3.0.0",
-    "electron-builder": "20.38.3",
-    "gulp": "3.9.1",
+    "del": "^5.1.0",
+    "electron-builder": "20.28.4",
+    "gulp": "^4.0.2",
     "gulp-install": "^1.1.0",
-    "gulp-rename": "^1.4.0",
+    "gulp-rename": "^2.0.0",
     "gulp-replace": "^1.0.0",
     "gulp-util": "^3.0.8"
   },

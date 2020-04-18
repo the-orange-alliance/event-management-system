@@ -3,8 +3,9 @@ import {Button, ButtonGroup} from "reactstrap";
 import {MatchParticipant} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
-  value: number,
-  participant: MatchParticipant,
+  value: number;
+  participant?: MatchParticipant;
+  label?: string;
   states: string[],
   onChange: (selected: number) => void
 }
@@ -15,7 +16,7 @@ class RobotButtonGroup extends React.Component<IProps> {
   }
 
   public render() {
-    const {participant, states, value} = this.props;
+    const {participant, label, states, value} = this.props;
     const statesView = states.map((state, index) => {
       const isSelected = value === index;
       return (
@@ -25,12 +26,19 @@ class RobotButtonGroup extends React.Component<IProps> {
       );
     });
 
+    let labelView;
+
+    if (typeof participant !== "undefined") {
+      labelView = (<span>{participant.team ? participant.team.teamNameShort : participant.teamKey}</span>);
+    } else if (typeof label !== "undefined") {
+      labelView = (<span>{label}</span>);
+    }
+
     // TODO - Get Team Indentifiers from EMS-CORE
     return(
       <div className="state-switcher-container">
         <div className="state-switcher-team-container">
-          {participant.team && <span>{participant.team.teamNameShort}</span>}
-          {!participant.team && <span>{participant.teamKey}</span>}
+          {labelView}
         </div>
         <ButtonGroup>
           {statesView}

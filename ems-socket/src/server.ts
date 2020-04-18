@@ -10,6 +10,7 @@ import EventRoom from "./rooms/Event";
 import RefereeRoom from "./rooms/Referee";
 import MatchTimer from "./scoring/MatchTimer";
 import {EMSProvider, FGC_CONFIG, FTC_CONFIG} from "@the-orange-alliance/lib-ems";
+import FmsRoom from "./rooms/FMS";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -33,11 +34,12 @@ if (process.argv[2] && process.argv[2].match(ipRegex)) {
 app.use(cors());
 
 const timer = new MatchTimer();
-timer.matchConfig = FGC_CONFIG;
+timer.matchConfig = FRC_CONFIG;
 const clients: Map<string, string[]> = new Map<string, string[]>();
 const scoringRoom = new ScoringRoom(socket, timer);
 const eventRoom = new EventRoom(socket);
 const refereeRoom = new RefereeRoom(socket, timer);
+const fmsRoom = new FmsRoom(socket);
 
 EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
 
@@ -62,6 +64,9 @@ socket.on("connection", (client: Socket) => {
         if (room === "referee") {
           refereeRoom.addClient(client);
         }
+        if (room === "fms") {
+          fmsRoom.addClient(client);
+        }
       }
     } else {
       logger.warn("Denied previous client from joining rooms (incorrect parameters).");
@@ -71,6 +76,7 @@ socket.on("connection", (client: Socket) => {
     scoringRoom.removeClient(client);
     eventRoom.removeClient(client);
     refereeRoom.removeClient(client);
+    fmsRoom.removeClient(client);
   });
   client.on("drip", () => {
     client.emit("drop");

@@ -60,6 +60,10 @@ class AppStore {
   get name() {
     return this._name + ".json";
   }
+
+  public createIfNotExists(): boolean {
+    return ipcRenderer.sendSync("check-existance", this.name);
+  }
 }
 
 export const CONFIG_STORE = new AppStore("config");

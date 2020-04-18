@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.7.24",
+    "@the-orange-alliance/lib-ems": "^0.8.11",
     "axios": "^0.19.0",
     "moment": "^2.24.0",
     "react": "^16.8.6",
@@ -18,7 +18,8 @@
     "start": "set PORT=3033 && react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "update-lib-ems": "npm i @the-orange-alliance/lib-ems@latest"
   },
   "devDependencies": {
     "@types/node": "^12.6.8",

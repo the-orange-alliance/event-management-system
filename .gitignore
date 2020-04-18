@@ -11,6 +11,7 @@ teams.txt
 
 # dependencies
 node_modules/
+node_modules.working/
 napa_cache/
 
 # testing

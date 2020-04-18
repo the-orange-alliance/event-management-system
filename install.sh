@@ -17,5 +17,7 @@ cd ../ems-web
 npm install
 cd ../ref-tablet
 npm install
+cd ../ems-frc-fms
+npm install
 cd ..
 npm run build

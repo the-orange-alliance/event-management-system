@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-npm i -g pm2 gulp-cli
+npm i -g pm2 gulp-cli typescript@3.7.4
 npm i gulp gulp-rename gulp-install del
 pwd
 cd audience-display

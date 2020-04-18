@@ -12,4 +12,4 @@ jobs:
     - os: osx
       before_install: pyenv install 2.7.17 && pyenv global 2.7.17
     - os: windows
-      before_install: choco install python2 && npm install --global --production windows-build-tools
+      before_install: choco install python2 visualstudio2019buildtools && npm install --global --production windows-build-tools

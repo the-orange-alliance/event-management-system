@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 npm i -g pm2 gulp-cli
-npm i gulp
+npm i gulp gulp-rename
 pwd
 cd audience-display
 npm install

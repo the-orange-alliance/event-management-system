@@ -10,7 +10,7 @@ import {CONFIG_STORE} from "./AppStore";
 import * as Config from "./stores/config/reducer";
 import * as Internal from "./stores/internal/reducer";
 import {initialState} from "./stores/scoring/reducer";
-import {IInternalState} from "./stores/internal/models";
+// import {IInternalState} from "./stores/internal/models";
 import ProcessManager from "./managers/ProcessManager";
 import DialogManager from "./managers/DialogManager";
 import {AppError, EliminationsSchedule, EMSProvider, Process, RoundRobinSchedule} from "@the-orange-alliance/lib-ems";

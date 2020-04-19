@@ -7,4 +7,4 @@ gulp post-build
 gulp update-pkg
 npm run predist
 npm run dist
-ls
+ls build/dist

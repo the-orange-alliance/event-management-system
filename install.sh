@@ -20,4 +20,4 @@ npm install
 cd ../ems-frc-fms
 npm install
 cd ..
-npm run build
+# npm run build

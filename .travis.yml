@@ -16,7 +16,11 @@ deploy:
   provider: releases
   api_key:
     secure: D3/yu7rS0mBZiyXbHbaysa96Q6gV8BAQtm6mENdHYCSYO/s9IU4ClSr1XUpkR9f7pxRO1j9ewRLZOgpyGWLKxohVwNXZIppWFlDuKkMm1p71l8hOxv3uMQnltFz8R/ZBNA69WyHOnUnZKGkxG/frKiivvEA6LjmA+isAvA+c+epdPfGCx8HFezwDfZDjae6AWo1UKIgdJsCPHOTRi+TDZPc7JJwxL6ZI6hxxv0pgCMwW1Px9dmX9c+S0XZ53UXUp/bu3vZowf4AntrkIzrD7Qm+7rKVpNAi3cb2bSIcI+UAo6/jqDxgMSXgMRPyX7PyDJ1VJ5x7R3NSjCEgkCb6IGUA9D2M2s4/MEHoh/t723wkroq2bvPLPt6P3k33HAgHODaErWTas1IWXILJHrGjZaenFEfGKBkBc3BV432x6jmpqKQvHV+wYDKtgyI2VLbD2SppkrJRxd8Nsm5FmxYBBMZJc7mBqE9RgJxksTUIStEGzFz+aHzW8NbHPL9UIT4u9TuXTXt6n2kjK1glUNyL8OtlT+1EI7QJkf4Ygx+1oX/scvvqtplm4eUEed91XYBhS5MHpRI3YTa0cmNqmyVDJNBvoLPw4P2wYw62kb+tWIwhRxSolaXgZ6vonmLcIu/+m188oKHeQj54EjIXAvgJkg5KNqKwy3VvAFpz9aqGPKN4=
-  file: build/dist/ems-core*
+  file:
+    - build/dist/ems-core*
+    - build/dist/mac/Electron.app
+    - build/dist/Event Management System Setup*
+  file_glob: true
   on:
     tags: true
     branch: master

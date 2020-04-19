@@ -2,6 +2,7 @@
 
 npm i -g pm2 gulp-cli typescript@3.7.4
 npm i gulp gulp-rename gulp-install del
+npm i
 pwd
 cd audience-display
 npm install

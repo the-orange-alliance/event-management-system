@@ -5,21 +5,19 @@ npm i gulp gulp-rename gulp-install del
 pwd
 cd audience-display
 which npm
-echo $PATH
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ems-api
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ems-core
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ems-home
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ems-socket
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ems-web
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ref-tablet
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ../ems-frc-fms
-npm install
+/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
 cd ..
-# npm run build

@@ -4,20 +4,20 @@ npm i -g pm2 gulp-cli typescript@3.7.4
 npm i gulp gulp-rename gulp-install del
 pwd
 cd audience-display
-which npm
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+export truenpm=`which npm`
+$truenpm install
 cd ../ems-api
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ../ems-core
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ../ems-home
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ../ems-socket
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ../ems-web
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ../ref-tablet
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ../ems-frc-fms
-/home/travis/.nvm/versions/node/v10.20.1/bin/npm install
+$truenpm install
 cd ..

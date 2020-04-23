@@ -1,8 +1,8 @@
 language: node_js
 node_js: 10
-install: "./install.sh"
+install: ./install.sh
 script: npm run build
-after_success: "./package.sh"
+after_success: ./package.sh
 jobs:
   include:
   - os: linux

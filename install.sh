@@ -4,18 +4,20 @@ npm i -g pm2 gulp-cli typescript@3.7.4
 npm i gulp gulp-rename gulp-install del
 pwd
 cd audience-display
-npm install
+export truenpm=`which npm`
+$truenpm install
 cd ../ems-api
-npm install
+$truenpm install
 cd ../ems-core
-npm install
+$truenpm install
 cd ../ems-home
-npm install
+$truenpm install
 cd ../ems-socket
-npm install
+$truenpm install
 cd ../ems-web
-npm install
+$truenpm install
 cd ../ref-tablet
-npm install
+$truenpm install
+cd ../ems-frc-fms
+$truenpm install
 cd ..
-npm run build

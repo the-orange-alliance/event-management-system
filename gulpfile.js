@@ -156,7 +156,7 @@ gulp.task("prebuild", gulp.series("generate-env", "deploy-env"));
 /* Inbetween these tasks, run `npm run build` */
 
 /* Postbuild tasks */
-gulp.task("postbuild", gulp.series("clean-build", "post-build", "update-pkg"));
+gulp.task("postbuild", gulp.series("clean-build", "post-build")); // , "update-pkg")); removed due because problems
 
 /* Predist tasks */
 gulp.task("predist", gulp.series("install-deps", "place-binary", "place-resources"));

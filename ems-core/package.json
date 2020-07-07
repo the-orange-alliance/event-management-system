@@ -43,7 +43,7 @@
     "@types/react-toastify": "^4.0.2",
     "@types/socket.io-client": "^1.4.32",
     "concurrently": "^4.1.0",
-    "electron": "^5.0.1",
+    "electron": "^9.1.0",
     "electron-debug": "^2.2.0",
     "electron-rebuild": "^1.8.4",
     "typescript": "^3.4.5"

@@ -1,6 +1,8 @@
 import {AppError} from "@the-orange-alliance/lib-ems";
 
-const ipcRenderer = (window as any).require("electron").ipcRenderer;
+// const ipcRenderer = (window as any).require("electron").ipcRenderer;
+
+import { ipcRenderer } from 'electron'
 
 /**
  * @author Kyle Flynn

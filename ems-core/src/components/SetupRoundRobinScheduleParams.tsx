@@ -6,7 +6,7 @@ import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import ExplanationIcon from "./ExplanationIcon";
 import DatePicker from "react-datepicker";
-import * as moment from "moment";
+import moment from "moment";
 import {SyntheticEvent} from "react";
 import {CONFIG_STORE} from "../AppStore";
 import DialogManager from "../managers/DialogManager";

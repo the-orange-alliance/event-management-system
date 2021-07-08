@@ -5,7 +5,7 @@ import {
   SET_MATCH_STATE, UPDATE_PARTICIPANT_STATUS,
 } from "./constants";
 import {Match, MatchState, MatchParticipant, MatchDetails} from "@the-orange-alliance/lib-ems";
-import * as moment from "moment";
+import moment from "moment";
 
 export interface ISetActiveMatch {
   type: SET_ACTIVE_MATCH,

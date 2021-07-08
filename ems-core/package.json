@@ -5,16 +5,17 @@
   "main": "build/electron.js",
   "dependencies": {
     "@the-orange-alliance/lib-ems": "^0.8.11",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "dotenv": "^8.0.0",
     "local-ipv4-address": "0.0.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.1",
     "opn": "^6.0.0",
     "pm2": "^3.5.0",
     "react": "^16.8.6",
     "react-datepicker": "^2.10.1",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
+    "react-scripts": "^4.0.3",
     "react-scripts-ts": "3.1.0",
     "react-toastify": "^5.1.0",
     "redux": "^4.0.1",
@@ -26,8 +27,9 @@
   "scripts": {
     "start": "concurrently --kill-others \"npm run desktop\" \"npm run react\"",
     "desktop": "tsc -p tsconfig.electron.json --skipLibCheck && electron .",
-    "react": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "electron": "electron .",
+    "react": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "postbuild": "tsc -p tsconfig.electron.json --skipLibCheck",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
@@ -35,19 +37,39 @@
     "update-lib-ems": "npm i @the-orange-alliance/lib-ems@latest"
   },
   "devDependencies": {
-    "@types/node": "^12.0.0",
+    "@types/node": "^15.12.5",
     "@types/react": "^16.8.16",
+
     "@types/react-datepicker": "^2.3.0",
     "@types/react-dom": "^16.8.4",
     "@types/react-redux": "^7.0.8",
     "@types/react-toastify": "^4.0.2",
     "@types/socket.io-client": "^1.4.32",
     "concurrently": "^4.1.0",
-    "electron": "^5.0.1",
+    "electron": "^6.0.12",
     "electron-debug": "^2.2.0",
-    "electron-rebuild": "^1.8.4",
-    "typescript": "^3.4.5"
+    "electron-rebuild": "^2.3.5",
+    "react-app-rewired": "^2.1.8",
+    "typescript": "^4.3.4"
   },
+  "homepage": "./",
   "proxy": "http://localhost:4200",
-  "homepage": "./"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  }
 }

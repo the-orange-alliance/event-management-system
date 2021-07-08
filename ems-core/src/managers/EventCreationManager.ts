@@ -55,17 +55,17 @@ class EventCreationManager {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getTeams().then((emsTeams: Team[]) => {
         if (emsTeams.length > 0) {
-          resolve();
+          resolve(null);
         } else {
           EMSProvider.postTeams(teams).then(() => {
-            resolve();
+            resolve(null);
           }).catch((error: HttpError) => {
             reject(error);
           });
         }
       }).catch(() => {
         EMSProvider.postTeams(teams).then(() => {
-          resolve();
+          resolve(null);
         }).catch((error: HttpError) => {
           reject(error);
         });
@@ -77,13 +77,13 @@ class EventCreationManager {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.deleteScheduleItems(type).then(() => {
         EMSProvider.postScheduleItems(scheduleItems).then(() => {
-          resolve();
+          resolve(null);
         }).catch((error: HttpError) => {
           reject(error);
         })
       }).catch(() => [
         EMSProvider.postScheduleItems(scheduleItems).then(() => {
-          resolve();
+          resolve(null);
         }).catch((error: HttpError) => {
           reject(error);
         })
@@ -95,7 +95,7 @@ class EventCreationManager {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getMatchesByTournamentLevel(tournamentLevel).then((emsMatches: Match[]) => {
         if (emsMatches.length > 0) {
-          resolve();
+          resolve(null);
         } else {
           EMSProvider.postMatchSchedule(matches).then(() => {
             const participants: MatchParticipant[] = [];
@@ -108,7 +108,7 @@ class EventCreationManager {
               }
             }
             EMSProvider.postMatchScheduleParticipants(participants).then(() => {
-              resolve();
+              resolve(null);
             }).catch((participantError: HttpError) => {
               reject(participantError);
             });
@@ -127,7 +127,7 @@ class EventCreationManager {
             }
           }
           EMSProvider.postMatchScheduleParticipants(participants).then(() => {
-            resolve();
+            resolve(null);
           }).catch((participantError: HttpError) => {
             reject(participantError);
           });
@@ -151,7 +151,7 @@ class EventCreationManager {
         }
         EMSProvider.postMatchScheduleParticipants(participants).then(() => {
           EMSProvider.resetCardStatuses().then(() => {
-            resolve();
+            resolve(null);
           }).catch((cardError: HttpError) => {
             reject(cardError);
           });
@@ -179,17 +179,17 @@ class EventCreationManager {
       }
       EMSProvider.getRankings().then((emsRankings: Ranking[]) => {
         if (emsRankings.length > 0) {
-          resolve();
+          resolve(null);
         } else {
           EMSProvider.postRankings(rankings).then(() => {
-            resolve();
+            resolve(null);
           }).catch((postError: HttpError) => {
             reject(postError);
           });
         }
       }).catch(() => {
         EMSProvider.postRankings(rankings).then(() => {
-          resolve();
+          resolve(null);
         }).catch((postError: HttpError) => {
           reject(postError);
         });
@@ -201,17 +201,17 @@ class EventCreationManager {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.getRankings().then((emsRankings: Ranking[]) => {
         if (emsRankings.length > 0) {
-          resolve();
+          resolve(null);
         } else {
           EMSProvider.postRankings(rankings).then(() => {
-            resolve();
+            resolve(null);
           }).catch((postError: HttpError) => {
             reject(postError);
           });
         }
       }).catch(() => {
         EMSProvider.postRankings(rankings).then(() => {
-          resolve();
+          resolve(null);
         }).catch((postError: HttpError) => {
           reject(postError);
         });
@@ -222,7 +222,7 @@ class EventCreationManager {
   public postAlliances(members: AllianceMember[]): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       EMSProvider.postAllianceMembers(members).then(() => {
-        resolve();
+        resolve(null);
       }).catch((error: HttpError) => {
         reject(error);
       });

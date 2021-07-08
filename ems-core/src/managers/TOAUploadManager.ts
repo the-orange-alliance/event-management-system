@@ -61,7 +61,7 @@ class TOAUploadManager {
         setTimeout(() => {
           const participants: TOAEventParticipant[] = teams.map((t: Team) => new TOAEventParticipantAdapter(t).get());
           TOAProvider.postEventParticipants(eventKey, participants).then(() => {
-            resolve();
+            resolve(null);
           }).catch((postError: HttpError) => {
             reject(postError);
           });
@@ -95,7 +95,7 @@ class TOAUploadManager {
           promises.push(TOAProvider.postMatchDetails(eventKey, toaDetails));
           promises.push(TOAProvider.postMatchParticipants(eventKey, toaParticipants));
           Promise.all(promises).then(() => {
-            resolve();
+            resolve(null);
           }).catch((error: HttpError) => {
             reject(error);
           });
@@ -123,7 +123,7 @@ class TOAUploadManager {
                 if (rankings.length > 0) {
                   const toaRankings: TOARanking[] = rankings.map((r: Ranking) => new TOARankingAdapter(r).get());
                   TOAProvider.postRankings(eventKey, toaRankings).then(() => {
-                    resolve();
+                    resolve(null);
                   }).catch((postError: HttpError) => {
                     reject(postError);
                   });
@@ -138,7 +138,7 @@ class TOAUploadManager {
             reject(deleteError);
           });
         } else {
-          resolve();
+          resolve(null);
         }
       }).catch((error: HttpError) => {
         reject(error);

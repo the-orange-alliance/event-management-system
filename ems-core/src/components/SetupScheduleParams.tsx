@@ -4,7 +4,7 @@ import {getTheme} from "../AppTheme";
 import ExplanationIcon from "./ExplanationIcon";
 import {SyntheticEvent} from "react";
 import DatePicker from "react-datepicker";
-import * as moment from "moment";
+import moment from "moment";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {CONFIG_STORE} from "../AppStore";

@@ -1,17 +1,33 @@
 {
-  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
-  "linterOptions": {
-    "exclude": [
-      "config/**/*.js",
-      "node_modules/**/*.ts"
-    ]
+ // "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+ // "linterOptions": {
+ //   "exclude": [
+ //     "config/**/*.js",
+ //     "node_modules/**/*.ts"
+ //   ]
+ // },
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react"
   },
-  "rules": {
-    "no-console": false,
-    "object-literal-sort-keys": false,
-    "object-literal-shorthand": false,
-    "variable-name": ["allow-leading-underscore"],
-    "member-ordering": false,
-    "ordered-imports": false
-  }
+  "include": [
+    "src"
+  ]
 }

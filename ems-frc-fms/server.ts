@@ -257,7 +257,7 @@ export class EmsFrcFms {
     }
 
     private startAPLoop() {
-        this.apInterval = setInterval(()=> { AccesspointSupport.getInstance().runAp() }, 3000);
+        this.apInterval = setInterval(async ()=> { await AccesspointSupport.getInstance().runAp() }, 3000);
         logger.info('✅ Access Point Manager Init Complete, Running Loop');
     }
 
@@ -292,7 +292,7 @@ export class EmsFrcFms {
                     }
                 }
                 resolve(participants);
-            }).catch(err => logger.info('Error getting match teams: ' + err));
+            }).catch(err => logger.info('❌ Error getting match teams: ' + err));
         });
     }
 }

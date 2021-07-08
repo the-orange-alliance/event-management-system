@@ -4,7 +4,7 @@ import {Table} from "semantic-ui-react";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import DialogManager from "../../../managers/DialogManager";
-import * as moment from "moment";
+import moment from "moment";
 import {EMSProvider, EventConfiguration, HttpError, Match, Ranking} from "@the-orange-alliance/lib-ems";
 
 interface IProps {

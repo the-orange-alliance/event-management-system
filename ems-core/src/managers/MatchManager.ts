@@ -92,21 +92,21 @@ class MatchManager {
   public setAudienceDisplay(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       SocketProvider.send("request-video", 2);
-      resolve();
+      resolve(null);
     });
   }
 
   public startMatch(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       SocketProvider.emit("start");
-      resolve();
+      resolve(null);
     });
   }
 
   public abortMatch(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       SocketProvider.emit("abort");
-      resolve();
+      resolve(null);
     });
   }
 
@@ -120,11 +120,11 @@ class MatchManager {
                 if (err) {
                   reject(err);
                 } else {
-                  resolve();
+                  resolve(null);
                 }
               });
               SocketProvider.emit("commit-scores", match.matchKey, updateDisplay);
-              resolve();
+              resolve(null);
             }).catch((rankError: HttpError) => {
               reject(rankError);
             });
@@ -135,11 +135,11 @@ class MatchManager {
               if (err) {
                 reject(err);
               } else {
-                resolve();
+                resolve(null);
               }
             });
             SocketProvider.emit("commit-scores", match.matchKey, updateDisplay);
-            resolve();
+            resolve(null);
           }, 250);
         }
       }).catch((error: any) => {
@@ -371,10 +371,10 @@ class MatchManager {
             }
           }
           EMSProvider.postMatchScheduleParticipants(participants).then(() => {
-            resolve();
+            resolve(null);
           }).catch(() => {
             EMSProvider.putMatchParticipants(participants).then(() => {
-              resolve();
+              resolve(null);
             }).catch((error: HttpError) => {
               reject(error);
             });
@@ -405,7 +405,7 @@ class MatchManager {
       return new Promise<any>((resolve, reject) => {
         EMSProvider.putActiveMatch(match).then(() => {
           EMSProvider.putMatchParticipants(match.participants).then(() => {
-            resolve();
+            resolve(null);
           }).catch((pError: HttpError) => reject(pError));
         }).catch((error: HttpError) => reject(error));
       });

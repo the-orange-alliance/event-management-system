@@ -390,7 +390,7 @@ export class DriverstationSupport {
             ds.allianceStation = match.participants[t].station;
             this.allDriverStations[t] = ds;
         }
-        logger.info('Driver Station Prestart Completed');
+        logger.info('✔ Driver Station Prestart Completed');
     }
 
     // Construct a control packet for the Driver Station

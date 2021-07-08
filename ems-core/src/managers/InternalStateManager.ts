@@ -1,7 +1,7 @@
 import {AllianceMember, AppError, EMSProvider, Event, EventConfiguration, HttpError, Team, Match} from "@the-orange-alliance/lib-ems";
-import * as moment from "moment";
+import moment from "moment";
 
-const {ipcRenderer} = (window as any).require("electron");
+import {ipcRenderer} from 'electron';
 
 export interface IInternalProgress {
   completedStep: number,
@@ -28,6 +28,7 @@ class InternalStateManager {
   private constructor() {}
 
   // TODO - Implement Web Server and Socket instance.
+  // TODO - Implement Timeout and failure
   public async pollServicesForResponse(): Promise<boolean> {
     let apiReady: boolean = false;
     while (!apiReady) {
@@ -122,7 +123,7 @@ class InternalStateManager {
   public createBackup(location: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       ipcRenderer.once("create-backup-success", () => {
-        resolve();
+        resolve(null);
       });
       ipcRenderer.once("create-backup-error", (event: any, error: any) => {
         reject(new AppError(1202, "BACKUP_ERROR", error));

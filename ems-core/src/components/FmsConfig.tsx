@@ -22,25 +22,48 @@ interface IState {
     apIpAddress: string,
     apUsername: string,
     apPassword: string
-    apTeamCh: string,
-    apAdminCh: string,
+    apTeamCh: number,
+    apAdminCh: number,
     apAdminWpaKey: string,
     switchIpAddress: string,
     switchPassword: string,
     enablePlc: boolean,
     plcIpAddress: string,
 }
-// TODO: Emit fms-request-settings and listen to fms-settings to get settings from FMS
+
+
 class FmsConfig extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {enableFms: false, enableAdvNet: false, apIpAddress:'10.0.100.1', apUsername:'root',
-            apPassword: '56Seven', apTeamCh: '157', apAdminCh: '-1', apAdminWpaKey:'56Seven', switchIpAddress: '10.0.100.2',
+            apPassword: '1234Five', apTeamCh: 157, apAdminCh: -1, apAdminWpaKey:'56Seven', switchIpAddress: '10.0.100.2',
             switchPassword: '56Seven', enablePlc: false, plcIpAddress: '10.0.100.10'};
         this.saveAndApply = this.saveAndApply.bind(this);
         this.toggleFms = this.toggleFms.bind(this);
         this.toggleAdvNet = this.toggleAdvNet.bind(this);
         this.togglePlc = this.togglePlc.bind(this);
+    }
+
+    // TODO: Emit fms-request-settings and listen to fms-settings to get settings from FMS
+    public componentDidMount(): void {
+        SocketProvider.on('fms-settings', (data) => {
+            const config = JSON.parse(data);
+            this.setState({
+                enableFms: config.enable_fms,
+                enableAdvNet: config.enable_adv_net,
+                apIpAddress: config.ap_ip,
+                apUsername: config.ap_username,
+                apPassword: config.ap_password,
+                apTeamCh: config.ap_team_ch,
+                apAdminCh: config.ap_admin_ch,
+                apAdminWpaKey: config.ap_admin_wpa,
+                switchIpAddress: config.switch_ip,
+                switchPassword: config.switch_password,
+                enablePlc: config.enable_plc,
+                plcIpAddress: config.plc_ip
+            });
+        });
+        SocketProvider.emit("fms-request-settings");
     }
 
     private toggleFms() {
@@ -64,81 +87,21 @@ class FmsConfig extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const {enableFms} = this.state;
-        const {enableAdvNet} = this.state;
-        const {apIpAddress} = this.state;
-        const {apUsername} = this.state;
-        const {apPassword} = this.state;
-        const {apTeamCh} = this.state;
-        const {apAdminCh} = this.state;
-        const {apAdminWpaKey} = this.state;
-        const {switchIpAddress} = this.state;
-        const {switchPassword} = this.state;
-        const {enablePlc} = this.state;
-        const {plcIpAddress} = this.state;
         const adminWifiOpts = [
-            {
-                key: 'Disabled',
-                text: 'Disabled',
-                value: '-1',
-            },
-            {
-                key: '1',
-                text: 'Ch 1',
-                value: '1',
-            },
-            {
-                key: '6',
-                text: 'Ch 6',
-                value: '6',
-            },
-            {
-                key: '11',
-                text: 'Ch 11',
-                value: '11',
-            },
+            { key: 'Disabled', text: 'Disabled', value: -1 },
+            { key: '1',  text: 'Ch 1',  value: 1  },
+            { key: '6',  text: 'Ch 6',  value: 6  },
+            { key: '11', text: 'Ch 11', value: 11 },
         ];
         const teamWifiOpts = [
-            {
-                key: '36',
-                text: 'Ch 36',
-                value: '36',
-            },
-            {
-                key: '40',
-                text: 'Ch 40',
-                value: '40',
-            },
-            {
-                key: '44',
-                text: 'Ch 44',
-                value: '44',
-            },
-            {
-                key: '48',
-                text: 'Ch 48',
-                value: '48',
-            },
-            {
-                key: '149',
-                text: 'Ch 149',
-                value: '149',
-            },
-            {
-                key: '153',
-                text: 'Ch 153',
-                value: '153',
-            },
-            {
-                key: '157',
-                text: 'Ch 157',
-                value: '157',
-            },
-            {
-                key: '161',
-                text: 'Ch 161',
-                value: '161',
-            },
+            { key: '36',  text: 'Ch 36',  value: 36  },
+            { key: '40',  text: 'Ch 40',  value: 40  },
+            { key: '44',  text: 'Ch 44',  value: 44  },
+            { key: '48',  text: 'Ch 48',  value: 48  },
+            { key: '149', text: 'Ch 149', value: 149 },
+            { key: '153', text: 'Ch 153', value: 153 },
+            { key: '157', text: 'Ch 157', value: 157 },
+            { key: '161', text: 'Ch 161', value: 161 },
         ];
         return (
             <Tab.Pane className="tab-subview">
@@ -165,12 +128,12 @@ class FmsConfig extends React.Component<IProps, IState> {
                                 </Grid.Row>
                                 <Grid.Row columns={5}>
                                     <GridColumn><span>Enable FMS</span></GridColumn>
-                                    <GridColumn><Checkbox checked={enableFms} onChange={this.toggleFms}/></GridColumn>
+                                    <GridColumn><Checkbox checked={this.state.enableFms} onChange={this.toggleFms}/></GridColumn>
                                 </Grid.Row>
                             </Grid>
                         </Card.Content>
                     </Card>
-                    {enableFms &&
+                    {this.state.enableFms &&
                         <Card fluid={true} color={getTheme().secondary}>
                             <Card.Content>
                                 <Grid>
@@ -187,14 +150,14 @@ class FmsConfig extends React.Component<IProps, IState> {
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>Enable Advanced Networking</span></GridColumn>
-                                        <GridColumn><Checkbox checked={enableAdvNet} onChange={this.toggleAdvNet}/></GridColumn>
+                                        <GridColumn><Checkbox checked={this.state.enableAdvNet} onChange={this.toggleAdvNet}/></GridColumn>
                                     </Grid.Row>
 
                                 </Grid>
                             </Card.Content>
                         </Card>
                     }
-                    {(enableFms && enableAdvNet) &&
+                    {(this.state.enableFms && this.state.enableAdvNet) &&
                         <Card fluid={true} color={getTheme().secondary}>
                             <Card.Content>
                                 <Grid>
@@ -205,7 +168,7 @@ class FmsConfig extends React.Component<IProps, IState> {
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>AP IP Address</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true}  value={apIpAddress}  /></GridColumn>
+                                        <GridColumn><Form.Input fluid={true}  value={this.state.apIpAddress} onChange={(e) => this.setState({apIpAddress: e.target.value})}/></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>AP Team Channel (5GHz) </span></GridColumn>
                                         <GridColumn>
@@ -213,15 +176,15 @@ class FmsConfig extends React.Component<IProps, IState> {
                                               placeholder={'Disabled'}
                                               fluid={true}
                                               selection={true}
-                                              defaultValue={'157'}
                                               options={teamWifiOpts}
-                                              value={apTeamCh}
+                                              value={this.state.apTeamCh}
+                                              onChange={(e, d) => this.setState({apTeamCh: d.value as number})}
                                             />
                                         </GridColumn>
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>AP Username</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={apUsername}/></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={this.state.apUsername}/></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>AP Admin Channel (2.4GHz) </span></GridColumn>
                                         <GridColumn>
@@ -229,24 +192,24 @@ class FmsConfig extends React.Component<IProps, IState> {
                                               placeholder={'Disabled'}
                                               fluid={true}
                                               selection={true}
-                                              defaultValue={'-1'}
                                               options={adminWifiOpts}
-                                              value={apAdminCh}
+                                              value={this.state.apAdminCh}
+                                              onChange={(e, d) => this.setState({apAdminCh: d.value as number})}
                                             />
                                         </GridColumn>
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>AP Password</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={apPassword} type={"password"} /></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={this.state.apPassword} type={"password"} onChange={(e) => this.setState({apPassword: e.target.value})}/></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>AP Admin WPA Key </span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={apAdminWpaKey} type={"password"} /></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={this.state.apAdminWpaKey} type={"password"} onChange={(e) => this.setState({apAdminWpaKey: e.target.value})}/></GridColumn>
                                     </Grid.Row>
                                 </Grid>
                             </Card.Content>
                         </Card>
                     }
-                    {(enableFms && enableAdvNet) &&
+                    {(this.state.enableFms && this.state.enableAdvNet) &&
                         <Card fluid={true} color={getTheme().secondary}>
                             <Card.Content>
                                 <Grid>
@@ -257,16 +220,16 @@ class FmsConfig extends React.Component<IProps, IState> {
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>Switch Address</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={switchIpAddress}/></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={this.state.switchIpAddress} onChange={(e) => this.setState({switchIpAddress: e.target.value})}/></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>Switch Password</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={switchPassword} type={"password"} /></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={this.state.switchPassword} type={"password"} onChange={(e) => this.setState({switchPassword: e.target.value})}/></GridColumn>
                                     </Grid.Row>
                                 </Grid>
                             </Card.Content>
                         </Card>
                     }
-                    {(enableFms && enableAdvNet) &&
+                    {(this.state.enableFms && this.state.enableAdvNet) &&
                         <Card fluid={true} color={getTheme().secondary}>
                             <Card.Content>
                                 <Grid>
@@ -277,10 +240,10 @@ class FmsConfig extends React.Component<IProps, IState> {
                                     </Grid.Row>
                                     <Grid.Row columns={5}>
                                         <GridColumn><span>Enable PLC Control</span></GridColumn>
-                                        <GridColumn><Checkbox checked={enablePlc} onChange={this.togglePlc}/></GridColumn>
+                                        <GridColumn><Checkbox checked={this.state.enablePlc} onChange={this.togglePlc}/></GridColumn>
                                         <GridColumn/>
                                         <GridColumn><span>PLC Address</span></GridColumn>
-                                        <GridColumn><Form.Input fluid={true} value={plcIpAddress}/></GridColumn>
+                                        <GridColumn><Form.Input fluid={true} value={this.state.plcIpAddress} onChange={(e) => this.setState({plcIpAddress: e.target.value})}/></GridColumn>
                                     </Grid.Row>
                                 </Grid>
                             </Card.Content>

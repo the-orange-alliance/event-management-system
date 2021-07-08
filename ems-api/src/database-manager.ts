@@ -31,7 +31,7 @@ class DatabaseManager {
           if (error) {
             reject(error);
           } else {
-            resolve();
+            resolve(null);
           }
         });
       }).catch((error) => {
@@ -47,7 +47,7 @@ class DatabaseManager {
       }
       this.createBase().then(() => {
         this.alterFromEventType(eventType).then(() => {
-          resolve();
+          resolve(null);
         }).catch((error) => reject(error));
       }).catch((error) => reject(error));
     });
@@ -294,7 +294,7 @@ class DatabaseManager {
           if (error) {
             reject(error);
           } else {
-            setTimeout(() => resolve(), 1000);
+            setTimeout(() => resolve(null), 1000);
           }
         });
       }).catch((error) => {
@@ -310,7 +310,7 @@ class DatabaseManager {
           if (error) {
             reject(error);
           } else {
-            setTimeout(() => resolve(), 1000);
+            setTimeout(() => resolve(null), 1000);
           }
         });
       }).catch((error) => {

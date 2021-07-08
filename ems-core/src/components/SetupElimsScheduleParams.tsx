@@ -4,7 +4,7 @@ import {getTheme} from "../AppTheme";
 import ExplanationIcon from "./ExplanationIcon";
 import {SyntheticEvent} from "react";
 import DatePicker from "react-datepicker";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
 import {IApplicationState} from "../stores";
 import {connect} from "react-redux";
 import {CONFIG_STORE} from "../AppStore";
@@ -19,7 +19,6 @@ import {
   ScheduleItem,
   TournamentRound
 } from "@the-orange-alliance/lib-ems";
-import * as moment from "moment";
 interface IProps {
   activeRound: TournamentRound,
   event?: Event,
@@ -100,7 +99,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
                   showTimeSelect={true}
                   timeIntervals={15}
                   dateFormat="EEEE, MMMM d yyyy, h:mm a"
-                  onChange={this.updateDayStartTime.bind(this, day.id)}
+                  onChange={(date: Date) => {this.updateDayStartTime(day.id, date)}}
                   selected={day.startTime.toDate()}
                 />
               </Form.Field>
@@ -281,7 +280,7 @@ class SetupElimsScheduleParams extends React.Component<IProps, IState> {
     this.forceUpdate();
   }
 
-  private updateDayStartTime(day: number, time: Moment) {
+  private updateDayStartTime(day: number, time: Date) {
     const {activeRound, playoffsSchedule} = this.props;
     const schedule = playoffsSchedule[activeRound.id] as EliminationsSchedule;
     schedule.days[day].startTime = moment(time);

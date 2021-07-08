@@ -1,8 +1,6 @@
 import logger from "./logger";
 import {EmsFrcFms} from "./server";
-import ssh = require('ssh2-promise');
-import {Team} from "@the-orange-alliance/lib-ems";
-import SSHConnection from "ssh2-promise/dist/sshConnection";
+import SSH2Promise from 'ssh2-promise';
 
 export class AccesspointSupport {
   private static _instance: AccesspointSupport;
@@ -14,7 +12,7 @@ export class AccesspointSupport {
   private accessPointConfigRetryIntervalSec: number = 5;
 
   private ap: AccessPoint = new AccessPoint();
-  private sshConn = new SSHConnection({});
+  private sshConn = new SSH2Promise({});
   private sshOpen = false;
   private teamWifiStatuses: TeamWifiStatus[] = new Array<TeamWifiStatus>(6);
 
@@ -40,9 +38,9 @@ export class AccesspointSupport {
   //TODO: Create SSH Command Queue so we don't break things by trying to do multiple SSHs at once
 
   // Run everything
-  public runAp() {
+  public async runAp() {
     if(!this.sshOpen) { // try not to break things now
-      this.updateTeamWifiStatus();
+      await this.updateTeamWifiStatus();
     }
   }
 
@@ -67,6 +65,8 @@ export class AccesspointSupport {
     if (!this.ap.networkSecurityEnabled) return;
     if (this.checkTeamConfig()) return;
 
+    // TODO: Generate WPA Key Functionality, then initialize this.teamWifiStatuses
+
     // Generate Config Command
     const configCommand = this.generateApConfigForMatch();
     if (!configCommand || configCommand.length < 1) {
@@ -80,17 +80,17 @@ export class AccesspointSupport {
       // Run command and wait for response
       if(!await this.runCommand(configCommand)) error = true;
       // Wait before reading the config back on write success as it doesn't take effect right away, or before retrying on failure.
-      this.sleep(this.accessPointConfigRetryIntervalSec * 1000)
+      this.sleep(this.accessPointConfigRetryIntervalSec * 1000);
       if(!error) {
         // Update Team Statuses
         await this.updateTeamWifiStatus();
         if(this.checkTeamConfig()) {
-          logger.info('Successfully configured Wifi after ' + attemptCount + 'attempt(s).');
+          logger.info('✔ Successfully configured Wifi after ' + attemptCount + 'attempt(s).');
           return;
         }
       }
       // There was an error of some kind and the config is not correct
-      logger.info("WiFi configuration still incorrect after " + attemptCount + " attempt(s); trying again.");
+      logger.info("❌ WiFi configuration still incorrect after " + attemptCount + " attempt(s); trying again.");
       attemptCount++;
     }
   }
@@ -108,7 +108,7 @@ export class AccesspointSupport {
     if(!this.ap.initialStatusesFetched || !EmsFrcFms.getInstance().activeMatch) return false;
     for (const i in EmsFrcFms.getInstance().activeMatch.participants) {
       const p = EmsFrcFms.getInstance().activeMatch.participants[i];
-      if (p && this.ap.TeamWifiStatuses[i].teamId != p.teamKey) return false;
+      if (p && this.ap.TeamWifiStatuses[i] && this.ap.TeamWifiStatuses[i].teamId != p.teamKey) return false;
     }
     return true;
   }
@@ -117,13 +117,14 @@ export class AccesspointSupport {
   public async updateTeamWifiStatus() {
     if (!this.ap.networkSecurityEnabled) return;
 
-    const response = await this.runCommand("iwinfo");
+    const data = await this.runCommand("iwinfo");
 
-    if(!response || response.length === 0) {
-      logger.info('Couldn\'t get Wifi Status from AP');
+    if (!data || typeof data !== "string" || data.length === 0) {
+      logger.info('❌ Couldn\'t get Wifi Status from AP (' + this.ap.address + ')');
       return;
     }
-    if(this.decodeWifiConfig(response)) {
+
+    if (this.decodeWifiConfig(data)) {
       this.ap.initialStatusesFetched = true;
     }
   }
@@ -131,23 +132,18 @@ export class AccesspointSupport {
   // Logs into the access point via SSH and runs the given shell command.
   public runCommand(command: string): any {
     if(this.sshConn) this.sshConn.close().catch();
-    this.sshConn = new SSHConnection({host: this.ap.address, username: this.ap.username, password: this.ap.password});
-    this.sshConn.connect().then(() => {
-      logger.info('SSHed into Field AP. Sending Commands...');
+    this.sshConn = new SSH2Promise({host: this.ap.address, username: this.ap.username, password: this.ap.password});
+    return this.sshConn.connect().then(() => {
+      // logger.info('🔨 SSHed into Field AP. Sending Commands...');
       this.sshOpen = true;
 
-      this.sshConn.shell().then((socket) => {
-        socket.on('data', (data: any) => {
-          this.sshConn.close().then(() => logger.info('Successfully closed Field AP Connection')).catch();
-          this.sshOpen = false;
-          return data;
-        });
-        //Write Command to Socket
-        socket.write(command);
+      return this.sshConn.exec(command).then((data) => {
+        this.sshConn.close().catch();
+        this.sshOpen = false;
+        return data
       });
-
     }).catch((reason: any) => {
-      logger.info('Error SSHing into Field AP: ' + reason)
+      logger.info('❌ Error SSHing into Field AP (' + this.ap.address + '): ' + reason);
       return;
     });
   }
@@ -185,22 +181,29 @@ export class AccesspointSupport {
 
   // Parses the given output from the "iwinfo" command on the AP and updates the given status structure with the result.
   public decodeWifiConfig(wifiInfo: string): boolean {
-    const ssidRegEx = new RegExp("ESSID: \"([-\\w ]*)\"");
-    const ssids = ssidRegEx.exec(wifiInfo);
-    const linkQualityRegex = new RegExp("Link Quality: ([-\\w ]+)/([-\\w ]+)");
-    const linkQualities = linkQualityRegex.exec(wifiInfo);
+    const ssidRegEx = /ESSID: "([-\w ]*)"/g;
+    const linkQualityRegex = /Link Quality: ([-\w ]+)\/([-\w ]+)/g;
+    const ssids = [];
+    const linkQualities = [];
+    let v;
+    do {
+      v = ssidRegEx.exec(wifiInfo);
+      if (v) ssids.push(v[1]);
+    } while (v);
+    do {
+      v = linkQualityRegex.exec(wifiInfo);
+      if (v) linkQualities.push([v[1], v[2]]);
+    } while (v);
 
-    if ((ssids !== null && ssids.length < 6) || (linkQualities !== null && linkQualities.length < 6)) {
+    if ((ssids.length < 6) || (linkQualities.length < 6)) {
       // worlds longest log message
-      logger.info("Could not parse wifi info; expected 6 team networks, got " + ((ssids) ? ssids.length : '0') + " and " + ((linkQualities) ? linkQualities.length : 0) )
+      logger.info("❌ Could not parse wifi info; expected 6 team networks and 6 statuses, got " + ((ssids) ? ssids.length : '0') + " and " + ((linkQualities) ? linkQualities.length : 0) );
       return false;
     }
-    let i = 0;
-    while(i < this.teamWifiStatuses.length) {
-      if(ssids!== null) this.teamWifiStatuses[i].teamId = parseInt(ssids[i][1]);
-      if(linkQualities!== null) this.teamWifiStatuses[i].radioLinked = linkQualities[i][1] !== 'unknown';
-
-      i++;
+    for(let i = 0; i < this.teamWifiStatuses.length; i++) {
+      if(!this.teamWifiStatuses[i]) this.teamWifiStatuses[i] = new TeamWifiStatus();
+      if(ssids) this.teamWifiStatuses[i].teamId = parseInt(ssids[i]);
+      if(linkQualities) this.teamWifiStatuses[i].radioLinked = linkQualities[i][0] !== 'unknown';
     }
     return true;
   }

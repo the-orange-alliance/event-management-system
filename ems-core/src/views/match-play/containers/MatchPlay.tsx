@@ -13,7 +13,7 @@ import {
 import {Dispatch} from "redux";
 import {setActiveDetails, setActiveMatch, setActiveParticipants, setMatchState} from "../../../stores/scoring/actions";
 import MatchManager from "../../../managers/MatchManager";
-import * as moment from "moment";
+import moment from "moment";
 import DialogManager from "../../../managers/DialogManager";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {disableNavigation} from "../../../stores/internal/actions";
@@ -466,7 +466,7 @@ class MatchPlay extends React.Component<IProps, IState> {
             this.props.setActiveParticipants(participants);
             this.props.setActiveDetails(data.matchDetails);
             this.setState({activeMatch: data});
-            resolve();
+            resolve(null);
           });
           break;
         }

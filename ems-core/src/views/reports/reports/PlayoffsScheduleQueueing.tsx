@@ -4,7 +4,7 @@ import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Table} from "semantic-ui-react";
 import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
-import * as Moment from "moment";
+import moment from "moment";
 
 interface IProps {
   fields: number[],
@@ -75,8 +75,8 @@ class PlayoffsScheduleQueueing extends React.Component<IProps, IState> {
         <Table.Row key={match.matchKey}>
           <Table.Cell>{match.matchName}</Table.Cell>
           <Table.Cell>{match.fieldNumber}</Table.Cell>
-          <Table.Cell>{useUTCTime ? Moment.utc(match.scheduledStartTime).subtract(queueingTime, "minutes").format("dddd H:mm UTC") :  Moment(match.scheduledStartTime).subtract(queueingTime, "minutes").format("dddd h:mm a")}</Table.Cell>
-          <Table.Cell>{useUTCTime ? Moment.utc(match.scheduledStartTime).format("dddd H:mm  UTC") : match.scheduledStartTime.format("dddd h:mm a")}</Table.Cell>
+          <Table.Cell>{useUTCTime ? moment.utc(match.scheduledStartTime).subtract(queueingTime, "minutes").format("dddd H:mm UTC") :  moment(match.scheduledStartTime).subtract(queueingTime, "minutes").format("dddd h:mm a")}</Table.Cell>
+          <Table.Cell>{useUTCTime ? moment.utc(match.scheduledStartTime).format("dddd H:mm  UTC") : match.scheduledStartTime.format("dddd h:mm a")}</Table.Cell>
           {participants}
         </Table.Row>
       );

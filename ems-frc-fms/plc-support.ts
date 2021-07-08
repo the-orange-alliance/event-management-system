@@ -34,17 +34,16 @@ export class PlcSupport {
     this.client.connectTCP(this.plc.address, { port: this.modBusPort }).then(() => {
       logger.info('✅ Connected to PLC at ' + this.plc.address + ':' + this.modBusPort);
     }).catch((err: any) => {
-      logger.info('❌ Failed to connect to PLC: ' + err);
+      logger.info('❌ Failed to connect to PLC (' + this.plc.address + ':' + this.modBusPort + '): ' + err);
       this.firstConn = true;
     });
-    logger.info('➖ Attempting to connect to PLC');
     this.client.setID(1);
   }
 
   public runPlc() {
     if(!this.client.isOpen) {
       if(this.firstConn) {
-        logger.info('Lost connection to PLC, retrying');
+        logger.info('❌ Lost connection to PLC (' + this.plc.address + ':' + this.modBusPort + '), retrying');
         this.firstConn = false;
         this.initPlc(this.plc.address);
       }
@@ -73,6 +72,7 @@ export class PlcSupport {
     }
   }
 
+  // TODO: This function should probably be being called by something........
   public checkEstops() {
     // Update Driver Stations if E-STOP, Stop Match is Master E-STOP
     if(this.plc.inputs.fieldEstop) {

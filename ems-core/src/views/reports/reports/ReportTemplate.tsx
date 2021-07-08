@@ -3,7 +3,7 @@ import {Dimmer, Divider, Grid, Loader} from "semantic-ui-react";
 import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Event} from "@the-orange-alliance/lib-ems";
-import * as moment from "moment";
+import moment from "moment";
 
 interface IProps {
   event?: Event,

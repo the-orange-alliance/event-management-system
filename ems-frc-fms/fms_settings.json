@@ -1,1 +1,1 @@
-{"enable_fms":true,"enable_adv_net":false,"ap_ip":"10.0.100.1","ap_username":"root","ap_password":"56Seven","ap_team_ch":"157","ap_admin_ch":"-1","ap_admin_wpa":"56Seven","switch_ip":"10.0.100.2","switch_password":"56Seven","enable_plc":false,"plc_ip":"10.0.100.10"}
+{"enable_fms":true,"enable_adv_net":true,"ap_ip":"10.0.100.3","ap_username":"root","ap_password":"1234Five","ap_team_ch":157,"ap_admin_ch":-1,"ap_admin_wpa":"56Seven","switch_ip":"10.0.100.2","switch_password":"56Seven","enable_plc":true,"plc_ip":"10.0.100.40"}

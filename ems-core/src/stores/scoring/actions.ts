@@ -11,7 +11,7 @@ import {
   SET_MATCH_DURATION,
   SET_MATCH_STATE, UPDATE_PARTICIPANT_STATUS
 } from "./constants";
-import * as moment from "moment";
+import moment from "moment";
 import {Match, MatchState, MatchParticipant, MatchDetails} from "@the-orange-alliance/lib-ems";
 
 export const setActiveMatch: ActionCreator<ISetActiveMatch> = (activeMatch: Match) => ({

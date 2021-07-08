@@ -166,7 +166,7 @@ class SettingsSlave extends React.Component<IProps, IState> {
 
   private requestConfig(host: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      const masterSocket = socket(`http://${host}:${process.env.REACT_APP_EMS_SCK_PORT}/`);
+      const masterSocket = socket.connect(`http://${host}:${process.env.REACT_APP_EMS_SCK_PORT}/`);
       setTimeout(() => {
         masterSocket.close();
         reject(new HttpError(1500, "ERR_TIMEOUT", "The server didn't send a response in time."));

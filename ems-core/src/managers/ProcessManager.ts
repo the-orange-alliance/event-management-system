@@ -74,7 +74,7 @@ class ProcessManager {
         if (error) {
           reject(new AppError(1015, "PM2_KILL", error));
         } else {
-          resolve();
+          resolve(null);
         }
       });
       ipcRenderer.send("kill-ecosystem");

@@ -55,7 +55,7 @@ class FGCUploadedManager {
       FGCProvider.deleteTeams(eventKey).then(() => {
         setTimeout(() => {
           FGCProvider.postEventParticipants(eventKey, teams).then(() => {
-            resolve();
+            resolve(null);
           }).catch((postError: HttpError) => {
             reject(postError);
           });
@@ -84,7 +84,7 @@ class FGCUploadedManager {
           promises.push(FGCProvider.postMatchDetails(eventKey, fgcDetails));
           promises.push(FGCProvider.postMatchParticipants(eventKey, fgcParticipants));
           Promise.all(promises).then(() => {
-            resolve();
+            resolve(null);
           }).catch((error: HttpError) => {
             reject(error);
           });
@@ -109,7 +109,7 @@ class FGCUploadedManager {
               EMSProvider.getRankings(getEventTypeFromKey(seasonKey)).then((rankings: Ranking[]) => {
                 if (rankings.length > 0) {
                   FGCProvider.postRankingsByLevel(eventKey, rankings, match.tournamentLevel).then(() => {
-                    resolve();
+                    resolve(null);
                   }).catch((postError: HttpError) => {
                     reject(postError);
                   });
@@ -124,7 +124,7 @@ class FGCUploadedManager {
             reject(deleteError);
           });
         } else {
-          resolve();
+          resolve(null);
         }
       }).catch((error: HttpError) => {
         reject(error);

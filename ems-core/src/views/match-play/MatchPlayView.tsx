@@ -5,7 +5,7 @@ import {ApplicationActions, IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import MatchPlay from "./containers/MatchPlay";
 import VideoSwitch from "./containers/VideoSwitch";
-import * as moment from "moment";
+import moment from "moment";
 import {ISetMatchDuration} from "../../stores/scoring/types";
 import {Dispatch} from "redux";
 import {setMatchDuration} from "../../stores/scoring/actions";

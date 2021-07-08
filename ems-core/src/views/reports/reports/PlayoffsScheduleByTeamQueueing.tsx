@@ -4,7 +4,7 @@ import {IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
 import {Dimmer, Loader, Table} from "semantic-ui-react";
 import {EventConfiguration, Match, Team} from "@the-orange-alliance/lib-ems";
-import * as Moment from "moment";
+import Moment from "moment";
 
 interface IProps {
   fields: number[],

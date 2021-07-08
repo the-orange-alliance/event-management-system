@@ -17,7 +17,7 @@ import {AppError, EliminationsSchedule, EMSProvider, Process, RoundRobinSchedule
 import InternalStateManager, {IInternalProgress} from "./managers/InternalStateManager";
 import Schedule from "@the-orange-alliance/lib-ems/dist/models/ems/Schedule";
 
-const {ipcRenderer} = (window as any).require("electron");
+import { ipcRenderer } from 'electron'
 
 console.log("Preloading application state...");
 

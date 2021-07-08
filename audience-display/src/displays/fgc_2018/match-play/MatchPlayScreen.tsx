@@ -1,6 +1,6 @@
 import * as React from "react";
 import ScoringComponent from "./ScoringComponent";
-import * as moment from "moment";
+import moment from "moment";
 import {Match, MatchParticipant, SocketProvider, Team} from "@the-orange-alliance/lib-ems";
 
 import "./MatchPlayScreen.css";

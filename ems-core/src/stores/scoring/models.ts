@@ -1,5 +1,5 @@
 import {Match, MatchState, MatchParticipant, MatchDetails} from "@the-orange-alliance/lib-ems";
-import * as moment from "moment";
+import moment from "moment";
 
 export interface IScoringState {
   activeMatch: Match,

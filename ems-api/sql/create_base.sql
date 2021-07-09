@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "team" (
     country VARCHAR(255),
     country_code VARCHAR(2),
     rookie_year INT,
+    wpa_key VARCHAR(10),
     card_status INT
 );
 

@@ -11,5 +11,5 @@ export interface IInternalState {
   qualificationMatches: Match[],
   playoffsMatches: Match[],
   allianceMembers: AllianceMember[]
-  socketConnected: boolean
+  socketConnected: boolean,
 }

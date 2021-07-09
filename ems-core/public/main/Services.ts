@@ -31,7 +31,8 @@ ipcMain.on("list-ecosystem", (event: IpcMessageEvent) => {
       pm2.list((errList, procDescList) => {
         pm2.disconnect();
         logger.info("Process description list results were sent back to the renderer process.");
-        event.sender.send("list-ecosystem-response", errList, procDescList);
+
+        event.reply("list-ecosystem-response", errList, procDescList);
       });
     }
   });

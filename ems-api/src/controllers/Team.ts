@@ -5,9 +5,16 @@ import logger from "../logger";
 
 const router: Router = Router();
 
+function cleanWPAs(list: any[]): any[] {
+  for(let i = 0; i < list.length; i++) {
+    list[i].wpa_key = undefined;
+  }
+  return list;
+}
+
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
   DatabaseManager.selectAll("team").then((rows: any[]) => {
-    res.send({payload: rows});
+    res.send({payload: cleanWPAs(rows)});
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
   });
@@ -20,6 +27,29 @@ router.get("/cards/reset", (req: Request, res: Response, next: NextFunction) => 
   }).catch((error: any) => {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
   });
+});
+
+router.get("/wpakeys", async (req: Request, res: Response, next: NextFunction) => {
+  // Get all teams, generate WPA keys for those without them and return team and WPA key
+  try {
+    const teams = await DatabaseManager.selectAll("team");
+    const results = [];
+    for (const team of teams) {
+      // No WPA Key generated, let's make it and put in in DB
+      if (!team.wpa_key || team.wpa_key.length < 8) {
+        // Generate a random WPA key that is 8 characters long:
+        const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        team.wpa_key = '';
+        for (let i = 0; i < 8; i++) team.wpa_key += possible.charAt(Math.floor(Math.random() * possible.length));
+        await DatabaseManager.updateWhere("team", team, `\`team_key\` = '${team.team_key}'`);
+      }
+      results.push({team_key: team.team_key, wpa_key: team.wpa_key})
+    }
+
+    res.send({payload: results});
+  } catch (error) {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  }
 });
 
 router.post("/", (req: Request, res: Response, next: NextFunction) => {

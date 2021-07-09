@@ -61,10 +61,12 @@ class ProcessManager {
           const proc2 = Process.fromPM2(procList[1][0], host);
           const proc3 = Process.fromPM2(procList[2][0], host);
           const processes: Process[] = [proc1, proc2, proc3];
+          console.log('Received PM2 ecosystem info!');
           resolve(processes);
         }
       });
       ipcRenderer.send("start-ecosystem", newHost);
+      console.log('Awaiting PM2 ecosystem results...')
     });
   }
 

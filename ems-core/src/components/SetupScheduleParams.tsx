@@ -303,7 +303,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
       let dayNormalTime: number = 0;
       for (const item of items) {
         if (prevItem.day !== item.day) {
-          schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+          schedule.days[prevItem.day].endTime = prevItem.startTime.add(prevItem.duration, "minutes");
           premiereIndex = 0;
           normalIndex = 0;
           index = 0;
@@ -318,7 +318,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
           // For all matches that are NOT on the final day. FIRST GLOBAL ONLY.
           if (((item.day + 1) === schedule.days.length) && schedule.type === "Qualification") {
             item.duration = 7;
-            item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
+            item.startTime = schedule.days[item.day].startTime.add((7 * premiereIndex) + breakPadding, "minutes");
             index++;
             if (index % 3 === 0) {
               index = 0;
@@ -330,12 +330,12 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
             if (!needsBufferMatch) {
               if (index % 7 < 4) {
                 item.duration = 10;
-                item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
+                item.startTime = schedule.days[item.day].startTime.add((10 * normalIndex) + breakPadding, "minutes");
                 dayNormalTime += item.duration / 2;
                 // console.log("CREATING NORMAL MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
               } else {
                 item.duration = 7;
-                item.startTime = moment(schedule.days[item.day].startTime).add((7 * premiereIndex) + breakPadding, "minutes");
+                item.startTime = schedule.days[item.day].startTime.add((7 * premiereIndex) + breakPadding, "minutes");
                 dayPremiereTime += 7;
                 premiereIndex++;
                 // console.log("CREATING PREMIERE MATCH", index, item.duration, dayPremiereTime, dayNormalTime);
@@ -355,7 +355,7 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
             } else {
               // console.log("BUFFER MATCH");
               item.duration = 10;
-              item.startTime = moment(schedule.days[item.day].startTime).add((10 * normalIndex) + breakPadding, "minutes");
+              item.startTime = schedule.days[item.day].startTime.add((10 * normalIndex) + breakPadding, "minutes");
               dayPremiereTime = 0;
               dayNormalTime = 0;
               bufferCount++;
@@ -369,15 +369,15 @@ class SetupScheduleParams extends React.Component<IProps, IState> {
 
         } else {
           const thisBreak = schedule.days[item.day].breaks[breakIndex];
-          schedule.days[item.day].breaks[breakIndex].startTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
-          schedule.days[item.day].breaks[breakIndex].endTime = moment(thisBreak.startTime).add(thisBreak.duration, "minutes");
+          schedule.days[item.day].breaks[breakIndex].startTime = prevItem.startTime.add(prevItem.duration, "minutes");
+          schedule.days[item.day].breaks[breakIndex].endTime = thisBreak.startTime.add(thisBreak.duration, "minutes");
           breakPadding += item.duration;
           breakIndex++;
         }
         prevItem = item;
       }
       if (items.length > 0) {
-        schedule.days[prevItem.day].endTime = moment(prevItem.startTime).add(prevItem.duration, "minutes");
+        schedule.days[prevItem.day].endTime = prevItem.startTime.add(prevItem.duration, "minutes");
       }
       this.forceUpdate();
       return items;

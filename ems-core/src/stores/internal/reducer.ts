@@ -30,7 +30,7 @@ export const initialState: IInternalState = {
   qualificationMatches: [],
   playoffsMatches: [],
   allianceMembers: [],
-  socketConnected: false
+  socketConnected: false,
 };
 
 const reducer: Reducer<IInternalState> = (state: IInternalState = initialState, action) => {

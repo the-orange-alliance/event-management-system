@@ -18,7 +18,7 @@ import OtherCompetingTeams from "./reports/OtherCompetingTeams";
 import QualificationMatchResults from "./reports/QualificationMatchResults";
 import QualificationAnnouncers from "./reports/QualificationAnnouncers";
 // import EliminationsAnnouncers from "./reports/EliminationsAnnouncers";
-import {Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, Event, EventConfiguration} from "@the-orange-alliance/lib-ems";
 import NumericInput from "../../components/NumericInput";
 import PracticeScheduleQueueing from "./reports/PracticeScheduleQueueing";
 import QualificationScheduleQueueing from "./reports/QualificationScheduleQueueing";
@@ -28,6 +28,7 @@ import PlayoffsSchedule from "./reports/PlayoffsSchedule";
 import PlayoffsScheduleQueueing from "./reports/PlayoffsScheduleQueueing";
 import PlayoffsScheduleByTeam from "./reports/PlayoffsScheduleByTeam";
 import PlayoffsScheduleByTeamQueueing from "./reports/PlayoffsScheduleByTeamQueueing";
+import WPAKeys from "./reports/WPAKeys";
 
 interface IProps {
   event?: Event,
@@ -198,6 +199,9 @@ class ReportsView extends React.Component<IProps, IState> {
                   <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateCompetingTeams}>Competing Team List Report</Button></Grid.Column>
                   <Grid.Column><Button fluid={true} disabled={true} color={getTheme().primary}>Awards Report</Button></Grid.Column>
                 </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column><Button fluid={true} color={getTheme().primary} onClick={this.generateWPAKeys.bind(this)}>Download WPA Keys</Button></Grid.Column>
+                </Grid.Row>
               </Grid>
             </Card.Content>
           </Card>
@@ -366,6 +370,11 @@ class ReportsView extends React.Component<IProps, IState> {
 
   private generateQualificationRankings() {
     this.generateReport(<QualificationRankings onHTMLUpdate={this.updateHTML}/>);
+  }
+
+  private async generateWPAKeys(event: any) {
+    const keys = await EMSProvider.getWpaKeys();
+    this.generateReport(<WPAKeys event={event} wpaKeys={keys} />);
   }
 
   private generateCompetingTeams() {

@@ -1,5 +1,6 @@
-import { Telnet } from 'telnet-rxjs'
+import telnet_client from "telnet-client"
 import {EmsFrcFms} from "./server";
+import logger from "./logger";
 
 export class SwitchSupport {
   private static _instance: SwitchSupport;
@@ -53,27 +54,32 @@ export class SwitchSupport {
     for(const c of vlanConfigs) {
       command = command + c;
     }
-    this.runConfigCommand(command);
+    this.runConfigCommand(command).then(() => {
+      logger.info('✔ Updated field switch configuration')
+    }).catch(error => {
+      logger.error('❌ Failed to update field switch configuration')
+    });
   }
 
-  private RunTeamVlanCommand() {
-    this.runCommand(`show running-config\n`, this.getTeamVlans);
-  }
+  private async getTeamVlans() {
+    let error = false;
+    const data = await this.runCommand(`show running-config\n`).catch(() => {error = true});
 
-  private getTeamVlans(data: string) {
-    const switchRegex = new RegExp("(?s)interface Vlan(\\d\\d)\\s+ip address 10\\.(\\d+)\\.(\\d+)\\.61");
-    const teamVlanMatches = switchRegex.exec(data);
-    if(!teamVlanMatches) return;
+    if (!error) {
+      const switchRegex = new RegExp("(?s)interface Vlan(\\d\\d)\\s+ip address 10\\.(\\d+)\\.(\\d+)\\.61");
+      const teamVlanMatches = switchRegex.exec(data);
+      if(!teamVlanMatches) return;
 
-    let i = 0;
-    // In theroy vlan 100 should be read last and won't get done. otherwise we gotta check for that
-    while(i < teamVlanMatches.length && i < 7) {
-      const vConfig = teamVlanMatches[i];
-      this.teamSwitchConfs[i].team100s = parseInt(vConfig[2]);
-      this.teamSwitchConfs[i].team1s = parseInt(vConfig[3]);
-      this.teamSwitchConfs[i].team = (parseInt(vConfig[2]) * 100) + parseInt(vConfig[3]);
-      this.teamSwitchConfs[i].vlan = parseInt(vConfig[1]);
-      i++;
+      // In theory vlan 100 should be read last and won't get done. otherwise we gotta check for that
+      for(let i = 0; i < teamVlanMatches.length && i < 7; i++) {
+        const vConfig = teamVlanMatches[i];
+        this.teamSwitchConfs[i].team100s = parseInt(vConfig[2]);
+        this.teamSwitchConfs[i].team1s = parseInt(vConfig[3]);
+        this.teamSwitchConfs[i].team = (parseInt(vConfig[2]) * 100) + parseInt(vConfig[3]);
+        this.teamSwitchConfs[i].vlan = parseInt(vConfig[1]);
+      }
+    } else {
+      logger.error('❌ Error reading switch config');
     }
   }
 
@@ -88,33 +94,35 @@ export class SwitchSupport {
     return multiply - 1;
   }
 
-  private runCommand(command: string, callback?: any) {
-    const client = Telnet.client(`${this.switch.address}:${this.telnetPort}`);
+  private runCommand(command: string): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      const client = new telnet_client();
+      const params = {
+        host: this.switch.address,
+        port: this.telnetPort,
+        negotiationMandatory: false,
+        timeout: 2500
+      };
 
-    let connected = false;
-
-    client.filter((event) => event instanceof Telnet.Event.Connected)
-      .subscribe((event) => {
-        connected = true;
-        client.sendln(`${this.switch.password}\nenable\n${this.switch.password}\nterminal length 0\n${command}exit\n`);
+      client.connect(params).then(() => {
+        console.log('connected');
+        return client.send(`${this.switch.password}\nenable\n${this.switch.password}\nterminal length 0\n${command}exit\n`);
+      }).then((res: string) => {
+        resolve(res);
+        return client.destroy();
+      }).catch((error) => {
+        console.log(error);
+        reject(error)
       });
-
-    client.data.subscribe((data) => {
-      if (!connected) {
-        return;
-      }
-      client.disconnect();
-      callback(data);
-    });
+    })
   }
 
-  private runConfigCommand(command: string, callback?: any) {
-    this.runCommand(`config terminal\n${command}end\ncopy running-config startup-config\n\n`, callback);
+  private runConfigCommand(command: string): Promise<any> {
+    return this.runCommand(`config terminal\n${command}end\ncopy running-config startup-config\n\n`);
   }
 
-  //TODO: Create Telnet Command Queue so we don't break things by trying to do multiple SSHs at once
-
-
+  // TODO: Create Telnet Command Queue so we don't break things by trying to do multiple SSHs at once
+  // Future soren says thats too much work and it probably will never be an issue ;) (famous last words)
 }
 
 class SwitchStatus {

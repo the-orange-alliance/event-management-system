@@ -32,9 +32,9 @@ export class PlcSupport {
   public initPlc(address: string) {
     this.plc.address = address;
     this.client.connectTCP(this.plc.address, { port: this.modBusPort }).then(() => {
-      logger.info('✅ Connected to PLC at ' + this.plc.address + ':' + this.modBusPort);
+      logger.info('✔ Connected to PLC at ' + this.plc.address + ':' + this.modBusPort);
     }).catch((err: any) => {
-      logger.info('❌ Failed to connect to PLC (' + this.plc.address + ':' + this.modBusPort + '): ' + err);
+      logger.error('❌ Failed to connect to PLC (' + this.plc.address + ':' + this.modBusPort + '): ' + err);
       this.firstConn = true;
     });
     this.client.setID(1);
@@ -43,7 +43,7 @@ export class PlcSupport {
   public runPlc() {
     if(!this.client.isOpen) {
       if(this.firstConn) {
-        logger.info('❌ Lost connection to PLC (' + this.plc.address + ':' + this.modBusPort + '), retrying');
+        logger.error('❌ Lost connection to PLC (' + this.plc.address + ':' + this.modBusPort + '), retrying');
         this.firstConn = false;
         this.initPlc(this.plc.address);
       }

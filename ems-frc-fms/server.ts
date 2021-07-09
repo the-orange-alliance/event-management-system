@@ -59,7 +59,7 @@ export class EmsFrcFms {
         this.loadSettingsFromFile();
         // Init EMS
         EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
-        process.env.REACT_APP_EMS_SCK_PORT = '8800';
+        process.env.REACT_APP_EMS_SCK_PORT = process.env.SOCKET_PORT;
         SocketProvider.initialize(host);
         this.initSocket();
 
@@ -99,15 +99,15 @@ export class EmsFrcFms {
         try {
             this.settings = new FMSSettings().fromJson(JSON.parse(fs.readFileSync('./fms_settings.json', 'utf8').toString()));
         } catch (error) {
-            logger.info('Unable to open fms_settings.json. Creating a new copy with default settings');
+            logger.error('❌ Unable to open fms_settings.json. Creating a new copy with default settings');
             this.settings = new FMSSettings();
             try {
                 await fs.writeFileSync('./fms_settings.json', JSON.stringify(this.settings.toJson()));
             } catch (error) {
-                logger.info('Unable to write new settings file. Setting local settings to default.');
+                logger.error('❌ Unable to write new settings file. Setting local settings to default.');
             }
         } finally {
-            logger.info('✅ Loaded Settings for FMS');
+            logger.info('✔ Loaded Settings for FMS');
         }
     }
 
@@ -137,20 +137,20 @@ export class EmsFrcFms {
         } else {
             clearInterval(this.plcInterval);
         }
-        logger.info('✅ Updated Settings!');
+        logger.info('✔ Updated Settings!');
     }
 
     private initSocket() {
         // Setup Socket Connect/Disconnect
         SocketProvider.on("connect", () => {
-            logger.info("✅ Connected to EMS through SocketIO.");
+            logger.info("✔ Connected to EMS through SocketIO.");
             SocketProvider.emit("identify","ems-frc-fms-main", ["event", "scoring", "referee", "fms"]);
         });
         SocketProvider.on("disconnect", () => {
-            logger.info("❌ Disconnected from SocketIO.");
+            logger.error("❌ Disconnected from SocketIO.");
         });
         SocketProvider.on("error", () => {
-            logger.info("❌ Error With SocketIO, not connected to EMS");
+            logger.error("❌ Error With SocketIO, not connected to EMS");
         });
         SocketProvider.on("fms-ping", () => {
             SocketProvider.emit("fms-pong");
@@ -182,17 +182,17 @@ export class EmsFrcFms {
             if (participants.length > 0) {
                 match.participants = participants;
             }
-        }).catch(err => logger.info('❌ Error getting participant information: ' + err));
+        }).catch(err => logger.error('❌ Error getting participant information: ' + err));
         this.activeMatch = match;
         if(!match) {
-            logger.info('❌ Received prestart command, but found no active match');
+            logger.error('❌ Received prestart command, but found no active match');
         }
 
         // Call DriverStation Prestart
         DriverstationSupport.getInstance().onPrestart(this.activeMatch);
         if(this.settings.enableAdvNet) {
             // Configure AP
-            AccesspointSupport.getInstance().handleTeamWifiConfig();
+            AccesspointSupport.getInstance().handleTeamWifiConfig(match.participants);
             // Configure Switch
             SwitchSupport.getInstance().configTeamEthernet();
         }
@@ -248,17 +248,17 @@ export class EmsFrcFms {
 
     private startDriverStation() {
         this.dsInterval = setInterval(()=> { DriverstationSupport.getInstance().runDriverStations() }, 500);
-        logger.info('✅ Driver Station Manager Init Complete, Running Loop');
+        logger.info('✔ Driver Station Manager Init Complete, Running Loop');
     }
 
     private startPLC() {
         this.plcInterval = setInterval(()=> { PlcSupport.getInstance().runPlc() }, 100);
-        logger.info('✅ PLC Manager Init Complete, Running Loop');
+        logger.info('✔ PLC Manager Init Complete, Running Loop');
     }
 
     private startAPLoop() {
         this.apInterval = setInterval(async ()=> { await AccesspointSupport.getInstance().runAp() }, 3000);
-        logger.info('✅ Access Point Manager Init Complete, Running Loop');
+        logger.info('✔ Access Point Manager Init Complete, Running Loop');
     }
 
     private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {
@@ -292,7 +292,7 @@ export class EmsFrcFms {
                     }
                 }
                 resolve(participants);
-            }).catch(err => logger.info('❌ Error getting match teams: ' + err));
+            }).catch(err => logger.error('❌ Error getting match teams: ' + err));
         });
     }
 }

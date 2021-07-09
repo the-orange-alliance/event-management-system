@@ -6,12 +6,12 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -- --watch",
-    "start": "tsc && node build/server.js"
+    "start": "tsc && node --trace-warnings build/server.js"
   },
   "author": "Soren Zaiser, Kyle Flynn",
   "license": "GPL-2.0",
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.7.24",
+    "@the-orange-alliance/lib-ems": "file:../../lib-ems",
     "@types/dotenv": "^8.2.0",
     "@types/ssh2-streams": "^0.1.6",
     "dgram": "^1.0.1",
@@ -21,7 +21,8 @@
     "path": "^0.12.7",
     "socket.io": "^2.3.0",
     "ssh2-promise": "^0.1.6",
-    "telnet-rxjs": "^2.1.0",
+    "telnet-client": "^1.4.9",
+    "telnet-rxjs": "^2.2.0",
     "typescript": "^3.7.4",
     "winston": "^3.2.1"
   }

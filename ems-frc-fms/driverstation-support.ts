@@ -91,7 +91,7 @@ export class DriverstationSupport {
                 i++;
             }
             // if for loop exits, we didn't find team in active match
-            logger.info('Couldn\'t find DS matched to UDP packet. Ignoring. ');
+            logger.info('❓ Couldn\'t find DS matched to UDP packet. Ignoring. ');
         } else {
             // Probably just a keepalive packet?
             //logger.info('Couldn\'t decipher team number from UDP packet');
@@ -114,15 +114,15 @@ export class DriverstationSupport {
             socket.setTimeout(this.dsTcpLinkTimeoutSec * 1000);
 
             if(this.allDriverStations[0]) {
-                logger.info(`New DS TCP Connection Established for ${socket.remoteAddress}:${socket.remotePort}`);
+                logger.info(`🔌 New DS TCP Connection Established for ${socket.remoteAddress}:${socket.remotePort}`);
                 // this should read the first packet and assign the TCP connection to the proper alliance member
                 socket.on('data', (chunk: Buffer) => {
                     this.parseTcpPacket(chunk, socket, socket.remoteAddress);
                 });
 
-                socket.on("timeout", (err: Error) => logger.error("Driver Station TCP Timeout"));
-                socket.on("close", (wasError: boolean) => logger.error("Driver Station TCP Closed. wasError: " + wasError));
-                socket.on("error", (err: Error) => logger.error('Error occurred on Driver Station TCP socket: ' + JSON.stringify(err)));
+                socket.on("timeout", (err: Error) => logger.error("❌ Driver Station TCP Timeout"));
+                socket.on("close", (wasError: boolean) => logger.error("❌ Driver Station TCP Closed. wasError: " + wasError));
+                socket.on("error", (err: Error) => logger.error('❌ Error occurred on Driver Station TCP socket: ' + JSON.stringify(err)));
             } else {
                 socket.destroy();
             }
@@ -131,11 +131,11 @@ export class DriverstationSupport {
         tcpListener.on("close", () => logger.error('❌ DriverStation TCP Listener Closed'));
 
         tcpListener.on('error', (chunk: Buffer) => {
-            logger.error('❌ Driver Station TCP listener Error.');
+            logger.error('❌ Driver Station TCP listener error: ' + chunk.toString());
         });
     }
 
-    // Parse TCP packet from the Driver STation
+    // Parse TCP packet from the Driver Station
     private parseTcpPacket(chunk: Buffer, socket: net.Socket, remoteAddress: string | undefined) {
         const teamId = (chunk[3]<<8) + (chunk[4]);
         let station = -1;
@@ -160,7 +160,7 @@ export class DriverstationSupport {
                 }, 1000);
             }
         } else {
-            // logger.info('Driver Station tried connection, but failed due to no active match'); // Clogs u
+            // logger.info('Driver Station tried connection, but failed due to no active match');
             socket.destroy();
         }
     }
@@ -173,9 +173,8 @@ export class DriverstationSupport {
             if(this.allDriverStations[i].teamId == teamNum) {
                 const packetType = chunk[2];
                 switch (packetType) {
-                    case 28:  logger.info('DS KeepAlive'); break; // DS KeepAlive Packet, do nothing
-                    case 22:
-                        this.decodeStatusPacket(chunk.slice(2), parseInt(i));
+                    case 28: logger.info('DS KeepAlive'); break; // DS KeepAlive Packet, do nothing
+                    case 22: this.decodeStatusPacket(chunk.slice(2), parseInt(i));
                 }
                 break;
             }
@@ -230,7 +229,8 @@ export class DriverstationSupport {
         // 1 = "Move to Station <Assigned Station>"
         // 2 = "Waiting..."
         if(socket.write(returnPacket)) {
-            logger.info(`Accepted ${teamId}'s DriverStation in station ${station}`); // TODO: Include Station # and color in log
+            const stations = ['Red 1', 'Red 2', 'Red 3', 'Blue 1', 'Blue 2', `Blue 3`]
+            logger.info(`Accepted ${teamId}'s DriverStation into ${stations[station]}`);
             const fmsStation = this.convertEMSStationToFMS(station + '');
             this.allDriverStations[fmsStation] = this.newDSConnection(teamId, station, socket, remoteAddress);
             this.sendControlPacket(fmsStation);
@@ -259,10 +259,15 @@ export class DriverstationSupport {
     // Ex. 11 = Red Alliance 1, Which will become Station 0
     // Ex. 23 = Blue Alliance 3, Which will become Station 5
     private convertEMSStationToFMS(emsStation: string): number{
-        const firstDigit = parseInt(emsStation.charAt(0));
-        const secondDigit = parseInt(emsStation.charAt(1));
-        const multiply = firstDigit*secondDigit;
-        return multiply - 1;
+        switch(emsStation) {
+            case '11': return 0;
+            case '12': return 1;
+            case '13': return 2;
+            case '21': return 3;
+            case '22': return 4;
+            case '23': return 5;
+            default: return 0;
+        }
     }
 
     public setTeamEstopped(station: number) {
@@ -271,9 +276,9 @@ export class DriverstationSupport {
 
     // Run all this stuff
     public runDriverStations() {
-        let i = 0;
+        PlcSupport.getInstance().checkEstops();
         const stationStatuses = []; // This will be used to set field stack light
-        while(i < this.allDriverStations.length) {
+        for(let i = 0; i < this.allDriverStations.length; i++) {
             if(this.allDriverStations[i]){
                 if(this.allDriverStations[i].udpConn) {
                     this.sendControlPacket(i); // TODO: Don't need to send this every time, unless it's during match
@@ -297,14 +302,13 @@ export class DriverstationSupport {
                 if(this.isMatchInProgress()) {
                     PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_ON : STACK_LIGHT_OFF);
                 } else {
-                    // If No Match in progress and stack lights are on, that means there is a problem with Robot Comms // TODO Should flash at some point
+                    // If No Match in progress and stack lights are on, that means there is a problem with Robot Comms // TODO Should flash at some point (handled in plc, fun fact :P)
                     // If No Match in progress and stack lights are off, that means team is ready to start the match
                     PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_OFF : STACK_LIGHT_ON);
                 }
 
                 this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
             }
-            i++;
             SocketProvider.emit('ds-update-all', JSON.stringify(this.dsToJsonObj()));
         }
 

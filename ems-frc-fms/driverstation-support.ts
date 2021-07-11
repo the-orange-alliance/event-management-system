@@ -120,9 +120,9 @@ export class DriverstationSupport {
                     this.parseTcpPacket(chunk, socket, socket.remoteAddress);
                 });
 
-                socket.on("timeout", (err: Error) => logger.info("Driver Station TCP Timeout"));
-                socket.on("close", (wasError: boolean) => logger.info("Driver Station TCP Closed. wasError: " + wasError));
-                socket.on("error", (err: Error) => logger.info('Error occurred on Driver Station TCP socket: ' + JSON.stringify(err)));
+                socket.on("timeout", (err: Error) => logger.error("Driver Station TCP Timeout"));
+                socket.on("close", (wasError: boolean) => logger.error("Driver Station TCP Closed. wasError: " + wasError));
+                socket.on("error", (err: Error) => logger.error('Error occurred on Driver Station TCP socket: ' + JSON.stringify(err)));
             } else {
                 socket.destroy();
             }
@@ -154,7 +154,7 @@ export class DriverstationSupport {
             } else if (chunk.length !== 5) {
                 this.handleRegularTCP(chunk, socket);
             } else {
-                logger.info('Rejecting DS Connection from team ' + teamId + ' who is not in the current match.');
+                logger.info('✋ Rejecting DS Connection from team ' + teamId + ' who is not in the current match.');
                 setTimeout(function(){ // wait before disconnecting
                     socket.destroy();
                 }, 1000);

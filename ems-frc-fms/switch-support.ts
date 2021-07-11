@@ -8,7 +8,6 @@ export class SwitchSupport {
   private telnetPort = 23;
   private fmsIpAddress = "10.0.100.5";
   private switch: SwitchStatus = new SwitchStatus();
-  private teamSwitchConfs: TeamSwitchConfig[] = new Array<TeamSwitchConfig>(6);
 
   //Vlans
   private red1Vlan  = 10;
@@ -31,70 +30,102 @@ export class SwitchSupport {
     this.switch.password = password;
   }
 
-  public configTeamEthernet() {
+  public async configTeamEthernet() {
+    const oldConfig = await this.getTeamVlans();
+    let infoString = 'ℹ Currently configured vlans |'
+    for(const c of oldConfig) infoString += ` Vlan${c.vlan}: ${c.team} |`
+    logger.info(infoString);
     let commands = [];
     let vlans = [this.red1Vlan, this.red2Vlan, this.red3Vlan, this.blue1Vlan, this.blue2Vlan, this.blue3Vlan];
+    // Build Command to configure VLANs
     for(const p of EmsFrcFms.getInstance().activeMatch.participants) {
       const vlan = vlans[this.convertEMSStationToFMS(p.station)];
-      // Remove Current Vlan Config
-      commands.push(`interface Vlan${vlan}`);   // Select VLAN to Modify
-      commands.push(`no ip address`);           // Clear Old IP
-      commands.push(`no access-list 1${vlan}`); // Clear Access List
 
-      // Setup DHCP pool for new Team
-      commands.push(`ip dhcp excluded-address 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.1 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.100`);
+      // Locate current vlan config for this vlan
+      const currVlanConfIndex = oldConfig.findIndex(e => e.vlan === vlan);
 
-      // Disable Old DHCP Pool
-      commands.push(`no ip dhcp pool dhcp${vlan}`);
+      if (oldConfig[currVlanConfIndex] && oldConfig[currVlanConfIndex].teamKey === p.teamKey){
+        // This team exists on this Vlan already. No need to reconfigure anything.
+      } else {
+        /* New Team. Clear Vlan and Reconfig */
 
-      // Enable New DHCP Pool
-      commands.push(`ip dhcp pool dhcp${vlan}`);
-      commands.push(`network 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 255.255.255.0`);   // Setup IP Addresses
-      commands.push(`default-router 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.61`);         // Set Default Gateway
-      commands.push(`lease 7`);                                                        // Set DHCP Lease
-      commands.push(`exit`);                                                           // Exit DHCP conf
+        // Remove Current Vlan Config
+        commands.push(`interface Vlan${vlan}`);   // Select VLAN to Modify
+        commands.push(`no ip address`);           // Clear Old IP
+        commands.push(`no access-list 1${vlan}`); // Clear Access List
 
-      // Disable/Clear Access-List
-      commands.push(`no access-list 1${vlan}`);
+        // Setup DHCP pool for new Team
+        commands.push(`ip dhcp excluded-address 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.1 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.100`);
 
-      // Allow IP Addresses to communicate to FMS
-      commands.push(`access-list 1${vlan} permit udp 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 0.0.0.255 host ${this.fmsIpAddress}`);
+        // Disable Old DHCP Pool
+        commands.push(`no ip dhcp pool dhcp${vlan}`);
 
-      // Protocols to allow to communicate with FMS
-      commands.push(`access-list 1${vlan} permit udp any eq bootpc any eq bootps`);
+        // Enable New DHCP Pool
+        commands.push(`ip dhcp pool dhcp${vlan}`);
+        commands.push(`network 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 255.255.255.0`);   // Setup IP Addresses
+        commands.push(`default-router 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.61`);         // Set Default Gateway
+        commands.push(`lease 7`);                                                                       // Set DHCP Lease
+        commands.push(`exit`);                                                                          // Exit DHCP conf
 
-      // Set Default Vlan IP Address
-      commands.push(`interface Vlan${vlan}`);                                             // Select VLAN
-      commands.push(`ip address 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.61 255.255.255.0`);  // Set Switch's IP on Vlan
-      commands.push(`exit`);                                                              // Exit Vlan config
+        // Disable/Clear Access-List
+        commands.push(`no access-list 1${vlan}`);
+
+        // Allow IP Addresses to communicate to FMS
+        commands.push(`access-list 1${vlan} permit udp 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 0.0.0.255 host ${this.fmsIpAddress}`);
+
+        // Protocols to allow to communicate with FMS
+        commands.push(`access-list 1${vlan} permit udp any eq bootpc any eq bootps`);
+
+        // Set Default Vlan IP Address
+        commands.push(`interface Vlan${vlan}`);                                                            // Select VLAN
+        commands.push(`ip address 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.61 255.255.255.0`);  // Set Switch's IP on Vlan
+        commands.push(`exit`);                                                                             // Exit Vlan config
+      }
     }
     const command = commands.join('\n')
     this.runConfigCommand(command).then(() => {
       logger.info('✔ Updated field switch (' + this.switch.address + ') configuration')
+      return this.getTeamVlans();
+    }).then((newConf) => {
+      // TODO: Use this info to ensure that switch config is correct
+      let infoString = 'ℹ Newly configured vlans |'
+      for(const c of newConf) infoString += ` Vlan${c.vlan}: ${c.team} |`
+      logger.info(infoString);
     }).catch(error => {
       logger.error('❌ Failed to update field switch (' + this.switch.address + ') configuration')
     });
   }
 
-  private async getTeamVlans() {
+  private async getTeamVlans(): Promise<any[]> {
     let error = false;
     const data = await this.runCommand(`show running-config\n`).catch(() => {error = true});
 
     if (!error) {
-      const switchRegex = new RegExp("(?s)interface Vlan(\\d\\d)\\s+ip address 10\\.(\\d+)\\.(\\d+)\\.61");
-      const teamVlanMatches = switchRegex.exec(data);
-      if(!teamVlanMatches) return;
+      const switchRegex = /interface Vlan(\d\d)\s+ip address 10.(\d+)\.(\d+).61/g;
+      const vlans = [];
+      let v;
+      do {
+        v = switchRegex.exec(data);
+        if (v && v.length > 2) vlans.push([v[1], v[2], v[3]]);
+      } while (v);
+      if(vlans.length < 1) return [];
+
+      const parsedVlans = [];
 
       // In theory vlan 100 should be read last and won't get done. otherwise we gotta check for that
-      for(let i = 0; i < teamVlanMatches.length && i < 7; i++) {
-        const vConfig = teamVlanMatches[i];
-        this.teamSwitchConfs[i].team100s = parseInt(vConfig[2]);
-        this.teamSwitchConfs[i].team1s = parseInt(vConfig[3]);
-        this.teamSwitchConfs[i].team = (parseInt(vConfig[2]) * 100) + parseInt(vConfig[3]);
-        this.teamSwitchConfs[i].vlan = parseInt(vConfig[1]);
+      for(let i = 0; i < vlans.length && i < 7; i++) {
+        const vConfig = vlans[i];
+        const t = new TeamSwitchConfig();
+        t.team100s = parseInt(vConfig[1]);
+        t.team1s = parseInt(vConfig[2]);
+        t.team = (parseInt(vConfig[1]) * 100) + parseInt(vConfig[2]);
+        t.vlan = parseInt(vConfig[0]);
+        parsedVlans.push(t);
       }
+      return parsedVlans;
     } else {
       logger.error('❌ Error reading switch config');
+      return [];
     }
   }
 
@@ -102,11 +133,15 @@ export class SwitchSupport {
   // Ex. 11 = Red Alliance 1, Which will become Station 0
   // Ex. 23 = Blue Alliance 3, Which will become Station 5
   private convertEMSStationToFMS(station: number): number{
-    const emsStation = station + '';
-    const firstDigit = parseInt(emsStation.charAt(0));
-    const secondDigit = parseInt(emsStation.charAt(1));
-    const multiply = firstDigit*secondDigit;
-    return multiply - 1;
+    switch(station) {
+      case 11: return 0;
+      case 12: return 1;
+      case 13: return 2;
+      case 21: return 3;
+      case 22: return 4;
+      case 23: return 5;
+      default: return 0;
+    }
   }
 
   private runCommand(command: string): Promise<any> {
@@ -135,7 +170,6 @@ export class SwitchSupport {
         resolve(res);
         return client.destroy();
       }).catch((error) => {
-        console.log(error);
         reject(error)
       });
     })

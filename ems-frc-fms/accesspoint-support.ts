@@ -36,13 +36,9 @@ export class AccesspointSupport {
       this.ap.initialStatusesFetched = initialStatusesFetched;
   }
 
-  //TODO: Create SSH Command Queue so we don't break things by trying to do multiple SSHs at once
-
   // Run everything
   public async runAp() {
-    if(!this.sshOpen) { // try not to break things now
-      await this.updateTeamWifiStatus();
-    }
+    await this.updateTeamWifiStatus().catch((error) => {logger.error(`❌ Routine AP (${this.ap.address}) status update failed: ${error}`)});
   }
 
   public async configAdminWifi() {
@@ -137,7 +133,7 @@ export class AccesspointSupport {
       if (!this.ap.networkSecurityEnabled) return;
 
       let error: any = false;
-      const data = await this.runCommand("iwinfo").catch(e => error = e);
+      const data = await this.runCommand("iwinfo").catch(e => {error = e});
 
       if (error || !data || typeof data !== "string" || data.length === 0) {
         logger.error('❌ Couldn\'t get Wifi Status from AP (' + this.ap.address + '): ' + error);
@@ -174,7 +170,7 @@ export class AccesspointSupport {
         resolve(data);
       }).catch((error: any) => {
         if (error instanceof Buffer) error = error.toString();
-        logger.info('❌ Error executing command on AP: ' + error);
+        logger.error('❌ Error executing command on AP: ' + error);
         reject(error)
       });
     });

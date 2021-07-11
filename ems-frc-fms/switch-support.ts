@@ -32,32 +32,47 @@ export class SwitchSupport {
   }
 
   public configTeamEthernet() {
-    let vlanConfigs = [];
+    let commands = [];
     let vlans = [this.red1Vlan, this.red2Vlan, this.red3Vlan, this.blue1Vlan, this.blue2Vlan, this.blue3Vlan];
     for(const p of EmsFrcFms.getInstance().activeMatch.participants) {
       const vlan = vlans[this.convertEMSStationToFMS(p.station)];
-      vlanConfigs.push(
-        `interface Vlan${vlan}\nno ip address\nno access-list 1${vlan}\n` +                                             // Remove Current Vlan Config
-        `ip dhcp excluded-address 10.${p.teamKey/100}.${p.teamKey%100}.1 10.${p.teamKey/100}.${p.teamKey%100}.100\n` +  // Setup DHCP pool for new Team
-        `no ip dhcp pool dhcp${vlan}\n` +                                                                               // Disable DHCP Pool
-        `ip dhcp pool dhcp${vlan}\n` +                                                                                  // Enable New DHCP Pool
-        `network 10.${p.teamKey/100}.${p.teamKey%100}.0 255.255.255.0\n` +                                              // Setup IP Addresses
-        `default-router 10.${p.teamKey/100}.${p.teamKey%100}.61\n` +                                                    // Set Default Gateway
-        `lease 7\n` +                                                                                                   // DHCP Lease
-        `no access-list 1${vlan}\n` +                                                                                   // Disable/Clear Access-List
-        `access-list 1${vlan} permit up 10.${p.teamKey/100}.${p.teamKey%100}.0 0.0.0.255 host ${this.fmsIpAddress}\n` + // Allow IP Addresses to communicate to FMS
-        `access-list 1${vlan} permit udp any eq bootpc any eq bootps\n` +                                               // Protocols to allow to communicate with FMS
-        `interface Vlan${vlan}\nip address 10.${p.teamKey/100}.${p.teamKey%100}.61 255.255.255.0\n`                     // Set Default Vlan IP Address
-      );
+      // Remove Current Vlan Config
+      commands.push(`interface Vlan${vlan}`);   // Select VLAN to Modify
+      commands.push(`no ip address`);           // Clear Old IP
+      commands.push(`no access-list 1${vlan}`); // Clear Access List
+
+      // Setup DHCP pool for new Team
+      commands.push(`ip dhcp excluded-address 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.1 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.100`);
+
+      // Disable Old DHCP Pool
+      commands.push(`no ip dhcp pool dhcp${vlan}`);
+
+      // Enable New DHCP Pool
+      commands.push(`ip dhcp pool dhcp${vlan}`);
+      commands.push(`network 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 255.255.255.0`);   // Setup IP Addresses
+      commands.push(`default-router 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.61`);         // Set Default Gateway
+      commands.push(`lease 7`);                                                        // Set DHCP Lease
+      commands.push(`exit`);                                                           // Exit DHCP conf
+
+      // Disable/Clear Access-List
+      commands.push(`no access-list 1${vlan}`);
+
+      // Allow IP Addresses to communicate to FMS
+      commands.push(`access-list 1${vlan} permit udp 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 0.0.0.255 host ${this.fmsIpAddress}`);
+
+      // Protocols to allow to communicate with FMS
+      commands.push(`access-list 1${vlan} permit udp any eq bootpc any eq bootps`);
+
+      // Set Default Vlan IP Address
+      commands.push(`interface Vlan${vlan}`);                                             // Select VLAN
+      commands.push(`ip address 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.61 255.255.255.0`);  // Set Switch's IP on Vlan
+      commands.push(`exit`);                                                              // Exit Vlan config
     }
-    let command = '';
-    for(const c of vlanConfigs) {
-      command = command + c;
-    }
+    const command = commands.join('\n')
     this.runConfigCommand(command).then(() => {
-      logger.info('✔ Updated field switch configuration')
+      logger.info('✔ Updated field switch (' + this.switch.address + ') configuration')
     }).catch(error => {
-      logger.error('❌ Failed to update field switch configuration')
+      logger.error('❌ Failed to update field switch (' + this.switch.address + ') configuration')
     });
   }
 
@@ -101,12 +116,21 @@ export class SwitchSupport {
         host: this.switch.address,
         port: this.telnetPort,
         negotiationMandatory: false,
-        timeout: 2500
+        timeout: 10000,
+        execTimeout: 10000,
       };
 
       client.connect(params).then(() => {
-        console.log('connected');
-        return client.send(`${this.switch.password}\nenable\n${this.switch.password}\nterminal length 0\n${command}exit\n`);
+        const commands = [];
+        commands.push(this.switch.password); // Enter Password for Telnet Conn
+        commands.push('enable');             // Enable Cisco Console
+        commands.push(this.switch.password); // Password for Console
+        commands.push('terminal length 0');  // Set Terminal length to not have "more"
+        commands.push(command);              // Run Predefined commands
+        commands.push('');                   // Blank line. DON'T REMOVE!
+        commands.push('exit');               // Exit?
+
+        return client.exec(commands.join('\n'));
       }).then((res: string) => {
         resolve(res);
         return client.destroy();
@@ -118,7 +142,13 @@ export class SwitchSupport {
   }
 
   private runConfigCommand(command: string): Promise<any> {
-    return this.runCommand(`config terminal\n${command}end\ncopy running-config startup-config\n\n`);
+    const commands = [];
+    commands.push('config terminal');                     // Open Config Terminal
+    commands.push(command);                               // Run Config Commands
+    commands.push('end');                                 // Exit Config Terminal
+    commands.push('copy running-config startup-config');  // Copy to Startup config
+    commands.push('');                                    // Blank line to agree to filename
+    return this.runCommand(commands.join('\n'));
   }
 
   // TODO: Create Telnet Command Queue so we don't break things by trying to do multiple SSHs at once

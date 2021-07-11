@@ -174,7 +174,7 @@ export class AccesspointSupport {
         resolve(data);
       }).catch((error: any) => {
         if (error instanceof Buffer) error = error.toString();
-        console.log('❌ Error executing command on AP: ' + error);
+        logger.info('❌ Error executing command on AP: ' + error);
         reject(error)
       });
     });

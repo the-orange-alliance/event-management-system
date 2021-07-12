@@ -1,0 +1,51 @@
+{
+  "name": "field-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@the-orange-alliance/lib-ems": "^0.8.11",
+    "axios": "^0.21.1",
+    "bootstrap": "^4.3.1",
+    "moment": "^2.24.0",
+    "react": "^16.8.6",
+    "react-cookie": "^4.0.1",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "^4.0.3",
+    "semantic-ui-react": "^2.0.3",
+    "socket.io-client": "^2.2.0"
+  },
+  "scripts": {
+    "start": "set PORT=3034 && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "update-lib-ems": "npm i @the-orange-alliance/lib-ems@latest"
+  },
+  "devDependencies": {
+    "@types/node": "^12.6.7",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-router-dom": "^4.3.4",
+    "@types/socket.io-client": "^1.4.32",
+    "typescript": "^4.3.5"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  }
+}

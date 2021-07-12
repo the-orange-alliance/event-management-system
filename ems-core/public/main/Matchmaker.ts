@@ -1,4 +1,4 @@
-import {IpcMessageEvent, ipcMain, app} from "electron";
+import {IpcMainEvent, ipcMain, app} from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
@@ -34,7 +34,7 @@ if (os.type() === "Windows_NT") {
   }
 }
 
-ipcMain.on("match-maker-teams", (event: IpcMessageEvent, scheduleType: TournamentType, teams: number[]) => {
+ipcMain.on("match-maker-teams", (event: IpcMainEvent, scheduleType: TournamentType, teams: number[]) => {
   const teamListPath = path.join(appDataPath, (scheduleType + "-teams.txt").toLowerCase());
   let contents = "";
   for (const team of teams) {
@@ -50,7 +50,7 @@ ipcMain.on("match-maker-teams", (event: IpcMessageEvent, scheduleType: Tournamen
   });
 });
 
-ipcMain.on("match-maker", (event: IpcMessageEvent, config: IMatchMakerOptions) => {
+ipcMain.on("match-maker", (event: IpcMainEvent, config: IMatchMakerOptions) => {
   const teamListPath = path.join(appDataPath, (config.type + "-teams.txt").toLowerCase());
   const args = `-l ${teamListPath} -t ${config.teams} -r ${config.rounds} -a ${config.teamsPerAlliance} ${config.quality} -s -o`;
   logger.debug(`Executing ${matchMakerPath} with ${args}`);

@@ -8,13 +8,13 @@ import {PlcSupport} from "./plc-support";
 import {
     EMSProvider,
     Match,
+    Event,
     MatchConfiguration,
     MatchMode, MatchParticipant,
     MatchTimer, Ranking,
     SocketProvider,
     Team
 } from "@the-orange-alliance/lib-ems";
-import * as fs from "fs";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -37,6 +37,7 @@ export class EmsFrcFms {
     public activeMatch: Match = new Match();
     public timeLeft: number = 0;
     public matchState: number = 0;
+    public event: Event = new Event();
     private dsInterval: any;
     private apInterval: any;
     private plcInterval: any;
@@ -55,13 +56,14 @@ export class EmsFrcFms {
     }
 
     public initFms() {
-        // Load Settings from file
-        this.loadSettingsFromFile();
         // Init EMS
         EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
         process.env.REACT_APP_EMS_SCK_PORT = process.env.SOCKET_PORT;
         SocketProvider.initialize(host);
         this.initSocket();
+
+        // Load Settings from EMS DB
+        this.loadSettings();
 
 
         // Init DriverStation listeners
@@ -95,30 +97,25 @@ export class EmsFrcFms {
     }
 
 
-    private async loadSettingsFromFile() {
-        try {
-            this.settings = new FMSSettings().fromJson(JSON.parse(fs.readFileSync('./fms_settings.json', 'utf8').toString()));
-        } catch (error) {
-            logger.error('❌ Unable to open fms_settings.json. Creating a new copy with default settings');
-            this.settings = new FMSSettings();
-            try {
-                await fs.writeFileSync('./fms_settings.json', JSON.stringify(this.settings.toJson()));
-            } catch (error) {
-                logger.error('❌ Unable to write new settings file. Setting local settings to default.');
+    private async loadSettings() {
+        const events = await EMSProvider.getEvent();
+        if (events.length > 0) {
+            this.event = events[0];
+            const config = await EMSProvider.getAdvNetConfig(this.event.eventKey);
+            if (!config.error) {
+                this.settings = new FMSSettings().fromJson(config);
+                logger.info('✔ Loaded Settings for FMS with event ' + this.event.eventKey);
+            } else {
+                await EMSProvider.postAdvNetConfig(this.event.eventKey, this.settings.toJson());
+                logger.info('✔ No FMS found for ' + this.event.eventKey +  '. Running with default settings.');
             }
-        } finally {
-            logger.info('✔ Loaded Settings for FMS');
+        } else {
+            logger.info('✔ No event found. Running with default settings.');
         }
     }
 
     private updateSettings(newSettings: object) {
         this.settings = new FMSSettings().fromJson(newSettings);
-        try {
-            fs.writeFileSync('./fms_settings.json', JSON.stringify(this.settings.toJson()));
-        } catch(error) {
-            logger.info('Unable to write new settings file. Setting local settings to new settings. These will be forgotten on the next restart.');
-        }
-        // TODO Better manage the enabling/disabling of advanced network settings
         // Update AP Settings
         if(this.settings.enableAdvNet) {
             AccesspointSupport.getInstance().setSettings(this.settings.apIp, this.settings.apUsername, this.settings.apPassword, this.settings.apTeamCh, this.settings.apAdminCh, this.settings.apAdminWpa, this.settings.enableAdvNet, [], false);

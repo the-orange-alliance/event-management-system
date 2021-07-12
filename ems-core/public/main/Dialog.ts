@@ -1,4 +1,4 @@
-import {ipcMain, BrowserWindow, dialog, app, IpcMessageEvent, FileFilter} from "electron";
+import {ipcMain, BrowserWindow, dialog, app, IpcMainEvent, FileFilter} from "electron";
 import * as fs from "fs";
 import * as url from "url";
 import * as path from "path";
@@ -15,7 +15,7 @@ interface IOpenDialogProps {
   sendData?: boolean
 }
 
-ipcMain.on("parse-csv", (event: IpcMessageEvent, file: string) => {
+ipcMain.on("parse-csv", (event: IpcMainEvent, file: string) => {
   if (!file.endsWith(".csv")) {
     event.sender.send("parse-csv-response", "File does not end with a .csv extension.", null);
   }
@@ -24,7 +24,7 @@ ipcMain.on("parse-csv", (event: IpcMessageEvent, file: string) => {
   });
 });
 
-ipcMain.on("open-dialog", (event: IpcMessageEvent, openProperties: IOpenDialogProps) => {
+ipcMain.on("open-dialog", (event: IpcMainEvent, openProperties: IOpenDialogProps) => {
   // @ts-ignore - Unless there is another way to do this...
   dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
     filters: openProperties.filters || [],
@@ -46,7 +46,7 @@ ipcMain.on("open-dialog", (event: IpcMessageEvent, openProperties: IOpenDialogPr
   });
 });
 
-ipcMain.on("show-info", (event: IpcMessageEvent, title: string, message: string) => {
+ipcMain.on("show-info", (event: IpcMainEvent, title: string, message: string) => {
   dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
     message: message,
     title: title,
@@ -54,7 +54,7 @@ ipcMain.on("show-info", (event: IpcMessageEvent, title: string, message: string)
   });
 });
 
-ipcMain.on("show-error", (event: IpcMessageEvent, error: any) => {
+ipcMain.on("show-error", (event: IpcMainEvent, error: any) => {
   if (error._stacktrace) {
     dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: "There was an error while trying to complete a vital operation. Error code " + error._errorCode + " (" + error._errorMessage + "). Stacktrace: " + error._stacktrace +

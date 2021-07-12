@@ -64,13 +64,13 @@ class MatchReviewView extends React.Component<IProps, IState> {
   public componentDidMount() {
     setTimeout(() => {
       if (this.props.playoffsMatches.length > 0) {
-        this.changeSelectedMatch(null, {value: this.props.playoffsMatches[0].matchKey});
+        this.changeSelectedMatch(null, {value: this.props.playoffsMatches[0]?.matchKey});
       } else if (this.props.qualificationMatches.length > 0) {
         this.changeSelectedLevel(null, {value: "Qualification"});
-        this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0].matchKey});
+        this.changeSelectedMatch(null, {value: this.props.qualificationMatches[0]?.matchKey});
       } else if (this.props.practiceMatches.length > 0) {
         this.changeSelectedLevel(null, {value: "Practice"});
-        this.changeSelectedMatch(null, {value: this.props.practiceMatches[0].matchKey});
+        this.changeSelectedMatch(null, {value: this.props.practiceMatches[0]?.matchKey});
       }
     }, 250); // Gives the renderer process a chance to catch up.
   }

@@ -1,4 +1,4 @@
-import {ipcMain, app, IpcMessageEvent} from "electron";
+import {ipcMain, app, IpcMainEvent} from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import logger from "./Logger";
@@ -12,7 +12,7 @@ interface IConfigOptions {
   file: string
 }
 
-ipcMain.on("store-set-all", (event: IpcMessageEvent, config: IConfigOptions) => {
+ipcMain.on("store-set-all", (event: IpcMainEvent, config: IConfigOptions) => {
   const filePath = path.join(appDataPath, config.file);
   fs.writeFile(filePath, JSON.stringify(config.data), (err) => {
     if (err) {
@@ -22,7 +22,7 @@ ipcMain.on("store-set-all", (event: IpcMessageEvent, config: IConfigOptions) => 
   });
 });
 
-ipcMain.on("store-get-all", (event: IpcMessageEvent, file: string) => {
+ipcMain.on("store-get-all", (event: IpcMainEvent, file: string) => {
   const filePath = path.join(appDataPath, file);
   fs.readFile(filePath, (err, data) => {
     if (err) {
@@ -34,7 +34,7 @@ ipcMain.on("store-get-all", (event: IpcMessageEvent, file: string) => {
   });
 });
 
-ipcMain.on("store-set", (event: IpcMessageEvent, config: IConfigOptions) => {
+ipcMain.on("store-set", (event: IpcMainEvent, config: IConfigOptions) => {
   const filePath = path.join(appDataPath, config.file);
   fs.readFile(filePath, (readErr, data) => {
     if (readErr) {
@@ -56,7 +56,7 @@ ipcMain.on("store-set", (event: IpcMessageEvent, config: IConfigOptions) => {
   });
 });
 
-ipcMain.on("create-backup", (event: IpcMessageEvent, backupDir: string, filename: string) => {
+ipcMain.on("create-backup", (event: IpcMainEvent, backupDir: string, filename: string) => {
   if (typeof backupDir !== "undefined" && backupDir.length > 0) {
     try {
       const dbFile = path.join(appDataPath, "production.db");
@@ -76,7 +76,7 @@ ipcMain.on("create-backup", (event: IpcMessageEvent, backupDir: string, filename
   }
 });
 
-ipcMain.on("check-existance", (event: IpcMessageEvent, filename: string) => {
+ipcMain.on("check-existance", (event: IpcMainEvent, filename: string) => {
   fs.open(path.join(appDataPath, filename), 'r', (err, file) => {
     if (err) {
       logger.error(err);

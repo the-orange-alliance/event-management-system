@@ -101,6 +101,12 @@ export function validate(req: Request, res: Response, next: NextFunction)  {
     return;
   }
 
+  /* Excluded Routed */
+  if (routeURL.endsWith('/networking')) {
+    next();
+    return;
+  }
+
   if (!routeMap.has(routeURL)) {
     next(Errors.ROUTE_NOT_DEFINED);
     return;

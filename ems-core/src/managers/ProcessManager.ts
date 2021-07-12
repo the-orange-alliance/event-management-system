@@ -39,10 +39,11 @@ class ProcessManager {
           reject(new AppError(1013, "PM2_LIST", error));
         } else {
           const processes: Process[] = [];
-          if (procList.length === 3) {
+          if (procList.length === 4) {
             processes.push(Process.fromPM2(procList[0]));
             processes.push(Process.fromPM2(procList[1]));
             processes.push(Process.fromPM2(procList[2]));
+            processes.push(Process.fromPM2(procList[3]));
           }
           resolve(processes);
         }
@@ -60,7 +61,8 @@ class ProcessManager {
           const proc1 = Process.fromPM2(procList[0][0], host);
           const proc2 = Process.fromPM2(procList[1][0], host);
           const proc3 = Process.fromPM2(procList[2][0], host);
-          const processes: Process[] = [proc1, proc2, proc3];
+          const proc4 = Process.fromPM2(procList[3][0], host);
+          const processes: Process[] = [proc1, proc2, proc3, proc4];
           console.log('Received PM2 ecosystem info!');
           resolve(processes);
         }

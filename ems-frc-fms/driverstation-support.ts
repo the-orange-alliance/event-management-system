@@ -281,7 +281,9 @@ export class DriverstationSupport {
         for(let i = 0; i < this.allDriverStations.length; i++) {
             if(this.allDriverStations[i]){
                 if(this.allDriverStations[i].udpConn) {
-                    this.sendControlPacket(i); // TODO: Don't need to send this every time, unless it's during match
+                    // TODO: Don't need to send this every time, unless it's during match
+                    // Maybe?
+                    this.sendControlPacket(i);
                 }
                 let allIsGood = false;
                 const diff = Date.now() - new Date(this.allDriverStations[i].lastPacketTime).getDate();
@@ -317,7 +319,6 @@ export class DriverstationSupport {
             let blueGood = (stationStatuses[0] && stationStatuses[1] && stationStatuses[2]);
             let redGood = (stationStatuses[3] && stationStatuses[4] && stationStatuses[5]);
             if(!redGood || !blueGood) this.soundedBuzzer = false; // If a team has disconnected, we can sound the buzzer again when we go green
-            // TODO: GET E-STOPS (oh no)
             const blue = (blueGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const red = (redGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const green = (redGood && blueGood)? STACK_LIGHT_ON : STACK_LIGHT_OFF;
@@ -352,7 +353,7 @@ export class DriverstationSupport {
         const packet = this.constructControlPacket(dsNum);
         if(this.allDriverStations[dsNum].udpConn) {
             this.allDriverStations[dsNum].udpConn.send(packet, this.dsUdpSendPort, this.allDriverStations[dsNum].ipAddress, (err) => {
-                // Yes?
+                if (err) logger.error('❌ Error sending control packet to station ' + dsNum + ': ' + err);
             });
         }
     }
@@ -362,6 +363,7 @@ export class DriverstationSupport {
         for(const ds in this.allDriverStations) {
             this.allDriverStations[ds].missedPacketOffset = this.allDriverStations[ds].missedPacketCount;
         }
+        // TODO: Init Packet Log
     }
 
     // Close all connections to the driver station
@@ -446,10 +448,24 @@ export class DriverstationSupport {
             packet[7] = localMatchNum >> 8;
             packet[8] = localMatchNum & 0xff;
         } else if (match.toLowerCase().indexOf("elim") > -1 ) {
-            // E.g. Quarter-final 3, match 1 will be numbered 431. TODO: aaaaaaaaaaaa
-            //matchNumber := match.ElimRound*100 + match.ElimGroup*10 + match.ElimInstance
-            //packet[7] = matchNumber >> 8;
-            //packet[8] = matchNumber & 0xff;
+            // E.g. Quarter-final 3, match 1 will be numbered 431.
+            let fmsMatchNum = 0
+            switch(activeMatch.tournamentLevel.toString().charAt(0)) {
+                case "8": // Octofinals TODO: Revisit
+                    fmsMatchNum = (800) + ((activeMatch.tournamentLevel - 20)*10) + localMatchNum;
+                    break;
+                case "2": // Quarterfinal
+                    fmsMatchNum = (400) + ((activeMatch.tournamentLevel - 20)*10) + localMatchNum;
+                    break;
+                case "3": // Semifinal
+                    fmsMatchNum = (200) + ((activeMatch.tournamentLevel - 30)*10) + localMatchNum;
+                    break;
+                case "4": // Final
+                    fmsMatchNum = (110) + localMatchNum;
+                    break;
+            }
+            packet[7] = fmsMatchNum >> 8;
+            packet[8] = fmsMatchNum & 0xff;
         } else {
             packet[7] = 0;
             packet[8] = 1;

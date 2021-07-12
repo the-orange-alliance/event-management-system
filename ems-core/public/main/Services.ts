@@ -1,4 +1,4 @@
-import {IpcMessageEvent, ipcMain} from "electron";
+import {IpcMainEvent, ipcMain} from "electron";
 import * as path from "path";
 import * as pm2 from "pm2";
 import logger from "./Logger";
@@ -8,7 +8,7 @@ const localIPv4 = require("local-ipv4-address");
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 const isProd = process.env.NODE_ENV === "production";
 
-ipcMain.on("kill-ecosystem", (event: IpcMessageEvent) => {
+ipcMain.on("kill-ecosystem", (event: IpcMainEvent) => {
   logger.info("Killing application ecosystem...");
   pm2.connect((err) => {
     if (err) {
@@ -22,7 +22,7 @@ ipcMain.on("kill-ecosystem", (event: IpcMessageEvent) => {
   });
 });
 
-ipcMain.on("list-ecosystem", (event: IpcMessageEvent) => {
+ipcMain.on("list-ecosystem", (event: IpcMainEvent) => {
   logger.info("Listing application ecosystem...");
   pm2.connect((err) => {
     if (err) {
@@ -31,14 +31,13 @@ ipcMain.on("list-ecosystem", (event: IpcMessageEvent) => {
       pm2.list((errList, procDescList) => {
         pm2.disconnect();
         logger.info("Process description list results were sent back to the renderer process.");
-
-        event.reply("list-ecosystem-response", errList, procDescList);
+        event.sender.send("list-ecosystem-response", errList, procDescList);
       });
     }
   });
 });
 
-ipcMain.on("start-ecosystem", (event: IpcMessageEvent, host: string) => {
+ipcMain.on("start-ecosystem", (event: IpcMainEvent, host: string) => {
   localIPv4().then((localHost: string) => {
     if (localHost === "Default") {
       localHost = "127.0.0.1";
@@ -64,7 +63,8 @@ ipcMain.on("start-ecosystem", (event: IpcMessageEvent, host: string) => {
         const apiProc = startProcess(base + "ems-api/build/server.js", "ems-api", host);
         const webProc = startProcess(base + "ems-web/build/server.js", "ems-web", host);
         const sckProc = startProcess(base + "ems-socket/build/server.js", "ems-sck", host);
-        Promise.all([apiProc, webProc, sckProc]).then((values) => {
+        const fmsProc = startProcess(base + "ems-frc-fms/build/server.js", "ems-fms", host);
+        Promise.all([apiProc, webProc, sckProc, fmsProc]).then((values) => {
           pm2.disconnect();
           logger.info(`Successfully started application ecosystem on ${host}`);
           event.sender.send("start-ecosystem-response", undefined, values, host);
@@ -78,7 +78,7 @@ ipcMain.on("start-ecosystem", (event: IpcMessageEvent, host: string) => {
   });
 });
 
-ipcMain.on("start-process", (event: IpcMessageEvent, procName: string, host: string) => {
+ipcMain.on("start-process", (event: IpcMainEvent, procName: string, host: string) => {
   localIPv4().then((localHost: string) => {
     if (localHost === "Default") {
       localHost = "127.0.0.1";
@@ -109,7 +109,7 @@ ipcMain.on("start-process", (event: IpcMessageEvent, procName: string, host: str
   });
 });
 
-ipcMain.on("stop-process", (event: IpcMessageEvent, procName: string) => {
+ipcMain.on("stop-process", (event: IpcMainEvent, procName: string) => {
   logger.info("Attempting to stop " + procName + " service...");
   pm2.connect((err) => {
     if (err) {
@@ -126,7 +126,7 @@ ipcMain.on("stop-process", (event: IpcMessageEvent, procName: string) => {
   });
 });
 
-ipcMain.on("restart-process", (event: IpcMessageEvent, procName: string) => {
+ipcMain.on("restart-process", (event: IpcMainEvent, procName: string) => {
   logger.info("Attempting to restart " + procName + " service...");
   pm2.connect((err) => {
     if (err) {
@@ -143,7 +143,7 @@ ipcMain.on("restart-process", (event: IpcMessageEvent, procName: string) => {
   });
 });
 
-ipcMain.on("get-logs", (event: IpcMessageEvent) => {
+ipcMain.on("get-logs", (event: IpcMainEvent) => {
   event.sender.send("get-logs-response");
 });
 

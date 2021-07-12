@@ -10,10 +10,12 @@ import {
     Dropdown, Button
 } from "semantic-ui-react";
 import {getTheme} from "../AppTheme";
-import {SocketProvider} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, SocketProvider, Event} from "@the-orange-alliance/lib-ems";
+import {connect} from "react-redux";
+import {IApplicationState} from "../stores";
 
 interface IProps {
-    idkWhatToPutHere?: number
+    event?: Event
 }
 
 interface IState {
@@ -46,24 +48,24 @@ class FmsConfig extends React.Component<IProps, IState> {
 
     // TODO: Emit fms-request-settings and listen to fms-settings to get settings from FMS
     public componentDidMount(): void {
-        SocketProvider.on('fms-settings', (data) => {
-            const config = JSON.parse(data);
-            this.setState({
-                enableFms: config.enable_fms,
-                enableAdvNet: config.enable_adv_net,
-                apIpAddress: config.ap_ip,
-                apUsername: config.ap_username,
-                apPassword: config.ap_password,
-                apTeamCh: config.ap_team_ch,
-                apAdminCh: config.ap_admin_ch,
-                apAdminWpaKey: config.ap_admin_wpa,
-                switchIpAddress: config.switch_ip,
-                switchPassword: config.switch_password,
-                enablePlc: config.enable_plc,
-                plcIpAddress: config.plc_ip
-            });
-        });
-        SocketProvider.emit("fms-request-settings");
+        EMSProvider.getAdvNetConfig(this.props.event.eventKey).then((config) => {
+            if (!config.error) {
+                this.setState({
+                    enableFms: config.enable_fms,
+                    enableAdvNet: config.enable_adv_net,
+                    apIpAddress: config.ap_ip,
+                    apUsername: config.ap_username,
+                    apPassword: config.ap_password,
+                    apTeamCh: config.ap_team_ch,
+                    apAdminCh: config.ap_admin_ch,
+                    apAdminWpaKey: config.ap_admin_wpa,
+                    switchIpAddress: config.switch_ip,
+                    switchPassword: config.switch_password,
+                    enablePlc: config.enable_plc,
+                    plcIpAddress: config.plc_ip
+                });
+            }
+        })
     }
 
     private toggleFms() {
@@ -256,7 +258,7 @@ class FmsConfig extends React.Component<IProps, IState> {
         );
     }
 
-    private saveAndApply() {
+    private async saveAndApply() {
         const json = {
             enable_fms: this.state.enableFms,
             enable_adv_net: this.state.enableAdvNet,
@@ -271,8 +273,18 @@ class FmsConfig extends React.Component<IProps, IState> {
             enable_plc: this.state.enablePlc,
             plc_ip: this.state.plcIpAddress
         };
-        SocketProvider.emit("fms-settings-update", JSON.stringify(json)); // TODO: setTimeout and wait for socket 'fms-settings-update-success'
+        SocketProvider.off('fms-settings-update-success');
+        SocketProvider.on('fms-settings-update-success', () => {
+            // TODO: push toast/save-success or something
+        })
+        await EMSProvider.postAdvNetConfig(this.props.event.eventKey, json);
     }
 }
 
-export default FmsConfig;
+function mapStateToProps({configState}: IApplicationState) {
+    return {
+        event: configState.event
+    };
+}
+
+export default connect(mapStateToProps)(FmsConfig);

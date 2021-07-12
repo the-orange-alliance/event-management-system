@@ -2,17 +2,43 @@ import { Router, Request, Response, NextFunction } from 'express';
 import DatabaseManager from '../database-manager';
 import * as Errors from '../errors';
 import logger from '../logger';
+import {SocketProvider} from "@the-orange-alliance/lib-ems";
 
 const router: Router = Router();
 
 router.get('/', (req: Request, res: Response, next: NextFunction) => {
-  DatabaseManager.selectAll('event')
-    .then((rows: any[]) => {
-      res.send({ payload: rows });
-    })
-    .catch((error) => {
-      next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
-    });
+  DatabaseManager.selectAll('event').then((rows: any[]) => {
+    for(let i = 0; i < rows.length; i++) rows[i].advanced_network_config = undefined;
+    res.send({ payload: rows });
+  })
+  .catch((error) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.get('/:event_key/networking', (req: Request, res: Response, next: NextFunction) => {
+  DatabaseManager.selectAllWhere('event', `\`event_key\` = "${req.params.event_key}"`).then((rows: any[]) => {
+    if(rows.length > 0 && rows[0].advanced_network_config.length > 0) {
+      res.json({payload: JSON.parse(rows[0].advanced_network_config)});
+    } else {
+      res.json({payload: {error: 'No Config in DB!'}});
+    }
+  })
+  .catch((error) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
+});
+
+router.post('/:event_key/networking', (req: Request, res: Response, next: NextFunction) => {
+  if(!req.body || req.body.records.length < 1) return next(Errors.INVALID_BODY_JSON);
+  let toUpdate = JSON.stringify(req.body.records[0]).replace(/"/g, '""');
+  DatabaseManager.updateWhere('event', { advanced_network_config: toUpdate } ,`\`event_key\` = "${req.params.event_key}"`).then((result: any) => {
+    SocketProvider.emit("fms-settings-update", req.body.records[0]);
+    res.send(result);
+  })
+  .catch((error) => {
+    next(Errors.ERROR_WHILE_EXECUTING_QUERY(error));
+  });
 });
 
 router.get('/create', (req: Request, res: Response, next: NextFunction) => {

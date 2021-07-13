@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {Grid} from "semantic-ui-react";
 
 interface IProps {
   event: Event,
@@ -9,15 +10,17 @@ interface IProps {
 
 interface IState {
   mode: string,
-  waitingForMatch: boolean
+  waitingForMatch: boolean,
+  modeColor: string
 }
 
 class BotMonitor extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      mode: "UNDEFINED",
-      waitingForMatch: true
+      mode: "Unknown",
+      waitingForMatch: true,
+      modeColor: ""
     };
   }
 
@@ -27,26 +30,27 @@ class BotMonitor extends React.Component<IProps, IState> {
       this.setState({mode});
     });
     SocketProvider.on("match-start", () => {
-      this.setState({mode: "MATCH STARTED"});
+      this.setState({mode: "Match Started", modeColor: "green"});
     });
     SocketProvider.on("match-auto", () => {
-      this.setState({mode: "AUTONOMOUS"});
+      this.setState({mode: "Autonomous", modeColor: "green"});
     });
     SocketProvider.on("match-tele", () => {
-      this.setState({mode: "TELEOP"});
+      this.setState({mode: "Teleop", modeColor: "green"});
     });
     SocketProvider.on("match-endgame", () => {
-      this.setState({mode: "ENDGAME"});
+      this.setState({mode: "Endgame", modeColor: "yellow"});
     });
     SocketProvider.on("match-end", () => {
-      this.setState({mode: "MATCH END"});
+      this.setState({mode: "Match Over", modeColor: "red"});
     });
     SocketProvider.on("match-abort", () => {
-      this.setState({mode: "MATCH ABORTED", waitingForMatch: true});
+      this.setState({mode: "Match Aborted", waitingForMatch: true, modeColor: "brown"});
     });
     SocketProvider.on("commit-scores-response", () => {
-      this.setState({waitingForMatch: true});
+      this.setState({mode: "Scores Committed", waitingForMatch: true, modeColor: "brown"});
     });
+
 
     if (this.state.waitingForMatch && this.props.match.matchKey.length > 0) {
       this.setState({waitingForMatch: false});
@@ -74,7 +78,15 @@ class BotMonitor extends React.Component<IProps, IState> {
   }
 
   public render() {
-    return <>FieldMon Coming Soon!</>
+    return (
+    <>
+      <Grid padded>
+        <Grid.Column color={"red"}>
+          Test
+        </Grid.Column>
+      </Grid>
+    </>
+    )
   }
 }
 

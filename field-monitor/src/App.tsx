@@ -30,6 +30,9 @@ class App extends React.Component<IProps, IState> {
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
+    } else if (process.env.NODE_ENV === 'development') {
+      SocketProvider.initialize('localhost');
+      EMSProvider.initialize('localhost', 8008);
     } else {
       EMSProvider.initialize("192.168.0.217");
       SocketProvider.initialize("192.168.0.217");
@@ -37,7 +40,7 @@ class App extends React.Component<IProps, IState> {
 
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
-      SocketProvider.emit("identify","ref-tablet", ["event", "scoring", "referee"]);
+      SocketProvider.emit('identify', 'field-monitor', ['scoring', 'event', 'fms']);
       this.setState({connected: true});
     });
     SocketProvider.on("disconnect", () => {
@@ -110,12 +113,12 @@ class App extends React.Component<IProps, IState> {
   public updateTab(tabNum: number, updateState: boolean = true) {
     switch (tabNum) {
       case 0:
-        this.setState({activeItem: 0})
-        if (updateState) window.history.pushState({activeItem: 0}, 'FMS Monitor | EMS', '/monitor/fms')
+        this.setState({activeItem: 0});
+        if (updateState) window.history.pushState({activeItem: 0}, 'FMS Monitor | EMS', '/monitor/fms');
         break;
       case 1:
-        this.setState({activeItem: 1})
-        if (updateState) window.history.pushState({activeItem: 1}, 'Match Monitor | EMS', '/monitor/match')
+        this.setState({activeItem: 1});
+        if (updateState) window.history.pushState({activeItem: 1}, 'Match Monitor | EMS', '/monitor/match');
         break;
     }
   }
@@ -128,9 +131,15 @@ class App extends React.Component<IProps, IState> {
           <Menu.Item><h2>EMS Field Monitor</h2></Menu.Item>
           <Menu.Item name='fieldmon' active={activeItem === 0} onClick={() => this.updateTab(0)}>FMS Monitor</Menu.Item>
           <Menu.Item name='matchmon' active={activeItem === 1} onClick={() => this.updateTab(1)}>Match Monitor</Menu.Item>
-          <Menu.Item position='right'>
-            EMS Status:<span className={connected ? "success" : "error"}>{connected ? "CONNECTED" : "NOT CONNECTED"}</span>
-          </Menu.Item>
+
+          <Menu.Menu position='right'>
+            <Menu.Item>
+              Event:<span className={this.state.event.eventName ? "success" : "error"}>{this.state.event.eventName ? this.state.event.eventName : "None"}</span>
+            </Menu.Item>
+            <Menu.Item position='right'>
+              EMS Status:<span className={connected ? "success" : "error"}>{connected ? "Connected" : "Not Connected"}</span>
+            </Menu.Item>
+          </Menu.Menu>
         </Menu>
         <Container>
           { activeItem === 0 &&

@@ -16,7 +16,6 @@
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
     "react-scripts": "^4.0.3",
-    "react-scripts-ts": "3.1.0",
     "react-toastify": "^5.1.0",
     "redux": "^4.0.1",
     "semantic-ui-offline": "^2.4.1",

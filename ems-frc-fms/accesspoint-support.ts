@@ -1,7 +1,7 @@
 import logger from "./logger";
 import {EmsFrcFms} from "./server";
 import SSH2Promise from 'ssh2-promise';
-import {EMSProvider, MatchParticipant} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, MatchParticipant, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 export class AccesspointSupport {
   private static _instance: AccesspointSupport;
@@ -99,6 +99,7 @@ export class AccesspointSupport {
         // Update Team Statuses
         await this.updateTeamWifiStatus().catch(() => {});
         if(this.checkTeamConfig()) {
+          SocketProvider.emit('fms-ap-ready')
           logger.info('✔ Successfully configured Wifi after ' + attemptCount + ' attempt(s).');
           return;
         }

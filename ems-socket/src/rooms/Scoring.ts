@@ -222,6 +222,9 @@ export default class ScoringRoom implements IRoom {
         this._timer.start();
       }
     });
+    client.on("get-timer", () => {
+      this._server.to('scoring').emit("get-timer-response", this._timer.mode, this._timer.timeLeft, this._timer.modeTimeLeft, this._timer.matchConfig);
+    })
     client.on("abort", () => {
       if (this._timer.inProgress()) {
         this._server.to("scoring").emit("control-update", PACKET_ABORT);

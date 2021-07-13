@@ -1,12 +1,6 @@
-import * as fs from "fs";
-import *as path from "path";
-import {getAppDataPath} from "appdata-path";
 import {Socket, Server} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
-import {EMSProvider} from "@the-orange-alliance/lib-ems";
-import * as net from "net";
-import * as dgram from "dgram";
 
 export default class FmsRoom implements IRoom {
   private readonly _server: Server;
@@ -58,15 +52,24 @@ export default class FmsRoom implements IRoom {
     client.on("fms-settings-update-success", (data: string) => {
       this._server.to(this._name).emit("fms-settings-update-success", data);
     });
-    client.on("ds-update-all", (dsData: string) => {
-      this.allDriverStations = JSON.parse(dsData);
-      this._server.to(this._name).emit("ds-update", dsData);
+    client.on("ds-update-all", (dsData: any[]) => {
+      this.allDriverStations = dsData;
+      this._server.to(this._name).emit("ds-update", this.allDriverStations);
     });
     client.on("fms-request-settings", () => {
       this._server.to(this._name).emit("fms-request-settings");
     });
     client.on("fms-settings", (data: string) => {
       this._server.to(this._name).emit("fms-settings", data);
+    });
+    client.on("fms-ds-ready", (data: string) => {
+      this._server.to(this._name).emit("fms-ds-ready", data);
+    });
+    client.on("fms-ap-ready", (data: string) => {
+      this._server.to(this._name).emit("fms-ap-ready", data);
+    });
+    client.on("fms-switch-ready", (data: string) => {
+      this._server.to(this._name).emit("fms-switch-ready", data);
     });
   }
 

@@ -55,7 +55,7 @@ export class EmsFrcFms {
         return EmsFrcFms._instance;
     }
 
-    public initFms() {
+    public async initFms() {
         // Init EMS
         EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
         process.env.REACT_APP_EMS_SCK_PORT = process.env.SOCKET_PORT;
@@ -63,7 +63,7 @@ export class EmsFrcFms {
         this.initSocket();
 
         // Load Settings from EMS DB
-        this.loadSettings();
+        await this.loadSettings();
 
 
         // Init DriverStation listeners

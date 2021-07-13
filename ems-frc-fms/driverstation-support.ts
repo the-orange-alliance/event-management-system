@@ -311,7 +311,7 @@ export class DriverstationSupport {
 
                 this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
             }
-            SocketProvider.emit('ds-update-all', JSON.stringify(this.dsToJsonObj()));
+            SocketProvider.emit('ds-update-all', this.dsToJsonObj());
         }
 
 
@@ -396,6 +396,7 @@ export class DriverstationSupport {
             ds.allianceStation = match.participants[t].station;
             this.allDriverStations[t] = ds;
         }
+        SocketProvider.emit('fms-ds-ready');
         logger.info('✔ Driver Station Prestart Completed');
     }
 
@@ -450,17 +451,17 @@ export class DriverstationSupport {
         } else if (match.toLowerCase().indexOf("elim") > -1 ) {
             // E.g. Quarter-final 3, match 1 will be numbered 431.
             let fmsMatchNum = 0
-            switch(activeMatch.tournamentLevel.toString().charAt(0)) {
-                case "8": // Octofinals TODO: Revisit
+            switch(activeMatch.tournamentLevel) {
+                case Match.OCTOFINALS_LEVEL:
                     fmsMatchNum = (800) + ((activeMatch.tournamentLevel - 20)*10) + localMatchNum;
                     break;
-                case "2": // Quarterfinal
+                case Match.QUARTERFINALS_LEVEL:
                     fmsMatchNum = (400) + ((activeMatch.tournamentLevel - 20)*10) + localMatchNum;
                     break;
-                case "3": // Semifinal
+                case Match.SEMIFINALS_level:
                     fmsMatchNum = (200) + ((activeMatch.tournamentLevel - 30)*10) + localMatchNum;
                     break;
-                case "4": // Final
+                case Match.FINALS_LEVEL:
                     fmsMatchNum = (110) + localMatchNum;
                     break;
             }

@@ -3,7 +3,15 @@ import {Cookies, withCookies} from 'react-cookie';
 import './App.css';
 import BotMonitor from "./views/BotMonitor";
 import MatchMonitor from "./views/MatchMonitor";
-import {EMSProvider, Event, Team, Match, MatchParticipant, Ranking, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {
+  EMSProvider,
+  Event,
+  Match,
+  MatchConfiguration,
+  MatchMode,
+  MatchTimer,
+  SocketProvider
+} from "@the-orange-alliance/lib-ems";
 import {Container, Menu} from "semantic-ui-react";
 
 interface IProps {
@@ -19,13 +27,15 @@ interface IState {
 
 class App extends React.Component<IProps, IState> {
 
+  private timer = new MatchTimer();
+
   constructor(props: IProps) {
     super(props);
     this.state = {
       event: new Event(),
       match: new Match(),
       connected: false,
-      activeItem: 0
+      activeItem: 0,
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
       SocketProvider.initialize((this.props.cookies.get("host") as string));
@@ -40,7 +50,7 @@ class App extends React.Component<IProps, IState> {
 
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");
-      SocketProvider.emit('identify', 'field-monitor', ['scoring', 'event', 'fms']);
+      SocketProvider.emit('identify', 'field-monitor', ['scoring', 'event', 'fms', 'ref']);
       this.setState({connected: true});
     });
     SocketProvider.on("disconnect", () => {
@@ -51,41 +61,7 @@ class App extends React.Component<IProps, IState> {
       console.log("Entered slave mode with master address " + masterHost);
       EMSProvider.initialize(masterHost);
     });
-    SocketProvider.on("prestart-response", (err: any, matchJSON: any) => {
-      const match: Match = new Match().fromJSON(matchJSON);
-      const seasonKey: string = match.matchKey.split("-")[0];
-      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-      if (typeof matchJSON.participants !== "undefined") {
-        match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
-      }
-      this.getParticipantInformation(match).then((participants: MatchParticipant[]) => {
-        if (participants.length > 0) {
-          match.participants = participants;
-        }
-        this.setState({match: match});
-      });
-    });
-    SocketProvider.on("score-update", (matchJSON: any) => {
-      const oldMatch = this.state.match;
-      const match: Match = new Match().fromJSON(matchJSON);
-      const seasonKey: string = match.matchKey.split("-")[0];
-      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey).fromJSON(matchJSON.details);
-      match.participants = matchJSON.participants.map((pJSON: any) => new MatchParticipant().fromJSON(pJSON));
-      match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
-      for (let i = 0; i < match.participants.length; i++) {
-        if (typeof oldMatch.participants !== "undefined" && typeof oldMatch.participants[i].team !== "undefined") {
-          match.participants[i].team = oldMatch.participants[i].team; // Both are sorted by station, so we can safely assume/do this.
-        }
-      }
-      this.setState({match: match});
-    });
-    SocketProvider.on("prestart-cancel", () => {
-      const match: Match = new Match();
-      const seasonKey: string = this.state.event.season.seasonKey + "";
-      match.participants = [];
-      match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
-      this.setState({match: match});
-    });
+
     EMSProvider.getEvent().then((events: Event[]) => {
       if (events.length > 0) {
         this.setState({event: events[0]});
@@ -108,6 +84,43 @@ class App extends React.Component<IProps, IState> {
         this.updateTab(event.state.activeItem, false);
       }
     };
+
+    // Match Timer
+    SocketProvider.on("match-start", (timerJSON: any) => {
+      this.timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
+      this.timer.on("match-end", () => {
+        this.timer.removeAllListeners("match-transition");
+        this.timer.removeAllListeners("match-tele");
+        this.timer.removeAllListeners("match-endgame");
+        this.timer.removeAllListeners("match-end");
+      });
+      this.timer.start();
+    });
+
+    SocketProvider.on("match-abort", () => {
+      this.timer.abort();
+      this.timer.removeAllListeners("match-transition");
+      this.timer.removeAllListeners("match-tele");
+      this.timer.removeAllListeners("match-endgame");
+      this.timer.removeAllListeners("match-end");
+    });
+
+    SocketProvider.emit('get-timer');
+    SocketProvider.once('get-timer-response', (mode, timeLeft, modeTimeLeft, timerConfig) => {
+      if(mode > MatchMode.PRESTART && mode < MatchMode.ENDED) {
+        this.timer.matchConfig = new MatchConfiguration().fromJSON(timerConfig);
+        this.timer.start();
+        this.timer.timeLeft = timeLeft;
+        this.timer.modeTimeLeft = modeTimeLeft;
+        this.timer.mode = mode;
+        this.timer.on("match-end", () => {
+          this.timer.removeAllListeners("match-transition");
+          this.timer.removeAllListeners("match-tele");
+          this.timer.removeAllListeners("match-endgame");
+          this.timer.removeAllListeners("match-end");
+        });
+      }
+    })
   }
 
   public updateTab(tabNum: number, updateState: boolean = true) {
@@ -143,7 +156,7 @@ class App extends React.Component<IProps, IState> {
         </Menu>
         <Container>
           { activeItem === 0 &&
-          <BotMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} />
+          <BotMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} timer={this.timer}/>
           }
           { activeItem === 1 &&
           <MatchMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} />
@@ -151,41 +164,6 @@ class App extends React.Component<IProps, IState> {
         </Container>
       </>
     );
-  }
-
-  private getParticipantInformation(match: Match): Promise<MatchParticipant[]> {
-    return new Promise<MatchParticipant[]>((resolve, reject) => {
-      EMSProvider.getMatchTeams(match.matchKey).then((matchTeams: MatchParticipant[]) => {
-        const participants: MatchParticipant[] = [];
-        const matchTeamKeys = matchTeams.map((p: MatchParticipant) => p.teamKey);
-        match.participants.sort((a: MatchParticipant, b: MatchParticipant) => a.station - b.station);
-        for (let i = 0; i < match.participants.length; i++) {
-          const participant: MatchParticipant = match.participants[i];
-          if (matchTeamKeys.includes(participant.teamKey)) {
-            const index = matchTeamKeys.indexOf(participant.teamKey);
-            const newParticipant: MatchParticipant = matchTeams[index];
-            newParticipant.cardStatus = participant.cardStatus;
-            participants.push(newParticipant);
-          } else {
-            if (typeof participant.team === "undefined") {
-              const team: Team = new Team();
-              team.teamKey = i;
-              team.teamNameShort = "Test Team #" + (i + 1);
-              team.country = "TST";
-              team.countryCode = "us";
-              participant.team = team;
-            }
-            if (typeof participant.teamRank === "undefined") {
-              const ranking: Ranking = new Ranking();
-              ranking.rank = 0;
-              participant.teamRank = ranking;
-            }
-            participants.push(participant);
-          }
-        }
-        resolve(participants);
-      });
-    });
   }
 }
 

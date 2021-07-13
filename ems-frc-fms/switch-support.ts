@@ -1,6 +1,7 @@
 import telnet_client from "telnet-client"
 import {EmsFrcFms} from "./server";
 import logger from "./logger";
+import {SocketProvider} from "@the-orange-alliance/lib-ems";
 
 export class SwitchSupport {
   private static _instance: SwitchSupport;
@@ -84,6 +85,7 @@ export class SwitchSupport {
     }
     const command = commands.join('\n')
     this.runConfigCommand(command).then(() => {
+      SocketProvider.emit('fms-switch-ready');
       logger.info('✔ Updated field switch (' + this.switch.address + ') configuration')
       return this.getTeamVlans();
     }).then((newConf) => {

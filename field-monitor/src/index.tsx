@@ -1,5 +1,4 @@
-// import React from "react";
-import {CookiesProvider} from "react-cookie";
+import React from "react";
 import * as ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
@@ -11,9 +10,6 @@ styleLink.href = "https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css
 document.head.appendChild(styleLink);
 
 ReactDOM.render(
-  <CookiesProvider>
-    {/* @ts-ignore */}
-    <App />
-  </CookiesProvider>,
+    <App />,
   document.getElementById('root') as HTMLElement
 );

@@ -33,7 +33,7 @@ export class PlcInputs {
     this.inputCount = 13;
   }
 
-  public fromArray(inputs: boolean[]) {
+  public fromArray(inputs: boolean[]): PlcInputs {
     if(inputs.length > 6) {
       this.fieldEstop = inputs[0];
       this.redEstop1 = inputs[1];
@@ -43,7 +43,7 @@ export class PlcInputs {
       this.blueEstop2 = inputs[5];
       this.blueEstop3 = inputs[6];
     } else {
-      logger.info('Error reading inputs from PLC. Received Input length not long enough')
+      logger.error('❌ Error reading inputs from PLC. Received Input length not long enough')
     }
     if(inputs.length > 12) {
       this.redConnected1 = inputs[7];
@@ -53,9 +53,10 @@ export class PlcInputs {
       this.blueConnected2 = inputs[11];
       this.blueConnected3 = inputs[12];
     }
+    return this;
   }
 
-  public equals(compare: this): boolean {
+  public equals(compare: PlcInputs): boolean {
     return (
       this.fieldEstop === compare.fieldEstop &&
       this.redEstop1 === compare.redEstop1 &&

@@ -40,6 +40,18 @@ export class PlcSupport {
     this.client.setID(1);
   }
 
+  public getEstop(station: number) {
+    switch(station) {
+      case 0: return this.plc.inputs.redEstop1;
+      case 1: return this.plc.inputs.redEstop2;
+      case 2: return this.plc.inputs.redEstop3;
+      case 3: return this.plc.inputs.blueEstop1;
+      case 4: return this.plc.inputs.blueEstop2;
+      case 5: return this.plc.inputs.blueEstop3;
+      case 99: return this.plc.inputs.fieldEstop;
+    }
+  }
+
   public runPlc() {
     if(!this.client.isOpen) {
       if(this.firstConn) {
@@ -57,7 +69,8 @@ export class PlcSupport {
         if(!this.plc.inputs.equals(this.plc.oldInputs)) {
           // We have a new input, lets notify
           SocketProvider.emit("plc-update", this.plc.inputs.toJSON());
-          this.plc.oldInputs = this.plc.inputs;
+          if(this.plc.inputs.fieldEstop) SocketProvider.emit('abort');
+          this.plc.oldInputs = new PlcInputs().fromArray(data.data);
         }
       });
 
@@ -70,29 +83,6 @@ export class PlcSupport {
         });
       }
     }
-  }
-
-  // TODO: This function should probably be being called by something........
-  public checkEstops() {
-    // Update Driver Stations if E-STOP, Stop Match is Master E-STOP
-    if(this.plc.inputs.fieldEstop) {
-      // Abort Match, Field ESTOP pressed
-      SocketProvider.emit('abort');
-      DriverstationSupport.getInstance().setTeamEstopped(0);
-      DriverstationSupport.getInstance().setTeamEstopped(1);
-      DriverstationSupport.getInstance().setTeamEstopped(2);
-
-      DriverstationSupport.getInstance().setTeamEstopped(3);
-      DriverstationSupport.getInstance().setTeamEstopped(4);
-      DriverstationSupport.getInstance().setTeamEstopped(5);
-    }
-    if(this.plc.inputs.redEstop1) DriverstationSupport.getInstance().setTeamEstopped(0);
-    if(this.plc.inputs.redEstop2) DriverstationSupport.getInstance().setTeamEstopped(1);
-    if(this.plc.inputs.redEstop3) DriverstationSupport.getInstance().setTeamEstopped(2);
-
-    if(this.plc.inputs.blueEstop1) DriverstationSupport.getInstance().setTeamEstopped(3);
-    if(this.plc.inputs.blueEstop2) DriverstationSupport.getInstance().setTeamEstopped(4);
-    if(this.plc.inputs.blueEstop3) DriverstationSupport.getInstance().setTeamEstopped(5);
   }
 
   public setStationStack(station: number, status: number) {

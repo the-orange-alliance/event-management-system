@@ -350,16 +350,18 @@ class BotMonitor extends React.Component<IProps, IState> {
                 {ds?.robot_linked ? <div className={'conn-good'} /> : <div className={'conn-bad'} />}
               </Grid.Column>
               <Grid.Column className={'d-flex justify-content-center grid-border notop noleft p-1'} color={problem ? 'yellow' : undefined}>
-                <h1 className={'text-black align-self-center'}>{ds?.batt_voltage + ' v'}</h1>
+                <h1 className={'text-black align-self-center'}>{((ds?.batt_voltage as number) || 0).toPrecision(4) + ' v'}</h1>
               </Grid.Column>
               <Grid.Column className={'grid-border notop noleft p-1'} color={problem ? 'yellow' : undefined}>
                 {
                   (ds?.estop) ? <div className={'estop-diamond'} >E</div> :
-                  (ds?.auto && !problem && this.state.currentTime > 0) ?  <div className={'conn-good'}>A</div> :
-                  (!ds?.auto && !problem && this.state.currentTime > 0) ?  <div className={'conn-good'}>T</div> :
-                  (ds?.auto && problem && this.state.currentTime > 0) ?  <div className={'conn-bad'}>A</div> :
-                  (!ds?.auto && problem && this.state.currentTime > 0) ?  <div className={'conn-bad'}>T</div> :
-                  (ds?.auto && problem && this.state.currentTime < 1) ?  <div className={'conn-bad'}>A</div> :
+                  (ds?.auto && !problem && ds.enabled) ?  <div className={'conn-good'}>A</div> : // no problems, auto, enabled
+                  (!ds?.auto && !problem && ds.enabled) ?  <div className={'conn-good'}>T</div> : // no problems, tele, enabled
+                  (ds?.auto && !problem && !ds.enabled) ?  <div className={'conn-bad'}>A</div> :  // no problems, auto, disabled
+                  (!ds?.auto && !problem && !ds.enabled) ?  <div className={'conn-bad'}>T</div> : // no problems, tele, disabled
+                  (ds?.auto && problem && this.state.currentTime > 0) ?  <div className={'conn-bad'}>A</div> : // problems, auto, match in progress
+                  (!ds?.auto && problem && this.state.currentTime > 0) ?  <div className={'conn-bad'}>T</div> : // problems, tele, match in progress
+                  (problem && this.state.currentTime < 1) ?  <div className={'conn-bad'}/> :                    // problems, postmatch
                   (!ds?.auto && problem && this.state.currentTime < 1) ?  <div className={'conn-bad'}>A</div> : // This is intentionally left at "A"
                   <div className={'conn-bad'}>?</div>
                 }

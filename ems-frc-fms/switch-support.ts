@@ -72,7 +72,7 @@ export class SwitchSupport {
         commands.push(`no access-list 1${vlan}`);
 
         // Allow IP Addresses to communicate to FMS
-        commands.push(`access-list 1${vlan} permit udp 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 0.0.0.255 host ${this.fmsIpAddress}`);
+        commands.push(`access-list 1${vlan} permit ip 10.${Math.floor(p.teamKey/100)}.${p.teamKey%100}.0 0.0.0.255 host ${this.fmsIpAddress}`);
 
         // Protocols to allow to communicate with FMS
         commands.push(`access-list 1${vlan} permit udp any eq bootpc any eq bootps`);

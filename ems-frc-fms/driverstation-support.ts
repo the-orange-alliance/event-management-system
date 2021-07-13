@@ -20,12 +20,15 @@ export class DriverstationSupport {
     private dsUdpLinkTimeoutSec = 1;
     private maxTcpPacketBytes   = 4096;
 
+    private updateSocketInterval: any;
+
     private soundedBuzzer = false;
 
     // TODO: Figure this out
     public colorToSend = 0;
 
     private allDriverStations: Array<DSConn> = new Array(6);
+    private stationNames: string[] = ['Red 1', 'Red 2', 'Red 3', 'Blue 1', 'Blue 2', `Blue 3`];
 
     private static _instance: DriverstationSupport;
 
@@ -185,13 +188,13 @@ export class DriverstationSupport {
     private getTeamFromIP(address: any): number {
         const ipAddress = address;
         if(!ipAddress) {
-            logger.info('Could not get IP address from first TCP packet. Ignoring.');
+            logger.error('❌ Could not get IP address from first TCP packet. Ignoring.');
             return -1;
         }
         const teamRegex = new RegExp("\\d+\\.(\\d+)\\.(\\d+)\\.");
         const teamDigits = teamRegex.exec(ipAddress);
         if (!teamDigits) {
-            logger.info('Could not get team number from IP Address');
+            logger.error('❌ Could not get team number from IP Address');
             return -1
         }
         const td1 = parseInt(teamDigits[1]);
@@ -214,7 +217,7 @@ export class DriverstationSupport {
             return;
         }
         if(stationTeamId != teamFromPacket) {
-            logger.info(`Team ${teamId} is in the incorrect station (Currently at ${stationTeamId}'s Station)`);
+            logger.info(`❗ Team ${teamId} is in the incorrect station (Currently at ${stationTeamId}'s Station)`);
             dsStationStatus = 1;
         }
         // Build Setup Packet
@@ -229,13 +232,12 @@ export class DriverstationSupport {
         // 1 = "Move to Station <Assigned Station>"
         // 2 = "Waiting..."
         if(socket.write(returnPacket)) {
-            const stations = ['Red 1', 'Red 2', 'Red 3', 'Blue 1', 'Blue 2', `Blue 3`]
-            logger.info(`Accepted ${teamId}'s DriverStation into ${stations[station]}`);
             const fmsStation = this.convertEMSStationToFMS(station + '');
+            logger.info(`🕹 Accepted ${teamId}'s DriverStation into ${this.stationNames[fmsStation]}`);
             this.allDriverStations[fmsStation] = this.newDSConnection(teamId, station, socket, remoteAddress);
             this.sendControlPacket(fmsStation);
         } else {
-            logger.info('Failed to send first packet to team ' + teamId + '\'s driver station');
+            logger.error('❌ Failed to send first packet to team ' + teamId + '\'s driver station');
         }
     }
 
@@ -276,10 +278,42 @@ export class DriverstationSupport {
 
     // Run all this stuff
     public runDriverStations() {
-        PlcSupport.getInstance().checkEstops();
         const stationStatuses = []; // This will be used to set field stack light
         for(let i = 0; i < this.allDriverStations.length; i++) {
             if(this.allDriverStations[i]){
+                const mode = EmsFrcFms.getInstance().matchState;
+                // Update Driver Stations if E-STOP, Stop Match is Master E-STOP
+                // NOTE: EStop states from PLC are reversed... true = not pressed, false = pressed!
+                if(PlcSupport.getInstance().getEstop(99)) {
+                    // Abort Match, Field ESTOP pressed
+                    this.allDriverStations[i].estop = true;
+                } else if(!PlcSupport.getInstance().getEstop(i) && !this.allDriverStations[i].estop) {
+                    // Team station estop pressed
+                    logger.info(`❗ ${this.stationNames[i]} has E-STOPED their robot!`);
+                    this.allDriverStations[i].estop = true;
+                } else if(PlcSupport.getInstance().getEstop(i) && mode === MatchMode.PRESTART && this.allDriverStations[i].estop) {
+                    //  Allow updating of estops during Prestart stage of match
+                    this.allDriverStations[i].estop = false;
+                }
+
+                if (mode === MatchMode.PRESTART) {
+                    this.allDriverStations[i].auto = true;
+                } else if (mode === MatchMode.AUTONOMOUS) {
+                    this.allDriverStations[i].auto = true;
+                    this.allDriverStations[i].enabled = true;
+                } else if (mode === MatchMode.TRANSITION) {
+                    this.allDriverStations[i].auto = false;
+                    this.allDriverStations[i].enabled = false;
+                } else if (mode === MatchMode.TELEOPERATED) {
+                    this.allDriverStations[i].auto = false;
+                    this.allDriverStations[i].enabled = true;
+                } else {
+                    this.allDriverStations[i].auto = false;
+                    this.allDriverStations[i].enabled = false;
+                }
+
+                if(this.allDriverStations[i].estop) this.allDriverStations[i].enabled = false;
+
                 if(this.allDriverStations[i].udpConn) {
                     // TODO: Don't need to send this every time, unless it's during match
                     // Maybe?
@@ -311,7 +345,12 @@ export class DriverstationSupport {
 
                 this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
             }
-            SocketProvider.emit('ds-update-all', this.dsToJsonObj());
+            // register socket to update twice a second
+            if(!this.updateSocketInterval) {
+                this.updateSocketInterval = setInterval(() => {
+                    SocketProvider.emit('ds-update-all', this.dsToJsonObj());
+                }, 500)
+            }
         }
 
 
@@ -340,10 +379,8 @@ export class DriverstationSupport {
 
     private dsToJsonObj(): object[] {
         const returnObj: object[] = [];
-        let i = 0;
-        while(i < this.allDriverStations.length) {
-            if(this.allDriverStations[i]) returnObj.push(this.allDriverStations[i].toJson());
-            i++;
+        for(const ds of this.allDriverStations) {
+            if(ds) returnObj.push(ds.toJson());
         }
         return returnObj;
     }
@@ -390,11 +427,12 @@ export class DriverstationSupport {
         // Close all DS Connections before we overwrite them
         this.closeAllDSConns();
         // Init New DriverStation Objects
-        for(const t in match.participants) { // run through list of match participants looking for a match
+        for(const p of match.participants) { // run through list of match participants looking for a match
             const ds = new DSConn();
-            ds.teamId = match.participants[t].teamKey;
-            ds.allianceStation = match.participants[t].station;
-            this.allDriverStations[t] = ds;
+            ds.teamId = p.teamKey;
+            ds.allianceStation = p.station;
+            const fmsStation = this.convertEMSStationToFMS(p.station + '');
+            this.allDriverStations[fmsStation] = ds;
         }
         SocketProvider.emit('fms-ds-ready');
         logger.info('✔ Driver Station Prestart Completed');

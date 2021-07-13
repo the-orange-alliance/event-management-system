@@ -163,6 +163,7 @@ export class EmsFrcFms {
         // Manage Socket Events
         SocketProvider.on("prestart-response", (err: any, matchJSON: any) => {
             logger.info('🔁 Prestart Command Issued');
+            this.matchState = MatchMode.PRESTART;
             this.fmsOnPrestart(matchJSON);
         });
     }
@@ -201,46 +202,42 @@ export class EmsFrcFms {
 
     private initTimer() {
         SocketProvider.on("match-start", (timerJSON: any) => {
-            logger.info('Match Started')
             this._timer.matchConfig = new MatchConfiguration().fromJSON(timerJSON);
             // Signal DriverStation Start
             DriverstationSupport.getInstance().driverStationMatchStart();
             this._timer.on("match-end", () => {
                 this.removeMatchlisteners()
             });
+            this._timer.on("match-auto", () => {this.matchState = MatchMode.AUTONOMOUS});
+            this._timer.on("match-transition", () => {this.matchState = MatchMode.TRANSITION});
+            this._timer.on("match-tele", () => {this.matchState = MatchMode.TELEOPERATED});
+            this._timer.on("match-end", () => {this.matchState = MatchMode.ENDED});
+
+            logger.info('Match Started');
             this._timer.start();
-            this.updateTimer();
+            this.matchState = MatchMode.AUTONOMOUS;
+            this.timeLeft = this._timer.timeLeft;
             const timerID = global.setInterval(() => {
-                this.updateTimer();
+                this.timeLeft = this._timer.timeLeft;
                 if (this._timer.timeLeft <= 0) {
-                    this.updateTimer();
+                    this.timeLeft = this._timer.timeLeft;
                     global.clearInterval(timerID);
                 }
             }, 1000);
         });
         SocketProvider.on("match-abort", () => {
             this._timer.abort();
-            this.updateTimer();
+            this.timeLeft = this._timer.timeLeft;
             this.removeMatchlisteners();
         });
     }
 
     private removeMatchlisteners() {
+        this._timer.removeAllListeners("match-auto");
         this._timer.removeAllListeners("match-transition");
         this._timer.removeAllListeners("match-tele");
         this._timer.removeAllListeners("match-endgame");
         this._timer.removeAllListeners("match-end");
-    }
-
-    private updateTimer() {
-        let displayTime: number = this._timer.timeLeft;
-        if (this._timer.mode === MatchMode.TRANSITION) {
-            displayTime = this._timer.modeTimeLeft;
-        }
-        if (this._timer.mode === MatchMode.AUTONOMOUS && this._timer.matchConfig.transitionTime > 0) {
-            displayTime = this._timer.timeLeft - this._timer.matchConfig.transitionTime;
-        }
-        this.timeLeft = this._timer.timeLeft;
     }
 
     private startDriverStation() {

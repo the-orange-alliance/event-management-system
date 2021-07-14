@@ -1,0 +1,80 @@
+.grid-border {
+  border: 2px solid rgba(0, 0, 0, 0.5);
+}
+.grid-border.notop {
+  border-top: 0px;
+}
+.grid-border.noleft {
+  border-left: 0px;
+}
+.grid-border.nobottom {
+  border-bottom: 0px;
+}
+.grid-border.noright {
+  border-right: 0px;
+}
+.conn-good {
+  width: 70px;
+  height:70px;
+  background-color: yellowgreen;
+  border: 3px solid green;
+  border-radius: 50%;
+  display: inline-block;
+  padding-top: 20px;
+  font-size: 60px;
+  font-weight: bold;
+}
+.conn-bad {
+  width: 70px;
+  height:70px;
+  background-color: red;
+  border: 3px solid darkred;
+  display: inline-block;
+  padding-top: 20px;
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.estop-diamond {
+  background: #000000;
+  height: 52px;
+  text-align: center;
+  transform:rotate(45deg);
+  margin-top: 10px;
+  width:52px;
+}
+.estop-text {
+  color: #FFFFFF;
+  display: table-cell;
+  height: 52px;
+  transform: rotate(-45deg);
+  vertical-align: middle;
+  width:52px;
+  font-size: 50px;
+}
+
+.text-black {
+  color: black;
+}
+
+.custom-progress {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  border: none;
+  margin: 0 0 0 0;
+  box-shadow: none;
+  background: rgba(0, 0, 0, .1);
+  padding: 0 0 0 0;
+}
+
+.custom-bar {
+  background-color: orangered;
+  display: block;
+  line-height: 1;
+  position: relative;
+  min-width: 0;
+  height: 1em;
+  border-radius: 0;
+  transition: width 1s linear, background-color 1s linear;
+}

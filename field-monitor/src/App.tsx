@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Cookies, withCookies} from 'react-cookie';
-import './App.css';
+import './App.scss';
 import BotMonitor from "./views/BotMonitor";
 import MatchMonitor from "./views/MatchMonitor";
 import {

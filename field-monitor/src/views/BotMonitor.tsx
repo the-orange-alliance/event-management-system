@@ -254,8 +254,8 @@ class BotMonitor extends React.Component<IProps, IState> {
 
   private renderHeaderFooter(mode: string, apReady: boolean, dsReady: boolean, switchReady: boolean, currentMatch: Match, modeColor: SemanticCOLORS | undefined, currentTime: number) {
     let m;
+    let padding = true;
     if (this.state.mode === 'Prestarting' && (!apReady || !dsReady || !switchReady)) {
-      console.log(dsReady)
       m = <>
         <h1>
           {`Prestarting:`}
@@ -267,15 +267,23 @@ class BotMonitor extends React.Component<IProps, IState> {
       </>
     } else if (mode === 'Prestarting' && apReady && dsReady && switchReady) {
       m = <h1>{`Prestart Complete`}</h1>
+    } else if (currentTime > 0) {
+      padding = false;
+      m = <>
+           <div className={'ui custom-progress'}>
+             <div className={'custom-bar'} style={{width: `${(currentTime > 0) ? 100 - (currentTime/this.props.timer.matchConfig.totalTime) * 100 : 100}%`}} />
+           </div>
+           <h1 style={{marginTop: '0'}}>{`${mode}${(currentTime > 0) ? ` (${(currentTime)})` : ''}`}</h1>
+          </>
     } else {
-      m = <h1>{`${mode}${currentTime > 0 ? ` (${currentTime}s)` : ''}`}</h1>
+      m = <h1>{`${mode}`}</h1>
     }
     return (
       <Grid columns={2}>
         <Grid.Column className={'grid-border'} color={"grey"} width={3}>
           <h1>{`M: ${this.friendlyMatchNum(currentMatch)}`}</h1>
         </Grid.Column>
-        <Grid.Column className={'grid-border text-center'} color={modeColor} floated={'right'} width={"13"}>
+        <Grid.Column className={`grid-border text-center ${!padding? 'p-0' : ''}`} color={modeColor} width={"13"}>
           {m}
         </Grid.Column>
       </Grid>
@@ -294,35 +302,35 @@ class BotMonitor extends React.Component<IProps, IState> {
     <>
       {this.renderHeaderFooter(mode, apReady, dsReady, switchReady, match, modeColor, currentTime)}
       <Grid className={'text-center'} columns={10}>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Station</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Station</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Team</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Team</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>DS</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>DS</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Bandwidth Usage</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Bandwidth Usage</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Radio</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Radio</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Rio</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Rio</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Battery</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Battery</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Status</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Status</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Trip Time (ms)</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Trip Time (ms)</h4>
         </Grid.Column>
-        <Grid.Column className={'grid-border notop noleft'} color={"black"}>
-          <h4>Missed Packets</h4>
+        <Grid.Column className={'d-flex justify-content-center grid-border notop noleft'} color={"black"}>
+          <h4 className={'align-self-center'}>Missed Packets</h4>
         </Grid.Column>
       </Grid>
       {
@@ -352,9 +360,9 @@ class BotMonitor extends React.Component<IProps, IState> {
               <Grid.Column className={'d-flex justify-content-center grid-border notop noleft p-1'} color={problem ? 'yellow' : undefined}>
                 <h1 className={'text-black align-self-center'}>{((ds?.batt_voltage as number) || 0).toPrecision(4) + ' v'}</h1>
               </Grid.Column>
-              <Grid.Column className={'grid-border notop noleft p-1'} color={problem ? 'yellow' : undefined}>
+              <Grid.Column className={'d-flex justify-content-center grid-border notop noleft p-1'} color={problem ? 'yellow' : undefined}>
                 {
-                  (ds?.estop) ? <div className={'estop-diamond'} >E</div> :
+                  (ds?.estop) ? <div className={'estop-diamond'} ><div className={'estop-text'}>E</div></div> :
                   (ds?.auto && !problem && ds.enabled) ?  <div className={'conn-good'}>A</div> : // no problems, auto, enabled
                   (!ds?.auto && !problem && ds.enabled) ?  <div className={'conn-good'}>T</div> : // no problems, tele, enabled
                   (ds?.auto && !problem && !ds.enabled) ?  <div className={'conn-bad'}>A</div> :  // no problems, auto, disabled

@@ -11,6 +11,8 @@
 - [X] Add EMS-FMS to services frontend
 - [X] Robot Connection Dashboard (like FMS's Field-Monitor)
 - [ ] Debug small quirks on Robot Connection dashboard
+    - [ ] If loaded after prestart, page is blank
+    - [ ] Fix match state being displayed after page refresh
 - [ ] Check Switch config after sent to ensure correctness, like Wifi
 - [ ] Time All loops, tune timings and try to reach PEAK EFFICIENCY :P 
 - [ ] Match Connection Logs

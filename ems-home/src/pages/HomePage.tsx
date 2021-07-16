@@ -105,6 +105,25 @@ class HomePage extends React.Component<RouteComponentProps, IState> {
               </CardActionArea>
             </Card>
           </Grid>
+          {/* FIELD MONITOR */}
+          <Grid item={true} xs={12} sm={12} md={6} lg={4}>
+            <Card raised={true}>
+              <CardActionArea onClick={this.navigateToFieldMonitor}>
+                <CardMedia
+                  style={styles.cardImage}
+                  component={'img'}
+                  image={SCORING_APPLICATION}
+                  title={'Field Monitor'}
+                />
+                <CardContent>
+                  <Typography variant={'h5'} component={'h2'}>Scoring Application</Typography>
+                  <Typography variant="body2" color="textSecondary" component="p">
+                    Field/Match Monitor to monitor robot and match status
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
           {/* DOWNLOADS */}
           <Grid item={true} xs={12} sm={12} md={6} lg={4}>
             <Card raised={true}>
@@ -154,6 +173,10 @@ class HomePage extends React.Component<RouteComponentProps, IState> {
 
   public navigateToScoringApp() {
     window.location.href = window.location.href = "/ref";
+  }
+
+  public navigateToFieldMonitor() {
+    window.location.href = window.location.href = "/monitor";
   }
 
   public navigateToDownloads() {

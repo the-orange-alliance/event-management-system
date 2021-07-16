@@ -13,6 +13,7 @@
     "fms": "cd ems-frc-fms/ && npm start",
     "ems": "concurrently --kill-others \"cd ems-core/ && npm run desktop\" \"cd ems-core/ && npm run react\"",
     "build-audience": "cd audience-display/ && npm run build && cd ../",
+    "build-monitor": "cd field-monitor/ && npm run build && cd ../",
     "build-ref": "cd ref-tablet/ && npm run build && cd ../",
     "build-pit": "cd pit-display/ && npm run build && cd ../",
     "build-fms": "cd ems-frc-fms/ && npm run build && cd ../",
@@ -21,7 +22,7 @@
     "build-api": "cd ems-api/ && npm run build && cd ../",
     "build-sck": "cd ems-socket/ && npm run build && cd ../",
     "build-web": "cd ems-web/ && npm run build && cd ../",
-    "build-webapps": "npm run build-audience && npm run build-ref && npm run build-core && npm run build-home",
+    "build-webapps": "npm run build-audience && npm run build-ref && npm run build-core && npm run build-home && npm run build-monitor",
     "build-services": "npm run build-api && npm run build-sck && npm run build-web && npm run build-fms",
     "prebuild": "gulp prebuild:prod",
     "build": "npm run build-services && npm run build-webapps",
@@ -30,7 +31,7 @@
     "predist": "gulp predist",
     "dist": "electron-builder",
     "generate-binary": "gulp update-env:prod && gulp prebuild:prod && npm run build && gulp post-build && gulp update-pkg && npm run predist && npm run dist",
-    "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems && cd ../"
+    "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems &&  cd ../field-monitor/ && npm run update-lib-ems && cd ../"
   },
   "dependencies": {
     "concurrently": "^5.0.2",
@@ -51,7 +52,7 @@
   "build": {
     "appId": "org.theorangealliance.ems",
     "productName": "Event Management System",
-    "copyright": "2019 The Orange Alliance",
+    "copyright": "2021 The Orange Alliance",
     "directories": {
       "output": "build/dist",
       "app": "build/ems",

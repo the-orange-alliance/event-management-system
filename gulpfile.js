@@ -55,8 +55,10 @@ gulp.task("deploy-env", (done) => {
   // gulp.src([".env"]).pipe(gulp.dest("ref-tablet"));
   // gulp.src([".env"]).pipe(gulp.dest("pit-display"));
   gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("audience-display"));
+  gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("field-monitor"));
   gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("ref-tablet"));
   gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-core"));
+  gulp.src(["ems-core.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-frc-fms"));
   gulp.src(["ems-api.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-api"));
   gulp.src(["ems-web.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-web"));
   gulp.src(["ems-sck.env"]).pipe(rename(".env")).pipe(gulp.dest("ems-socket"));
@@ -64,7 +66,7 @@ gulp.task("deploy-env", (done) => {
 });
 
 gulp.task("post-build", (done) => {
-  // TODO transfer FMS files to prod build
+  gulp.src(["ems-frc-fms/**/*", "!ems-frc-fms/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-frc-fms"));
   gulp.src(["ems-api/**/*", "!ems-api/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-api"));
   gulp.src(["ems-web/**/*", "!ems-web/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-web"));
   gulp.src(["ems-socket/**/*", "!ems-socket/src/**/*"]).pipe(gulp.dest("build/ems/server/ems-socket"));
@@ -73,6 +75,7 @@ gulp.task("post-build", (done) => {
   gulp.src(["ems-core/match-maker/**/*"]).pipe(gulp.dest("build/ems/public/desktop/match-maker"));
   gulp.src(["audience-display/build/**/*"]).pipe(gulp.dest("build/ems/public/audience-display"));
   gulp.src(["ref-tablet/build/**/*"]).pipe(gulp.dest("build/ems/public/ref-tablet"));
+  gulp.src(["field-monitor/build/**/*"]).pipe(gulp.dest("build/ems/public/field-monitor"));
   gulp.src(["ems-home/build/**/*"]).pipe(gulp.dest("build/ems/public/ems-home"));
   gulp.src(["ecosystem.config.js"]).pipe(gulp.dest("build/ems/server/"));
 

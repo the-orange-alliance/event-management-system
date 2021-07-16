@@ -129,7 +129,7 @@ export class AccesspointSupport {
   }
 
   // Fetches the current wifi network status from the access point and updates the status structure.
-  public async updateTeamWifiStatus(): Promise<any> {
+  public async updateTeamWifiStatus(): Promise<void> {
     return new Promise(async (resolve, reject) => {
       if (!this.ap.networkSecurityEnabled) return;
 

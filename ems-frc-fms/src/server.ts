@@ -57,8 +57,7 @@ export class EmsFrcFms {
 
     public async initFms() {
         // Init EMS
-        EMSProvider.initialize(host, parseInt(process.env.API_PORT as string, 10));
-        process.env.REACT_APP_EMS_SCK_PORT = process.env.SOCKET_PORT;
+        EMSProvider.initialize(host, parseInt(process.env.REACT_APP_EMS_API_PORT as string, 10));
         SocketProvider.initialize(host);
         this.initSocket();
 

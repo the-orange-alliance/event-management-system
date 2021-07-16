@@ -51,6 +51,12 @@ app.use("/ref", (req: express.Request, res: express.Response) => {
   res.sendFile(path.join(__dirname, staticPath.replace("*", "ref-tablet") + "/index.html"));
 });
 
+
+app.use("/monitor", (req: express.Request, res: express.Response) => {
+  res.cookie("host", host, {secure: false, httpOnly: false, maxAge: 600000});
+  res.sendFile(path.join(__dirname, staticPath.replace("*", "monitor") + "/index.html"));
+});
+
 app.use("/ping", (req: express.Request, res: express.Response) => {
   res.send({res: "pong!"});
 });

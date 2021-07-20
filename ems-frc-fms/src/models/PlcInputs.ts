@@ -33,9 +33,13 @@ export class PlcInputs {
     this.inputCount = 13;
   }
 
+  /* PLC Inputs Array:
+  0 -
+
+   */
   public fromArray(inputs: boolean[]): PlcInputs {
     if(inputs.length > 6) {
-      this.fieldEstop = inputs[0];
+      this.fieldEstop = !inputs[0];
       this.redEstop1 = inputs[1];
       this.redEstop2 = inputs[2];
       this.redEstop3 = inputs[3];

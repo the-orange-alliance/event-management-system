@@ -7,6 +7,7 @@ export default class DSConn {
     private _auto:                      boolean;
     private _enabled:                   boolean;
     private _estop:                     boolean;
+    private _bypassed:                  boolean;
     private _dsLinked:                  boolean;
     private _radioLinked:               boolean;
     private _robotLinked:               boolean;
@@ -29,6 +30,7 @@ export default class DSConn {
         this._allianceStation = -1;
         this._auto = false;
         this._enabled = false;
+        this._bypassed = false;
         this._estop = false;
         this._dsLinked = false;
         this._radioLinked = false;
@@ -52,6 +54,7 @@ export default class DSConn {
             "team_id": this.teamId,
             "alliance_station": this.allianceStation,
             "enabled": this.enabled,
+            "bypassed": this.bypassed,
             "auto": this.auto,
             "estop": this.estop,
             "ds_linked": this.dsLinked,
@@ -99,6 +102,14 @@ export default class DSConn {
 
     set enabled(value: boolean) {
         this._enabled = value;
+    }
+
+    get bypassed(): boolean {
+        return this._bypassed;
+    }
+
+    set bypassed(value: boolean) {
+        this._bypassed = value;
     }
 
     get estop(): boolean {

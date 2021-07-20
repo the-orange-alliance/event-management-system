@@ -1,0 +1,300 @@
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname EMSSwitch
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$kKSW$fCMwnMdYvXui1TulfyYHN/
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+ip routing
+ip dhcp excluded-address 10.0.100.1 10.0.100.150
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree portfast default
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+interface FastEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+!
+interface FastEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10-100
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport mode access
+!
+interface FastEthernet0/4
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport trunk allowed vlan 10-100
+ switchport mode trunk
+!
+interface FastEthernet0/5
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/6
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/7
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/8
+ switchport access vlan 20
+ switchport mode access
+!
+interface FastEthernet0/9
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/10
+ switchport access vlan 30
+ switchport mode access
+!
+interface FastEthernet0/11
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/12
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet0/13
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/14
+ switchport access vlan 50
+ switchport mode access
+!
+interface FastEthernet0/15
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/16
+ switchport access vlan 60
+ switchport mode access
+!
+interface FastEthernet0/17
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/18
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/19
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/20
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/21
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/22
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/23
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/24
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/25
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/26
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/27
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/28
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/29
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/30
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/31
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/32
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/33
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/34
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/35
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/36
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/37
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/38
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/39
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/40
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/41
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/42
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/43
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/44
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/45
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/46
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/47
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/48
+ switchport access vlan 100
+ switchport mode access
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface GigabitEthernet0/3
+!
+interface GigabitEthernet0/4
+!
+interface Vlan1
+ ip address 10.0.0.61 255.255.255.0
+!
+interface Vlan10
+ ip address 10.15.17.61 255.255.255.0
+ ip access-group 110 in
+!
+interface Vlan20
+ ip address 10.15.7.61 255.255.255.0
+ ip access-group 120 in
+!
+interface Vlan30
+ ip address 10.15.8.61 255.255.255.0
+ ip access-group 130 in
+!
+interface Vlan40
+ ip address 10.0.3.61 255.255.255.0
+ ip access-group 140 in
+!
+interface Vlan50
+ ip address 10.15.10.61 255.255.255.0
+ ip access-group 150 in
+!
+interface Vlan60
+ ip address 10.15.11.61 255.255.255.0
+ ip access-group 160 in
+!
+interface Vlan100
+ ip address 10.0.100.2 255.255.255.0
+!
+ip classless
+no ip http server
+no ip http secure-server
+!
+!
+ip sla enable reaction-alerts
+access-list 110 permit ip 10.0.1.0 0.0.0.255 host 10.0.100.5
+access-list 110 permit udp any eq bootpc any eq bootps
+access-list 120 permit ip 10.0.2.0 0.0.0.255 host 10.0.100.5
+access-list 120 permit udp any eq bootpc any eq bootps
+access-list 130 permit ip 10.0.3.0 0.0.0.255 host 10.0.100.5
+access-list 130 permit udp any eq bootpc any eq bootps
+access-list 140 permit ip 10.0.4.0 0.0.0.255 host 10.0.100.5
+access-list 140 permit udp any eq bootpc any eq bootps
+access-list 150 permit ip 10.0.5.0 0.0.0.255 host 10.0.100.5
+access-list 150 permit udp any eq bootpc any eq bootps
+access-list 160 permit ip 10.0.6.0 0.0.0.255 host 10.0.100.5
+access-list 160 permit udp any eq bootpc any eq bootps
+!
+snmp-server community 1234Five RO
+!
+!
+line con 0
+ exec-timeout 0 0
+line vty 0 4
+ password 1234Five
+ login
+line vty 5 15
+ password 1234Five
+ login
+!
+end

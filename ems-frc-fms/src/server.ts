@@ -44,8 +44,10 @@ export class EmsFrcFms {
     private settings: FMSSettings = new FMSSettings();
     public matchStateMap: Map<String, number> = new Map<String, number>([["prestart", 0], ["timeout", 1], ["post-timeout", 2], ["start-match", 3], ["auto", 4], ["transition", 5], ["tele", 5]]);
 
+    private delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
     constructor() {
-        this.initFms();
+        this.attemptInit();
     }
 
     public static getInstance(): EmsFrcFms {
@@ -53,6 +55,20 @@ export class EmsFrcFms {
             EmsFrcFms._instance = new EmsFrcFms();
         }
         return EmsFrcFms._instance;
+    }
+
+    private async attemptInit() {
+        let isInit = false;
+        let initializeCount = 1;
+        while (!isInit) {
+            await this.initFms().then(() => {
+                isInit = true;
+            }).catch(async () => {
+                console.error('Failed to initialize FMS after ' + initializeCount + ' tries. Make sure  API and Socket are running.');
+                initializeCount++;
+                await this.delay(5000);
+            });
+        }
     }
 
     public async initFms() {

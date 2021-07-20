@@ -5,7 +5,7 @@ import logger from "./logger";
 import {EmsFrcFms} from "./server";
 import Match from "@the-orange-alliance/lib-ems/dist/models/ems/Match";
 import {MatchMode, SocketProvider} from "@the-orange-alliance/lib-ems";
-import {PlcSupport, STACK_LIGHT_OFF, STACK_LIGHT_ON} from "./plc-support";
+import {PlcSupport, ROBOT_CONNECTED, ROBOT_DISCONNECTED, STACK_LIGHT_OFF, STACK_LIGHT_ON} from "./plc-support";
 
 const udpDSListener = dgram.createSocket("udp4");
 let tcpListener = net.createServer();
@@ -55,7 +55,6 @@ export class DriverstationSupport {
         });
 
         udpDSListener.on('error', function() {
-            //const address = udpDSListener.address();
             logger.error('❌ Error Listening for DriverStations on UDP. Please make sure you IP Address is set correctly. Should be set to 10.0.100.5');
         });
 
@@ -78,7 +77,7 @@ export class DriverstationSupport {
             let i = 0;
             while(i < this.allDriverStations.length) { // run through current driver staions
                 if(this.allDriverStations[i] && this.allDriverStations[i].teamId === teamNum) { // found team in DS list
-                    PlcSupport.getInstance().setStationStack(i, STACK_LIGHT_ON);
+                    PlcSupport.getInstance().setStationStack(i, ROBOT_CONNECTED);
                     this.allDriverStations[i].dsLinked = true;
                     this.allDriverStations[i].lastPacketTime = Date.now();
 
@@ -272,10 +271,6 @@ export class DriverstationSupport {
         }
     }
 
-    public setTeamEstopped(station: number) {
-        this.allDriverStations[station].estop = true;
-    }
-
     // Run all this stuff
     public runDriverStations() {
         const stationStatuses = []; // This will be used to set field stack light
@@ -331,17 +326,10 @@ export class DriverstationSupport {
                 } else {
                     allIsGood = this.allDriverStations[i].dsLinked && this.allDriverStations[i].radioLinked && this.allDriverStations[i].robotLinked && this.allDriverStations[i].batteryVoltage > 0;
                 }
-                // SET STACK LIGHTS // TODO: Is this proper? Who knows ️
                 stationStatuses[i] = allIsGood;
-                // If match in progress and Stack Light On, Robot Connection Good
-                // If match in progress and Stack Light Off, Robot Connection Bad
-                if(this.isMatchInProgress()) {
-                    PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_ON : STACK_LIGHT_OFF);
-                } else {
-                    // If No Match in progress and stack lights are on, that means there is a problem with Robot Comms // TODO Should flash at some point (handled in plc, fun fact :P)
-                    // If No Match in progress and stack lights are off, that means team is ready to start the match
-                    PlcSupport.getInstance().setStationStack(i, (allIsGood) ? STACK_LIGHT_OFF : STACK_LIGHT_ON);
-                }
+
+                // Set Alliance Stack Light
+                PlcSupport.getInstance().setStationStack(i, (allIsGood) ? ROBOT_CONNECTED : ROBOT_DISCONNECTED);
 
                 this.allDriverStations[i].secondsSinceLastRobotLink = Math.abs(diff/1000);
             }
@@ -358,11 +346,9 @@ export class DriverstationSupport {
             let blueGood = (stationStatuses[0] && stationStatuses[1] && stationStatuses[2]);
             let redGood = (stationStatuses[3] && stationStatuses[4] && stationStatuses[5]);
             if(!redGood || !blueGood) this.soundedBuzzer = false; // If a team has disconnected, we can sound the buzzer again when we go green
-            const blue = (blueGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
-            const red = (redGood)? STACK_LIGHT_OFF : STACK_LIGHT_ON;
             const green = (redGood && blueGood)? STACK_LIGHT_ON : STACK_LIGHT_OFF;
-            const orange = STACK_LIGHT_ON;
-            PlcSupport.getInstance().setFieldStack(blue, red, orange, green, STACK_LIGHT_OFF );
+            // Red/Blue lights managed within PLC based on robot connection
+            PlcSupport.getInstance().setFieldStack(0, 0, 0, green, STACK_LIGHT_OFF );
             if (!this.isMatchInProgress() && !this.soundedBuzzer && blueGood && redGood) {
                 PlcSupport.getInstance().soundBuzzer();
                 this.soundedBuzzer = true;

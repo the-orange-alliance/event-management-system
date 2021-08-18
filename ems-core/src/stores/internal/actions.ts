@@ -12,7 +12,7 @@ import {
   SET_QUALIFICATION_MATCHES,
   SET_SOCKET_CONNECTED,
   SET_PLAYOFFS_MATCHES,
-  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES, ADD_PLAYOFFS_MATCHES
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES, ADD_PLAYOFFS_MATCHES, SET_LOGGED_IN
 } from "./constants";
 import {
   IUpdateProcessList,
@@ -26,7 +26,7 @@ import {
   ISetPracticeMatches,
   ISetQualificationMatches,
   ISetSocketConnected,
-  ISetPlayoffsMatches, ISetAllianceMembers, ISetTestMatches, IAddPlayoffsMatches
+  ISetPlayoffsMatches, ISetAllianceMembers, ISetTestMatches, IAddPlayoffsMatches, ISetLoggedIn
 } from "./types";
 import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
@@ -136,3 +136,11 @@ export const setSocketConnected: ActionCreator<ISetSocketConnected> = (connected
     connected: connected
   }
 });
+
+export const setLoggedIn: ActionCreator<ISetLoggedIn> = (loggedIn: boolean) => ({
+  type: SET_LOGGED_IN,
+  payload: {
+    loggedIn: loggedIn
+  }
+});
+

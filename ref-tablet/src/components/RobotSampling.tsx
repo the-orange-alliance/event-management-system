@@ -22,13 +22,13 @@ class RobotSampling extends React.Component<IProps> {
     return (
       <div className="robot-sample-container">
         <div className={"robot-sample-item " + (silverOneStatus ? "selected" : "")} onClick={this.toggleSilverOne}>
-          <img src={SILVER_MINERAL}/>
+          <img alt={""} src={SILVER_MINERAL}/>
         </div>
         <div className={"robot-sample-item " + (silverTwoStatus ? "selected" : "")} onClick={this.toggleSilverTwo}>
-          <img src={SILVER_MINERAL}/>
+          <img alt={""} src={SILVER_MINERAL}/>
         </div>
         <div className={"robot-sample-item " + (goldStatus ? "selected" : "")} onClick={this.toggleGold}>
-          <img src={GOLD_MINERAL}/>
+          <img alt={""} src={GOLD_MINERAL}/>
         </div>
       </div>
     );

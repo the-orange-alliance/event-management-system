@@ -36,6 +36,10 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
       configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);
     }
 
+    if (typeof configStore.apiKey !== "undefined") {
+      configState.apiKey = configStore.apiKey;
+    }
+
     if (typeof configStore.schedule !== "undefined") {
       if (typeof configStore.schedule.Practice !== "undefined") {
         configState.practiceSchedule = configState.practiceSchedule.fromJSON(configStore.schedule.Practice);
@@ -82,7 +86,9 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
     }
 
     InternalStateManager.pollServicesForResponse().then((res: any) => {
-      InternalStateManager.refreshInternalProgress(configState.eventConfiguration).then((internalProgress: IInternalProgress) => {
+      InternalStateManager.refreshInternalProgress(configState.eventConfiguration, configState.apiKey).then((internalProgress: IInternalProgress) => {
+        internalState.loggedIn = internalProgress.loggedIn;
+
         internalState.completedStep = internalProgress.currentStep;
         if (internalProgress.teams) {
           internalState.teamList = internalProgress.teams;

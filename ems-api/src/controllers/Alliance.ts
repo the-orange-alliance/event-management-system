@@ -1,6 +1,7 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response, Router} from 'express';
 import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
+import {Permissions} from "../errors";
 import logger from "../logger";
 
 const router: Router = Router();
@@ -22,6 +23,7 @@ router.get("/:alliance_key", (req: Request, res: Response, next: NextFunction) =
 });
 
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   DatabaseManager.insertValues("alliance", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " alliance members in the database.");
     res.send({payload: "Created " + req.body.records.length + " alliance members in the database."});

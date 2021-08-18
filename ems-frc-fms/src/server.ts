@@ -15,6 +15,8 @@ import {
     SocketProvider,
     Team
 } from "@the-orange-alliance/lib-ems";
+import * as fs from "fs";
+import getAppDataPath from "appdata-path";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
@@ -63,18 +65,34 @@ export class EmsFrcFms {
         while (!isInit) {
             await this.initFms().then(() => {
                 isInit = true;
-            }).catch(async () => {
-                console.error('Failed to initialize FMS after ' + initializeCount + ' tries. Make sure  API and Socket are running.');
+            }).catch(async (err) => {
+                logger.error('❌ Failed to initialize FMS after ' + initializeCount + ' tries. Make sure API and Socket are running. Error: ' + err);
                 initializeCount++;
                 await this.delay(5000);
             });
         }
     }
 
+    private async emsAuthLoop(renew: boolean): Promise<string> {
+        try {
+            const credDir = path.join(getAppDataPath(""), "ems-core", "frc-fms-key.json");
+            const key = JSON.parse(fs.readFileSync(credDir, {encoding: 'utf-8'}));
+            const apiKey = await EMSProvider.authApiKey(key.key);
+            if(renew) logger.info("✔ Renewed API Key");
+            setTimeout(() => this.emsAuthLoop(true), 60 * 60 * 1000); // renew authorization every hour
+            return apiKey;
+        } catch {
+            logger.error('❌ EMS-API Authorization failed. Trying again...');
+            await new Promise<void>((resolve) => {setTimeout(() => resolve(), 1000)});
+            return this.emsAuthLoop(renew);
+        }
+    };
+
     public async initFms() {
         // Init EMS
         EMSProvider.initialize(host, parseInt(process.env.REACT_APP_EMS_API_PORT as string, 10));
-        SocketProvider.initialize(host);
+        await this.emsAuthLoop(false);
+        SocketProvider.initialize(host, EMSProvider);
         this.initSocket();
 
         // Load Settings from EMS DB
@@ -114,7 +132,7 @@ export class EmsFrcFms {
 
     private async loadSettings() {
         const events = await EMSProvider.getEvent();
-        if (events.length > 0) {
+        if (events && events.length > 0) {
             this.event = events[0];
             const config = await EMSProvider.getAdvNetConfig(this.event.eventKey);
             if (!config.error) {
@@ -122,7 +140,7 @@ export class EmsFrcFms {
                 logger.info('✔ Loaded Settings for FMS with event ' + this.event.eventKey);
             } else {
                 await EMSProvider.postAdvNetConfig(this.event.eventKey, this.settings.toJson());
-                logger.info('✔ No FMS found for ' + this.event.eventKey +  '. Running with default settings.');
+                logger.info('❗ No FMS configuration found for ' + this.event.eventKey +  '. Running with default settings.');
             }
         } else {
             logger.info('✔ No event found. Running with default settings.');
@@ -170,9 +188,6 @@ export class EmsFrcFms {
         SocketProvider.on("fms-settings-update", (data: string) => {
             this.updateSettings(JSON.parse(data));
             SocketProvider.emit("fms-settings-update-success", JSON.stringify(this.settings.toJson()));
-        });
-        SocketProvider.on("fms-request-settings", () => {
-            SocketProvider.emit("fms-settings", JSON.stringify(this.settings.toJson()));
         });
 
         // Manage Socket Events

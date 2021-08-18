@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Button, ButtonGroup} from "reactstrap";
 import {MatchParticipant} from "@the-orange-alliance/lib-ems";
+import {Button, ButtonGroup} from "semantic-ui-react";
 
 interface IProps {
   value: number;
@@ -20,7 +20,7 @@ class RobotButtonGroup extends React.Component<IProps> {
     const statesView = states.map((state, index) => {
       const isSelected = value === index;
       return (
-        <Button key={index} color={isSelected ? "primary" : "secondary"} className={isSelected ? "selected" : ""} onClick={this.updateSelected.bind(this, index)}>
+        <Button key={index} color={isSelected ? "green" : "grey"} className={isSelected ? "selected" : ""} onClick={this.updateSelected.bind(this, index)}>
           {state}
         </Button>
       );

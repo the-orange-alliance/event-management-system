@@ -6,6 +6,7 @@
     "build": "tsc",
     "watch": "tsc -- --watch",
     "start": "tsc && node build/server.js",
+    "run": "node build/server.js",
     "update-lib-ems": "npm i @the-orange-alliance/lib-ems@latest"
   },
   "keywords": [],
@@ -24,8 +25,8 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.8.11",
-    "appdata-path": "^0.1.2",
+    "@the-orange-alliance/lib-ems": "file:../../lib-ems",
+    "appdata-path": "^1.0.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "dotenv": "^6.0.0",

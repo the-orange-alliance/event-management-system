@@ -4,7 +4,7 @@ import {getAppDataPath} from "appdata-path";
 import {Socket, Server} from "socket.io";
 import {IRoom} from "./IRoom";
 import logger from "../logger";
-import {EMSProvider} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, User} from "@the-orange-alliance/lib-ems";
 
 export default class EventRoom implements IRoom {
   private readonly _server: Server;
@@ -24,9 +24,9 @@ export default class EventRoom implements IRoom {
     this.teamsList = [];
   }
 
-  public addClient(client: Socket) {
+  public addClient(client: Socket, user: User | null) {
     this._clients.push(client);
-    this.initializeEvents(client);
+    this.initializeEvents(client, user);
     logger.info(`Client ${client.id} joined '${this._name}'.`);
   }
 
@@ -41,7 +41,7 @@ export default class EventRoom implements IRoom {
     return this._clients;
   }
 
-  private initializeEvents(client: Socket) {
+  private initializeEvents(client: Socket, user: User | null) {
     if (this.isSlaveEnabled) {
       this._server.to(this._name).emit("enter-slave", this.masterAddress);
     }
@@ -61,6 +61,7 @@ export default class EventRoom implements IRoom {
       // this._server.to(this._name).emit("config-receive", host);
     });
     client.on("enter-slave", (masterHost: string) => {
+      if(!user || (user && !user.canControlEvent)) return client.emit('Unauthorized', {event: 'enter-slave', required_priv: 'can_control_event'});
       this.isSlaveEnabled = true;
       this.masterAddress = masterHost;
       logger.info("Asking all clients to enable slave mode on " + masterHost + ".");
@@ -75,6 +76,7 @@ export default class EventRoom implements IRoom {
       this._server.to(this._name).emit("test-audience-success");
     });
     client.on("alliance-update", (teamsList: number[]) => {
+      if(!user || (user && !user.canControlEvent)) return client.emit('Unauthorized', {event: 'alliance-update', required_priv: 'can_control_event'});
       this.teamsList = teamsList;
       this._server.to(this.name).emit("alliance-update", teamsList);
     });

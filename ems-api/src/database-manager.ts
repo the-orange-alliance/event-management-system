@@ -2,6 +2,8 @@ import * as path from "path";
 import * as fs from "fs";
 import * as SQL from "sqlite3";
 import {getAppDataPath} from "appdata-path";
+import {checkAndCreateDefaultAccount} from "./controllers/Auth";
+import logger from "./logger";
 
 class DatabaseManager {
   private static _instance: DatabaseManager;
@@ -300,6 +302,23 @@ class DatabaseManager {
       }).catch((error) => {
         reject(error);
       });
+    });
+  }
+
+  public setupAccounts() {
+    this.getQueryFromFile("create_accounts_base.sql").then((queryStr: string) => {
+      this._db.exec(queryStr, (error) => {
+        if (error) {
+          logger.error('Failed to execute account sql: ' + error)
+        } else {
+          setTimeout(() => {
+            // This creates our default login account, if needed
+            checkAndCreateDefaultAccount();
+          }, 1000);
+        }
+      });
+    }).catch((error) => {
+      logger.error('Failed to get account SQL from file: ' + error)
     });
   }
 

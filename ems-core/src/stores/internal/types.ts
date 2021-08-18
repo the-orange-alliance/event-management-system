@@ -12,7 +12,7 @@ import {
   SET_QUALIFICATION_MATCHES,
   SET_PLAYOFFS_MATCHES,
   SET_SOCKET_CONNECTED,
-  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES, ADD_PLAYOFFS_MATCHES
+  SET_ALLIANCE_MEMBERS, SET_TEST_MATCHES, ADD_PLAYOFFS_MATCHES, SET_LOGGED_IN
 } from "./constants";
 import {Process, Team, Match, AllianceMember} from "@the-orange-alliance/lib-ems";
 
@@ -123,6 +123,13 @@ export interface ISetSocketConnected extends Action {
   }
 }
 
+export interface ISetLoggedIn extends Action {
+  type: SET_LOGGED_IN,
+  payload: {
+    loggedIn: boolean
+  }
+}
+
 export type InternalActions = ISetProcessActionsDisabled | IUpdateProcessList | IDisableNavigation |
   IIncrementCompletedStep | IUpdateTeamList | IAddTeam | IAlterTeam | IRemoveTeam | ISetTestMatches | ISetPracticeMatches |
-  ISetPlayoffsMatches | IAddPlayoffsMatches | ISetQualificationMatches | ISetSocketConnected | ISetAllianceMembers;
+  ISetPlayoffsMatches | IAddPlayoffsMatches | ISetQualificationMatches | ISetSocketConnected | ISetAllianceMembers | ISetLoggedIn;

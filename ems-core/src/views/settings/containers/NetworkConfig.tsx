@@ -156,7 +156,7 @@ class NetworkConfig extends React.Component<IProps, IState> {
         const newHost: string = procList[0].address;
         EMSProvider.initialize(newHost);
         WebProvider.initialize(newHost);
-        SocketProvider.initialize(newHost);
+        SocketProvider.initialize(newHost, EMSProvider);
         this.props.updateProcessList(procList);
         this.props.setNetworkHost(newHost);
         this.props.setNavigationDisabled(false);

@@ -8,9 +8,12 @@ const localIPv4 = require("local-ipv4-address");
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 const isProd = process.env.NODE_ENV === "production";
 
+// Running the processes in no daemon mode prevents endless terminal windows from launching
+const noDaemonMode = true;
+
 ipcMain.on("kill-ecosystem", (event: IpcMainEvent) => {
   logger.info("Killing application ecosystem...");
-  pm2.connect((err) => {
+  pm2.connect(noDaemonMode,(err) => {
     if (err) {
       event.sender.send("kill-ecosystem-response", err);
     } else {
@@ -24,7 +27,7 @@ ipcMain.on("kill-ecosystem", (event: IpcMainEvent) => {
 
 ipcMain.on("list-ecosystem", (event: IpcMainEvent) => {
   logger.info("Listing application ecosystem...");
-  pm2.connect((err) => {
+  pm2.connect(noDaemonMode,(err) => {
     if (err) {
       event.sender.send("list-ecosystem-response", err, undefined);
     } else {
@@ -42,7 +45,10 @@ ipcMain.on("start-ecosystem", (event: IpcMainEvent, host: string) => {
     if (localHost === "Default") {
       localHost = "127.0.0.1";
     }
-    if (typeof host === "undefined" || host === null) {
+    if(process.env.NODE_ENV === 'development') {
+      host = '127.0.0.1';
+      logger.info(`Starting services for development mode, with a default ${host} address.`);
+    } else if (typeof host === "undefined" || host === null) {
       host = localHost;
       logger.info(`Starting services with a default ${host} address.`);
     } else if (host.match(ipRegex) === null || localHost.match(ipRegex) === null) {
@@ -51,7 +57,7 @@ ipcMain.on("start-ecosystem", (event: IpcMainEvent, host: string) => {
     } else {
       logger.info(`Starting services with a ${host} address.`);
     }
-    pm2.connect((err) => {
+    pm2.connect(noDaemonMode,(err) => {
       if (err) {
         event.sender.send("start-ecosystem-response", err, undefined, undefined);
       } else {
@@ -93,7 +99,7 @@ ipcMain.on("start-process", (event: IpcMainEvent, procName: string, host: string
       logger.info(`Starting services with a ${host} address.`);
     }
     logger.info("Attempting to start " + procName + " service...");
-    pm2.connect((err) => {
+    pm2.connect(noDaemonMode,(err) => {
       if (err) {
         event.sender.send("start-process-response", err, undefined);
       } else {
@@ -111,7 +117,7 @@ ipcMain.on("start-process", (event: IpcMainEvent, procName: string, host: string
 
 ipcMain.on("stop-process", (event: IpcMainEvent, procName: string) => {
   logger.info("Attempting to stop " + procName + " service...");
-  pm2.connect((err) => {
+  pm2.connect(noDaemonMode,(err) => {
     if (err) {
       event.sender.send("stop-process-response", err, undefined);
     } else {
@@ -128,7 +134,7 @@ ipcMain.on("stop-process", (event: IpcMainEvent, procName: string) => {
 
 ipcMain.on("restart-process", (event: IpcMainEvent, procName: string) => {
   logger.info("Attempting to restart " + procName + " service...");
-  pm2.connect((err) => {
+  pm2.connect(noDaemonMode,(err) => {
     if (err) {
       event.sender.send("restart-process-response", err, undefined);
     } else {
@@ -155,7 +161,9 @@ function startProcess(scriptLoc: string, procName: string, args?: any) {
       args: args,
       env: isProd ? {NODE_PATH: modulesPath} : {},
       name: procName,
-      script: scriptLoc
+      script: scriptLoc,
+      max_restarts: 10,
+      min_uptime: 5000,
     }, (err, apps) => {
       if (err) {
         reject(err);

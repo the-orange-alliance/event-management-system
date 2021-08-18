@@ -13,6 +13,7 @@ import {
   SocketProvider
 } from "@the-orange-alliance/lib-ems";
 import {Container, Menu} from "semantic-ui-react";
+import LoginContainer from "./views/LoginContainer";
 
 interface IProps {
   cookies: Cookies
@@ -22,7 +23,8 @@ interface IState {
   event: Event,
   match: Match,
   connected: boolean,
-  activeItem: number
+  activeItem: number,
+  loggedIn: boolean,
 }
 
 class App extends React.Component<IProps, IState> {
@@ -36,16 +38,37 @@ class App extends React.Component<IProps, IState> {
       match: new Match(),
       connected: false,
       activeItem: 0,
+      loggedIn: !!localStorage.getItem('auth'),
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
-      SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
+      SocketProvider.initialize((this.props.cookies.get("host") as string), EMSProvider);
     } else if (process.env.NODE_ENV === 'development') {
-      SocketProvider.initialize('localhost');
       EMSProvider.initialize('localhost', 8008);
+      SocketProvider.initialize('localhost', EMSProvider);
     } else {
       EMSProvider.initialize("192.168.0.217");
-      SocketProvider.initialize("192.168.0.217");
+      SocketProvider.initialize("192.168.0.217", EMSProvider);
+    }
+
+    const key = localStorage.getItem('auth');
+    if(key) {
+      EMSProvider.authOldKey(key).then((newKey) => {
+        SocketProvider.reconnect();
+        localStorage.setItem('auth', newKey);
+        return EMSProvider.getEvent();
+      }).then((events: Event[]) => {
+        if (events.length > 0) {
+          this.setState({event: events[0]});
+        }
+      });
+    } else {
+      // this probably won't work
+      EMSProvider.getEvent().then((events: Event[]) => {
+        if (events.length > 0) {
+          this.setState({event: events[0]});
+        }
+      });
     }
 
     SocketProvider.on("connect", () => {
@@ -60,12 +83,6 @@ class App extends React.Component<IProps, IState> {
     SocketProvider.on("enter-slave", (masterHost: string) => {
       console.log("Entered slave mode with master address " + masterHost);
       EMSProvider.initialize(masterHost);
-    });
-
-    EMSProvider.getEvent().then((events: Event[]) => {
-      if (events.length > 0) {
-        this.setState({event: events[0]});
-      }
     });
   }
 
@@ -142,24 +159,35 @@ class App extends React.Component<IProps, IState> {
       <>
         <Menu stackable>
           <Menu.Item><h2>EMS Field Monitor</h2></Menu.Item>
-          <Menu.Item name='fieldmon' active={activeItem === 0} onClick={() => this.updateTab(0)}>FMS Monitor</Menu.Item>
-          <Menu.Item name='matchmon' active={activeItem === 1} onClick={() => this.updateTab(1)}>Match Monitor</Menu.Item>
+          {this.state.loggedIn &&
+            <>
+                <Menu.Item name='fieldmon' active={activeItem === 0} onClick={() => this.updateTab(0)}>FMS Monitor</Menu.Item>
+                <Menu.Item name='matchmon' active={activeItem === 1} onClick={() => this.updateTab(1)}>Match Monitor</Menu.Item>
 
-          <Menu.Menu position='right'>
-            <Menu.Item>
-              Event:<span className={this.state.event.eventName ? "success" : "error"}>{this.state.event.eventName ? this.state.event.eventName : "None"}</span>
-            </Menu.Item>
-            <Menu.Item position='right'>
-              EMS Status:<span className={connected ? "success" : "error"}>{connected ? "Connected" : "Not Connected"}</span>
-            </Menu.Item>
-          </Menu.Menu>
+                <Menu.Menu position='right'>
+                    <Menu.Item>
+                        Event:<span className={this.state.event.eventName ? "success" : "error"}>{this.state.event.eventName ? this.state.event.eventName : "None"}</span>
+                    </Menu.Item>
+                    <Menu.Item position='right'>
+                        EMS Status:<span className={connected ? "success" : "error"}>{connected ? "Connected" : "Not Connected"}</span>
+                    </Menu.Item>
+                </Menu.Menu>
+            </>
+          }
         </Menu>
         <Container>
-          { activeItem === 0 &&
-          <BotMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} timer={this.timer}/>
+          { this.state.loggedIn &&
+            <>
+              { activeItem === 0 &&
+              <BotMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} timer={this.timer}/>
+              }
+              { activeItem === 1 &&
+              <MatchMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} />
+              }
+            </>
           }
-          { activeItem === 1 &&
-          <MatchMonitor event={this.state.event} match={this.state.match} connected={this.state.connected} />
+          { !this.state.loggedIn &&
+            <LoginContainer callback={() => {this.setState({loggedIn: true});}} />
           }
         </Container>
       </>

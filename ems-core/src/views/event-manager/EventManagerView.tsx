@@ -11,14 +11,15 @@ import {IIncrementCompletedStep} from "../../stores/internal/types";
 import EventQualificationSetup from "./views/EventQualificationSetup";
 import EventAwardsSetup from "./views/EventAwardsSetup";
 import EventDataUpload from "./views/EventDataUpload";
-import {EventConfiguration} from "@the-orange-alliance/lib-ems";
+import {EventConfiguration, Team} from "@the-orange-alliance/lib-ems";
 import EventAdvancement from "./views/EventAdvancement";
 
 interface IProps {
   completedStep?: number,
   navigationDisabled?: boolean,
   eventConfig?: EventConfiguration,
-  setCompletedStep?: (step: number) => IIncrementCompletedStep
+  setCompletedStep?: (step: number) => IIncrementCompletedStep,
+  teams?: Team[]
 }
 
 interface IState {
@@ -152,6 +153,7 @@ class EventManagerView extends React.Component<IProps, IState> {
 
 export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
+    teams: internalState.teamList,
     completedStep: internalState.completedStep,
     eventConfig: configState.eventConfiguration,
     navigationDisabled: internalState.navigationDisabled

@@ -1,6 +1,6 @@
 import {ActionCreator} from "redux";
 import {
-  ADD_PLAYOFFS_SCHEDULE,
+  ADD_PLAYOFFS_SCHEDULE, SET_API_KEY,
   SET_BACKUP_DIR,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
@@ -10,7 +10,7 @@ import {
   TOGGLE_SLAVE_MODE
 } from "./constants";
 import {
-  IAddPlayoffsSchedule,
+  IAddPlayoffsSchedule, ISetApiKey,
   ISetBackupDir,
   ISetEvent,
   ISetEventConfiguration, ISetMasterHost, ISetMatchConfig,
@@ -109,5 +109,12 @@ export const setBackupDir: ActionCreator<ISetBackupDir> = (backupDir: string) =>
   type: SET_BACKUP_DIR,
   payload: {
     backupDir: backupDir
+  }
+});
+
+export const setApiKey: ActionCreator<ISetApiKey> = (key: string) => ({
+  type: SET_API_KEY,
+  payload: {
+    key: key
   }
 });

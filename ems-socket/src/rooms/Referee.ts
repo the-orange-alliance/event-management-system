@@ -3,6 +3,8 @@ import {IRoom} from "./IRoom";
 import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import ScoreManager from "../scoring/ScoreManager";
+import {User} from "@the-orange-alliance/lib-ems";
+
 
 export default class RefereeRoom implements IRoom {
   private readonly _server: Server;
@@ -17,9 +19,9 @@ export default class RefereeRoom implements IRoom {
     this._timer = timer;
   }
 
-  public addClient(client: Socket) {
+  public addClient(client: Socket, user: User | null) {
     this._clients.push(client);
-    this.initializeEvents(client);
+    this.initializeEvents(client, user);
     logger.info(`Client ${client.id} joined '${this._name}'.`);
   }
 
@@ -34,7 +36,7 @@ export default class RefereeRoom implements IRoom {
     return this._clients;
   }
 
-  private initializeEvents(client: Socket) {
+  private initializeEvents(client: Socket, user: User | null) {
     if (this._timer.inProgress()) {
       setTimeout(() => {
         client.emit("data-update", ScoreManager.matchMetadata.toJSON());
@@ -42,6 +44,7 @@ export default class RefereeRoom implements IRoom {
     }
 
     client.on("data-update", (dataJSON: any) => {
+      if(!user || (user && !user.canRef)) return client.emit('Unauthorized', {event: 'data-update', required_priv: 'can_ref'});
       ScoreManager.updateMatchMetaData(dataJSON[0]);
       client.emit("data-update", ScoreManager.matchMetadata.toJSON());
     });

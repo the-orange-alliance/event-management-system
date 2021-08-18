@@ -1,14 +1,15 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import {NextFunction, Request, Response, Router} from 'express';
 import DatabaseManager from '../database-manager';
 import * as Errors from '../errors';
+import {Permissions} from '../errors';
 import logger from '../logger';
 import {
   EnergyImpactRanker,
   IMatchRanker,
+  InfiniteRechargeRanker,
   IPostableObject,
   OceanOpportunitiesRanker,
-  RoverRuckusRanker,
-  InfiniteRechargeRanker
+  RoverRuckusRanker
 } from '@the-orange-alliance/lib-ems';
 
 const router: Router = Router();
@@ -72,6 +73,7 @@ router.get('/calculate/:tournament_level', (req: Request, res: Response, next: N
 });
 
 router.post('/', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   for (const rankJSON of req.body.records) {
     if (typeof rankJSON.team !== 'undefined') delete rankJSON.team;
   }
@@ -86,6 +88,7 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.delete('/', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   DatabaseManager.deleteAll('ranking')
     .then((rows: any[]) => {
       res.send({ payload: rows });

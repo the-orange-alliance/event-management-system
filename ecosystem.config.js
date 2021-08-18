@@ -5,14 +5,17 @@ module.exports = {
     watch       : true,
     env: {
       "NODE_ENV": "development",
+      "SOCKET_PORT": "8800",
       "PORT": "8008",
     },
     env_staging : {
       "NODE_ENV": "staging",
+      "SOCKET_PORT": "8800",
       "PORT": "8008",
     },
     env_production : {
       "NODE_ENV": "production",
+      "SOCKET_PORT": "8800",
       "PORT": "8008",
     }
   },

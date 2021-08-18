@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -- --watch",
-    "start": "tsc && node build/server.js"
+    "start": "tsc && node build/server.js",
+    "run": "node build/server.js"
   },
   "keywords": [],
   "author": "",

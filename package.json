@@ -5,12 +5,16 @@
   "private": true,
   "scripts": {
     "api": "cd ems-api/ && npm start",
+    "run-api": "cd ems-api/ && npm run run",
     "socket": "cd ems-socket/ && npm start",
+    "run-socket": "cd ems-socket/ && npm run run",
     "webserv": "cd ems-web/ && npm start",
+    "run-webserv": "cd ems-web/ && npm run run",
     "audience": "cd audience-display/ && npm start",
     "ref": "cd ref-tablet/ && npm start",
     "pit": "cd pit-display/ && npm start",
     "fms": "cd ems-frc-fms/ && npm start",
+    "run-fms": "cd ems-frc-fms/ && npm run run",
     "ems": "concurrently --kill-others \"cd ems-core/ && npm run desktop\" \"cd ems-core/ && npm run react\"",
     "build-audience": "cd audience-display/ && npm run build && cd ../",
     "build-monitor": "cd field-monitor/ && npm run build && cd ../",
@@ -37,7 +41,7 @@
     "concurrently": "^5.0.2",
     "node-gyp": "^6.1.0",
     "npm": "^6.13.6",
-    "pm2": "^4.2.3",
+    "pm2": "^5.1.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {

@@ -7,7 +7,8 @@ import {
   SET_NETWORK_HOST, SET_PLAYOFFS_SCHEDULE,
   SET_PRACTICE_SCHEDULE,
   SET_QUALIFICATION_SCHEDULE, SET_SLAVE_ID, SET_TOA_CONFIG,
-  TOGGLE_SLAVE_MODE
+  TOGGLE_SLAVE_MODE,
+  SET_API_KEY,
 } from "./constants";
 import {IConfigState} from "./models";
 import {ConfigActions} from "./types";
@@ -26,6 +27,7 @@ export const initialState: IConfigState = {
   playoffsSchedule: [],
   toaConfig: new TOAConfig(),
   backupDir: "",
+  apiKey: ""
 };
 
 const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, action) => {
@@ -56,6 +58,8 @@ const reducer: Reducer<IConfigState> = (state: IConfigState = initialState, acti
       return {...state, toaConfig: action.payload.toaConfig};
     case SET_BACKUP_DIR:
       return {...state, backupDir: action.payload.backupDir};
+    case SET_API_KEY:
+      return {...state, apiKey: action.payload.key};
     default:
       return state;
   }

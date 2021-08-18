@@ -9,9 +9,13 @@ import {
   incrementCompletedStep, setAllianceMembers, setSocketConnected,
 } from "./stores/internal/actions";
 
-import {EMSProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
-AllianceMember} from "@the-orange-alliance/lib-ems";
+import {
+  EMSProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
+  AllianceMember
+} from "@the-orange-alliance/lib-ems";
 import UploadManager from "./managers/UploadManager";
+import LoginContainer from "./LoginContainer";
+import {Dimmer, Loader} from 'semantic-ui-react';
 
 interface IProps {
   slaveModeEnabled: boolean,
@@ -19,12 +23,19 @@ interface IProps {
   networkHost: string,
   toaConfig: TOAConfig,
   matchTimerConfig: MatchConfiguration,
-  setSocketConnected?: (connected: boolean) => ISetSocketConnected
+  setSocketConnected?: (connected: boolean) => ISetSocketConnected,
+  loggedIn?: boolean,
+}
+interface IState {
+  loading: boolean
 }
 
-class App extends React.Component<IProps> {
+class App extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    this.state = {
+      loading: true
+    }
   }
 
   public componentDidMount() {
@@ -39,16 +50,26 @@ class App extends React.Component<IProps> {
       document.title = "Event Management System";
       EMSProvider.initialize(this.props.networkHost);
     }
+
+    this.setState({loading: false});
   }
 
   public render() {
     return (
-      <AppContainer/>
+      <>
+        {this.props.loggedIn && !this.state.loading && <AppContainer/>}
+        {!this.props.loggedIn && !this.state.loading && <LoginContainer/>}
+        {this.state.loading && <>
+          <Dimmer active inverted>
+              <Loader size={"massive"}>Loading EMS...</Loader>
+          </Dimmer>
+        </>}
+      </>
     );
   }
 
   private initializeSocket(host: string) {
-    SocketProvider.initialize('localhost');
+    SocketProvider.initialize('localhost', EMSProvider);
     SocketProvider.on("connect", () => {
       SocketProvider.emit("identify", "ems-core", ["scoring", "event", "fms"]);
       this.props.setSocketConnected(true);
@@ -70,7 +91,8 @@ export function mapStateToProps(state: IApplicationState) {
     masterHost: state.configState.masterHost,
     networkHost: state.configState.networkHost,
     matchTimerConfig: state.configState.matchConfig,
-    toaConfig: state.configState.toaConfig
+    toaConfig: state.configState.toaConfig,
+    loggedIn: state.internalState.loggedIn,
   };
 }
 

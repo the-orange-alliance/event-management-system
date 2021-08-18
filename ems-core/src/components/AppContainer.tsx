@@ -79,7 +79,7 @@ class AppContainer extends React.Component<IProps, IState> {
     }
   }
 
-  private changeActiveView = (event: React.SyntheticEvent, data: MenuItemProps) => {
+  private   changeActiveView = (event: React.SyntheticEvent, data: MenuItemProps) => {
     this.setState({activeItem: data.name});
   };
 }

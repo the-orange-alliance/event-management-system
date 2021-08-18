@@ -60,6 +60,30 @@ const postAlliance = [
   "is_captain"
 ];
 
+const postChangePassword = [
+  "new_password_verifier",
+  "new_password",
+  "old_password"
+];
+
+const postCheckUsername = [
+  "username",
+];
+
+const postCreateUser = [
+  "can_control_match",
+  "can_control_event",
+  "can_ref",
+  "can_control_fms",
+];
+
+const putUpdateUser = [
+  "can_control_match",
+  "can_control_event",
+  "can_ref",
+  "can_control_fms"
+];
+
 const putActiveMatch = ["match_key", "active"];
 const putMatchScores = ["match_key", "red_score", "blue_score"];
 const putMatchDetails = ["match_detail_key"];
@@ -75,11 +99,15 @@ postRoutes.set("match", postMatch);
 postRoutes.set("match/participants", postMatchParticipants);
 postRoutes.set("ranking", postRankings);
 postRoutes.set("alliance", postAlliance);
+postRoutes.set("account/changepassword", postChangePassword);
+postRoutes.set("account/checkusername", postCheckUsername);
+postRoutes.set("account/createuser", postCreateUser);
 
 putRoutes.set("match", putActiveMatch);
 putRoutes.set("match/results", putMatchScores);
 putRoutes.set("match/details", putMatchDetails);
 putRoutes.set("match/participants", putMatchParticipants);
+putRoutes.set("account/updateuser", putUpdateUser);
 
 export function validate(req: Request, res: Response, next: NextFunction)  {
   const method = req.method.toString().toUpperCase();
@@ -101,7 +129,7 @@ export function validate(req: Request, res: Response, next: NextFunction)  {
     return;
   }
 
-  /* Excluded Routed */
+  /* Excluded Routes */
   if (routeURL.endsWith('/networking')) {
     next();
     return;

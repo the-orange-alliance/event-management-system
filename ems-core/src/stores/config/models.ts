@@ -12,5 +12,6 @@ export interface IConfigState {
   qualificationSchedule: Schedule,
   playoffsSchedule: Schedule[],
   toaConfig: TOAConfig,
-  backupDir: string
+  backupDir: string,
+  apiKey: string
 }

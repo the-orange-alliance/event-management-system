@@ -9,10 +9,10 @@ import {
     GridColumn,
     Dropdown, Button
 } from "semantic-ui-react";
-import {getTheme} from "../AppTheme";
 import {EMSProvider, SocketProvider, Event} from "@the-orange-alliance/lib-ems";
 import {connect} from "react-redux";
-import {IApplicationState} from "../stores";
+import {IApplicationState} from "../../../stores";
+import {getTheme} from "../../../AppTheme";
 
 interface IProps {
     event?: Event
@@ -46,7 +46,6 @@ class FmsConfig extends React.Component<IProps, IState> {
         this.togglePlc = this.togglePlc.bind(this);
     }
 
-    // TODO: Emit fms-request-settings and listen to fms-settings to get settings from FMS
     public componentDidMount(): void {
         EMSProvider.getAdvNetConfig(this.props.event.eventKey).then((config) => {
             if (!config.error) {

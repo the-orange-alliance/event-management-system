@@ -2,6 +2,7 @@ import {AllianceMember, AppError, EMSProvider, Event, EventConfiguration, HttpEr
 import moment from "moment";
 
 import {ipcRenderer} from 'electron';
+import {CONFIG_STORE} from "../AppStore";
 
 export interface IInternalProgress {
   completedStep: number,
@@ -12,7 +13,8 @@ export interface IInternalProgress {
   practiceMatches?: Match[],
   qualificationMatches?: Match[],
   playoffMatches?: Match[],
-  allianceMembers?: AllianceMember[]
+  allianceMembers?: AllianceMember[],
+  loggedIn?: boolean
 }
 
 class InternalStateManager {
@@ -35,21 +37,33 @@ class InternalStateManager {
       await EMSProvider.ping().then(() => {
         apiReady = true;
         console.log("Received API response. Launching application.");
-      }).catch((res: any) => {
+      }).catch(async (res: any) => {
         console.log("Did not receive API response. Trying again...");
+        await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
         apiReady = false;
       });
     }
     return apiReady;
   }
 
-  public async refreshInternalProgress(eventConfig: EventConfiguration): Promise<IInternalProgress> {
+  public async refreshInternalProgress(eventConfig: EventConfiguration, apiKey?: string): Promise<IInternalProgress> {
     let completedStep: number = 0;
+
+    let loginSuccess = undefined;
+    if(apiKey) {
+      await EMSProvider.authOldKey(apiKey).then((newKey: string) => {
+        CONFIG_STORE.set('apiKey', newKey);
+        loginSuccess = true;
+      }).catch(() => loginSuccess = false);
+    }
 
     let events: Event[] = [];
     await EMSProvider.getEvent().then((res: Event[]) => {
       events = res;
-    }).catch((error: HttpError) => console.log(error));
+    }).catch((error: HttpError) => {
+      if(error.httpCode === 401) loginSuccess = false;
+      console.log(error)
+    });
     if (events.length === 0) {
       return {completedStep, currentStep: completedStep};
     } else {
@@ -68,7 +82,7 @@ class InternalStateManager {
     }).catch((error: HttpError) => console.log(error));
 
     if (teams.length === 0) {
-      return {completedStep, currentStep: completedStep, event: events[0], testMatches: tMatches};
+      return {completedStep, currentStep: completedStep, event: events[0], testMatches: tMatches, loggedIn: loginSuccess};
     } else {
       completedStep++;
     }
@@ -81,7 +95,7 @@ class InternalStateManager {
     }).catch((error: HttpError) => console.log(error));
 
     if (pMatches.length === 0) {
-      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches};
+      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, loggedIn: loginSuccess};
     } else {
       completedStep++;
     }
@@ -92,7 +106,7 @@ class InternalStateManager {
     }).catch((error: HttpError) => console.log(error));
 
     if (qMatches.length === 0) {
-      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches};
+      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, loggedIn: loginSuccess};
     } else {
       completedStep++;
     }
@@ -112,12 +126,12 @@ class InternalStateManager {
     }).catch((error: HttpError) => console.log(error));
 
     if (eMatches.length === 0) {
-      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, qualificationMatches: qMatches, allianceMembers: alliances};
+      return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, qualificationMatches: qMatches, allianceMembers: alliances, loggedIn: loginSuccess};
     } else {
       completedStep++;
     }
 
-    return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, qualificationMatches: qMatches, allianceMembers: alliances, playoffMatches: eMatches};
+    return {completedStep, currentStep: completedStep, event: events[0], teams, testMatches: tMatches, practiceMatches: pMatches, qualificationMatches: qMatches, allianceMembers: alliances, playoffMatches: eMatches, loggedIn: loginSuccess};
   }
 
   public createBackup(location: string): Promise<any> {

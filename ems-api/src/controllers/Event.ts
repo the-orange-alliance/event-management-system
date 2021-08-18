@@ -3,6 +3,7 @@ import DatabaseManager from '../database-manager';
 import * as Errors from '../errors';
 import logger from '../logger';
 import {SocketProvider} from "@the-orange-alliance/lib-ems";
+import {Permissions} from "../errors";
 
 const router: Router = Router();
 
@@ -17,8 +18,10 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.get('/:event_key/networking', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-FMS') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.fms));
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   DatabaseManager.selectAllWhere('event', `\`event_key\` = "${req.params.event_key}"`).then((rows: any[]) => {
-    if(rows.length > 0 && rows[0].advanced_network_config.length > 0) {
+    if(rows && rows.length > 0 && rows[0].advanced_network_config) {
       res.json({payload: JSON.parse(rows[0].advanced_network_config)});
     } else {
       res.json({payload: {error: 'No Config in DB!'}});
@@ -30,6 +33,8 @@ router.get('/:event_key/networking', (req: Request, res: Response, next: NextFun
 });
 
 router.post('/:event_key/networking', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-FMS') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.fms));
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   if(!req.body || req.body.records.length < 1) return next(Errors.INVALID_BODY_JSON);
   let toUpdate = JSON.stringify(req.body.records[0]).replace(/"/g, '""');
   DatabaseManager.updateWhere('event', { advanced_network_config: toUpdate } ,`\`event_key\` = "${req.params.event_key}"`).then((result: any) => {
@@ -42,6 +47,7 @@ router.post('/:event_key/networking', (req: Request, res: Response, next: NextFu
 });
 
 router.get('/create', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   if (!req.query.type) {
     next(Errors.MISSING_QUERY('type'));
   }
@@ -56,6 +62,7 @@ router.get('/create', (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.post('/', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   DatabaseManager.insertValues('event', [req.body.records[0]])
     .then((data: any) => {
       res.send({ payload: data });
@@ -66,6 +73,7 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.delete('/delete', (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   DatabaseManager.delete()
     .then(() => {
       res.send({ payload: 'Deleted event database.' });

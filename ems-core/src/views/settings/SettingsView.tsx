@@ -6,7 +6,8 @@ import EventConfig from "./containers/EventConfig";
 import {IApplicationState} from "../../stores";
 import {connect} from "react-redux";
 import {SyntheticEvent} from "react";
-import FmsConfig from "../../components/FmsConfig";
+import FmsConfig from "./containers/FmsConfig";
+import SecurityConfig from "./containers/SecurityConfig";
 
 interface IProps {
   navigationDisabled?: boolean
@@ -34,7 +35,7 @@ class SettingsView extends React.Component<IProps, IState> {
           { menuItem: "Network Config", render: () => <NetworkConfig/>},
           { menuItem: "DataSync", render: () => <DataSyncConfig/>},
           { menuItem: "Event", render: () => <EventConfig/>},
-          { menuItem: "Security", render: () => <span>Security</span>},
+          { menuItem: "Security", render: () => <SecurityConfig />},
           { menuItem: "Logs", render: () => <span>Logs</span>},
           { menuItem: "FMS Setup", render: () => <FmsConfig/>},
         ]}/>

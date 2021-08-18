@@ -3,6 +3,7 @@ import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
 import logger from "../logger";
 import {Match, MatchDetails} from "@the-orange-alliance/lib-ems";
+import {Permissions} from "../errors";
 
 const router: Router = Router();
 
@@ -89,6 +90,7 @@ router.get("/:match_key/teamranks", (req: Request, res: Response, next: NextFunc
 });
 
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   DatabaseManager.insertValues("match", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " matches in the database.");
     setTimeout(() => {
@@ -113,6 +115,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.post("/participants", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   DatabaseManager.insertValues("match_participant", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " match participants in the database.");
     res.send({payload: "Created " + req.body.records.length + " match participants in the database."});
@@ -122,6 +125,7 @@ router.post("/participants", (req: Request, res: Response, next: NextFunction) =
 });
 
 router.put("/:match_key", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   DatabaseManager.updateWhere("match", {active: 0}, "active=" + req.body.records[0].active).then(() => {
     setTimeout(() => {
       DatabaseManager.updateWhere("match", req.body.records[0], "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
@@ -136,6 +140,7 @@ router.put("/:match_key", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.put("/:match_key/results", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   DatabaseManager.updateWhere("match", req.body.records[0], "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
     res.send({payload: row});
   }).catch((error: any) => {
@@ -144,6 +149,7 @@ router.put("/:match_key/results", (req: Request, res: Response, next: NextFuncti
 });
 
 router.put("/:match_key/details", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   DatabaseManager.updateWhere("match_detail", req.body.records[0], "match_key=\"" + req.params.match_key + "\"").then((row: any) => {
     res.send({payload: row});
   }).catch((error: any) => {
@@ -152,6 +158,7 @@ router.put("/:match_key/details", (req: Request, res: Response, next: NextFuncti
 });
 
 router.put("/:match_key/participants", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Match') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.match));
   const promises: Promise<any>[] = [];
   for (const record of req.body.records) {
     if (typeof record.team !== "undefined") delete record.team;

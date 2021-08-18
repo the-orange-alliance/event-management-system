@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -- --watch",
-    "start": "tsc && node --trace-warnings build/server.js"
+    "start": "tsc && node --trace-warnings build/server.js",
+    "run": "node build/server.js"
   },
   "author": "Soren Zaiser, Kyle Flynn",
   "license": "GPL-2.0",
@@ -14,6 +15,7 @@
     "@the-orange-alliance/lib-ems": "file:../../lib-ems",
     "@types/dotenv": "^8.2.0",
     "@types/ssh2-streams": "^0.1.6",
+    "appdata-path": "^1.0.0",
     "dgram": "^1.0.1",
     "dotenv": "^8.2.0",
     "modbus-serial": "^7.7.4",

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "event" (
     country VARCHAR(255),
     website VARCHAR(255),
     field_count INT,
-    advanced_network_config: VARCHAR(1024)
+    advanced_network_config VARCHAR(1024)
 );
 
 CREATE TABLE IF NOT EXISTS "team" (

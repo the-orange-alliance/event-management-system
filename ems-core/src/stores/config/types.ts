@@ -1,6 +1,6 @@
 import {Action} from "redux";
 import {
-  ADD_PLAYOFFS_SCHEDULE,
+  ADD_PLAYOFFS_SCHEDULE, SET_API_KEY,
   SET_BACKUP_DIR,
   SET_EVENT,
   SET_EVENT_CONFIG, SET_MASTER_HOST, SET_MATCH_CONFIG,
@@ -102,6 +102,13 @@ export interface ISetBackupDir extends Action {
   }
 }
 
+export interface ISetApiKey extends Action {
+  type: SET_API_KEY,
+  payload: {
+    key: string
+  }
+}
+
 export type ConfigActions = IToggleSlaveMode | ISetEventConfiguration | ISetEvent | ISetNetworkHost |
   ISetPracticeSchedule | ISetQualificationSchedule | ISetPlayoffsSchedule | IAddPlayoffsSchedule |
-  ISetMatchConfig | ISetMasterHost | ISetSlaveID | ISetTOAConfig | ISetBackupDir;
+  ISetMatchConfig | ISetMasterHost | ISetSlaveID | ISetTOAConfig | ISetBackupDir | ISetApiKey;

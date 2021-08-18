@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Cookies} from 'react-cookie';
-import {Event} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, Event, SocketProvider} from "@the-orange-alliance/lib-ems";
+import {Button, Form, Grid, Header, Message, Segment} from "semantic-ui-react";
 
 interface IProps {
   cookies: Cookies,
@@ -10,7 +11,11 @@ interface IProps {
 
 interface IState {
   username: string,
-  password: string
+  password: string,
+  loading: boolean,
+  errorMsg: string | null,
+  successMsg: string | null,
+  showResetPass: boolean
 }
 
 class LoginView extends React.Component<IProps, IState> {
@@ -18,52 +23,76 @@ class LoginView extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       username: "",
-      password: ""
+      password: "",
+      loading: false,
+      errorMsg: null,
+      successMsg: null,
+      showResetPass: false
     };
-    this.authenticate = this.authenticate.bind(this);
-    this.updateUsername = this.updateUsername.bind(this);
-    this.updatePassword = this.updatePassword.bind(this);
   }
 
   public render() {
-    const {event} = this.props;
     return (
-      <div id="app-container">
-        <div id="app-top">
-          <span id="app-top-name">EMS Scoring Application</span>
-          <span id="app-top-event">{event.eventName}</span>
-        </div>
-        <div id="app-bottom">
-          <div>
-            <input className="app-input" type="text" placeholder="Logon Name" onChange={this.updateUsername}/>
-          </div>
-          <div>
-            <input className="app-input" type="password" placeholder="Password" onChange={this.updatePassword}/>
-          </div>
-          <div>
-            <button className="app-button" onClick={this.authenticate}>Login</button>
-          </div>
-        </div>
-      </div>
+      <>{!this.state.showResetPass &&
+      <Grid textAlign='center' style={{height: '90vh'}} verticalAlign='middle'>
+          <Grid.Column style={{maxWidth: 450}}>
+              <Header as='h2' color='green' textAlign='center'>
+                  Login to EMS
+              </Header>
+              <Form size='large'>
+                  <Segment stacked>
+                      <Form.Input
+                          fluid
+                          icon='user'
+                          iconPosition='left'
+                          placeholder='Username'
+                          disabled={this.state.loading}
+                          value={this.state.username}
+                          onChange={(e) => this.setState({username: e.target.value})}
+                      />
+                      <Form.Input
+                          fluid
+                          icon='lock'
+                          iconPosition='left'
+                          placeholder='Password'
+                          disabled={this.state.loading}
+                          type='password'
+                          value={this.state.password}
+                          onChange={(e) => this.setState({password: e.target.value})}
+                      />
+                      <Button color='green' fluid size='large' onClick={() => this.login()}
+                              disabled={this.state.loading}>{this.state.loading ? "Logging in..." : "Login"}</Button>
+                  </Segment>
+              </Form>
+              <Message color={'red'} hidden={!this.state.errorMsg}>
+                {this.state.errorMsg}
+              </Message>
+              <Message color={'green'} hidden={!this.state.successMsg}>
+                {this.state.successMsg}
+              </Message>
+              <Message>
+                  Default login is <p>Username: <code>ems-admin</code></p> <p>Password: <code>admin</code></p>
+              </Message>
+          </Grid.Column>
+      </Grid>
+      }</>
     );
   }
 
-  private authenticate() {
-    if (this.state.username === (process.env.REACT_APP_USERNAME || "admin") &&
-        this.state.password === (process.env.REACT_APP_PASSWORD || "password")) {
-      this.props.cookies.set("login", true, {
-        maxAge: 86400
-      });
-      this.props.onSuccessfulLogin();
-    }
-  }
-
-  private updateUsername(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({username: event.currentTarget.value});
-  }
-
-  private updatePassword(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({password: event.currentTarget.value});
+  private login(): void {
+    this.setState({loading: true});
+    EMSProvider.authPassword(this.state.username, this.state.password).then((key: string) => {
+      this.setState({errorMsg: null});
+      if(this.state.password === 'admin') {
+        this.setState({showResetPass: true});
+      } else {
+        SocketProvider.reconnect();
+        this.props.cookies.set('login', key);
+        this.props.onSuccessfulLogin();
+      }
+    }).catch(() => {
+      this.setState({errorMsg: 'Invalid username/password!', successMsg: null, loading: false});
+    })
   }
 }
 

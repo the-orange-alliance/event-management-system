@@ -30,7 +30,7 @@ class WPAKeys extends React.Component<IProps, IState> {
   }
 
   private download (event: any) {
-    event.preventDefault();
+    // event.preventDefault();
     // Prepare data
     let output = '';
     this.props.wpaKeys.forEach((data) => {
@@ -54,7 +54,7 @@ class WPAKeys extends React.Component<IProps, IState> {
          download={"wpa_keys.csv"}
          href={this.state.fileDownloadUrl}
          ref={e => this.fileDownloadAnchor = e}
-      />
+      >Download didn't start? Click here</a>
     )
   }
 }

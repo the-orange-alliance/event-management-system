@@ -28,11 +28,33 @@ class App extends React.Component<IProps, IState> {
       connected: false
     };
     if (typeof this.props.cookies.get("host") !== "undefined") {
-      SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
+      SocketProvider.initialize((this.props.cookies.get("host") as string), EMSProvider);
     } else {
       EMSProvider.initialize("192.168.0.217");
-      SocketProvider.initialize("192.168.0.217");
+      SocketProvider.initialize("192.168.0.217", EMSProvider);
+    }
+
+    const key = this.props.cookies.get('login');
+    if(key) {
+      EMSProvider.authOldKey(key).then((newKey) => {
+        SocketProvider.reconnect();
+        this.props.cookies.set('login', newKey);
+        return EMSProvider.getEvent();
+      }).then((events: Event[]) => {
+        if (events.length > 0) {
+          this.setState({event: events[0]});
+        }
+      }).catch(() => {
+        this.props.cookies.remove('login');
+      });
+    } else {
+      // this probably won't work
+      EMSProvider.getEvent().then((events: Event[]) => {
+        if (events.length > 0) {
+          this.setState({event: events[0]});
+        }
+      });
     }
 
     SocketProvider.on("connect", () => {
@@ -83,11 +105,6 @@ class App extends React.Component<IProps, IState> {
       match.matchDetails = Match.getDetailsFromSeasonKey(seasonKey);
       this.setState({match: match});
     });
-    EMSProvider.getEvent().then((events: Event[]) => {
-      if (events.length > 0) {
-        this.setState({event: events[0]});
-      }
-    });
 
     this.renderLoginView = this.renderLoginView.bind(this);
     this.renderRedView = this.renderRedView.bind(this);
@@ -130,8 +147,8 @@ class App extends React.Component<IProps, IState> {
 
   private renderLoginView(props: RouteComponentProps<any>) {
     const navigateToMain = this.navigateToMain.bind(this, props);
-    if (typeof this.props.cookies.get("login") !== "undefined" &&
-      this.props.cookies.get("login")) {
+    if (this.props.cookies.get("login") !== "undefined" && this.props.cookies.get("login")) {
+      EMSProvider.authOldKey(this.props.cookies.get("login")); // TODO: Catch failure and redirect to login page
       return <Redirect to={"/main"}/>
     } else {
       return <LoginView cookies={this.props.cookies} event={this.state.event} onSuccessfulLogin={navigateToMain}/>;

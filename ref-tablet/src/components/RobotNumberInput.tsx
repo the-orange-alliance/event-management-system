@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Input} from "reactstrap";
+import {Button, Input} from "semantic-ui-react";
 
 interface IProps {
   value: number,

@@ -1,6 +1,7 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import {NextFunction, Request, Response, Router} from 'express';
 import DatabaseManager from "../database-manager";
 import * as Errors from "../errors";
+import {Permissions} from "../errors";
 import logger from "../logger";
 
 const router: Router = Router();
@@ -21,6 +22,7 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.get("/cards/reset", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   DatabaseManager.updateAll("team", {card_status: 0}).then((data: any) => {
     logger.warn("RESET ALL TEAM CARD STATUSES.");
     res.send(data);
@@ -31,6 +33,7 @@ router.get("/cards/reset", (req: Request, res: Response, next: NextFunction) => 
 
 router.get("/wpakeys", async (req: Request, res: Response, next: NextFunction) => {
   // Get all teams, generate WPA keys for those without them and return team and WPA key
+  if(res.get('Can-Control-FMS') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.fms));
   try {
     const teams = await DatabaseManager.selectAll("team");
     const results = [];
@@ -53,6 +56,7 @@ router.get("/wpakeys", async (req: Request, res: Response, next: NextFunction) =
 });
 
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   DatabaseManager.insertValues("team", req.body.records).then((data: any) => {
     logger.info("Created " + req.body.records.length + " teams in the database.");
     res.send({payload: "Created " + req.body.records.length + " teams in the database."});
@@ -62,6 +66,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.put("/:team_key", (req: Request, res: Response, next: NextFunction) => {
+  if(res.get('Can-Control-Event') === '0') return next(Errors.INVALID_PERMISSIONS(Permissions.event));
   if (!req.params.team_key || !parseInt(req.params.team_key)) {
     next(Errors.ERROR_WHILE_EXECUTING_QUERY("Unable to parse team key as a number."));
   }

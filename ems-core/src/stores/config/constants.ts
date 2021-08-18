@@ -36,3 +36,6 @@ export type SET_TOA_CONFIG = typeof SET_TOA_CONFIG;
 
 export const SET_BACKUP_DIR = "SET_BACKUP_DIR";
 export type SET_BACKUP_DIR = typeof SET_BACKUP_DIR;
+
+export const SET_API_KEY = "SET_API_KEY";
+export type SET_API_KEY = typeof SET_API_KEY;

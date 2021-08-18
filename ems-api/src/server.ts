@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
 import http from "http";
 import parser from "body-parser";
 import cors from "cors";
@@ -8,6 +8,7 @@ import * as Errors from "./errors";
 import logger from './logger';
 import * as ErrorHandler from "./error-handler";
 import * as Validator from "./validator";
+import * as Authorizer from "./authorizer";
 import * as dotenv from "dotenv";
 import {EventController} from "./controllers/Event";
 import {TeamController} from "./controllers/Team";
@@ -15,12 +16,19 @@ import {ScheduleController} from "./controllers/Schedule";
 import {MatchController} from "./controllers/Match";
 import {RankingController} from "./controllers/Ranking";
 import {AllianceController} from "./controllers/Alliance";
+import {AuthController} from "./controllers/Auth";
+import * as crypto from "crypto";
+import DatabaseManager from './database-manager'
+import {AccountController} from "./controllers/Account";
 
 /* Load our environment variables. The .env file is not included in the repository.
  * Only TOA staff/collaborators will have access to their own, specialized version of
  * the .env file.
  */
 dotenv.config({path: path.join(__dirname, "../.env")});
+
+export const jwtToken = crypto.randomBytes(64).toString();
+export const jwtExpires = 60 * 60 * 3; // 3 hours (in seconds)
 
 const ipRegex = /\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b/;
 
@@ -55,8 +63,17 @@ app.use("/ping", (req, res) => {
     res.send({res: "pong!"});
 });
 
+// Handle tokens
+app.use("/api/auth", AuthController);
+
+// Authenticate API Tokens for all routes after this
+app.use("/api/*", Authorizer.authenticate);
+
+// Validate Routes
 app.use("/api/*", Validator.validate);
 
+// Routes
+app.use('/api/account', AccountController);
 app.use("/api/event", EventController);
 app.use("/api/team", TeamController);
 app.use("/api/schedule", ScheduleController);
@@ -72,6 +89,10 @@ app.all("*", (req, res, next) => {
 app.use(ErrorHandler.logErrors);
 app.use(ErrorHandler.handleClient);
 
+// this configures the DB for accounts, and creates the default if needed
+DatabaseManager.setupAccounts();
+
+// TODO: emit to socket that API restarted and everyone should go get a fresh key
 http.createServer(app).listen({
   port: port,
   host: host

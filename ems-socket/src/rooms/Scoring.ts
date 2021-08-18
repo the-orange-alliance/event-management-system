@@ -4,7 +4,7 @@ import logger from "../logger";
 import MatchTimer from "../scoring/MatchTimer";
 import {MatchMode} from "../scoring/MatchMode";
 import ScoreManager from "../scoring/ScoreManager";
-import {EMSProvider, IFieldControlPacket, Match} from "@the-orange-alliance/lib-ems";
+import {EMSProvider, IFieldControlPacket, Match, User} from "@the-orange-alliance/lib-ems";
 import {
   PACKET_ABORT, PACKET_BALL_RESET,
   PACKET_BLUE_BOT_RESET,
@@ -47,9 +47,9 @@ export default class ScoringRoom implements IRoom {
     this._ledTimes = [0, 0, 0, 0, 0, 0];
   }
 
-  public addClient(client: Socket) {
+  public addClient(client: Socket, user: User | null) {
     this._clients.push(client);
-    this.initializeEvents(client);
+    this.initializeEvents(client, user);
     logger.info(`Client ${client.id} joined '${this._name}'.`); // TODO - Figure out why evnts aren't sending...
   }
 
@@ -64,7 +64,7 @@ export default class ScoringRoom implements IRoom {
     return this._clients;
   }
 
-  private initializeEvents(client: Socket) {
+  private initializeEvents(client: Socket, user: User | null) {
     if (!this._hasPrestarted && !this._hasCommittedScore && !this._timer.inProgress()) {
       this._server.to("scoring").emit("control-update", PACKET_BALL_RESET);
     }
@@ -102,6 +102,7 @@ export default class ScoringRoom implements IRoom {
       }, 500);
     });
     client.on("score-update", (matchJSON: any) => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'score-update', required_priv: 'can_control_match'});
       if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART || !this._hasCommittedScore) {
         if (matchJSON && typeof matchJSON.match_key !== "undefined" && matchJSON.match_key.length > 0) {
           if (typeof matchJSON.details !== "undefined" && typeof matchJSON.participants !== "undefined") {
@@ -143,6 +144,7 @@ export default class ScoringRoom implements IRoom {
       this._server.to("scoring").emit("video-switch", id);
     });
     client.on("prestart", (matchKey: string) => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'prestart', required_priv: 'can_control_match'});
       logger.info(`Initiating prestart sequence for ${matchKey}`);
       this.getMatch(matchKey).then((match: Match) => {
         logger.info(`Successfully prestarted match ${match.matchKey}`);
@@ -162,6 +164,7 @@ export default class ScoringRoom implements IRoom {
       });
     });
     client.on("prestart-cancel", () => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'prestart-cancel', required_priv: 'can_control_match'});
       this._currentVideoID = 1;
       this._hasPrestarted = false;
       this._mode = "UNDEFINED";
@@ -169,6 +172,7 @@ export default class ScoringRoom implements IRoom {
       this._server.to("scoring").emit("control-update", PACKET_RESET);
     });
     client.on("commit-scores", (matchKey: string, updateDisplay?: boolean) => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'commit-scores', required_priv: 'can_control_match'});
       const updateAudience: boolean = updateDisplay ? updateDisplay : false;
       this.getMatch(matchKey).then((match: Match) => {
         ScoreManager.match = match;
@@ -183,6 +187,7 @@ export default class ScoringRoom implements IRoom {
       });
     });
     client.on("start", () => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'start', required_priv: 'can_control_match'});
       if (!this._timer.inProgress()) {
         this._server.to("scoring").emit("control-update", PACKET_START);
         this._timer.once("match-start", () => {
@@ -224,14 +229,16 @@ export default class ScoringRoom implements IRoom {
     });
     client.on("get-timer", () => {
       this._server.to('scoring').emit("get-timer-response", this._timer.mode, this._timer.timeLeft, this._timer.modeTimeLeft, this._timer.matchConfig);
-    })
+    });
     client.on("abort", () => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'abort', required_priv: 'can_control_match'});
       if (this._timer.inProgress()) {
         this._server.to("scoring").emit("control-update", PACKET_ABORT);
         this._timer.abort();
       }
     });
     client.on("update-timer", (timerJSON: any) => {
+      if(!user || (user && !user.canControlEvent)) return client.emit('Unauthorized', {event: 'update-timer', required_priv: 'can_control_event'});
       if (!this._timer.inProgress()) {
         if (typeof timerJSON.delay_time !== "undefined") {
           this._timer.matchConfig.delayTime = timerJSON.delay_time;
@@ -260,6 +267,7 @@ export default class ScoringRoom implements IRoom {
       }
     });
     client.on("control-update", (controlPacket: IFieldControlPacket) => {
+      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'control-update', required_priv: 'can_control_match'});
       logger.info(`Sending field control packet with ${controlPacket.messages.length} messages.`);
       this._server.to("scoring").emit("control-update", controlPacket);
     });

@@ -7,9 +7,10 @@ EMS consists of 6 different programs:
 1. [ems-core](https://github.com/orange-alliance/event-management-system/tree/master/ems-core) (Core desktop application)
 2. [ems-api](https://github.com/orange-alliance/event-management-system/tree/master/ems-api) (REST API for communication with local database)
 3. [ems-web](https://github.com/orange-alliance/event-management-system/tree/master/ems-web) (Web server for routing applications)
-4. [ems-socket](https://github.com/orange-alliance/event-management-system/tree/master/ems-socket) (Real-time connection interfacing)
-5. [audience-display](https://github.com/orange-alliance/event-management-system/tree/master/audience-display) (Web application to display scoring and match results)
-6. [ref-tablet](https://github.com/orange-alliance/event-management-system/tree/master/ref-tablet) (Web application for referee scoring)
+4. [ems-frc-fms](https://github.com/orange-alliance/event-management-system/tree/master/ems-frc-fms) (Field Management service for controlling driver stations and robots on the field)
+5. [ems-socket](https://github.com/orange-alliance/event-management-system/tree/master/ems-socket) (Real-time connection interfacing)
+6. [audience-display](https://github.com/orange-alliance/event-management-system/tree/master/audience-display) (Web application to display scoring and match results)
+7. [ref-tablet](https://github.com/orange-alliance/event-management-system/tree/master/ref-tablet) (Web application for referee scoring)
 
 Details on each program can be found within their prospective sub-folders within this
 repository.  
@@ -65,6 +66,9 @@ will kill the other process. If you would like to reload an instance, use pm2.*
 ## [ems-web](https://github.com/orange-alliance/event-management-system/tree/master/ems-web)
 1. To start the web server use ```npm run web```
 
+## [ems-frc-fms](https://github.com/orange-alliance/event-management-system/tree/master/ems-frc-fms)
+1. To start the FMS service use ```npm run fms```
+
 ## [ems-socket](https://github.com/orange-alliance/event-management-system/tree/master/ems-socket)
 1. To start the socket service use ```npm run socket```
 
@@ -82,5 +86,5 @@ EMS already comes with a process configuration that is pm2-friendly. To use the 
 configuration, use ```pm2 start ecosystem.config.js``` from the project root. 
 
 This will spawn the [ems-socket](https://github.com/orange-alliance/event-management-system/tree/master/ems-socket), [ems-api](https://github.com/orange-alliance/event-management-system/tree/master/ems-api),
-and [ems-web](https://github.com/orange-alliance/FTC-EMS/tree/master/ems-web).
+[ems-web](https://github.com/orange-alliance/FTC-EMS/tree/master/ems-web), and [ems-frc-fms](https://github.com/orange-alliance/FTC-EMS/tree/master/ems-frc-fms), .
 microservices. For production environment variables, use `pm2 start ecosystem.config.js --env production`. Use ```pm2 help``` for a list of commands and options.

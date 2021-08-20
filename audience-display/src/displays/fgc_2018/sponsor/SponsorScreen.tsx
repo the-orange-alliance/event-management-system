@@ -40,7 +40,7 @@ class SponsorScreen extends React.Component<{}, IState> {
             <span>Thank you to our wonderful sponsors</span>
           </div>
           <div id="fgc-sponsor-image">
-            <img src={this._sponsors[activeIndex]} className="fit-h"/>
+            <img alt={'sponsor slide'} src={this._sponsors[activeIndex]} className="fit-h"/>
           </div>
         </div>
       </div>

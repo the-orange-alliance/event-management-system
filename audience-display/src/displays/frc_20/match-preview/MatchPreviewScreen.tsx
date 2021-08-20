@@ -21,9 +21,9 @@ class MatchPreviewScreen extends React.Component<IProps> {
       <div id="ir-body">
         <div id="ir-container">
           <div id="ir-pre-top" className="ir-border">
-            <div className="col-left"><img src={TOA_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'toa logo'} src={TOA_LOGO} className="fit-h"/></div>
             <div className="center-items ir-pre-match">{match.matchName}</div>
-            <div className="col-right"><img src={FACC_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'facc logo'} src={FACC_LOGO}className="fit-h"/></div>
           </div>
           <div id="ir-pre-mid" className="ir-border">
             <div id="ir-pre-mid-labels" className="center-items">
@@ -39,7 +39,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
             </div>
           </div>
           <div id="ir-pre-bot" className="ir-border">
-            <div className="ir-bot-logo"><img src={FACC_LOGO_TEXT} className="fit-h"/></div>
+            <div className="ir-bot-logo"><img alt={'facc logo text'} src={FACC_LOGO_TEXT} className="fit-h"/></div>
             <div className="ir-bot-text">
               <span>{event.eventName}</span>
               <span>Watch live! https://twitch.tv/FirstUpdatesNow</span>

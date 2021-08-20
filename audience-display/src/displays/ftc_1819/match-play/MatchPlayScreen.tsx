@@ -191,12 +191,12 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         <div id="rr-play-container">
           <div id="rr-play-top" className="center-items">
             <div id="rr-play-top-left" className="center-items">
-              <div className="center-left-items"><img src={FIRST_LOGO} className="fit-h"/></div>
+              <div className="center-left-items"><img alt={'FIRST logo'} src={FIRST_LOGO} className="fit-h"/></div>
               <div className="center-left-items">{match.matchName}</div>
             </div>
             <div id="rr-play-top-right">
               <div className="rr-play-event center-items">{event.eventName}</div>
-              <div className="rr-play-logo center-right-items"><img src={RR_LOGO} className="fit-h"/></div>
+              <div className="rr-play-logo center-right-items"><img alt={'Rover Ruckus logo'} src={RR_LOGO} className="fit-h"/></div>
             </div>
           </div>
           <div id="rr-play-bot" className="center-items">

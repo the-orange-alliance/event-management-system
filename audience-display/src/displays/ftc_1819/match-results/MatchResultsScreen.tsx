@@ -89,9 +89,9 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
       <div id="rr-body">
         <div id="rr-container">
           <div id="rr-result-top" className="rr-border">
-            <div className="col-left"><img src={FIRST_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'FIRST logo'} src={FIRST_LOGO} className="fit-h"/></div>
             <div className="center-items rr-pre-match">{match.matchName}</div>
-            <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'Rover Ruckus logo'} src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-result-mid" className="rr-border">
             <div className="rr-result-alliance">
@@ -150,7 +150,7 @@ class MatchResultsScreen extends React.Component<IProps, IState> {
             </div>
           </div>
           <div id="rr-result-bot" className="rr-border">
-            <div className="col-left"><img src={FTC_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'FTC logo'} src={FTC_LOGO} className="fit-h"/></div>
           </div>
         </div>
       </div>

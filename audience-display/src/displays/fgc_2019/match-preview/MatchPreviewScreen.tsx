@@ -22,7 +22,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
       <div id="fgc-body">
         <div id="fgc-container">
           <div id="fgc-pre-header">
-            <img id="fgc-pre-logo" className={"fit-h"} src={FGC_LOGO}/>
+            <img alt={'fgc logo'} id="fgc-pre-logo" className={"fit-h"} src={FGC_LOGO}/>
           </div>
           <div id="fgc-pre-match-info">
             <div id="fgc-pre-match-info-left">
@@ -44,7 +44,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
           </div>
           <div className="pre-match-alliance">
             <div className="pre-match-alliance-left">
-              <img src={RED_FLAG} className="auto-w"/>
+              <img alt={'red flag'} src={RED_FLAG} className="auto-w"/>
             </div>
             <div className="pre-match-alliance-right">
               {this.renderRedAlliance()}
@@ -52,7 +52,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
           </div>
           <div className="pre-match-alliance">
             <div className="pre-match-alliance-left">
-              <img src={BLUE_FLAG} className="auto-w"/>
+              <img alt={'blue flag'} src={BLUE_FLAG} className="auto-w"/>
             </div>
             <div className="pre-match-alliance-right">
               {this.renderBlueAlliance()}
@@ -61,7 +61,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
         </div>
 
         <div id={"fgc-pre-side-logo-left"} className={"center-items"}>
-          <img src={FGC_SIDE_LOGO} className={"fit-w"}/>
+          <img alt={'fgc logo'} src={FGC_SIDE_LOGO} className={"fit-w"}/>
         </div>
       </div>
     );

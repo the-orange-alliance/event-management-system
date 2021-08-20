@@ -145,7 +145,7 @@ class MiniMatchPlayScreen extends React.Component<IProps, IState> {
       <div>
         <div id="mini-play-display-center" className={positionClass}>
           <div id="mini-score-container-header">
-            <img src={FGC_LOGO} className="fit-w"/>
+            <img alt={'fgc logo'} src={FGC_LOGO} className="fit-w"/>
           </div>
 
           <div id="mini-score-container-scores">

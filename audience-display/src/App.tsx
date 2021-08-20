@@ -39,11 +39,11 @@ class App extends React.Component<IProps, IState> {
     };
 
     if (typeof this.props.cookies.get("host") !== "undefined") {
-      SocketProvider.initialize((this.props.cookies.get("host") as string));
       EMSProvider.initialize((this.props.cookies.get("host") as string));
+      SocketProvider.initialize((this.props.cookies.get("host") as string), EMSProvider);
     } else {
-      SocketProvider.initialize("localhost"); // Debug/local IPv4
       EMSProvider.initialize("localhost"); // Debug/local IPv4
+      SocketProvider.initialize("localhost", EMSProvider); // Debug/local IPv4
     }
     SocketProvider.on("connect", () => {
       console.log("Connected to SocketIO.");

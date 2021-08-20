@@ -182,7 +182,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
             </div>
             <div id="play-display-center">
               <div id="score-container-header">
-                <img src={FGC_LOGO} className="fit"/>
+                <img alt={'fgc logo'} src={FGC_LOGO} className="fit"/>
               </div>
               <div id="score-container-timer">
                 <span>{disMin}:{disSec}</span>

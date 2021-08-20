@@ -30,7 +30,7 @@ class TeamCardStatus extends React.Component<IProps> {
     return (
       <div className="team-card">
         <div className="card-container">
-          <img src={this.getCardImage(this.props.cardStatus)} className="fit-h"/>
+          <img alt={'team card status'} src={this.getCardImage(this.props.cardStatus)} className="fit-h"/>
         </div>
       </div>
     );

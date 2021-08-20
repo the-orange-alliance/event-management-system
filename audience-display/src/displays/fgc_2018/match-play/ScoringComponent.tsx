@@ -16,7 +16,7 @@ class ScoringComponent extends React.Component<IProps> {
   public render() {
     return (
       <div className="scoring-icon-container">
-        <img src={this.getImage()} className={"fit-w " + this.getStyle()}/>
+        <img alt={'Scoring Icon'} src={this.getImage()} className={"fit-w " + this.getStyle()}/>
       </div>
     );
   }

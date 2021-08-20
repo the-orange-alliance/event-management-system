@@ -150,12 +150,12 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         <div id="ir-play-container">
           <div id="ir-play-top" className="center-items">
             <div id="ir-play-top-left" className="center-items">
-              <div className="center-left-items"><img src={TOA_LOGO} className="fit-h"/></div>
+              <div className="center-left-items"><img alt={'toa logo'} src={TOA_LOGO} className="fit-h"/></div>
               <div className="center-left-items">{match.matchName}</div>
             </div>
             <div id="ir-play-top-right">
               <div className="ir-play-event center-items">{event.eventName}</div>
-              <div className="ir-play-logo center-right-items"><img src={FACC_LOGO} className="fit-h"/></div>
+              <div className="ir-play-logo center-right-items"><img alt={'facc logo'} src={FACC_LOGO}className="fit-h"/></div>
             </div>
           </div>
           <div id="ir-play-bot" className="center-items">

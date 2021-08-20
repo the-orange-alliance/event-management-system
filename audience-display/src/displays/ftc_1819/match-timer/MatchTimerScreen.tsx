@@ -126,9 +126,9 @@ class MatchTimerScreen extends React.Component<IProps, IState> {
       <div id="rr-body">
         <div id="rr-container">
           <div id="rr-mt-top" className="rr-border">
-            <div className="col-left"><img src={FIRST_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'FIRST logo'} src={FIRST_LOGO} className="fit-h"/></div>
             <div className="center-items rr-pre-match">{match.matchName}</div>
-            <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'Rover Ruckus logo'} src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-mt-mid" className="rr-border">
             <div id="rr-mt-left">
@@ -152,7 +152,7 @@ class MatchTimerScreen extends React.Component<IProps, IState> {
             </div>
           </div>
           <div id="rr-mt-bot" className="rr-border">
-            <div className="col-left"><img src={FTC_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'FTC logo'} src={FTC_LOGO} className="fit-h"/></div>
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ EMS consists of 6 different programs:
 5. [ems-socket](https://github.com/orange-alliance/event-management-system/tree/master/ems-socket) (Real-time connection interfacing)
 6. [audience-display](https://github.com/orange-alliance/event-management-system/tree/master/audience-display) (Web application to display scoring and match results)
 7. [ref-tablet](https://github.com/orange-alliance/event-management-system/tree/master/ref-tablet) (Web application for referee scoring)
+8. [field-monitor](https://github.com/orange-alliance/event-management-system/tree/master/field-monitor) (Web application for monitor FMS and/or match status)
 
 Details on each program can be found within their prospective sub-folders within this
 repository.  
@@ -77,6 +78,9 @@ will kill the other process. If you would like to reload an instance, use pm2.*
 
 ## [ref-tablet](https://github.com/orange-alliance/event-management-system/tree/master/ref-tablet)
 1. To start the ref-tablet use ```npm run ref```
+
+## [field-monitor](https://github.com/orange-alliance/event-management-system/tree/master/field-monitor)
+1. To start the field-monitor use ```npm run field-monitor```
 
 # Using pm2 With EMS
 In addition to the program shortcuts listed above, pm2 is a module that is designed for production-level process management.

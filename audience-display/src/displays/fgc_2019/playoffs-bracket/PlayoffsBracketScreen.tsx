@@ -88,11 +88,11 @@ class PlayoffsBracketScreen extends React.Component<{}, IState> {
         }
 
         <div id={"playoffs-left-side-logo"} className={"center-items"}>
-          <img src={FGC_LEFT_LOGO} className={"fit-w"}/>
+          <img alt={'fgc logo'} src={FGC_LEFT_LOGO} className={"fit-w"}/>
         </div>
 
         <div id={"playoffs-right-side-logo"} className={"center-items"}>
-          <img src={FGC_RIGHT_LOGO} className={"fit-w"}/>
+          <img alt={'fgc logo'} src={FGC_RIGHT_LOGO} className={"fit-w"}/>
         </div>
 
       </div>

@@ -189,11 +189,11 @@ class MatchTimerScreen extends React.Component<IProps, IState> {
         </div>
 
         <div id={"timer-left-side-logo"} className={"center-items"}>
-          <img src={FGC_LEFT_LOGO} className={"fit-w"}/>
+          <img alt='fgc logo' src={FGC_LEFT_LOGO} className={"fit-w"}/>
         </div>
 
         <div id={"timer-right-side-logo"} className={"center-items"}>
-          <img src={FGC_RIGHT_LOGO} className={"fit-w"}/>
+          <img alt='fgc logo' src={FGC_RIGHT_LOGO} className={"fit-w"}/>
         </div>
 
       </div>

@@ -69,9 +69,9 @@ class AvailableTeamsScreen extends React.Component<IProps, IState> {
       <div id="rr-body">
         <div id="rr-container">
           <div id="rr-at-top" className="rr-border">
-            <div className="col-left"><img src={FIRST_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'FIRST logo'} src={FIRST_LOGO} className="fit-h"/></div>
             <div className="center-items rr-pre-match">{event.eventName}</div>
-            <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'Rover Ruckus logo'} src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-at-mid" className="rr-border">
             <table>

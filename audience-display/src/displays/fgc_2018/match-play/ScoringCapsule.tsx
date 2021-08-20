@@ -65,7 +65,7 @@ class SolarCapsule extends React.Component<IProps> {
   public render() {
     return (
       <div className="scoring-capsule-container">
-        <img src={this.getCapsuleImage(this.props.allianceColor, this.props.solarPanelCount)} className="fit-w"/>
+        <img alt={'capsule image'} src={this.getCapsuleImage(this.props.allianceColor, this.props.solarPanelCount)} className="fit-w"/>
       </div>
     );
   }

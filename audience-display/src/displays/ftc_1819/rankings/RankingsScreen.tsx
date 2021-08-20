@@ -73,9 +73,9 @@ class RankingsScreen extends React.Component<IProps, IState> {
       <div id="rr-body">
         <div id="rr-container">
           <div id="rr-rank-top" className="rr-border">
-            <div className="col-left"><img src={FIRST_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'FIRST logo'} src={FIRST_LOGO} className="fit-h"/></div>
             <div className="center-items rr-pre-match">{event.eventName}</div>
-            <div className="col-right"><img src={RR_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'Rover Ruckus Logo'} src={RR_LOGO} className="fit-h"/></div>
           </div>
           <div id="rr-rank-mid" className="rr-border">
             <div id="rr-rank-table-container">

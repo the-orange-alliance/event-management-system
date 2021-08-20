@@ -58,9 +58,9 @@ class RankingsScreen extends React.Component<IProps, IState> {
       <div id="ir-body">
         <div id="ir-container">
           <div id="ir-rank-top" className="ir-border">
-            <div className="col-left"><img src={TOA_LOGO} className="fit-h"/></div>
+            <div className="col-left"><img alt={'toa logo'} src={TOA_LOGO} className="fit-h"/></div>
             <div className="center-items ir-rank-title">Event Rankings</div>
-            <div className="col-right"><img src={FACC_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'facc logo'} src={FACC_LOGO} className="fit-h"/></div>
           </div>
           <div id="ir-rank-mid" className="ir-border">
             <div id="ir-rank-table-container">
@@ -84,7 +84,7 @@ class RankingsScreen extends React.Component<IProps, IState> {
             </div>
           </div>
           <div id="ir-rank-bot" className="ir-border">
-            <div className="ir-bot-logo"><img src={FACC_LOGO_TEXT} className="fit-h"/></div>
+            <div className="ir-bot-logo"><img alt={'facc logo text'} src={FACC_LOGO_TEXT} className="fit-h"/></div>
             <div className="ir-bot-text">
               <span>{event.eventName}</span>
               <span>Watch live! https://twitch.tv/FirstUpdatesNow</span>

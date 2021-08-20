@@ -37,7 +37,7 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
       <div id="fgc-body">
         <div id="fgc-container">
           <div id="fgc-pre-header">
-            <img id="fgc-pre-logo" src={FGC_LOGO}/>
+            <img alt={'fgc logo'} id="fgc-pre-logo" src={FGC_LOGO}/>
           </div>
           <div id="fgc-pre-match-info">
             <div id="fgc-pre-match-info-left">
@@ -59,7 +59,7 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
           </div>
           <div className="pre-match-alliance">
             <div className="pre-match-alliance-left">
-              <img src={RED_FLAG} className="auto-w"/>
+              <img alt={'red flag'} src={RED_FLAG} className="auto-w"/>
             </div>
             {
               match.tournamentLevel < 10 &&
@@ -112,7 +112,7 @@ class MatchPreviewScreen extends React.Component<IProps, IState> {
           </div>
           <div className="pre-match-alliance">
             <div className="pre-match-alliance-left">
-              <img src={BLUE_FLAG} className="auto-w"/>
+              <img alt={'blue flag'} src={BLUE_FLAG} className="auto-w"/>
             </div>
             {
               match.tournamentLevel < 10 &&

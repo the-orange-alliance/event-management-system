@@ -7,6 +7,7 @@ import ftc_1718 from "../../../resources/FTC_rr.png";
 import ftc_1819 from "../../../resources/FTC_roverruckus.png";
 import ftc_logo from "../../../resources/FTC_logo.png";
 import frc_ir from "../../../resources/FRC_ir.png";
+import frc_rr from "../../../resources/FRC_rr.svg";
 import {ISetEvent, ISetEventConfiguration} from "../../../stores/config/types";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {connect} from "react-redux";
@@ -24,7 +25,7 @@ import EventCreationManager from "../../../managers/EventCreationManager";
 import {
   DropdownData, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData,
   SeasonData,
-  TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET, FRC_PRESET,
+  TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET, FRC_IR_PRESET, FRC_RR_PRESET,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, SeriesType, ROUND_ROBIN_PRESET, RANKING_PRESET,
   ELIMINATIONS_PRESET, AppError, TournamentRound
 } from "@the-orange-alliance/lib-ems";
@@ -110,17 +111,24 @@ class EventSelection extends React.Component<IProps, IState> {
           <Grid.Column width={3}>
             <EventConfigurationCard title={"FIRST Global Ocean Opportunities"} color={"green"} imgUrl={fgc_2019} onClick={this.setConfigurationPreset.bind(this, FGC_PRESET)}/>
           </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
           <Grid.Column width={3}>
             <EventConfigurationCard title={"Standard FIRST Tech Challenge Relic Recovery Event"} color={"brown"} imgUrl={ftc_1718} onClick={this.setConfigurationPreset.bind(this, FTC_RELIC_PRESET)}/>
           </Grid.Column>
           <Grid.Column width={3}>
             <EventConfigurationCard title={"Standard FIRST Tech Challenge Rover Ruckus Event"} color={"orange"} imgUrl={ftc_1819} onClick={this.setConfigurationPreset.bind(this, FTC_ROVER_PRESET)}/>
           </Grid.Column>
-           <Grid.Column width={3}>
-            <EventConfigurationCard title={"FRC Infinite Recharge"} color={"black"} imgUrl={frc_ir} onClick={this.setConfigurationPreset.bind(this, FRC_PRESET)}/>
-          </Grid.Column>
           <Grid.Column width={3}>
             <EventConfigurationCard title={"Custom FTC Event"} color={"black"} imgUrl={ftc_logo} onClick={this.setConfigurationPreset.bind(this, DEFAULT_RESET)}/>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={3}>
+            <EventConfigurationCard title={"FRC Infinite Recharge"} color={"black"} imgUrl={frc_ir} onClick={this.setConfigurationPreset.bind(this, FRC_IR_PRESET)}/>
+          </Grid.Column>
+          <Grid.Column width={3}>
+            <EventConfigurationCard title={"FRC Rapid React"} color={"black"} imgUrl={frc_rr} onClick={this.setConfigurationPreset.bind(this, FRC_RR_PRESET)}/>
           </Grid.Column>
         </Grid.Row>
       </Grid>

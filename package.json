@@ -39,6 +39,7 @@
     "update-lib-ems": "cd ems-core/ && npm run update-lib-ems && cd ../ems-api/ && npm run update-lib-ems && cd ../audience-display/ && npm run update-lib-ems && cd ../ems-socket/ && npm run update-lib-ems && cd ../ref-tablet/ && npm run update-lib-ems &&  cd ../field-monitor/ && npm run update-lib-ems && cd ../"
   },
   "dependencies": {
+    "@the-orange-alliance/lib-ems": "^0.9.1",
     "concurrently": "^5.0.2",
     "node-gyp": "^6.1.0",
     "npm": "^6.13.6",

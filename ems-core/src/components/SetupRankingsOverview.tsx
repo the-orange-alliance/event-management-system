@@ -77,6 +77,7 @@ class SetupRankingsOverview extends React.Component<IProps, IState> {
       case "fgc_2019":
         return <EnergyImpactRankTable rankings={this.state.rankings as EnergyImpactRanking[]}/>;
       case "frc_20":
+      case "frc_22":
         return <FRC20RankTable rankings={this.state.rankings as InfiniteRechargeRank[]}/>;
       default:
         return <OceanOpportunitiesRankTable rankings={this.state.rankings as OceanOpportunitiesRank[]}/>;

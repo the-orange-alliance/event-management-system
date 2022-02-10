@@ -8,7 +8,7 @@ import {
   IMatchRanker,
   InfiniteRechargeRanker,
   IPostableObject,
-  OceanOpportunitiesRanker,
+  OceanOpportunitiesRanker, RapidReactRanker,
   RoverRuckusRanker
 } from '@the-orange-alliance/lib-ems';
 
@@ -108,6 +108,8 @@ function getRankerByType(eventType: string) {
       return RoverRuckusRanker;
     case 'frc_20':
       return InfiniteRechargeRanker;
+    case 'frc_22':
+      return RapidReactRanker;
     default:
       return EnergyImpactRanker;
   }

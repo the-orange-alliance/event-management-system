@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@the-orange-alliance/lib-ems": "^0.9.0-a",
+    "@the-orange-alliance/lib-ems": "^0.9.1-a",
     "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "moment": "^2.24.0",

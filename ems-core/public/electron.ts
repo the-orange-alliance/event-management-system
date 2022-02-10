@@ -7,7 +7,7 @@ require("dotenv").config({path: path.join(__dirname, ".env")});
 
 const prod: boolean = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging";
 
-if (!prod) {
+if (!prod || true) { // todo: disable debug in production
   require("electron-debug")({showDevTools: true, enabled: true});
 }
 // Keep a global reference of the window object, if you don't, the window will

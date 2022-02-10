@@ -24,6 +24,13 @@ class GameSpecificScorecard extends React.Component<IProps> {
     const {type, alliance, loading} = this.props;
     let display;
     switch (type) {
+      case "frc_22":
+        if (alliance === "Red") {
+          display = <FRC20RedScorecard/>;
+        } else {
+          display = <FRC20BlueScorecard/>
+        }
+        break;
       case "frc_20":
         if (alliance === "Red") {
           display = <FRC20RedScorecard/>;

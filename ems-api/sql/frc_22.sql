@@ -1,0 +1,31 @@
+ALTER TABLE "ranking" ADD ranking_score INT;
+ALTER TABLE "ranking" ADD ranking_points INT;
+ALTER TABLE "ranking" ADD auto_points INT;
+ALTER TABLE "ranking" ADD end_points INT;
+ALTER TABLE "ranking" ADD tele_points INT;
+
+ALTER TABLE "match_detail" ADD red_auto_taxi_robot_1 INT;
+ALTER TABLE "match_detail" ADD red_auto_taxi_robot_2 INT;
+ALTER TABLE "match_detail" ADD red_auto_taxi_robot_3 INT;
+ALTER TABLE "match_detail" ADD red_auto_cargo_low INT;
+ALTER TABLE "match_detail" ADD red_auto_cargo_high INT;
+ALTER TABLE "match_detail" ADD red_tele_cargo_low INT;
+ALTER TABLE "match_detail" ADD red_tele_cargo_high INT;
+ALTER TABLE "match_detail" ADD red_hangar_robot_1 INT;
+ALTER TABLE "match_detail" ADD red_hangar_robot_2 INT;
+ALTER TABLE "match_detail" ADD red_hangar_robot_3 INT;
+ALTER TABLE "match_detail" ADD red_cargo_bonus INT;
+ALTER TABLE "match_detail" ADD red_hangar_bonus INT;
+
+ALTER TABLE "match_detail" ADD blue_auto_taxi_robot_1 INT;
+ALTER TABLE "match_detail" ADD blue_auto_taxi_robot_2 INT;
+ALTER TABLE "match_detail" ADD blue_auto_taxi_robot_3 INT;
+ALTER TABLE "match_detail" ADD blue_auto_cargo_low INT;
+ALTER TABLE "match_detail" ADD blue_auto_cargo_high INT;
+ALTER TABLE "match_detail" ADD blue_tele_cargo_low INT;
+ALTER TABLE "match_detail" ADD blue_tele_cargo_high INT;
+ALTER TABLE "match_detail" ADD blue_hangar_robot_1 INT;
+ALTER TABLE "match_detail" ADD blue_hangar_robot_2 INT;
+ALTER TABLE "match_detail" ADD blue_hangar_robot_3 INT;
+ALTER TABLE "match_detail" ADD blue_cargo_bonus INT;
+ALTER TABLE "match_detail" ADD blue_hangar_bonus INT;

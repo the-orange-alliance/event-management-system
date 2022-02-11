@@ -113,6 +113,16 @@ class App extends React.Component<IProps, IState> {
     this.renderMainView = this.renderMainView.bind(this);
   }
 
+  public componentDidMount() {
+    if(this.state.event.season.seasonKey === 0) {
+      EMSProvider.getEvent().then((events: Event[]) => {
+        if (events.length > 0) {
+          this.setState({event: events[0]});
+        }
+      });
+    }
+  }
+
   public render() {
     return (
       <div id="app-container">

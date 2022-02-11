@@ -8,6 +8,8 @@ import OceanOpportunitiesRedScorecard from "./game-specifics/ocean-opportunities
 import OceanOpportunitiesBlueScorecard from "./game-specifics/ocean-opportunities/OceanOpportunitiesBlueScorecard";
 import FRC20RedScorecard from "./game-specifics/frc20/FRC20RedScorecard";
 import FRC20BlueScorecard from "./game-specifics/frc20/FRC20BlueScorecard";
+import FRC22RedScorecard from "./game-specifics/frc22/FRC22RedScorecard";
+import FRC22BlueScorecard from "./game-specifics/frc22/FRC22BlueScorecard";
 
 interface IProps {
   type: EventType,
@@ -26,9 +28,9 @@ class GameSpecificScorecard extends React.Component<IProps> {
     switch (type) {
       case "frc_22":
         if (alliance === "Red") {
-          display = <FRC20RedScorecard/>;
+          display = <FRC22RedScorecard/>;
         } else {
-          display = <FRC20BlueScorecard/>
+          display = <FRC22BlueScorecard/>
         }
         break;
       case "frc_20":

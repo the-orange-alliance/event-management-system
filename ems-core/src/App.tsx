@@ -41,14 +41,15 @@ class App extends React.Component<IProps, IState> {
   public componentDidMount() {
     UploadManager.initialize(1, this.props.toaConfig);
 
-    this.initializeSocket("localhost");
     WebProvider.initialize(this.props.networkHost);
     if (this.props.slaveModeEnabled) {
       document.title = "Event Management System (Slave to " + this.props.masterHost + ")";
       EMSProvider.initialize(this.props.masterHost);
+      this.initializeSocket(this.props.masterHost);
     } else {
       document.title = "Event Management System";
       EMSProvider.initialize(this.props.networkHost);
+      this.initializeSocket(this.props.networkHost);
     }
 
     this.setState({loading: false});
@@ -69,7 +70,7 @@ class App extends React.Component<IProps, IState> {
   }
 
   private initializeSocket(host: string) {
-    SocketProvider.initialize('localhost', EMSProvider);
+    SocketProvider.initialize(host, EMSProvider);
     SocketProvider.on("connect", () => {
       SocketProvider.emit("identify", "ems-core", ["scoring", "event", "fms"]);
       this.props.setSocketConnected(true);

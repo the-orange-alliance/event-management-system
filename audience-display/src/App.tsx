@@ -12,6 +12,7 @@ import {Route, RouteComponentProps} from "react-router";
 import OceanOpportunities from "./displays/fgc_2019/OceanOpportunities";
 import Ranking from "@the-orange-alliance/lib-ems/dist/models/ems/Ranking";
 import InfiniteRecharge from "./displays/frc_20/InfiniteRecharge";
+import RapidReact from "./displays/frc_22/RapidReact";
 
 interface IProps {
   cookies: Cookies
@@ -133,8 +134,11 @@ class App extends React.Component<IProps, IState> {
       case "frc_20":
         display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         break;
+      case "frc_22":
+        display = <RapidReact displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        break;
       default:
-        // display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        // display = <RapidReact displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
         display = <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
     }
 

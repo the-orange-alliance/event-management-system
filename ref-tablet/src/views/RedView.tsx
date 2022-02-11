@@ -2,6 +2,7 @@ import * as React from 'react';
 import RoverRuckusRedView from "./ftc_1819/RedAllianceView";
 import OceanOpportunitiesRedView from "./fgc_2019/RedAllianceView";
 import InfiniteRechargeRedView from "./frc_20/RedAllianceView";
+import RapidReactRedView from "./frc_22/RedAllianceView";
 import {Event, Match, SocketProvider} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
@@ -90,6 +91,9 @@ class RedView extends React.Component<IProps, IState> {
         break;
       case 20:
         display = <InfiniteRechargeRedView event={event} match={match} mode={mode} connected={connected} waitingForMatch={waitingForMatch}/>;
+        break;
+      case 22:
+        display = <RapidReactRedView event={event} match={match} mode={mode} connected={connected} waitingForMatch={waitingForMatch}/>;
         break;
       default:
         display = <span>No ref tablet application has been made for {event.season.seasonKey}</span>;

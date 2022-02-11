@@ -1,0 +1,141 @@
+#ir-rank-top {
+  width: 100%;
+  margin-top: 2.5vh;
+  height: 10vh;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#ir-rank-top > div {
+  width: 100%;
+  height: 100%;
+}
+
+#ir-rank-mid {
+  width: 100%;
+  margin-top: 5vh;
+  height: 60vh;
+  padding: 2.5vh 6px 6px 6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.5vw;
+}
+
+.ir-rank-title {
+  color: #ffffff;
+  font-size: 2.25vw;
+  font-weight: bold;
+  text-align: center;
+}
+
+#ir-rank-bot {
+  position: relative;
+  width: 100%;
+  margin-top: 5vh;
+  height: 15vh;
+  padding: 6px;
+}
+
+#ir-rank-bot > .ir-bot-logo {
+  position: absolute;
+  width: 5vw;
+  height: 100%;
+}
+
+#ir-rank-bot > .ir-bot-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  color: #FFFFFF;
+  font-size: 2vw;
+  font-weight: bold;
+}
+
+
+#ir-rank-table-container {
+  width: 77vw;
+  height: 95%;
+  overflow: hidden;
+  max-height: 95%;
+}
+
+#ir-rank-table-container > table {
+  width: 100%;
+  height: calc(75vh - 2vw);
+  overflow: hidden;
+  margin: 0;
+  border-spacing: 0;
+}
+
+#ir-rank-table-container > table > thead {
+  display: block;
+  width: 77vw;
+  height: 44px;
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+#ir-rank-table-container > table > tbody {
+  display: block;
+  overflow: hidden;
+  width: 77vw;
+  height: calc(75vh - 2vw - 44px);
+}
+
+#ir-rank-table-container > table > tbody > tr, #ir-rank-table-container > table > thead > tr {
+  text-align: center;
+  height: 40px;
+  width: 77vw;
+  font-family: Roboto, sans-serif;
+  font-weight: bold;
+}
+
+#ir-rank-table-container > table > tbody > tr:nth-child(even) {
+  background-color: #e6e6e6;
+  color: #000000;
+}
+
+#ir-rank-table-container > table > tbody > tr:nth-child(odd) {
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+#ir-rank-scrollview {
+  width: 100%;
+  height: 100%;
+}
+
+/* We've got 77vw to work with */
+.ir-rank {
+  width: 9vw;
+}
+.ir-team {
+  width: 22vw;
+}
+.ir-record {
+  width: 9vw;
+}
+.ir-rp {
+  width: 7vw;
+}
+.ir-rs {
+  width: 7vw;
+}
+.ir-auto {
+  width: 8vw;
+}
+.ir-end {
+  width: 8vw;
+}
+.ir-tele {
+  width: 8vw;
+}

@@ -3,7 +3,7 @@ import {
   IPostableObject,
   Match,
   MatchParticipant,
-  OceanOpportunitiesMatchDetails,
+  OceanOpportunitiesMatchDetails, RapidReactMatchDetails,
   RoverRuckusRefereeData
 } from "@the-orange-alliance/lib-ems";
 
@@ -52,7 +52,7 @@ class ScoreManager {
 
   private handleGameSpecifics() {
     const seasonKey: string = this._match.matchKey.split("-")[0];
-    switch (seasonKey){
+    switch (seasonKey) {
       case "2019":
         if (this._match.tournamentLevel > Match.QUALIFICATION_LEVEL) {
           const details: OceanOpportunitiesMatchDetails = (this._match.matchDetails as OceanOpportunitiesMatchDetails);
@@ -157,6 +157,10 @@ class ScoreManager {
         // if (details.blueStage === 3) {
         //   details.blueStageThreeCells = blueTeleCells - details.blueStageTwoCells - details.blueStageOneCells;
         // }
+        break;
+      case "22":
+        // const details: RapidReactMatchDetails = this._match.matchDetails as RapidReactMatchDetails;
+
         break;
     }
   }

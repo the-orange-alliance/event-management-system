@@ -37,7 +37,7 @@ class RobotButtonGroup extends React.Component<IProps> {
     // TODO - Get Team Indentifiers from EMS-CORE
     return(
       <div className="state-switcher-container">
-        <div className="state-switcher-team-container">
+        <div className="state-switcher-team-container w-100 mt-2">
           {labelView}
         </div>
         <ButtonGroup>

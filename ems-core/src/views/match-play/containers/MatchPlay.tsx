@@ -446,7 +446,9 @@ class MatchPlay extends React.Component<IProps, IState> {
           this.setState({activeMatch: match});
           // Temporarily set the match to what we have now, and then get ALL the details.
           MatchManager.getMatchResults(match.matchKey).then((data: Match) => {
-            const participants: MatchParticipant[] = [];
+            // This code was causing issues and I'm not quite sure what it does
+/*            const participants: MatchParticipant[] = [];
+
             for (let i = 0; i < match.participants.length; i++) {
               const participant: MatchParticipant = match.participants[i];
               if (typeof data !== "undefined" && typeof data.participants !== "undefined" && typeof data.participants[i] !== "undefined") {
@@ -461,6 +463,11 @@ class MatchPlay extends React.Component<IProps, IState> {
               }
             }
             data.participants = participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON()));
+*/
+            const participants: MatchParticipant[] = match.participants;
+            console.log(participants)
+            data.participants = participants.map((p: MatchParticipant) => new MatchParticipant().fromJSON(p.toJSON()));
+
 
             this.props.setActiveMatch(data);
             this.props.setActiveParticipants(participants);

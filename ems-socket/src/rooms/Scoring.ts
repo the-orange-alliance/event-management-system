@@ -102,7 +102,7 @@ export default class ScoringRoom implements IRoom {
       }, 500);
     });
     client.on("score-update", (matchJSON: any) => {
-      if(!user || (user && !user.canControlMatch)) return client.emit('Unauthorized', {event: 'score-update', required_priv: 'can_control_match'});
+      if(!user || (user && !user.canControlMatch && !user.canRef)) return client.emit('Unauthorized', {event: 'score-update', required_priv: 'can_control_match'});
       if (this._timer.inProgress() || this._timer.mode === MatchMode.PRESTART || !this._hasCommittedScore) {
         if (matchJSON && typeof matchJSON.match_key !== "undefined" && matchJSON.match_key.length > 0) {
           if (typeof matchJSON.details !== "undefined" && typeof matchJSON.participants !== "undefined") {

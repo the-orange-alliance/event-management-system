@@ -12,14 +12,28 @@ import DialogManager from "../../../managers/DialogManager";
 import {CONFIG_STORE} from "../../../AppStore";
 import {ISetBackupDir} from "../../../stores/config/types";
 import {setBackupDir} from "../../../stores/config/actions";
-import {AppError, EMSProvider, HttpError} from "@the-orange-alliance/lib-ems";
+import {
+  AppError,
+  EMSProvider,
+  Event,
+  FGCProvider,
+  HttpError,
+  Match,
+  MatchParticipant,
+  Team,
+} from "@the-orange-alliance/lib-ems";
 import InternalStateManager from "../../../managers/InternalStateManager";
+import {AxiosResponse} from "axios";
 
 interface IProps {
   backupDir?: string
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   setCompletedStep?: (step: number) => IIncrementCompletedStep,
-  setBackupDir?: (backupDir: string) => ISetBackupDir
+  setBackupDir?: (backupDir: string) => ISetBackupDir,
+  teams?: Team[],
+  qualMatches: Match[],
+  playoffMatches: Match[],
+  event: Event,
 }
 
 interface IState {
@@ -27,6 +41,7 @@ interface IState {
 }
 
 class DataSyncConfig extends React.Component<IProps, IState> {
+
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -37,6 +52,8 @@ class DataSyncConfig extends React.Component<IProps, IState> {
     this.openModal = this.openModal.bind(this);
     this.chooseBackupDir = this.chooseBackupDir.bind(this);
     this.forceBackup = this.forceBackup.bind(this);
+    this.forceUpload = this.forceUpload.bind(this);
+    this.purgeOnline = this.purgeOnline.bind(this);
   }
 
   public render() {
@@ -71,10 +88,10 @@ class DataSyncConfig extends React.Component<IProps, IState> {
             <Card.Content>
               <Grid>
                 <Grid.Row columns="equal">
-                  <Grid.Column><Button fluid={true} color="orange">Force Backup</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color="orange" onClick={this.forceUpload}>Force Sync</Button></Grid.Column>
                 </Grid.Row>
                 <Grid.Row columns="equal">
-                  <Grid.Column><Button fluid={true} color="red">Purge Online</Button></Grid.Column>
+                  <Grid.Column><Button fluid={true} color="red" onClick={this.purgeOnline}>Purge Online</Button></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Card.Content>
@@ -88,6 +105,115 @@ class DataSyncConfig extends React.Component<IProps, IState> {
         </Card.Group>
       </Tab.Pane>
     )
+  }
+
+  private purgeOnline() {
+    const {eventKey} = this.props.event;
+    const promises = [];
+
+    // Teams
+    promises.push(FGCProvider.deleteTeams(eventKey));
+
+    // Rankings
+    promises.push(FGCProvider.deleteRankings(eventKey));
+
+    // Match Data
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.TEST_LEVEL, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.PRACTICE_LEVEL, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.QUALIFICATION_LEVEL, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.OCTOFINALS_LEVEL, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.QUARTERFINALS_LEVEL, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.SEMIFINALS_level, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.ROUND_ROBIN_LEVEL, undefined));
+    promises.push(FGCProvider.deleteMatchData(eventKey, Match.FINAL_LEVEL, undefined));
+
+    Promise.all(promises).then(() => {
+      console.log('Successfully purged online data');
+    }).catch(err => {
+      console.error("Failed to purge online data: ", err);
+    })
+  }
+
+  private forceUpload() {
+    const {eventKey} = this.props.event;
+
+    const promises: Promise<any>[] = [];
+    const teamsPromise = EMSProvider.getTeams().then((teams) => {
+      return Promise.all(teams.map(team => {
+        return FGCProvider.postEventParticipants(eventKey, [team]).catch(() => {}); // If it fails to upload, it already exists and we don't care
+      }));
+    });
+    promises.push(teamsPromise);
+
+    // Post Rankings
+    const ranksPromise = FGCProvider.deleteRankings(eventKey).then(() => {
+      EMSProvider.getRankings().then((ranks) => {
+        return FGCProvider.postRankingsByLevel(eventKey, ranks, Match.QUALIFICATION_LEVEL).catch((err) => {
+          console.warn('Failed to upload rankings', err);
+        });
+      }).catch((err) => {
+        console.warn('Failed to get rankings from EMS', err)
+      });
+    }).catch((err) => {
+      console.warn('Failed to purge rankings online', err);
+    });
+    promises.push(ranksPromise);
+
+    // Post Qual Matches
+    const qualPromises = EMSProvider.getMatchesAndParticipants(eventKey).then((matches) => {
+      return this.forceUploadMatches(eventKey, matches);
+    });
+
+    // Push those to our array
+    promises.push(qualPromises);
+
+    Promise.all(promises).then(() => {
+      console.log('Successfully force-synced data');
+    }).catch((error) => {
+      console.error("Failed to force sync: ", error);
+    });
+  }
+
+  // Brute-force match uploading. if we get an HTTP error we just PUT the data instead.
+  private forceUploadMatches(eventKey: string, matches: Match[]): Promise<any>[] {
+    // Even though the match has a "posted" attribute, we can't trust that because this is a "force" sync
+    return matches.map(m => {
+
+      // Map each match participant to its own API call
+      const mpPromises = m.participants.map((participant) => {
+        return FGCProvider.postMatchParticipants(eventKey, [participant]).catch(() => {
+          return FGCProvider.putMatchParticipants(eventKey, [participant]);
+        }).catch((reason: AxiosResponse) => {
+          console.log("Failed to upload match participant " + participant.matchParticipantKey + ". \n     Response code: " + reason.status + "\n     PUT Response: " + reason.data);
+        });
+      });
+
+      const matchParticipantPromise = Promise.all(mpPromises).catch((err) => {
+        console.warn("Failed to upload match participants for match " + m.matchKey, err)
+      });
+
+      // Upload Match Participants
+      return matchParticipantPromise.then(() => {
+        // Upload Match Data
+        return FGCProvider.postMatches(eventKey, [m]).catch(() => {
+          return FGCProvider.putMatchResults(eventKey, m);
+        }).catch((reason: AxiosResponse) => {
+          console.warn("Failed to upload basic match data for " + m.matchKey + ". \n     Response code: " + reason.status + "\n     PUT Response: " + reason.data);
+        })
+
+      }).then(() => {
+        // Upload Match Details
+        return EMSProvider.getMatchDetails(m.matchKey).then((details: any) => {
+          const md = details[0];
+          return FGCProvider.postMatchDetails(eventKey, [md]).catch(() => {
+            return FGCProvider.putMatchDetails(eventKey, md);
+          }).catch((reason: AxiosResponse) => {
+            console.warn("Failed to upload match details for match " + md.matchDetailKey + ". \n     Response code: " + reason.status + "\n     PUT Response: " + reason.data);
+          });
+        });
+
+      })
+    });
   }
 
   private chooseBackupDir() {
@@ -139,9 +265,13 @@ class DataSyncConfig extends React.Component<IProps, IState> {
   }
 }
 
-export function mapStateToProps({configState}: IApplicationState) {
+export function mapStateToProps({internalState, configState}: IApplicationState) {
   return {
-    backupDir: configState.backupDir
+    backupDir: configState.backupDir,
+    teams: internalState.teamList,
+    qualMatches: internalState.qualificationMatches,
+    playoffMatches: internalState.playoffsMatches,
+    event: configState.event
   };
 }
 

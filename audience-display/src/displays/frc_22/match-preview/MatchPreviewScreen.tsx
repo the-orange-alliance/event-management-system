@@ -57,7 +57,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
       return (
         <div key={team.teamKey} className="center-items red-border">
           <div className="ir-pre-team center-left-items">{team.teamKey}</div>
-          <div className="ir-pre-name center-left-items">{team.teamNameShort}</div>
+          <div className="ir-pre-name center-left-items">{team.teamNameLong}</div>
           <div className="ir-pre-rank center-items">#{rank.rank}</div>
         </div>
       );
@@ -75,7 +75,7 @@ class MatchPreviewScreen extends React.Component<IProps> {
       return (
         <div key={team.teamKey} className="center-items blue-border">
           <div className="ir-pre-team center-left-items">{team.teamKey}</div>
-          <div className="ir-pre-name center-left-items">{team.teamNameShort}</div>
+          <div className="ir-pre-name center-left-items">{team.teamNameLong}</div>
           <div className="ir-pre-rank center-items">#{rank.rank}</div>
         </div>
       );

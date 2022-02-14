@@ -193,7 +193,7 @@ class MatchResultsScreen extends React.Component<IProps> {
       return (
         <div key={team.teamKey} className="ir-result-team-container red-border">
           <div className="ir-result-team center-items">{team.teamKey}</div>
-          <div className="ir-result-name center-left-items">{team.teamNameShort}</div>
+          <div className="ir-result-name center-left-items">{team.teamNameLong}</div>
           <div className="ir-result-rank center-items">#{rank.rank}</div>
         </div>
       );
@@ -211,7 +211,7 @@ class MatchResultsScreen extends React.Component<IProps> {
       return (
         <div key={team.teamKey} className="ir-result-team-container blue-border">
           <span className="ir-result-team center-items">{team.teamKey}</span>
-          <span className="ir-result-name center-left-items">{team.teamNameShort}</span>
+          <span className="ir-result-name center-left-items">{team.teamNameLong}</span>
           <span className="ir-result-rank center-items">#{rank.rank}</span>
         </div>
       );

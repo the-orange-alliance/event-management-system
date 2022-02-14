@@ -119,7 +119,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private renderAutoView(): JSX.Element {
     const {match} = this.props;
     const details: RapidReactMatchDetails = match.matchDetails as RapidReactMatchDetails;
-    const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station >= 20) : [];
+    const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station < 20) : [];
     const robotAutoLineViews = redParticipants.map((p: MatchParticipant, index: number) => {
       let crossed: boolean;
       let action: (state: number) => void;
@@ -205,7 +205,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
   private renderEndView(): JSX.Element {
     const {match} = this.props;
     const details: RapidReactMatchDetails = match.matchDetails as RapidReactMatchDetails;
-    const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station >= 20) : [];
+    const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station < 20) : [];
     const robotAutoLineViews = redParticipants.map((p: MatchParticipant, index: number) => {
       let hangValue: number;
       let action: (state: number) => void;

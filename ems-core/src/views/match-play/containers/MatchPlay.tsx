@@ -331,7 +331,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       SocketProvider.emit("control-update", PACKET_BALL_RESET);
 
       if (this.props.uploadConfig.enabled) {
-        UploadManager.postMatchResults(event.eventKey, activeMatch).then(() => {
+        UploadManager.postMatchResults(this.props.uploadConfig.eventKey, activeMatch).then(() => {
           console.log(`Uploaded match results for ${activeMatch.matchKey}`);
         }).catch((error: HttpError) => {
           DialogManager.showErrorBox(error);

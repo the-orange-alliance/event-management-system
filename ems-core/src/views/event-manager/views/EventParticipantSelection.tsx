@@ -130,7 +130,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
       updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + this.props.teams[i].teamKey;
     }
     if (this.props.uploadConfig.enabled) {
-      UploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
+      UploadManager.postEventParticipants(this.props.uploadConfig.eventKey, updatedTeams).then(() => {
         console.log(`${updatedTeams.length} teams have been posted online.`);
       }).catch((error: HttpError) => {
         DialogManager.showErrorBox(error);
@@ -196,7 +196,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   private importOnline() {
     this.setState({loadingTeams: true});
     this.props.setNavigationDisabled(true);
-    UploadManager.getTeams(this.props.event.eventKey).then((teams: Team[]) => {
+    UploadManager.getTeams(this.props.uploadConfig.eventKey).then((teams: Team[]) => {
       console.log(teams);
       this.setState({loadingTeams: false});
       this.props.setNavigationDisabled(false);

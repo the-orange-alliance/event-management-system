@@ -216,7 +216,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
     const updateDisplay: boolean = updateAudience ? updateAudience : false;
     MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig, updateDisplay).then(() => {
       if (this.props.uploadConfig.enabled) {
-        UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
+        UploadManager.postMatchResults(this.props.uploadConfig.eventKey, this.props.activeMatch).then(() => {
           console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
         }).catch((error: HttpError) => {
           DialogManager.showErrorBox(error);

@@ -30,7 +30,10 @@ ProcessManager.performStartupCheck().then((procList: Process[]) => {
 
     const configState = Config.initialState;
 
-    configState.networkHost = procList[0].address;
+
+    let host = procList[0].address;
+    if(host === '0.0.0.0') host = '127.0.0.1'; // Most systems don't redirect 0.0.0.0 to 127.0.0.1
+    configState.networkHost = host;
     if (typeof configStore.event !== "undefined" && typeof configStore.eventConfig !== "undefined") {
       configState.event = configState.event.fromJSON(configStore.event);
       configState.eventConfiguration = configState.eventConfiguration.fromJSON(configStore.eventConfig);

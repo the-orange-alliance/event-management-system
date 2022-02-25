@@ -43,16 +43,16 @@ ipcMain.on("list-ecosystem", (event: IpcMainEvent) => {
 ipcMain.on("start-ecosystem", (event: IpcMainEvent, host: string) => {
   localIPv4().then((localHost: string) => {
     if (localHost === "Default") {
-      localHost = "127.0.0.1";
+      localHost = "0.0.0.0";
     }
     if(process.env.NODE_ENV === 'development') {
-      host = '127.0.0.1';
+      host = '0.0.0.0';
       logger.info(`Starting services for development mode, with a default ${host} address.`);
     } else if (typeof host === "undefined" || host === null) {
       host = localHost;
       logger.info(`Starting services with a default ${host} address.`);
     } else if (host.match(ipRegex) === null || localHost.match(ipRegex) === null) {
-      host = "127.0.0.1";
+      host = "0.0.0.0";
       logger.info(`Starting services with a default ${host} address.`);
     } else {
       logger.info(`Starting services with a ${host} address.`);

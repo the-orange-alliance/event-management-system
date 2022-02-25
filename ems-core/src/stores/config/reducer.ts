@@ -12,7 +12,13 @@ import {
 } from "./constants";
 import {IConfigState} from "./models";
 import {ConfigActions} from "./types";
-import {MatchConfiguration, Schedule, TOAConfig, EventConfiguration, Event} from "@the-orange-alliance/lib-ems";
+import {
+  MatchConfiguration,
+  Schedule,
+  EventConfiguration,
+  Event,
+  UploadConfig
+} from "@the-orange-alliance/lib-ems";
 
 export const initialState: IConfigState = {
   slaveModeEnabled: false,
@@ -25,7 +31,7 @@ export const initialState: IConfigState = {
   practiceSchedule: new Schedule("Practice"),
   qualificationSchedule: new Schedule("Qualification"),
   playoffsSchedule: [],
-  toaConfig: new TOAConfig(),
+  uploadConfig: new UploadConfig(),
   backupDir: "",
   apiKey: ""
 };

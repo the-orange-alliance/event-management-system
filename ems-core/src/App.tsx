@@ -10,8 +10,8 @@ import {
 } from "./stores/internal/actions";
 
 import {
-  EMSProvider, SocketProvider, WebProvider, TOAConfig, MatchConfiguration,
-  AllianceMember
+  EMSProvider, SocketProvider, WebProvider, MatchConfiguration,
+  AllianceMember, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import UploadManager from "./managers/UploadManager";
 import LoginContainer from "./LoginContainer";
@@ -21,10 +21,11 @@ interface IProps {
   slaveModeEnabled: boolean,
   masterHost: string,
   networkHost: string,
-  toaConfig: TOAConfig,
+  uploadConfig: UploadConfig,
   matchTimerConfig: MatchConfiguration,
   setSocketConnected?: (connected: boolean) => ISetSocketConnected,
   loggedIn?: boolean,
+  uploadType?: number,
 }
 interface IState {
   loading: boolean
@@ -39,7 +40,7 @@ class App extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    UploadManager.initialize(1, this.props.toaConfig);
+    UploadManager.initialize(this.props.uploadType, this.props.uploadConfig);
 
     WebProvider.initialize(this.props.networkHost);
     if (this.props.slaveModeEnabled) {
@@ -92,7 +93,8 @@ export function mapStateToProps(state: IApplicationState) {
     masterHost: state.configState.masterHost,
     networkHost: state.configState.networkHost,
     matchTimerConfig: state.configState.matchConfig,
-    toaConfig: state.configState.toaConfig,
+    uploadConfig: state.configState.uploadConfig,
+    uploadType: state.configState.eventConfiguration.uploadType,
     loggedIn: state.internalState.loggedIn,
   };
 }

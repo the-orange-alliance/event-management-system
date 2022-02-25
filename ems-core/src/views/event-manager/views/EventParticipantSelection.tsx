@@ -13,8 +13,8 @@ import TeamValidator from "../../../validators/TeamValidator";
 import EventCreationManager from "../../../managers/EventCreationManager";
 // import TOAUploadManager from "../../../managers/TOAUploadManager";
 import {
-  Event, EventConfiguration, HttpError, Team, TOAConfig,
-  EliminationMatchesFormat
+  Event, EventConfiguration, HttpError, Team,
+  EliminationMatchesFormat, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import UploadManager from "../../../managers/UploadManager";
 
@@ -23,7 +23,7 @@ interface IProps {
   teams?: Team[],
   eventConfig?: EventConfiguration,
   event: Event,
-  toaConfig?: TOAConfig
+  uploadConfig?: UploadConfig
   addTeam?: (team: Team) => IAddTeam,
   alterTeam?: (index: number, team: Team) => IAlterTeam,
   removeTeam?: (index: number) => IRemoveTeam
@@ -66,7 +66,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {teams, toaConfig} = this.props;
+    const {teams, uploadConfig} = this.props;
     const {removeMode, confirmModalOpen, teamModalOpen, activeTeam, loadingTeams} = this.state;
 
     const teamsView = teams.map((team, index) => {
@@ -108,7 +108,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
             <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams || !this.canCreateTeamList()} onClick={this.createTeamList}>Save &amp; Publish</Button>
             <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importTeamsByCSV}>Import By CSV</Button>
             {
-              toaConfig.enabled &&
+              uploadConfig.enabled &&
               <Button color={getTheme().primary} loading={loadingTeams} disabled={loadingTeams} onClick={this.importOnline}>Import From TOA</Button>
             }
           </div>
@@ -129,7 +129,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
     for (let i = 0; i < this.props.teams.length; i++) {
       updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + this.props.teams[i].teamKey;
     }
-    if (this.props.toaConfig.enabled) {
+    if (this.props.uploadConfig.enabled) {
       UploadManager.postEventParticipants(this.props.event.eventKey, updatedTeams).then(() => {
         console.log(`${updatedTeams.length} teams have been posted online.`);
       }).catch((error: HttpError) => {
@@ -285,7 +285,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     teams: internalState.teamList,
     eventConfig: configState.eventConfiguration,
     event: configState.event,
-    toaConfig: configState.toaConfig
+    uploadConfig: configState.uploadConfig
   };
 }
 

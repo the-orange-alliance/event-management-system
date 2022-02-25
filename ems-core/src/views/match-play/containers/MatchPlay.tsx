@@ -20,7 +20,7 @@ import {disableNavigation} from "../../../stores/internal/actions";
 import GameSpecificScorecard from "../../../components/GameSpecificScorecard";
 import {
   Event, EventConfiguration, HttpError, Match, MatchDetails, MatchConfiguration, MatchParticipant,
-  MatchState, MatchTimer, SocketProvider, TOAConfig, TournamentType, EliminationMatchesFormat
+  MatchState, MatchTimer, SocketProvider, TournamentType, EliminationMatchesFormat, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import InternalStateManager from "../../../managers/InternalStateManager";
 import ConfirmActionModal from "../../../components/ConfirmActionModal";
@@ -34,7 +34,7 @@ interface IProps {
   activeDetails?: MatchDetails,
   activeParticipants?: MatchParticipant[],
   event?: Event,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   backupDir?: string,
   eventConfig?: EventConfiguration,
   matchConfig?: MatchConfiguration,
@@ -330,7 +330,7 @@ class MatchPlay extends React.Component<IProps, IState> {
     MatchManager.commitScores(activeMatch, eventConfig, true).then(() => {
       SocketProvider.emit("control-update", PACKET_BALL_RESET);
 
-      if (this.props.toaConfig.enabled) {
+      if (this.props.uploadConfig.enabled) {
         UploadManager.postMatchResults(event.eventKey, activeMatch).then(() => {
           console.log(`Uploaded match results for ${activeMatch.matchKey}`);
         }).catch((error: HttpError) => {
@@ -372,6 +372,7 @@ class MatchPlay extends React.Component<IProps, IState> {
       DialogManager.showErrorBox(error);
     });
   }
+
 
   private getAvailableTournamentLevels(): TournamentType[] {
     const {playoffsMatches} = this.props;
@@ -502,7 +503,7 @@ export function mapStateToProps({configState, internalState, scoringState}: IApp
     activeDetails: scoringState.activeDetails,
     activeParticipants: scoringState.activeParticipants,
     event: configState.event,
-    toaConfig: configState.toaConfig,
+    uploadConfig: configState.uploadConfig,
     backupDir: configState.backupDir,
     eventConfig: configState.eventConfiguration,
     matchConfig: configState.matchConfig,

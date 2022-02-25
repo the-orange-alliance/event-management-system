@@ -15,13 +15,13 @@ import {disableNavigation} from "../../stores/internal/actions";
 import ConfirmActionModal from "../../components/ConfirmActionModal";
 import {
   Event, EventConfiguration, HttpError, Match, MatchDetails, MatchParticipant,
-  TournamentType, TOAConfig, EliminationMatchesFormat
+  TournamentType, EliminationMatchesFormat, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import UploadManager from "../../managers/UploadManager";
 
 interface IProps {
   event?: Event,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   eventConfig?: EventConfiguration,
   practiceMatches?: Match[],
   qualificationMatches?: Match[],
@@ -215,7 +215,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
     this.props.activeMatch.participants = this.props.activeParticipants;
     const updateDisplay: boolean = updateAudience ? updateAudience : false;
     MatchManager.commitScores(this.props.activeMatch, this.props.eventConfig, updateDisplay).then(() => {
-      if (this.props.toaConfig.enabled) {
+      if (this.props.uploadConfig.enabled) {
         UploadManager.postMatchResults(this.props.event.eventKey, this.props.activeMatch).then(() => {
           console.log(`Uploaded match results for ${this.props.activeMatch.matchKey}`);
         }).catch((error: HttpError) => {
@@ -249,7 +249,7 @@ class MatchReviewView extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState, scoringState}: IApplicationState) {
   return {
     event: configState.event,
-    toaConfig: configState.toaConfig,
+    uploadConfig: configState.uploadConfig,
     eventConfig: configState.eventConfiguration,
     practiceMatches: internalState.practiceMatches,
     qualificationMatches: internalState.qualificationMatches,

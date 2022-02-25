@@ -2,7 +2,7 @@ import * as React from "react";
 import {IDisableNavigation} from "../../../stores/internal/types";
 import {
   AppError, Event, EventConfiguration, EliminationsSchedule, HttpError, RoundRobinSchedule, Schedule,
-  PlayoffsType, TOAConfig, Match, TournamentType
+  PlayoffsType, Match, TournamentType, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import {ApplicationActions, IApplicationState} from "../../../stores";
 import {disableNavigation} from "../../../stores/internal/actions";
@@ -31,7 +31,7 @@ interface IProps {
   eventConfig?: EventConfiguration,
   event?: Event,
   teams?: Team[],
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   navigationDisabled?: boolean,
   setNavigationDisabled?: (disabled: boolean) => IDisableNavigation,
   addSchedule?: (schedule: Schedule) => IAddPlayoffsSchedule
@@ -167,7 +167,7 @@ class EventAdvancementView extends React.Component<IProps, IState> {
     this.props.setNavigationDisabled(true);
     const matches: Match[] = this.props.playoffsMatches.filter((m: Match) => m.matchKey.split("-")[3].substring(1, 2) === (this.props.eventConfig.activeTournamentID + ""));
     EventCreationManager.createRanks(teams.filter((t: Team) => playoffsSchedule[eventConfig.activeTournamentID].teams.indexOf(t.teamKey) > 0), this.props.event.eventKey).then(() => {
-      if (this.props.toaConfig.enabled && upload) {
+      if (this.props.uploadConfig.enabled && upload) {
         UploadManager.postMatchSchedule(this.props.event.eventKey, matches).then(() => {
           console.log(`${matches.length} matches have been posted to TOA.`);
         }).catch((error: HttpError) => {
@@ -235,7 +235,7 @@ function mapStateToProps({configState, internalState}: IApplicationState) {
     event: configState.event,
     eventConfig: configState.eventConfiguration,
     teams: internalState.teamList,
-    toaConfig: configState.toaConfig,
+    toaConfig: configState.uploadConfig,
     playoffsSchedule: configState.playoffsSchedule,
     playoffsMatches: internalState.playoffsMatches
   };

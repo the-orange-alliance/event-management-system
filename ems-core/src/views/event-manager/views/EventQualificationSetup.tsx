@@ -12,7 +12,16 @@ import {Dispatch} from "redux";
 import {disableNavigation, setQualificationMatches} from "../../../stores/internal/actions";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
-import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
+import {
+  Event,
+  EventConfiguration,
+  HttpError,
+  Match,
+  Schedule,
+  ScheduleItem,
+  Team,
+  UploadConfig
+} from "@the-orange-alliance/lib-ems";
 import SetupScheduleParticipants from "../../../components/SetupScheduleParticipants";
 import UploadManager from "../../../managers/UploadManager";
 
@@ -20,7 +29,7 @@ interface IProps {
   onComplete: () => void,
   navigationDisabled?: boolean,
   event?: Event,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   eventConfig?: EventConfiguration,
   teamList?: Team[],
   schedule?: Schedule,
@@ -94,7 +103,7 @@ class EventQualificationSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule(upload: boolean) {
     this.props.setNavigationDisabled(true);
-    if (this.props.toaConfig.enabled && upload) {
+    if (this.props.uploadConfig.enabled && upload) {
       UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.qualificationMatches).then(() => {
         console.log(`${this.props.qualificationMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {
@@ -122,7 +131,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     navigationDisabled: internalState.navigationDisabled,
     teamList: internalState.teamList,
     eventConfig: configState.eventConfiguration,
-    toaConfig: configState.toaConfig,
+    uploadConfig: configState.uploadConfig,
     event: configState.event,
     schedule: configState.qualificationSchedule,
     qualificationMatches: internalState.qualificationMatches

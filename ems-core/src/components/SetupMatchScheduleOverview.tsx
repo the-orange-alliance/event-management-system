@@ -6,11 +6,17 @@ import {connect} from "react-redux";
 import {IDisableNavigation} from "../stores/internal/types";
 import ConfirmActionModal from "./ConfirmActionModal";
 import {SyntheticEvent} from "react";
-import {EventConfiguration, Match, TOAConfig, TournamentType, TournamentRound} from "@the-orange-alliance/lib-ems";
+import {
+  EventConfiguration,
+  Match,
+  TournamentType,
+  TournamentRound,
+  UploadConfig
+} from "@the-orange-alliance/lib-ems";
 
 interface IProps {
   onComplete: (postOnline: boolean) => void,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   type: TournamentType,
   matchList: Match[],
   eventConfig?: EventConfiguration,
@@ -29,7 +35,7 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       confirmModalOpen: false,
-      postOnline: this.props.toaConfig.enabled
+      postOnline: this.props.uploadConfig.enabled
     };
     this.openConfirmModal = this.openConfirmModal.bind(this);
     this.closeConfirmModal = this.closeConfirmModal.bind(this);
@@ -38,7 +44,7 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const {eventConfig, matchList, toaConfig, tournamentRound, type} = this.props;
+    const {eventConfig, matchList, uploadConfig, tournamentRound, type} = this.props;
     const {confirmModalOpen} = this.state;
     let matches: Match[] = matchList;
     let tpa: number;
@@ -123,8 +129,8 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
               <Button color={getTheme().primary} loading={this.props.navigationDisabled} disabled={this.props.navigationDisabled} onClick={this.openConfirmModal}>Save &amp; Publish</Button>
             }
             {
-              toaConfig.enabled &&
-              <Checkbox label={"Post schedule to TOA"} checked={this.state.postOnline} onChange={this.modifyTOAEnabled}/>
+              uploadConfig.enabled &&
+              <Checkbox label={"Post schedule online"} checked={this.state.postOnline} onChange={this.modifyTOAEnabled}/>
             }
           </Card.Content>
         </Card>
@@ -153,7 +159,7 @@ class SetupMatchScheduleOverview extends React.Component<IProps, IState> {
 export function mapStateToProps({configState, internalState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
-    toaConfig: configState.toaConfig,
+    uploadConfig: configState.uploadConfig,
     navigationDisabled: internalState.navigationDisabled
   };
 }

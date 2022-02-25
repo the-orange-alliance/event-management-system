@@ -12,7 +12,7 @@ import SetupScheduleOverview from "../../../components/SetupScheduleOverview";
 import SetupMatchScheduleOverview from "../../../components/SetupMatchScheduleOverview";
 import {
   EliminationMatchesFormat, EliminationsSchedule, Event, EventConfiguration, HttpError, Match, ScheduleItem,
-  TOAConfig
+  UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import UploadManager from "../../../managers/UploadManager";
 
@@ -20,7 +20,7 @@ interface IProps {
   onComplete: () => void,
   event?: Event,
   eventConfig?: EventConfiguration,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   navigationDisabled?: boolean,
   schedule?: EliminationsSchedule,
   playoffsMatches?: Match[],
@@ -88,7 +88,7 @@ class EventEliminationsSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule() {
     this.props.setNavigationDisabled(true);
-    if (this.props.toaConfig.enabled) {
+    if (this.props.uploadConfig.enabled) {
       UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.playoffsMatches).then(() => {
         console.log(`${this.props.playoffsMatches.length} matches have been posted to TOA.`);
       }).catch((error: HttpError) => {
@@ -111,7 +111,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     navigationDisabled: internalState.navigationDisabled,
     event: configState.event,
     eventConfig: configState.eventConfiguration,
-    toaConfig: configState.toaConfig,
+    uploadConfig: configState.uploadConfig,
     playoffsSchedule: configState.playoffsSchedule, // TODO - THIS NEEDS TO CHANGE HOW DO I EVEN HANDLE THIS HELP
     playoffsMatches: internalState.playoffsMatches
   };

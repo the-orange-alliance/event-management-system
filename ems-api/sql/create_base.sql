@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS "event" (
     event_type_key VARCHAR(25),
     city VARCHAR(255),
     state_prov VARCHAR(255),
+    start_date VARCHAR(255),
+    end_date VARCHAR(255),
     country VARCHAR(255),
     website VARCHAR(255),
     field_count INT,

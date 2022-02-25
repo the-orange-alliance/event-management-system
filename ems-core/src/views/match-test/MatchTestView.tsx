@@ -12,7 +12,7 @@ import {
   TOAConfig,
   TOAProvider,
   WebProvider,
-  IFieldControlPacket, IHubMessage, HubFunctions
+  IFieldControlPacket, IHubMessage, HubFunctions, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import ExplanationIcon from "../../components/ExplanationIcon";
 import NumericInput from "../../components/NumericInput";
@@ -20,7 +20,7 @@ import UploadManager from "../../managers/UploadManager";
 
 interface IProps {
   slaveModeEnabled?: boolean,
-  toaConfig?: TOAConfig
+  uploadConfig?: UploadConfig
 }
 
 interface IState {
@@ -85,7 +85,7 @@ class MatchTestView extends React.Component<IProps, IState> {
   }
 
   public componentDidMount() {
-    if (!this.props.toaConfig.enabled) {
+    if (!this.props.uploadConfig.enabled) {
       TOAProvider.initialize(new TOAConfig());
     }
     SocketProvider.on("drop", this.updateSocketStatus);
@@ -357,7 +357,7 @@ class MatchTestView extends React.Component<IProps, IState> {
 export function mapStateToProps({configState}: IApplicationState) {
   return {
     slaveModeEnabled: configState.slaveModeEnabled,
-    toaConfig: configState.toaConfig
+    uploadConfig: configState.uploadConfig
   };
 }
 

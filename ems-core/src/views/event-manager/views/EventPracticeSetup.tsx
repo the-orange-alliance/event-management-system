@@ -12,7 +12,16 @@ import {Dispatch} from "redux";
 import {disableNavigation, setPracticeMatches} from "../../../stores/internal/actions";
 import EventCreationManager from "../../../managers/EventCreationManager";
 import DialogManager from "../../../managers/DialogManager";
-import {Event, EventConfiguration, HttpError, Match, Schedule, ScheduleItem, Team, TOAConfig} from "@the-orange-alliance/lib-ems";
+import {
+  Event,
+  EventConfiguration,
+  HttpError,
+  Match,
+  Schedule,
+  ScheduleItem,
+  Team,
+  UploadConfig
+} from "@the-orange-alliance/lib-ems";
 import SetupScheduleParticipants from "../../../components/SetupScheduleParticipants";
 import UploadManager from "../../../managers/UploadManager";
 
@@ -21,7 +30,7 @@ interface IProps {
   navigationDisabled?: boolean,
   event?: Event,
   eventConfig?: EventConfiguration,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   teamList?: Team[],
   schedule?: Schedule,
   practiceMatches?: Match[],
@@ -94,7 +103,7 @@ class EventPracticeSetup extends React.Component<IProps, IState> {
 
   private onPublishSchedule(postOnline: boolean) {
     this.props.setNavigationDisabled(true);
-    if (postOnline && this.props.toaConfig.enabled) {
+    if (postOnline && this.props.uploadConfig.enabled) {
       UploadManager.postMatchSchedule(this.props.event.eventKey, this.props.practiceMatches).then(() => {
         console.log(`${this.props.practiceMatches.length} matches have been posted online.`);
       }).catch((error: HttpError) => {
@@ -118,7 +127,7 @@ export function mapStateToProps({internalState, configState}: IApplicationState)
     teamList: internalState.teamList,
     event: configState.event,
     eventConfig: configState.eventConfiguration,
-    toaConfig: configState.toaConfig,
+    uploadConfig: configState.uploadConfig,
     schedule: configState.practiceSchedule,
     practiceMatches: internalState.practiceMatches
   };

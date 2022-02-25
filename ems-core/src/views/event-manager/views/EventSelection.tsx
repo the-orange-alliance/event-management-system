@@ -25,20 +25,21 @@ import EventCreationManager from "../../../managers/EventCreationManager";
 import {
   DropdownData, Event, EventConfiguration, HttpError, Match, PlayoffsType, Region, RegionData,
   SeasonData,
-  TOAConfig, DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET, FRC_IR_PRESET, FRC_RR_PRESET,
+  DEFAULT_RESET, FTC_RELIC_PRESET, FGC_PRESET, FTC_ROVER_PRESET, FRC_IR_PRESET, FRC_RR_PRESET,
   EliminationMatchesFormat, RankingMatchesFormat, RoundRobinFormat, SeriesType, ROUND_ROBIN_PRESET, RANKING_PRESET,
-  ELIMINATIONS_PRESET, AppError, TournamentRound
+  ELIMINATIONS_PRESET, AppError, TournamentRound, UploadConfig
 } from "@the-orange-alliance/lib-ems";
 import NumericInput from "../../../components/NumericInput";
 import MatchManager from "../../../managers/MatchManager";
 import TournamentValidator from "../../../validators/TournamentValidator";
-import UploadManager, {FGC} from "../../../managers/UploadManager";
+import UploadManager from "../../../managers/UploadManager";
+import {Providers} from "@the-orange-alliance/lib-ems/dist/models/ems/EventConfiguration";
 
 interface IProps {
   onComplete: () => void,
   eventConfig?: EventConfiguration,
   event?: Event,
-  toaConfig?: TOAConfig,
+  uploadConfig?: UploadConfig,
   selectConfigPreset?: (preset: EventConfiguration) => ISetEventConfiguration
   setEvent?: (event: Event) => ISetEvent,
   setTestMatches?: (matches: Match[]) => ISetTestMatches,
@@ -50,14 +51,44 @@ interface IState {
   downloadingData: boolean
 }
 
+const uploadOptions = [
+  {
+    key: Providers.TOA,
+    text: 'The Orange Alliance (FTC Only)',
+    value: Providers.TOA,
+  },
+  {
+    key: Providers.TBA,
+    text: 'The Blue Alliance (FRC 2022+ Only)',
+    value: Providers.TBA,
+  },
+  {
+    key: Providers.FGA,
+    text: 'The Global Alliance (FGC Only)',
+    value: Providers.FGA,
+  },
+  {
+    key: Providers.FCA,
+    text: 'The Collegiate Alliance (FRC Only)',
+    value: Providers.FCA,
+  },
+  {
+    key: Providers.CUSTOM,
+    text: 'Custom Provider',
+    value: Providers.CUSTOM,
+  },
+]
+
 class EventSelection extends React.Component<IProps, IState> {
   private _validator: EventCreationValidator;
   private _tournamentValidator: TournamentValidator;
 
   constructor(props: IProps) {
     super(props);
-    this.setTOAEventKey = this.setTOAEventKey.bind(this);
-    this.setTOAKey = this.setTOAKey.bind(this);
+    this.setLiveEventKey = this.setLiveEventKey.bind(this);
+    this.setApiKey = this.setApiKey.bind(this);
+    this.setSecret = this.setSecret.bind(this);
+    this.setClientId = this.setClientId.bind(this);
     this.setTeamsPerAlliance = this.setTeamsPerAlliance.bind(this);
     this.setAdvancementConfig = this.setAdvancementConfig.bind(this);
     this.setAdvancementTeamsPerAlliance = this.setAdvancementTeamsPerAlliance.bind(this);
@@ -136,39 +167,75 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   private renderDownloadAndVerification(): JSX.Element {
-    const {eventConfig, toaConfig} = this.props;
+    const {eventConfig, uploadConfig} = this.props;
     const {downloadingData} = this.state;
-    const downloadDisabled: boolean = !eventConfig.requiresTOA || toaConfig.eventKey.length <= 0 || toaConfig.apiKey.length <= 0;
+    const toaNotReady = eventConfig.uploadType === Providers.TOA && uploadConfig.toaConfig.apiKey.length <= 0;
+    const tbaNotReady = eventConfig.uploadType === Providers.TBA && (uploadConfig.tbaConfig.secret.length <= 0 || uploadConfig.tbaConfig.clientId.length <= 0)
+    const downloadDisabled: boolean = !eventConfig.uploadLive || uploadConfig.eventKey.length <= 0 || toaNotReady || tbaNotReady ;
     return (
       <Form>
         <Grid>
           <Grid.Row columns={16}>
-            <Grid.Column width={8}>Would you like to live upload match results to The Orange Alliance?</Grid.Column>
-            <Grid.Column width={2}><Radio label="Yes" checked={eventConfig.requiresTOA} onClick={this.setConfigRequiresTOA.bind(this, true)}/></Grid.Column>
-            <Grid.Column width={2}><Radio label="No" checked={!eventConfig.requiresTOA} onClick={this.setConfigRequiresTOA.bind(this, false)}/></Grid.Column>
+            <Grid.Column width={8}>Would you like to live upload match results?</Grid.Column>
+            <Grid.Column width={2}><Radio label="Yes" checked={eventConfig.uploadLive} onClick={this.setConfigUploadLive.bind(this, true)}/></Grid.Column>
+            <Grid.Column width={2}><Radio label="No" checked={!eventConfig.uploadLive} onClick={this.setConfigUploadLive.bind(this, false)}/></Grid.Column>
           </Grid.Row>
           {
-            eventConfig.requiresTOA &&
-            <Grid.Row columns="equal">
-              <Grid.Column>
-                <Form.Group widths="equal">
-                  <Form.Input
-                    label="TOA Event Code"
-                    placeholder="####-###-####"
-                    value={toaConfig.eventKey}
-                    onChange={this.setTOAEventKey}
-                    error={toaConfig.eventKey.length <= 0}
+            eventConfig.uploadLive &&
+            <>
+              <Grid.Row columns={"equal"}>
+                <Grid.Column widths={"equal"}>
+                  <Form.Dropdown
+                    placeholder={'Select Provider'}
+                    fluid
+                    selection
+                    options={uploadOptions}
+                    value={eventConfig.uploadType}
+                    onChange={(e, p) => this.setConfigUploadProvider(p.value as number)}
                   />
-                  <Form.Input
-                    label="TOA API Key"
-                    placeholder="Encrypted API Key"
-                    value={toaConfig.apiKey}
-                    onChange={this.setTOAKey}
-                    error={toaConfig.apiKey.length <= 0}
-                  />
-                </Form.Group>
-              </Grid.Column>
-            </Grid.Row>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row columns="equal">
+                <Grid.Column>
+                  <Form.Group widths="equal">
+                    <Form.Input
+                      label="Event Code"
+                      placeholder="####-###-#### (TOA) | ##-##-### (FCC, FGC) | ######### (TBA)"
+                      value={uploadConfig.eventKey}
+                      onChange={this.setLiveEventKey}
+                      error={uploadConfig.eventKey.length <= 0}
+                    />
+                    {eventConfig.uploadType === Providers.TBA &&
+                      <>
+                        <Form.Input
+                          label="TBA Secret Key"
+                          placeholder="Secret Key"
+                          value={uploadConfig.tbaConfig.secret}
+                          onChange={this.setSecret}
+                          error={uploadConfig.tbaConfig.secret.length <= 0}
+                        />
+                        <Form.Input
+                          label="TBA Client ID"
+                          placeholder="Client ID"
+                          value={uploadConfig.tbaConfig.clientId}
+                          onChange={this.setClientId}
+                          error={uploadConfig.tbaConfig.clientId.length <= 0}
+                        />
+                      </>
+                    }
+                    {eventConfig.uploadType === Providers.TOA &&
+                      <Form.Input
+                        label="TOA API Key"
+                        placeholder="Encrypted API Key"
+                        value={uploadConfig.toaConfig.apiKey}
+                        onChange={this.setApiKey}
+                        error={uploadConfig.toaConfig.apiKey.length <= 0}
+                      />
+                    }
+                  </Form.Group>
+                </Grid.Column>
+              </Grid.Row>
+            </>
           }
           <Grid.Row columns={16}>
             <Grid.Column width={4}><Button fluid={true} loading={downloadingData} color={getTheme().primary} disabled={downloadDisabled || downloadingData} onClick={this.downloadTOAData}>Download Event Data</Button></Grid.Column>
@@ -191,14 +258,7 @@ class EventSelection extends React.Component<IProps, IState> {
           <Grid.Row columns={16}>
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={SeasonData.SeasonItems} disabled={true} value={SeasonData.getFromEventType(this.props.eventConfig.eventType).value} label="Season"/></Grid.Column>
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={RegionData.RegionItems} value={selectedRegion} onChange={this.setEventRegion} error={!isValidRegion} label="Region"/></Grid.Column>
-            {
-              this.props.eventConfig.requiresTOA &&
-              <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={[]} error={!eventValidator.isValidEventKey()} label="Event"/></Grid.Column>
-            }
-            {
-              !this.props.eventConfig.requiresTOA &&
-              <Grid.Column width={4}><Form.Input fluid={true} value={event.eventCode} onChange={this.setEventCode} error={!eventValidator.isValidEventKey()} label={<ExplanationIcon title={"Event Code"} content={"An event's code is a 3-4 letter combination that is used to represent the event. For example, Great Lakes Bay Region event could be coded into GLBR."}/>}/></Grid.Column>
-            }
+            <Grid.Column width={4}><Form.Input fluid={true} value={event.eventCode} onChange={this.setEventCode} error={!eventValidator.isValidEventKey()} label={<ExplanationIcon title={"Event Code"} content={"An event's code is a 3-4 letter combination that is used to represent the event. For example, Great Lakes Bay Region event could be coded into GLBR."}/>}/></Grid.Column>
             <Grid.Column width={4}><Form.Dropdown fluid={true} selection={true} options={DropdownData.EventTypeItems} value={selectedEventType} onChange={this.setEventType} error={!isValidEventType} label="Event Type"/></Grid.Column>
           </Grid.Row>
           <Grid.Row columns={16}>
@@ -328,19 +388,19 @@ class EventSelection extends React.Component<IProps, IState> {
   /* Online Download Methods */
   private downloadTOAData() {
     this.setState({downloadingData: true});
-    UploadManager.initialize(FGC, this.props.toaConfig);
-    UploadManager.getEvent(this.props.toaConfig.eventKey).then((event: Event) => {
+    UploadManager.initialize(this.props.eventConfig.uploadType, this.props.uploadConfig);
+    UploadManager.getEvent(this.props.uploadConfig.eventKey).then((event: Event) => {
       if (event && event.eventKey && event.eventKey.length > 0) {
         this.props.setEvent(event);
-        this.props.toaConfig.enabled = true;
+        this.props.uploadConfig.enabled = true;
         this._validator.update(this.props.eventConfig, this.props.event);
         this.forceUpdate();
       } else {
-        DialogManager.showInfoBox("TheOrangeAlliance", `The Orange Alliance does not contain any event info for "${this.props.toaConfig.eventKey}". Are you sure your event information is posted online?`);
+        DialogManager.showInfoBox("Event Management System - Data Download", `Your Live Provider does not contain any event info for "${this.props.uploadConfig.eventKey}". Are you sure your event information is posted online?`);
       }
       this.setState({downloadingData: false});
     }).catch((error: HttpError) => {
-      this.props.toaConfig.enabled = false;
+      this.props.uploadConfig.enabled = false;
       console.log(error);
       this.setState({downloadingData: false});
       DialogManager.showErrorBox(error);
@@ -348,16 +408,30 @@ class EventSelection extends React.Component<IProps, IState> {
   }
 
   /* TOA Configuration Methods */
-  private setTOAEventKey(event: SyntheticEvent, props: InputProps) {
+  private setLiveEventKey(event: SyntheticEvent, props: InputProps) {
     if (typeof props.value === "string") {
-      this.props.toaConfig.eventKey = props.value;
+      this.props.uploadConfig.eventKey = props.value;
       this.forceUpdate();
     }
   }
 
-  private setTOAKey(event: SyntheticEvent, props: InputProps) {
+  private setApiKey(event: SyntheticEvent, props: InputProps) {
     if (typeof props.value === "string") {
-      this.props.toaConfig.apiKey = props.value;
+      this.props.uploadConfig.toaConfig.apiKey = props.value;
+      this.forceUpdate();
+    }
+  }
+
+  private setSecret(event: SyntheticEvent, props: InputProps) {
+    if (typeof props.value === "string") {
+      this.props.uploadConfig.tbaConfig.secret = props.value;
+      this.forceUpdate();
+    }
+  }
+
+  private setClientId(event: SyntheticEvent, props: InputProps) {
+    if (typeof props.value === "string") {
+      this.props.uploadConfig.tbaConfig.clientId = props.value;
       this.forceUpdate();
     }
   }
@@ -371,8 +445,16 @@ class EventSelection extends React.Component<IProps, IState> {
     this.forceUpdate();
   }
 
-  private setConfigRequiresTOA(requiresTOA: boolean) {
-    this.props.eventConfig.requiresTOA = requiresTOA;
+  private setConfigUploadLive(uploadLive: boolean) {
+    this.props.eventConfig.uploadLive = uploadLive;
+    this.props.selectConfigPreset(this.props.eventConfig);
+    this.forceUpdate();
+  }
+
+  private setConfigUploadProvider(provider: number) {
+    console.log('Updating Live Provider: ' + provider);
+    this.props.eventConfig.uploadType = provider;
+    UploadManager.initialize(provider, this.props.uploadConfig)
     this.props.selectConfigPreset(this.props.eventConfig);
     this.forceUpdate();
   }
@@ -475,6 +557,7 @@ class EventSelection extends React.Component<IProps, IState> {
   private setEventCode(event: SyntheticEvent, props: InputProps) {
     if (typeof props.value === "string") {
       this.props.event.eventCode = props.value.toString().toUpperCase();
+      console.log(this.props.event.eventKey)
       this.props.setEvent(this.props.event);
       this._validator.update(this.props.eventConfig, this.props.event);
       this.forceUpdate();
@@ -548,8 +631,8 @@ class EventSelection extends React.Component<IProps, IState> {
     this.setState({creatingEvent: true});
     this.props.setNavigationDisabled(true);
     this.props.event.eventType = this.props.eventConfig.eventType;
-    const toaConfig = (this.props.toaConfig.enabled && this.props.eventConfig.requiresTOA) ? this.props.toaConfig.toJSON() : undefined;
-    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), toaConfig: toaConfig}).catch((err) => console.log(err));
+    const uploadConfig = (this.props.eventConfig.uploadLive) ? this.props.uploadConfig.toJSON() : undefined;
+    CONFIG_STORE.setAll({event: this.props.event.toJSON(), eventConfig: this.props.eventConfig.toJSON(), uploadConfig: uploadConfig}).catch((err) => console.log(err));
     EventCreationManager.createEventDatabase(this.props.eventConfig.eventType, this.props.event).then(() => {
       console.log(this.props.event);
       console.log(this.props.eventConfig);
@@ -578,7 +661,7 @@ export function mapStateToProps({configState}: IApplicationState) {
   return {
     eventConfig: configState.eventConfiguration,
     event: configState.event,
-    toaConfig: configState.toaConfig
+    uploadConfig: configState.uploadConfig
   };
 }
 

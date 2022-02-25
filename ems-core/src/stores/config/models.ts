@@ -1,4 +1,10 @@
-import {EventConfiguration, MatchConfiguration, Schedule, TOAConfig, Event} from "@the-orange-alliance/lib-ems";
+import {
+  EventConfiguration,
+  MatchConfiguration,
+  Schedule,
+  Event,
+  UploadConfig
+} from "@the-orange-alliance/lib-ems";
 
 export interface IConfigState {
   slaveModeEnabled: boolean,
@@ -11,7 +17,7 @@ export interface IConfigState {
   practiceSchedule: Schedule,
   qualificationSchedule: Schedule,
   playoffsSchedule: Schedule[],
-  toaConfig: TOAConfig,
+  uploadConfig: UploadConfig,
   backupDir: string,
   apiKey: string
 }

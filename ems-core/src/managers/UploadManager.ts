@@ -40,6 +40,7 @@ class UploadManager {
     if (this._type === Providers.FGA || this._type === Providers.FCA) {
       FGCProvider.initialize(this._type);
     }
+    
     if (this._type === Providers.TBA) {
       if(!config.tbaConfig) config.tbaConfig = new TBAConfig();
       TBAProvider.initialize(config.tbaConfig.secret, config.tbaConfig.clientId);

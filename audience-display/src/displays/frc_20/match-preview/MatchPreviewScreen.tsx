@@ -11,9 +11,6 @@ interface IProps {
 }
 
 class MatchPreviewScreen extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {event, match} = this.props;

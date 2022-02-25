@@ -18,9 +18,6 @@ interface IProps {
 }
 
 class OceanOpportunities extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {displayMode, match, videoID} = this.props;

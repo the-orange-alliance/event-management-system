@@ -18,9 +18,6 @@ interface IProps {
 }
 
 class RoverRuckus extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {displayMode, event, match, videoID} = this.props;

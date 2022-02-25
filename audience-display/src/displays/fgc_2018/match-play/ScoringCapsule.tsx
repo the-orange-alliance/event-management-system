@@ -20,9 +20,6 @@ interface IProps {
 }
 
 class SolarCapsule extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   private getCapsuleImage(allianceColor: string, solarPanelCount: number) {
     if (allianceColor === "red") {
@@ -65,7 +62,7 @@ class SolarCapsule extends React.Component<IProps> {
   public render() {
     return (
       <div className="scoring-capsule-container">
-        <img alt={'capsule image'} src={this.getCapsuleImage(this.props.allianceColor, this.props.solarPanelCount)} className="fit-w"/>
+        <img alt={'capsule'} src={this.getCapsuleImage(this.props.allianceColor, this.props.solarPanelCount)} className="fit-w"/>
       </div>
     );
   }

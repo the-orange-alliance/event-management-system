@@ -16,9 +16,6 @@ interface IProps {
 }
 
 class EnergyImpact extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {videoID, match} = this.props;

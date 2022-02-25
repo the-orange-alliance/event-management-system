@@ -18,9 +18,6 @@ interface IProps {
 }
 
 class RapidReact extends React.Component<IProps> {
-  public constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     // const {displayMode, event, match, videoID} = this.props;

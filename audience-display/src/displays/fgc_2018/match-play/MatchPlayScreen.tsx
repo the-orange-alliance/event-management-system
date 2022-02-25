@@ -92,10 +92,14 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
     SocketProvider.on("onSolar", (solarObj: any) => {
       const alliance = solarObj.alliance_index === 0 ? "red" : "blue";
       if (solarObj.value === true) {
-        this.state.panels[alliance]++;
+        const panels = this.state.panels;
+        panels[alliance]++;
+        this.setState({panels});
       } else {
         if (this.state.panels[alliance] > 0) {
-          this.state.panels[alliance]--;
+          const panels = this.state.panels;
+          panels[alliance]--;
+          this.setState({panels});
         }
       }
       this.forceUpdate();

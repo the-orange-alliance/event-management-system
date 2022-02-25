@@ -7,9 +7,6 @@ interface IProps {
 }
 
 class TwoAllianceBracket extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     return (

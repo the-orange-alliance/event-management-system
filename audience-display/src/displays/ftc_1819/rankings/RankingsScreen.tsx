@@ -126,14 +126,14 @@ class RankingsScreen extends React.Component<IProps, IState> {
       const scrollToBottom = new Promise((resolve, reject) => {
         ReactScroll.Events.scrollEvent.register("end", () => {
           ReactScroll.Events.scrollEvent.remove("end");
-          resolve();
+          resolve(undefined);
         });
         this.scrollToBottom(48000);
       });
       scrollToBottom.then(() => {
         this.scrollToTop(4000);
         setTimeout(() => {
-          funcResolve();
+          funcResolve(undefined);
         });
       });
     });

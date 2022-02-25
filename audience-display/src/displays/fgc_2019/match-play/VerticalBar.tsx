@@ -8,9 +8,6 @@ interface IProps {
 }
 
 class VerticalBar extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {alliance, fillHeight, label} = this.props;

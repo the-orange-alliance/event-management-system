@@ -7,9 +7,6 @@ interface IProps {
 }
 
 class CoopertitionBar extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {alliance, fillWidth} = this.props;

@@ -9,9 +9,6 @@ interface IProps {
 }
 
 class ScoringComponent extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     return (

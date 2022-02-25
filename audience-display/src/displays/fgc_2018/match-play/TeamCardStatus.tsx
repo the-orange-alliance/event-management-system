@@ -9,9 +9,6 @@ interface IProps {
 }
 
 class TeamCardStatus extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   private getCardImage(cardStatus: number) {
     switch (cardStatus) {

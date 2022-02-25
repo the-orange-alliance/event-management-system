@@ -13,9 +13,6 @@ interface IProps {
 }
 
 class MatchResultsScreen extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
 
   public render() {
     const {event, match} = this.props;

@@ -18,7 +18,7 @@ class RobotCardStatus extends React.Component<IProps> {
     return (
       <div className="robot-card-container">
         <div className="robot-card-team">
-          {participant.team.teamNameShort}
+          {`${participant.teamKey} - ${participant.team.teamNameShort}`}
         </div>
         <div className="robot-card-cards">
           <div className={"robot-card-none " + (selected === 0 ? "selected" : "")} onClick={this.updateSelected.bind(this, 0)}>None</div>

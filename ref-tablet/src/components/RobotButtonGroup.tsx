@@ -29,7 +29,7 @@ class RobotButtonGroup extends React.Component<IProps> {
     let labelView;
 
     if (typeof participant !== "undefined") {
-      labelView = (<span>{participant.team ? participant.team.teamNameShort : participant.teamKey}</span>);
+      labelView = (<span>{participant.teamKey} - {participant.team ? participant.team.teamNameShort : participant.teamKey}</span>);
     } else if (typeof label !== "undefined") {
       labelView = (<span>{label}</span>);
     }

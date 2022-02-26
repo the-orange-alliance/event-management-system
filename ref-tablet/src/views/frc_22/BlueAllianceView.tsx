@@ -239,14 +239,14 @@ class BlueAllianceView extends React.Component<IProps, IState> {
     return (
       <div>
         <Row>
-          <Col sm={6}>
+          <Col lg={6} md={12}>
             <Row>
               <Col sm={12}>
                 {robotAutoLineViews}
               </Col>
             </Row>
           </Col>
-          <Col sm={6}>
+          <Col lg={6} md={12}>
             <Row>
               <Col sm={12}>
                 <RobotButtonGroup value={details.blueHangarBonus ? 1 : 0} label={"Hangar Bonus"} states={["None", "Achieved"]} onChange={this.updateHangarBonus}/>

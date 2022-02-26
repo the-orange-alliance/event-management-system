@@ -54,7 +54,7 @@ class FRC22BlueScorecard extends React.Component<IProps> {
     const details = this.getDetails();
     const disabled = this.props.matchState === MatchState.MATCH_IN_PROGRESS || match === null || typeof match.matchDetails === "undefined";
     return (
-      <Card fluid={true} className="scorecard blue-bg">
+      <Card  className="scorecard blue-bg">
         <Card.Content className="center-items card-header"><Card.Header>Blue Alliance Scorecard</Card.Header></Card.Content>
         <Card.Content>
           <FRC20TeamStatus alliance={"Blue"} />
@@ -63,23 +63,13 @@ class FRC22BlueScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 1 Taxied" checked={this.boolCheck(details.blueAutoTaxiRobot1)} onChange={this.modifyRobotOneTaxi}/></Grid.Column>
-                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 2 Taxied" checked={this.boolCheck(details.blueAutoTaxiRobot2)} onChange={this.modifyRobotTwoTaxi}/></Grid.Column>
-                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 3 Taxied" checked={this.boolCheck(details.blueAutoTaxiRobot3)} onChange={this.modifyRobotThreeTaxi}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled}  label="Auto Robot 1 Taxied" checked={this.boolCheck(details.blueAutoTaxiRobot1)} onChange={this.modifyRobotOneTaxi}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled}  label="Auto Robot 2 Taxied" checked={this.boolCheck(details.blueAutoTaxiRobot2)} onChange={this.modifyRobotTwoTaxi}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled}  label="Auto Robot 3 Taxied" checked={this.boolCheck(details.blueAutoTaxiRobot3)} onChange={this.modifyRobotThreeTaxi}/></Grid.Column>
               </Grid.Row>
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Low Cargo" value={details.blueAutoCargoLow} onChange={this.modifyAutoLowCargo}/></Grid.Column>
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto High Cargo" value={details.blueAutoCargoHigh} onChange={this.modifyAutoHighCargo}/></Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </Form>
-        </Card.Content>
-        <Card.Content>
-          <Form>
-            <Grid className="details">
-              <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele Low Cargo" value={details.blueTeleCargoLow} onChange={this.modifyTeleLowCargo}/></Grid.Column>
-                <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Tele High Cargo" value={details.blueTeleCargoHigh} onChange={this.modifyTeleHighCargo}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled}  label="Auto Low Cargo" value={details.blueAutoCargoLow} onChange={this.modifyAutoLowCargo}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled}  label="Auto High Cargo" value={details.blueAutoCargoHigh} onChange={this.modifyAutoHighCargo}/></Grid.Column>
               </Grid.Row>
             </Grid>
           </Form>
@@ -88,8 +78,8 @@ class FRC22BlueScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Hangar Bonus?" checked={this.boolCheck(details.blueHangarBonus)} onChange={this.modifyHangarBonus}/></Grid.Column>
-                <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Cargo Bonus?" checked={this.boolCheck(details.blueCargoBonus)} onChange={this.modifyCargoBonus}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled}  label="Tele Low Cargo" value={details.blueTeleCargoLow} onChange={this.modifyTeleLowCargo}/></Grid.Column>
+                <Grid.Column className="align-bottom"><Form.Input disabled={disabled}  label="Tele High Cargo" value={details.blueTeleCargoHigh} onChange={this.modifyTeleHighCargo}/></Grid.Column>
               </Grid.Row>
             </Grid>
           </Form>
@@ -98,9 +88,8 @@ class FRC22BlueScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 1 Endgame" value={details.blueHangerRobot1} options={DropdownData.RapidReactEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 2 Endgame" value={details.blueHangerRobot2} options={DropdownData.RapidReactEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
-                <Grid.Column><Form.Dropdown disabled={disabled} fluid={true} label="Robot 3 Endgame" value={details.blueHangerRobot3} options={DropdownData.RapidReactEndItems} onChange={this.modifyRobotThreeEndgame}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled}  label="Hangar Bonus?" checked={this.boolCheck(details.blueHangarBonus)} onChange={this.modifyHangarBonus}/></Grid.Column>
+                <Grid.Column><Form.Checkbox disabled={disabled}  label="Cargo Bonus?" checked={this.boolCheck(details.blueCargoBonus)} onChange={this.modifyCargoBonus}/></Grid.Column>
               </Grid.Row>
             </Grid>
           </Form>
@@ -109,8 +98,19 @@ class FRC22BlueScorecard extends React.Component<IProps> {
           <Form>
             <Grid className="details">
               <Grid.Row columns="equal" textAlign="center">
-                <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Fouls (4pt)" value={match.blueMinPen} onChange={this.modifyMinorPenalties}/></Grid.Column>
-                <Grid.Column><Form.Input disabled={disabled} fluid={true} label="Tech Fouls (8pt)" value={match.blueMajPen} onChange={this.modifyMajorPenalties}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled}  label="Robot 1 Endgame" value={details.blueHangerRobot1} options={DropdownData.RapidReactEndItems} onChange={this.modifyRobotOneEndgame}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled}  label="Robot 2 Endgame" value={details.blueHangerRobot2} options={DropdownData.RapidReactEndItems} onChange={this.modifyRobotTwoEndgame}/></Grid.Column>
+                <Grid.Column><Form.Dropdown disabled={disabled}  label="Robot 3 Endgame" value={details.blueHangerRobot3} options={DropdownData.RapidReactEndItems} onChange={this.modifyRobotThreeEndgame}/></Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Form>
+        </Card.Content>
+        <Card.Content>
+          <Form>
+            <Grid className="details">
+              <Grid.Row columns="equal" textAlign="center">
+                <Grid.Column><Form.Input disabled={disabled}  label="Fouls (4pt)" value={match.blueMinPen} onChange={this.modifyMinorPenalties}/></Grid.Column>
+                <Grid.Column><Form.Input disabled={disabled}  label="Tech Fouls (8pt)" value={match.blueMajPen} onChange={this.modifyMajorPenalties}/></Grid.Column>
               </Grid.Row>
               <Grid.Row>
                 <Grid.Column>Score: {match.blueScore}</Grid.Column>

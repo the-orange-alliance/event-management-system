@@ -119,6 +119,8 @@ class MatchPlay extends React.Component<IProps, IState> {
     });
 
     const availableMatches = this.getMatchesByTournamentLevel(selectedLevel).map(match => {
+      console.log(selectedLevel);
+      console.log("here?");
       return {
         text: match.matchName,
         value: match.matchKey
@@ -396,6 +398,7 @@ class MatchPlay extends React.Component<IProps, IState> {
   }
 
   private getMatchesByTournamentLevel(tournamentLevel: TournamentType): Match[] {
+    console.log("double here: " + tournamentLevel);
     switch (tournamentLevel) {
       case "Test":
         return this.props.testMatches;

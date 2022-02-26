@@ -64,9 +64,9 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
             <Form>
               <Grid className="details">
                 <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 1 Taxied" checked={this.boolCheck(details.redAutoTaxiRobot1)} onChange={this.modifyRobotOneTaxi}/></Grid.Column>
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 2 Taxied" checked={this.boolCheck(details.redAutoTaxiRobot2)} onChange={this.modifyRobotTwoTaxi}/></Grid.Column>
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Auto Robot 3 Taxied" checked={this.boolCheck(details.redAutoTaxiRobot3)} onChange={this.modifyRobotThreeTaxi}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} label="Auto Robot 1 Taxied" checked={this.boolCheck(details.redAutoTaxiRobot1)} onChange={this.modifyRobotOneTaxi}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} label="Auto Robot 2 Taxied" checked={this.boolCheck(details.redAutoTaxiRobot2)} onChange={this.modifyRobotTwoTaxi}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} label="Auto Robot 3 Taxied" checked={this.boolCheck(details.redAutoTaxiRobot3)} onChange={this.modifyRobotThreeTaxi}/></Grid.Column>
                 </Grid.Row>
                 <Grid.Row columns="equal" textAlign="center">
                   <Grid.Column className="align-bottom"><Form.Input disabled={disabled} fluid={true} label="Auto Low Cargo" value={details.redAutoCargoLow} onChange={this.modifyAutoLowCargo}/></Grid.Column>
@@ -89,8 +89,8 @@ class RoverRuckusRedScorecard extends React.Component<IProps> {
             <Form>
               <Grid className="details">
                 <Grid.Row columns="equal" textAlign="center">
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Hangar Bonus?" checked={this.boolCheck(details.redHangarBonus)} onChange={this.modifyHangarBonus}/></Grid.Column>
-                  <Grid.Column><Form.Checkbox disabled={disabled} fluid={true} label="Cargo Bonus?" checked={this.boolCheck(details.redCargoBonus)} onChange={this.modifyCargoBonus}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} label="Hangar Bonus?" checked={this.boolCheck(details.redHangarBonus)} onChange={this.modifyHangarBonus}/></Grid.Column>
+                  <Grid.Column><Form.Checkbox disabled={disabled} label="Cargo Bonus?" checked={this.boolCheck(details.redCargoBonus)} onChange={this.modifyCargoBonus}/></Grid.Column>
                 </Grid.Row>
               </Grid>
             </Form>

@@ -3,7 +3,7 @@ import * as url from "url";
 import * as path from "path";
 import logger from "./main/Logger";
 
-require("dotenv").config({path: path.join(__dirname, ".env")});
+require("dotenv").config({path: path.join(__dirname, "../.env")});
 
 const prod: boolean = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging";
 

@@ -76,10 +76,22 @@ authLoop(false);
  * be able to see all connected clients. Clients can't send/receive any events until they identify themselves.
  */
 socket.on("connection", async (client: Socket) => {
+  const bypassAuth = true;
 
-  const user: User | null = await EMSProvider.verifyAuth(client.handshake.query.authorization).catch((err) => {logger.error(err); return null});
+  let user: User | null;
+  if(!bypassAuth) {
+    user = await EMSProvider.verifyAuth(client.handshake.query.authorization).catch((err) => {logger.error(err); return null});
+  } else {
+    user = new User();
+    user.canRef = true;
+    user.canControlEvent = true;
+    user.canControlFms = true;
+    user.canControlMatch = true;
+  }
 
-  if (user) logger.info(`Client connection '${client.id}' authenticated. Privileges: ${(user.canRef ? 'Ref,' : '')} ${(user.canControlFms ? 'FMS,' : '')} ${(user.canControlMatch ? 'Match Control,' : '')} ${(user.canControlEvent ? 'Event Control' : '')}`);
+
+  if (user && bypassAuth) logger.info(`Client connection '${client.id}' authenticated. All privileges granted, authentication bypassed`);
+  if (user && !bypassAuth) logger.info(`Client connection '${client.id}' authenticated. Privileges: ${(user.canRef ? 'Ref,' : '')} ${(user.canControlFms ? 'FMS,' : '')} ${(user.canControlMatch ? 'Match Control,' : '')} ${(user.canControlEvent ? 'Event Control' : '')}`);
   if (!user) logger.info(`Client connection '${client.id}' connected with no or invalid authorization.`);
 
   client.on("identify", (clientStr: string, rooms: string[]) => {

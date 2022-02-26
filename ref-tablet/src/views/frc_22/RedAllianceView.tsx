@@ -95,7 +95,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
 
     return (
       <div className={"alliance-view"}>
-        <div className={"alliance-header red-bg"}>Blue Alliance</div>
+        <div className={"alliance-header red-bg"}>Red Alliance</div>
         <StatusBar match={match} mode={mode} connected={connected}/>
         <Nav tabs={true}>
           <NavItem>
@@ -249,13 +249,13 @@ class RedAllianceView extends React.Component<IProps, IState> {
           <Col sm={6}>
             <Row>
               <Col sm={12}>
-                <RobotButtonGroup value={details.redHangarBonus ? 1 : 0} label={"Rotation Control"} states={["None", "Achieved"]} onChange={this.updateHangarBonus}/>
+                <RobotButtonGroup value={details.redHangarBonus ? 1 : 0} label={"Hangar Bonus"} states={["None", "Achieved"]} onChange={this.updateHangarBonus}/>
                 <h6 className={'text-center'}>
                   ALLIANCE is credited with at least 16 HANGAR points
                 </h6>
               </Col>
               <Col sm={12}>
-                <RobotButtonGroup value={details.redCargoBonus ? 1 : 0} label={"Position Control"} states={["None", "Achieved"]} onChange={this.updateCargoBonus}/>
+                <RobotButtonGroup value={details.redCargoBonus ? 1 : 0} label={"Cargo Bonus"} states={["None", "Achieved"]} onChange={this.updateCargoBonus}/>
                 <h6 className={'text-center'}>
                   20 or more ALLIANCE colored CARGO scored in the HUB.
                   If at least 5 ALLIANCE colored CARGO are scored in
@@ -273,7 +273,7 @@ class RedAllianceView extends React.Component<IProps, IState> {
     const {match} = this.props;
     const minorPenalties = match.redMinPen || 0;
     const majorPenalties = match.redMajPen || 0;
-    const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station >= 20) : [];
+    const redParticipants: MatchParticipant[] = match.participants.length > 0 ? match.participants.filter((p: MatchParticipant) => p.station <= 20) : [];
 
     const participantCards = redParticipants.map((p: MatchParticipant) => {
       return (

@@ -1,8 +1,10 @@
 import * as React from 'react';
 import "./RankingsScreen.css";
 import {EMSProvider, Ranking, Event, InfiniteRechargeRank} from "@the-orange-alliance/lib-ems";
-import FACC_LOGO from "../res/facc-large-bg-dark.png";
-import FACC_LOGO_TEXT from "../res/facc-large-text-underneath-bg-dark.png";
+// import FACC_LOGO from "../res/facc-large-bg-dark.png";
+// import FACC_LOGO_TEXT from "../res/facc-large-text-underneath-bg-dark.png";
+import FRC_LOGO from "../res/frc-horiz.png";
+import GAME_LOGO from "../res/rapid_react_white.png";
 import TOA_LOGO from "../res/toa-generic-lol.png";
 
 interface IProps {
@@ -60,7 +62,7 @@ class RankingsScreen extends React.Component<IProps, IState> {
           <div id="ir-rank-top" className="ir-border">
             <div className="col-left"><img alt={'toa logo'} src={TOA_LOGO} className="fit-h"/></div>
             <div className="center-items ir-rank-title">Event Rankings</div>
-            <div className="col-right"><img alt={'facc logo'} src={FACC_LOGO} className="fit-h"/></div>
+            <div className="col-right"><img alt={'FRC logo'} src={FRC_LOGO} className="fit-h"/></div>
           </div>
           <div id="ir-rank-mid" className="ir-border">
             <div id="ir-rank-table-container">
@@ -84,10 +86,10 @@ class RankingsScreen extends React.Component<IProps, IState> {
             </div>
           </div>
           <div id="ir-rank-bot" className="ir-border">
-            <div className="ir-bot-logo"><img alt={'facc logo text'} src={FACC_LOGO_TEXT} className="fit-h"/></div>
+            <div className="ir-bot-logo"><img alt={'game logo'} src={GAME_LOGO} className="fit-h"/></div>
             <div className="ir-bot-text">
               <span>{event.eventName}</span>
-              <span>Watch live! https://twitch.tv/FirstUpdatesNow</span>
+              <span>Watch live! twitch.tv/RoboZonePodcast</span>
             </div>
           </div>
         </div>

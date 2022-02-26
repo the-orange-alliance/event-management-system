@@ -31,8 +31,8 @@ class App extends React.Component<IProps, IState> {
       EMSProvider.initialize((this.props.cookies.get("host") as string));
       SocketProvider.initialize((this.props.cookies.get("host") as string), EMSProvider);
     } else {
-      EMSProvider.initialize("192.168.0.217");
-      SocketProvider.initialize("192.168.0.217", EMSProvider);
+      EMSProvider.initialize("192.168.1.2");
+      SocketProvider.initialize("192.168.1.2", EMSProvider);
     }
 
     const key = this.props.cookies.get('login');

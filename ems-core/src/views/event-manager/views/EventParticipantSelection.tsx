@@ -130,6 +130,7 @@ class EventParticipantSelection extends React.Component<IProps, IState> {
       updatedTeams[i].participantKey = this.props.event.eventKey + "-T" + this.props.teams[i].teamKey;
     }
     if (this.props.uploadConfig.enabled) {
+      console.log(updatedTeams);
       UploadManager.postEventParticipants(this.props.uploadConfig.eventKey, updatedTeams).then(() => {
         console.log(`${updatedTeams.length} teams have been posted online.`);
       }).catch((error: HttpError) => {

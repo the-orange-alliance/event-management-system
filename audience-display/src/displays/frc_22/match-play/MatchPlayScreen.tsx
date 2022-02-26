@@ -9,8 +9,9 @@ import {
   MatchTimer,
   SocketProvider
 } from "@the-orange-alliance/lib-ems";
-import FACC_LOGO from "../res/facc-med-bg-light.png";
+// import FACC_LOGO from "../res/facc-med-bg-light.png";
 import TOA_LOGO from "../res/toa-generic-lol-black.png";
+import FRC_LOGO from "../res/FRC-Vertical.png";
 
 import MATCH_START from "../res/sounds/match_start.wav";
 import MATCH_AUTO from "../res/sounds/match_auto_end_warning.wav";
@@ -171,7 +172,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
             </div>
             <div id="ir-play-top-right">
               <div className="ir-play-event center-items">{event.eventName}</div>
-              <div className="ir-play-logo center-right-items"><img alt={'facc logo'} src={FACC_LOGO}className="fit-h"/></div>
+              <div className="ir-play-logo center-right-items"><img alt={'facc logo'} src={FRC_LOGO}className="fit-h"/></div>
             </div>
           </div>
           <div id="ir-play-bot" className="center-items">
@@ -218,7 +219,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
       return (
         <div key={p.matchParticipantKey} className="ir-play-team">
           {!p.team && <span>{p.teamKey}</span>}
-          {p.team && <span>{p.team.robotName}</span>}
+          {p.team && <span>{p.team.teamKey}</span>}
           <span className={"ir-card-status " + cardStyle}/>
         </div>
       );
@@ -242,7 +243,7 @@ class MatchPlayScreen extends React.Component<IProps, IState> {
         <div key={p.matchParticipantKey} className="ir-play-team">
           <span className={"ir-card-status " + cardStyle}/>
           {!p.team && <span>{p.teamKey}</span>}
-          {p.team && <span>{p.team.robotName}</span>}
+          {p.team && <span>{p.team.teamKey}</span>}
         </div>
       );
     });

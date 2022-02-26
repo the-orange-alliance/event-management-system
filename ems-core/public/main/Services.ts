@@ -41,6 +41,7 @@ ipcMain.on("list-ecosystem", (event: IpcMainEvent) => {
 });
 
 ipcMain.on("start-ecosystem", (event: IpcMainEvent, host: string) => {
+  logger.info('Request to start ecosystem received with host "' + host + '". Current in ' + process.env.NODE_ENV + ' mode.')
   localIPv4().then((localHost: string) => {
     if (localHost === "Default") {
       localHost = "0.0.0.0";

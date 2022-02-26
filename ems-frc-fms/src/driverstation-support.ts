@@ -71,6 +71,7 @@ export class DriverstationSupport {
     }
 
     // Parse a UDP packet from the Driver Station
+    // see https://frcture.readthedocs.io/en/latest/driverstation/ds_to_fms.html#status
     private parseUDPPacket(data: Buffer, remote: any) {
         const teamNum = (data[4]<<8) + data[5];
         if(teamNum) { // if team id is defined

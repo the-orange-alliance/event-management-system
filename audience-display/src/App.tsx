@@ -103,6 +103,7 @@ class App extends React.Component<IProps, IState> {
     });
 
     this.renderAudienceDisplay = this.renderAudienceDisplay.bind(this);
+    this.renderPitDisplay = this.renderPitDisplay.bind(this);
   }
 
   /**
@@ -115,37 +116,52 @@ class App extends React.Component<IProps, IState> {
   }
 
   public render() {
-    return <Route path="/" render={this.renderAudienceDisplay}/>
+    return (
+      <>
+        <Route path="/" exact={true} render={this.renderAudienceDisplay}/>
+        <Route path="/pit" exact={true} render={this.renderPitDisplay}/>
+      </>
+    )
   }
 
   private renderAudienceDisplay(props: RouteComponentProps<any>) {
     const {event, teams, loading, videoID, activeMatch} = this.state;
-    let display: JSX.Element;
-    switch (event.eventType) {
-      case "fgc_2018":
-        display = <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        break;
-      case "fgc_2019":
-        display = <OceanOpportunities displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        break;
-      case "ftc_1819":
-        display = <RoverRuckus displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        break;
-      case "frc_20":
-        display = <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        break;
-      case "frc_22":
-        display = <RapidReact displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        break;
-      default:
-        // display = <RapidReact displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
-        display = <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
-    }
+    const display: JSX.Element = this.getYearDisplays(event, teams, activeMatch, videoID, props);
 
     if (!loading) {
       return (display);
     } else {
       return (<span/>);
+    }
+  }
+
+  private renderPitDisplay(props: RouteComponentProps<any>) {
+    const {event, teams, loading, activeMatch} = this.state;
+    // Pit display is always videoID 6
+    const display: JSX.Element = this.getYearDisplays(event, teams, activeMatch, 6, props);
+
+    if (!loading) {
+      return (display);
+    } else {
+      return (<span/>);
+    }
+  }
+
+  private getYearDisplays(event: Event, teams: Team[], activeMatch: Match, videoID: number, props: RouteComponentProps<any>) {
+    switch (event.eventType) {
+      case "fgc_2018":
+        return <EnergyImpact event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+      case "fgc_2019":
+        return <OceanOpportunities displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+      case "ftc_1819":
+        return <RoverRuckus displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+      case "frc_20":
+        return <InfiniteRecharge displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+      case "frc_22":
+        return <RapidReact displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+      default:
+        // display = <RapidReact displayMode={props.location.pathname} event={event} teams={teams} match={activeMatch} videoID={videoID}/>;
+        return <div id="app-error">NO EVENT HAS BEEN CREATED</div>;
     }
   }
 

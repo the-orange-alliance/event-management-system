@@ -14,6 +14,14 @@ interface IProps {
 
 class MatchResultsScreen extends React.Component<IProps> {
 
+  private boolCheck(v: any): boolean {
+    switch (typeof v) {
+      case "boolean": return v;
+      case "string": return v.toLowerCase() === 'true';
+      default: return v;
+    }
+  }
+
   public render() {
     const {event, match} = this.props;
     const details: RapidReactMatchDetails = (match.matchDetails as RapidReactMatchDetails) || new RapidReactMatchDetails();
@@ -25,7 +33,8 @@ class MatchResultsScreen extends React.Component<IProps> {
     const redPen = details.getRedPenalty(match.blueMinPen ? match.blueMinPen : 0, match.blueMajPen ? match.blueMajPen : 0);
 
     const redAutoCargo: number = (details.redAutoCargoLow * 2) + (details.redAutoCargoHigh * 4)
-    const redTaxi: number = (details.redAutoTaxiRobot1 ? 2 : 0) + (details.redAutoTaxiRobot2 ? 2 : 0) + (details.redAutoTaxiRobot3 ? 2 : 0);
+
+    const redTaxi: number = (this.boolCheck(details.redAutoTaxiRobot1) ? 2 : 0) + (this.boolCheck(details.redAutoTaxiRobot2) ? 2 : 0) + (this.boolCheck(details.redAutoTaxiRobot3) ? 2 : 0);
 
     const redTeleCargo: number = details.redTeleCargoLow + (details.redTeleCargoHigh * 2)
 
@@ -37,7 +46,7 @@ class MatchResultsScreen extends React.Component<IProps> {
     const bluePen = details.getBluePenalty(match.redMinPen ? match.redMinPen : 0, match.redMajPen ? match.redMajPen : 0);
 
     const blueAutoCargo: number = (details.blueAutoCargoLow * 2) + (details.blueAutoCargoHigh * 4)
-    const blueTaxi: number = (details.blueAutoTaxiRobot1 ? 2 : 0) + (details.blueAutoTaxiRobot2 ? 2 : 0) + (details.blueAutoTaxiRobot3 ? 2 : 0);
+    const blueTaxi: number = (this.boolCheck(details.blueAutoTaxiRobot1) ? 2 : 0) + (this.boolCheck(details.blueAutoTaxiRobot2) ? 2 : 0) + (this.boolCheck(details.blueAutoTaxiRobot3) ? 2 : 0);
 
     const blueTeleCargo: number = details.blueTeleCargoLow + (details.blueTeleCargoHigh * 2)
 
@@ -47,10 +56,10 @@ class MatchResultsScreen extends React.Component<IProps> {
     const redWin: boolean = match.redScore > match.blueScore;
     const tie: boolean = match.redScore === match.blueScore;
 
-    const redCargoRp = details.redCargoBonus ? 1 : 0;
-    const redHangarRp = details.redHangarBonus ? 1 : 0;
-    const blueCargoRp = details.blueCargoBonus ? 1 : 0;
-    const blueHangarRp = details.blueHangarBonus ? 1 : 0;
+    const redCargoRp = this.boolCheck(details.redCargoBonus) ? 1 : 0;
+    const redHangarRp = this.boolCheck(details.redHangarBonus) ? 1 : 0;
+    const blueCargoRp = this.boolCheck(details.blueCargoBonus) ? 1 : 0;
+    const blueHangarRp = this.boolCheck(details.blueHangarBonus) ? 1 : 0;
     const redRP: number = redCargoRp + redHangarRp + (tie ? 1 : redWin ? 2 : 0);
     const blueRP: number = blueCargoRp + blueHangarRp + (tie ? 1 : !redWin ? 2 : 0);
 
@@ -192,7 +201,7 @@ class MatchResultsScreen extends React.Component<IProps> {
       return (
         <div key={team.teamKey} className="ir-result-team-container red-border">
           <div className="ir-result-team center-items">{team.teamKey}</div>
-          <div className="ir-result-name center-left-items">{team.teamNameLong}</div>
+          <div className="ir-result-name center-left-items">{team.teamNameShort}</div>
           <div className="ir-result-rank center-items">#{rank.rank}</div>
         </div>
       );
@@ -210,7 +219,7 @@ class MatchResultsScreen extends React.Component<IProps> {
       return (
         <div key={team.teamKey} className="ir-result-team-container blue-border">
           <span className="ir-result-team center-items">{team.teamKey}</span>
-          <span className="ir-result-name center-left-items">{team.teamNameLong}</span>
+          <span className="ir-result-name center-left-items">{team.teamNameShort}</span>
           <span className="ir-result-rank center-items">#{rank.rank}</span>
         </div>
       );
